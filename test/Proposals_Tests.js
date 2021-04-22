@@ -5,6 +5,8 @@ var Proposals = artifacts.require("./Proposals.sol");
 var Credentials = artifacts.require("./Credentials.sol");
 var CredentialsAbi = Credentials.abi;
 const ProviderDoesNotExist = new RegExp(/(Provider does not exist)/g);
+const addressesLength = 42;
+const PriceWei = 10;
 
 contract("Testing Proposals",function(accounts){
     var proposals;
@@ -15,8 +17,6 @@ contract("Testing Proposals",function(accounts){
     // providers info
     const provider_1_Info = "Account 1 Info";
     // test constants
-    const addressesLength = 42;
-    const PriceWei = 10;
     const NotEnoughFunds = new RegExp(/(Not enough funds)/g);
     const NotAllowedToApproveProposals = new RegExp(/(Not allowed to approve proposals)/g);
     const Gas = 600000;
@@ -93,5 +93,30 @@ contract("Testing Proposals",function(accounts){
         var info = await credentials.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
         expect(info).to.be.equal(provider_1_Info);
     });
+    
+});
+
+
+contract("Testing Credentials", function(accounts){
+    var proposals;
+    // used addresses
+    const chairPerson = accounts[0];
+    const provider_1 = accounts[1];  
+    const user_1 = accounts[2];
+    // providers info
+    const provider_1_Info = "Account 1 Info";
+    // test constants
+    const addressesLength = 42;
+    const Gas = 600000;
+
+    beforeEach(async function(){
+        proposals = await Proposals.new({from: chairPerson});
+    });
+
+    it("Retrieve Chair Person",async function(){
+       
+    });
+
+    
     
 });

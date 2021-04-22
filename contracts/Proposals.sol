@@ -6,12 +6,25 @@ pragma solidity >=0.7.0 <0.9.0;
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
+ /* 
+ Providers lifecycle
+    Provider Creation : Only creator (proposal contract)
+    Provider Update : Any Owner or Provider himself
+    Provider Remove : Any Owner or Provider himself
+
+ Credentials lifecycle
+    Credential Creation : Only providers
+    Credential Update : Only Provider
+    Credential Remove : Only Provider or Holder himself    
+ */
+
 contract Credentials {
     
     event _credentialIdEvent(uint256);
     
     struct _credentialToken{
         address _provider;
+        address _holder;
         string _credential;
     }
     
@@ -20,15 +33,19 @@ contract Credentials {
         string _providerInfo;
     }
 
-    _credentialToken[] public _credentials;
+    // Contract Creator
+    address _creator;
+    // list and number of providers
     mapping(address => _providerIdentity) public _providers;
     uint256 _numberOfProviders;
+    // list and number of owners
     mapping(address => bool) public _owners;
     uint256 _numberOfOwners;
+    // list of credentials
+    _credentialToken[] public _credentials;
 
-
-    
     constructor(address[] memory owners) payable{
+        _creator = msg.sender;
         _owners[msg.sender] = true;
         _numberOfOwners = 1;
         for (uint i=0; i<owners.length; i++) {
@@ -42,8 +59,8 @@ contract Credentials {
     }
     
     function addProvider(address provider, string memory providerInfo) public {
-       require(true == _owners[msg.sender], "Not allowed to add providers");
-       require (false == _providers[provider]._activated, "Provider already activated") ;
+       require(msg.sender == _creator, "Not allowed to add providers");
+       require(false == _providers[provider]._activated, "Provider already activated") ;
        _providers[provider]._providerInfo = providerInfo;
        _providers[provider]._activated = true;
        _numberOfProviders += 1;
@@ -58,22 +75,28 @@ contract Credentials {
     
     function updateProvider(address provider, string memory providerInfo) public {
        require(true == _owners[msg.sender] || msg.sender == provider, "Not allowed to update providers");
-       require (true == _providers[provider]._activated, "Provider not activated") ;
+       require(true == _providers[provider]._activated, "Provider not activated") ;
        _providers[provider]._providerInfo = providerInfo;
     }
     
-    function addCredential(string memory credential) public {
+    function addCredential(string memory credential, address holder) public {
        require(true == _providers[msg.sender]._activated, "Not allowed to add credentials");
-       _credentials.push(_credentialToken(msg.sender, credential));
+       _credentials.push(_credentialToken(msg.sender, holder, credential));
        emit _credentialIdEvent(_credentials.length - 1);
     }
     
     function removeCredential(uint256 credentialTokenId) public {
-       require(msg.sender == _credentials[credentialTokenId]._provider, "Not allowed to remove this particular credential");
+       require(msg.sender == _credentials[credentialTokenId]._provider || msg.sender == _credentials[credentialTokenId]._holder, "Not allowed to remove this particular credential");
        require(credentialTokenId < _credentials.length, "Credential does not exist");
        delete _credentials[credentialTokenId];
     }
     
+    function updateCredential(uint256 credentialTokenId, string memory credential) public {
+       require(msg.sender == _credentials[credentialTokenId]._provider, "Not allowed to update this particular credential");
+       require(credentialTokenId < _credentials.length, "Credential does not exist");
+       _credentials[credentialTokenId]._credential = credential;
+    }
+
     function addOwner(address owner) public {
        require(true == _owners[msg.sender], "Not allowed to add owners");
        require(false == _owners[owner], "Owner already activated");
@@ -89,8 +112,8 @@ contract Credentials {
     }
 
 
-    function retrieveCredential(uint256 credentialTokenId) public view returns (address, string memory){
-        return (_credentials[credentialTokenId]._provider, _credentials[credentialTokenId]._credential);
+    function retrieveCredential(uint256 credentialTokenId) public view returns (address, string memory, address){
+        return (_credentials[credentialTokenId]._provider, _credentials[credentialTokenId]._credential, _credentials[credentialTokenId]._holder);
     }
     
     function retrieveProvider(address provider) public view returns (string memory){
