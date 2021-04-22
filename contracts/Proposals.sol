@@ -145,6 +145,9 @@ contract Proposals{
         _credentialsContract.addProvider(provider, _proposals[provider]._providerInfo);
     }
     
+    function retrieveProposal(address provider) public view returns (bool, string memory) {
+        return (_proposals[provider]._activated, _proposals[provider]._providerInfo);
+    }
     
     function retrieveCredentialsContractAddress() public view returns (Credentials) {
         return _credentialsContract;
