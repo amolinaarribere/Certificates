@@ -146,11 +146,11 @@ contract Proposals{
     }
     
     
-    function retreiveCredentialsContractAddress() public view returns (Credentials) {
+    function retrieveCredentialsContractAddress() public view returns (Credentials) {
         return _credentialsContract;
     }
     
-    function retreiveChairPerson() public view returns (address) {
+    function retrieveChairPerson() public view returns (address) {
         return _chairperson;
     }
     
