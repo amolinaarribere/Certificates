@@ -1,10 +1,15 @@
 // Chai library for testing
 
 var Proposals = artifacts.require("./Proposals.sol");
+//var CredentialsAbiStr = artifacts.require("./Credentials.json");
+var fs = require("fs");
+var CredentialsAbiStr = fs.readFileSync("C:/Users/d-aam/Truffle/build/contracts/Credentials.json", "utf8");
+var CredentialsAbi = JSON.parse(CredentialsAbiStr).abi;
 
-contract("Test-Group-1",function(accounts){
+contract("Testing Proposals",function(accounts){
     var proposals;
     var credentialsAddress;
+    var credentials;
     // used addresses
     const chairPerson = accounts[0];
     const provider_1 = accounts[1];  
@@ -21,6 +26,9 @@ contract("Test-Group-1",function(accounts){
 
     beforeEach(async function(){
         proposals = await Proposals.new({from: chairPerson});
+        credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
+        //console.log(CredentialsAbi.abi);
+        credentials = new web3.eth.Contract(CredentialsAbi, credentialsAddress);
     });
 
     it("Retrieve Chair Person",async function(){
@@ -28,14 +36,6 @@ contract("Test-Group-1",function(accounts){
         let _chairPerson = await proposals.retrieveChairPerson({from: user_1});
         // assert
         expect(_chairPerson).to.equal(chairPerson);
-    });
-
-    it("Retrieve Credential Contract Address",async function(){
-        // act
-        credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
-        // assert
-        expect(credentialsAddress).to.be.a("string");
-        expect(credentialsAddress).to.have.lengthOf(addressesLength);
     });
 
     it("Send Proposal Underfunded",async function(){
@@ -71,8 +71,11 @@ contract("Test-Group-1",function(accounts){
     });
 
     it("Approve Proposal CORRECT Chair Person",async function(){
+        
         await proposals.sendProposal(provider_1, provider_1_Info, {from: user_1, gas: Gas, value: PriceWei});
         await proposals.approveProposal(provider_1, {from: chairPerson, gas: Gas});
+        var info = await credentials.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+        expect(info).to.be.equal(provider_1_Info);
     });
     
 });
