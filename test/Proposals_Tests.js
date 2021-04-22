@@ -1,22 +1,19 @@
 // Chai library for testing
+// ERROR tests = First we test the error message then we test the action was not carried out
 
 var Proposals = artifacts.require("./Proposals.sol");
-//var CredentialsAbiStr = artifacts.require("./Credentials.json");
-var fs = require("fs");
-var CredentialsAbiStr = fs.readFileSync("C:/Users/d-aam/Truffle/build/contracts/Credentials.json", "utf8");
-var CredentialsAbi = JSON.parse(CredentialsAbiStr).abi;
+var Credentials = artifacts.require("./Credentials.sol");
+var CredentialsAbi = Credentials.abi;
+const ProviderDoesNotExist = new RegExp(/(Provider does not exist)/g);
 
 contract("Testing Proposals",function(accounts){
     var proposals;
-    var credentialsAddress;
-    var credentials;
     // used addresses
     const chairPerson = accounts[0];
     const provider_1 = accounts[1];  
-    const user_1 = accounts[3];
+    const user_1 = accounts[2];
     // providers info
     const provider_1_Info = "Account 1 Info";
-    const provider_2_Info = "Account 2 Info";
     // test constants
     const addressesLength = 42;
     const PriceWei = 10;
@@ -26,9 +23,6 @@ contract("Testing Proposals",function(accounts){
 
     beforeEach(async function(){
         proposals = await Proposals.new({from: chairPerson});
-        credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
-        //console.log(CredentialsAbi.abi);
-        credentials = new web3.eth.Contract(CredentialsAbi, credentialsAddress);
     });
 
     it("Retrieve Chair Person",async function(){
@@ -36,6 +30,14 @@ contract("Testing Proposals",function(accounts){
         let _chairPerson = await proposals.retrieveChairPerson({from: user_1});
         // assert
         expect(_chairPerson).to.equal(chairPerson);
+    });
+
+    it("Retrieve Credentials Contract Address",async function(){
+        // act
+        let _credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
+        // assert
+        expect(_credentialsAddress).to.be.a("string");
+        expect(_credentialsAddress).to.have.lengthOf(addressesLength);
     });
 
     it("Send Proposal Underfunded",async function(){
@@ -46,6 +48,9 @@ contract("Testing Proposals",function(accounts){
         }
         catch(error){
             expect(error.message).to.match(NotEnoughFunds);
+            let sentProposal = await proposals.retrieveProposal(provider_1, {from: user_1});
+            const {0: activated, 1: info} = sentProposal;
+            expect(activated).to.be.false;
         }
     });
 
@@ -67,6 +72,15 @@ contract("Testing Proposals",function(accounts){
         }
         catch(error){
             expect(error.message).to.match(NotAllowedToApproveProposals);
+            try{
+                var credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
+                var credentials = new web3.eth.Contract(CredentialsAbi, credentialsAddress);
+                var info = await credentials.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+                expect.fail();
+            }
+            catch(error){
+                expect(error.message).to.match(ProviderDoesNotExist);
+            } 
         }
     });
 
@@ -74,6 +88,8 @@ contract("Testing Proposals",function(accounts){
         
         await proposals.sendProposal(provider_1, provider_1_Info, {from: user_1, gas: Gas, value: PriceWei});
         await proposals.approveProposal(provider_1, {from: chairPerson, gas: Gas});
+        var credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
+        var credentials = new web3.eth.Contract(CredentialsAbi, credentialsAddress);
         var info = await credentials.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
         expect(info).to.be.equal(provider_1_Info);
     });
