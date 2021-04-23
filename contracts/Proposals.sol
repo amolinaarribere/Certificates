@@ -7,15 +7,27 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
  /* 
+ Actors : Creator, Owners, Providers, Holders
+ Token : Credentials
+
+ 1- Creator (an owner himslef) add Providers and manage Owners (both as creator and owner).
+ 2- Owners manage other owners and Providers
+ 3- Providers manage themselves and their own Credentials
+ 4- Holders can remove their own Credentials
+
  Providers lifecycle
     Provider Creation : Only creator (proposal contract)
     Provider Update : Any Owner or Provider himself
     Provider Remove : Any Owner or Provider himself
 
  Credentials lifecycle
-    Credential Creation : Only providers
-    Credential Update : Only Provider
-    Credential Remove : Only Provider or Holder himself    
+    Credential Creation : Any Provider
+    Credential Update : Only Provider that created credential
+    Credential Remove : Only Provider that created credential or Holder himself    
+
+ Owners lifecycle
+    Owner Creation : Any Owner or Creator
+    Owner Remove : Any Owner or Creator
  */
 
 contract Credentials {
@@ -58,6 +70,8 @@ contract Credentials {
         _numberOfProviders = 0;
     }
     
+    // PROVIDERS CRUD Operations
+
     function addProvider(address provider, string memory providerInfo) public {
        require(msg.sender == _creator, "Not allowed to add providers");
        require(false == _providers[provider]._activated, "Provider already activated") ;
@@ -79,6 +93,17 @@ contract Credentials {
        _providers[provider]._providerInfo = providerInfo;
     }
     
+    function retrieveProvider(address provider) public view returns (string memory){
+        require(true == _providers[provider]._activated, "Provider does not exist");
+        return _providers[provider]._providerInfo;
+    }
+    
+    function retrieveTotalProviders() public view returns (uint){
+        return (_numberOfProviders);
+    }
+    
+    // CREDENTIALS CRUD Operations
+
     function addCredential(string memory credential, address holder) public {
        require(true == _providers[msg.sender]._activated, "Not allowed to add credentials");
        _credentials.push(_credentialToken(msg.sender, holder, credential));
@@ -97,43 +122,56 @@ contract Credentials {
        _credentials[credentialTokenId]._credential = credential;
     }
 
+    function retrieveCredential(uint256 credentialTokenId) public view returns (address, string memory, address){
+        require(credentialTokenId < _credentials.length, "Credential does not exist");
+        return (_credentials[credentialTokenId]._provider, _credentials[credentialTokenId]._credential, _credentials[credentialTokenId]._holder);
+    }
+    
+    function retrieveTotalCredential() public view returns (uint){
+        return (_credentials.length);
+    }
+
+    // OWNERS CRD Operations
+
     function addOwner(address owner) public {
-       require(true == _owners[msg.sender], "Not allowed to add owners");
+       require(true == _owners[msg.sender] || msg.sender == _creator, "Not allowed to add owners");
        require(false == _owners[owner], "Owner already activated");
        _owners[owner] = true;
        _numberOfOwners += 1;
     }
     
     function removeOwner(address owner) public {
-       require(true == _owners[msg.sender], "Not allowed to remove owners");
+       require(true == _owners[msg.sender]  || msg.sender == _creator, "Not allowed to remove owners");
        require(true == _owners[owner], "Owner already de-activated");
        _owners[owner] = false;
         _numberOfOwners -= 1;
     }
 
-
-    function retrieveCredential(uint256 credentialTokenId) public view returns (address, string memory, address){
-        return (_credentials[credentialTokenId]._provider, _credentials[credentialTokenId]._credential, _credentials[credentialTokenId]._holder);
+    function isOwner(address owner) public view returns (bool){
+        return(_owners[owner]);
     }
-    
-    function retrieveProvider(address provider) public view returns (string memory){
-        require(true == _providers[provider]._activated, "Provider does not exist");
-        return _providers[provider]._providerInfo;
-    }
-    
-    function retrieveTotalProviders() public view returns (uint){
-        return (_numberOfProviders);
-    }
-    
-    function retrieveTotalCredential() public view returns (uint){
-        return (_credentials.length);
-    }
-    
+ 
     function retrieveTotalOwners() public view returns (uint){
         return (_numberOfOwners);
     }
 
 }
+
+ /* 
+ Actors : Chair Person, Anyone
+ Token : Proposals
+
+ 1- Anyone can submit proposals (paying a fee)
+ 2- Chair Person can approve proposals creating Providers in Credentials Contract
+
+
+ Proposals lifecycle
+    Proposals Creation : Anyone (paying fee)
+    Proposals Update : 
+    Proposals Remove :   
+    Proposals Validations : Only Chair Person  
+
+ */
 
 contract Proposals{
     Credentials  _credentialsContract;
@@ -155,6 +193,8 @@ contract Proposals{
         _credentialsContract = new Credentials(listOfOwners);
     }
     
+    // PROPOSALS CRUD Operations
+
     function sendProposal(address provider, string memory providerInfo) public payable {
        require(msg.value >= _PriceWei, "Not enough funds");
        _chairperson.transfer(msg.value);
@@ -169,9 +209,12 @@ contract Proposals{
     }
     
     function retrieveProposal(address provider) public view returns (bool, string memory) {
+        require(true == _proposals[provider]._activated, "This proposal does not exist");
         return (_proposals[provider]._activated, _proposals[provider]._providerInfo);
     }
     
+    // Contract basic information
+
     function retrieveCredentialsContractAddress() public view returns (Credentials) {
         return _credentialsContract;
     }
