@@ -20,6 +20,10 @@ contract("Testing Proposals",function(accounts){
     const NotEnoughFunds = new RegExp(/(Not enough funds)/g);
     const NotAllowedToApproveProposals = new RegExp(/(Not allowed to approve proposals)/g);
     const Gas = 600000;
+    const State_NOT_SUBMITTED = 0;
+    const State_PENDING = 1;
+    const State_APPROVED = 2;
+    const State_REJECTED = 3;
 
     beforeEach(async function(){
         proposals = await Proposals.new({from: chairPerson});
@@ -48,9 +52,6 @@ contract("Testing Proposals",function(accounts){
         }
         catch(error){
             expect(error.message).to.match(NotEnoughFunds);
-            let sentProposal = await proposals.retrieveProposal(provider_1, {from: user_1});
-            const {0: activated, 1: info} = sentProposal;
-            expect(activated).to.be.false;
         }
     });
 
@@ -58,9 +59,9 @@ contract("Testing Proposals",function(accounts){
         // act
         await proposals.sendProposal(provider_1, provider_1_Info, {from: user_1, gas: Gas, value: PriceWei});
         let sentProposal = await proposals.retrieveProposal(provider_1, {from: user_1});
-        const {0: activated, 1: info} = sentProposal;
+        const {0: state, 1: info} = sentProposal;
         // assert
-        expect(activated).to.be.true;
+        expect(state.toNumber()).to.equal(State_PENDING);
         expect(info).to.be.equal(provider_1_Info);
     });
 

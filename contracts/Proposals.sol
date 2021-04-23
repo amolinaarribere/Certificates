@@ -174,12 +174,14 @@ contract Credentials {
  */
 
 contract Proposals{
+    enum proposalState { NOT_SUBMITTED, PENDING, APPROVED, REJECTED }
+    uint constant _PriceWei = 10;
+
     Credentials  _credentialsContract;
     
-    uint constant _PriceWei = 10;
-    
     struct _proposal{
-        bool _activated;
+        //bool _submitted;
+        proposalState _state;
         string _providerInfo;
     } 
     
@@ -198,19 +200,20 @@ contract Proposals{
     function sendProposal(address provider, string memory providerInfo) public payable {
        require(msg.value >= _PriceWei, "Not enough funds");
        _chairperson.transfer(msg.value);
-       _proposals[provider]._activated = true;
+       //_proposals[provider]._submitted = true;
+       _proposals[provider]._state = proposalState.PENDING;
        _proposals[provider]._providerInfo = providerInfo;
     }
     
     function approveProposal(address provider) public{
         require(msg.sender == _chairperson, "Not allowed to approve proposals");
-        require(true == _proposals[provider]._activated, "This proposal does not exist");
+        require(proposalState.NOT_SUBMITTED != _proposals[provider]._state, "This proposal does not exist");
         _credentialsContract.addProvider(provider, _proposals[provider]._providerInfo);
     }
     
-    function retrieveProposal(address provider) public view returns (bool, string memory) {
-        require(true == _proposals[provider]._activated, "This proposal does not exist");
-        return (_proposals[provider]._activated, _proposals[provider]._providerInfo);
+    function retrieveProposal(address provider) public view returns (uint, string memory) {
+        require(proposalState.NOT_SUBMITTED != _proposals[provider]._state, "This proposal does not exist");
+        return (uint(_proposals[provider]._state), _proposals[provider]._providerInfo);
     }
     
     // Contract basic information
