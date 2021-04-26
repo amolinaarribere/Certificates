@@ -155,6 +155,10 @@ contract Credentials {
         return (_numberOfOwners);
     }
 
+     function retrieveCreator() public view returns (address){
+        return (_creator);
+    }
+
 }
 
  /* 

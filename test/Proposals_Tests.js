@@ -100,6 +100,8 @@ contract("Testing Proposals",function(accounts){
 
 contract("Testing Credentials", function(accounts){
     var proposals;
+    var credentials;
+    var creator;
     // used addresses
     const chairPerson = accounts[0];
     const provider_1 = accounts[1];  
@@ -112,10 +114,16 @@ contract("Testing Credentials", function(accounts){
 
     beforeEach(async function(){
         proposals = await Proposals.new({from: chairPerson});
+        var credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
+        credentials = new web3.eth.Contract(CredentialsAbi, credentialsAddress);
     });
 
-    it("Retrieve Chair Person",async function(){
-       
+    it("Retrieve Creator",async function(){
+       // act
+       creator = await credentials.methods.retrieveCreator().call({from: user_1}, function(error, result){});
+       console.log(" " + creator);
+       // assert
+       expect(creator).to.equal(proposals);
     });
 
     
