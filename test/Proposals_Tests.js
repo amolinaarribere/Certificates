@@ -2,8 +2,8 @@
 // ERROR tests = First we test the error message then we test the action was not carried out
 
 var Proposals = artifacts.require("./Proposals.sol");
-var Credentials = artifacts.require("./Credentials.sol");
-var CredentialsAbi = Credentials.abi;
+var Certificates = artifacts.require("./Certificates.sol");
+var certificatesAbi = Certificates.abi;
 const ProviderDoesNotExist = new RegExp(/(Provider does not exist)/g);
 const addressesLength = 42;
 const PriceWei = 10;
@@ -36,12 +36,12 @@ contract("Testing Proposals",function(accounts){
         expect(_chairPerson).to.equal(chairPerson);
     });
 
-    it("Retrieve Credentials Contract Address",async function(){
+    it("Retrieve certificates Contract Address",async function(){
         // act
-        let _credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
+        let _certificatesAddress = await proposals.retrieveCertificatesContractAddress({from: user_1});
         // assert
-        expect(_credentialsAddress).to.be.a("string");
-        expect(_credentialsAddress).to.have.lengthOf(addressesLength);
+        expect(_certificatesAddress).to.be.a("string");
+        expect(_certificatesAddress).to.have.lengthOf(addressesLength);
     });
 
     it("Send Proposal Underfunded",async function(){
@@ -75,9 +75,9 @@ contract("Testing Proposals",function(accounts){
             expect(error.message).to.match(NotAllowedToApproveProposals);
         }
         try{
-            var credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
-            var credentials = new web3.eth.Contract(CredentialsAbi, credentialsAddress);
-            var info = await credentials.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+            var certificatesAddress = await proposals.retrieveCertificatesContractAddress({from: user_1});
+            var certificates = new web3.eth.Contract(certificatesAbi, certificatesAddress);
+            var info = await certificates.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
@@ -89,18 +89,18 @@ contract("Testing Proposals",function(accounts){
         
         await proposals.sendProposal(provider_1, provider_1_Info, {from: user_1, gas: Gas, value: PriceWei});
         await proposals.approveProposal(provider_1, {from: chairPerson, gas: Gas});
-        var credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
-        var credentials = new web3.eth.Contract(CredentialsAbi, credentialsAddress);
-        var info = await credentials.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+        var certificatesAddress = await proposals.retrieveCertificatesContractAddress({from: user_1});
+        var certificates = new web3.eth.Contract(certificatesAbi, certificatesAddress);
+        var info = await certificates.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
         expect(info).to.be.equal(provider_1_Info);
     });
     
 });
 
 
-contract("Testing Credentials", function(accounts){
+contract("Testing certificates", function(accounts){
     var proposals;
-    var credentials;
+    var certificates;
     // used addresses
     const owner_1 = accounts[0]; // owner and chair person
     const owner_2 = accounts[1];
@@ -118,27 +118,27 @@ contract("Testing Credentials", function(accounts){
 
     beforeEach(async function(){
         proposals = await Proposals.new({from: owner_1});
-        var credentialsAddress = await proposals.retrieveCredentialsContractAddress({from: user_1});
-        credentials = new web3.eth.Contract(CredentialsAbi,credentialsAddress);
+        var certificatesAddress = await proposals.retrieveCertificatesContractAddress({from: user_1});
+        certificates = new web3.eth.Contract(certificatesAbi,certificatesAddress);
     });
 
     it("Retrieve Creator",async function(){
        // act
-       let creator = await credentials.methods.retrieveCreator().call({from: user_1}, function(error, result){});
+       let creator = await certificates.methods.retrieveCreator().call({from: user_1}, function(error, result){});
        // assert
        expect(creator).to.equal(proposals.address);
     });
 
     it("Add Owners WRONG",async function(){
         try{
-            await credentials.methods.addOwner(owner_2).send({from: user_1}, function(error, result){});
+            await certificates.methods.addOwner(owner_2).send({from: user_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
             expect(error.message).to.match(NotAllowedToAddOwners);
         } 
         try{
-            await credentials.methods.addOwner(owner_1).send({from: owner_1}, function(error, result){});
+            await certificates.methods.addOwner(owner_1).send({from: owner_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
@@ -148,11 +148,11 @@ contract("Testing Credentials", function(accounts){
 
     it("Add Owners CORRECT",async function(){
         // act
-        await credentials.methods.addOwner(owner_2).send({from: owner_1}, function(error, result){});
-        const TotalOwners = await credentials.methods.retrieveTotalOwners().call({from: user_1}, function(error, result){});
-        let ISOwner1 = await credentials.methods.isOwner(owner_1).call({from: user_1}, function(error, result){});
-        let ISOwner2 = await credentials.methods.isOwner(owner_2).call({from: user_1}, function(error, result){});
-        let ISCreatorOwner = await credentials.methods.isOwner(proposals.address).call({from: user_1}, function(error, result){});
+        await certificates.methods.addOwner(owner_2).send({from: owner_1}, function(error, result){});
+        const TotalOwners = await certificates.methods.retrieveTotalOwners().call({from: user_1}, function(error, result){});
+        let ISOwner1 = await certificates.methods.isOwner(owner_1).call({from: user_1}, function(error, result){});
+        let ISOwner2 = await certificates.methods.isOwner(owner_2).call({from: user_1}, function(error, result){});
+        let ISCreatorOwner = await certificates.methods.isOwner(proposals.address).call({from: user_1}, function(error, result){});
         // assert
         expect(parseInt(TotalOwners)).to.equal(3);
         expect(ISCreatorOwner).to.be.true;
@@ -162,14 +162,14 @@ contract("Testing Credentials", function(accounts){
 
      it("Remove Owners WRONG",async function(){
         try{
-            await credentials.methods.removeOwner(owner_1).send({from: user_1}, function(error, result){});
+            await certificates.methods.removeOwner(owner_1).send({from: user_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
             expect(error.message).to.match(NotAllowedToRemoveOwners);
         } 
         try{
-            await credentials.methods.removeOwner(owner_2).send({from: owner_1}, function(error, result){});
+            await certificates.methods.removeOwner(owner_2).send({from: owner_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
@@ -179,10 +179,10 @@ contract("Testing Credentials", function(accounts){
 
     it("Remove Owners CORRECT",async function(){
         // act
-        await credentials.methods.removeOwner(owner_1).send({from: owner_1}, function(error, result){});
-        const TotalOwners = await credentials.methods.retrieveTotalOwners().call({from: user_1}, function(error, result){});
-        let ISOwner1 = await credentials.methods.isOwner(owner_1).call({from: user_1}, function(error, result){});
-        let ISCreatorOwner = await credentials.methods.isOwner(proposals.address).call({from: user_1}, function(error, result){});
+        await certificates.methods.removeOwner(owner_1).send({from: owner_1}, function(error, result){});
+        const TotalOwners = await certificates.methods.retrieveTotalOwners().call({from: user_1}, function(error, result){});
+        let ISOwner1 = await certificates.methods.isOwner(owner_1).call({from: user_1}, function(error, result){});
+        let ISCreatorOwner = await certificates.methods.isOwner(proposals.address).call({from: user_1}, function(error, result){});
         // assert
         expect(parseInt(TotalOwners)).to.equal(1);
         expect(ISCreatorOwner).to.be.true;

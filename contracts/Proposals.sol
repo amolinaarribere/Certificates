@@ -8,36 +8,36 @@ pragma solidity >=0.7.0 <0.9.0;
  */
  /* 
  Actors : Creator, Owners, Providers, Holders
- Token : Credentials
+ Token : Certificates
 
  1- Creator (an owner himslef) add Providers and manage Owners (both as creator and owner).
  2- Owners manage other owners and Providers
- 3- Providers manage themselves and their own Credentials
- 4- Holders can remove their own Credentials
+ 3- Providers manage themselves and their own Certificates
+ 4- Holders can remove their own Certificates
 
  Providers lifecycle
     Provider Creation : Only creator (proposal contract)
     Provider Update : Any Owner or Provider himself
     Provider Remove : Any Owner or Provider himself
 
- Credentials lifecycle
-    Credential Creation : Any Provider
-    Credential Update : Only Provider that created credential
-    Credential Remove : Only Provider that created credential or Holder himself    
+ Certificates lifecycle
+    Certificate Creation : Any Provider
+    Certificate Update : Only Provider that created Certificate
+    Certificate Remove : Only Provider that created Certificate or Holder himself    
 
  Owners lifecycle
     Owner Creation : Any Owner or Creator
     Owner Remove : Any Owner or Creator
  */
 
-contract Credentials {
+contract Certificates {
     
-    event _credentialIdEvent(uint256);
+    event _CertificateIdEvent(uint256);
     
-    struct _credentialToken{
+    struct _CertificateToken{
         address _provider;
         address _holder;
-        string _credential;
+        string _Certificate;
     }
     
     struct _providerIdentity{
@@ -53,8 +53,8 @@ contract Credentials {
     // list and number of owners
     mapping(address => bool) public _owners;
     uint256 _numberOfOwners;
-    // list of credentials
-    _credentialToken[] public _credentials;
+    // list of Certificates
+    _CertificateToken[] public _Certificates;
 
     constructor(address[] memory owners) payable{
         _creator = msg.sender;
@@ -102,33 +102,33 @@ contract Credentials {
         return (_numberOfProviders);
     }
     
-    // CREDENTIALS CRUD Operations
+    // CertificateS CRUD Operations
 
-    function addCredential(string memory credential, address holder) public {
-       require(true == _providers[msg.sender]._activated, "Not allowed to add credentials");
-       _credentials.push(_credentialToken(msg.sender, holder, credential));
-       emit _credentialIdEvent(_credentials.length - 1);
+    function addCertificate(string memory Certificate, address holder) public {
+       require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");
+       _Certificates.push(_CertificateToken(msg.sender, holder, Certificate));
+       emit _CertificateIdEvent(_Certificates.length - 1);
     }
     
-    function removeCredential(uint256 credentialTokenId) public {
-       require(msg.sender == _credentials[credentialTokenId]._provider || msg.sender == _credentials[credentialTokenId]._holder, "Not allowed to remove this particular credential");
-       require(credentialTokenId < _credentials.length, "Credential does not exist");
-       delete _credentials[credentialTokenId];
+    function removeCertificate(uint256 CertificateTokenId) public {
+       require(msg.sender == _Certificates[CertificateTokenId]._provider || msg.sender == _Certificates[CertificateTokenId]._holder, "Not allowed to remove this particular Certificate");
+       require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
+       delete _Certificates[CertificateTokenId];
     }
     
-    function updateCredential(uint256 credentialTokenId, string memory credential) public {
-       require(msg.sender == _credentials[credentialTokenId]._provider, "Not allowed to update this particular credential");
-       require(credentialTokenId < _credentials.length, "Credential does not exist");
-       _credentials[credentialTokenId]._credential = credential;
+    function updateCertificate(uint256 CertificateTokenId, string memory Certificate) public {
+       require(msg.sender == _Certificates[CertificateTokenId]._provider, "Not allowed to update this particular Certificate");
+       require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
+       _Certificates[CertificateTokenId]._Certificate = Certificate;
     }
 
-    function retrieveCredential(uint256 credentialTokenId) public view returns (address, string memory, address){
-        require(credentialTokenId < _credentials.length, "Credential does not exist");
-        return (_credentials[credentialTokenId]._provider, _credentials[credentialTokenId]._credential, _credentials[credentialTokenId]._holder);
+    function retrieveCertificate(uint256 CertificateTokenId) public view returns (address, string memory, address){
+        require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
+        return (_Certificates[CertificateTokenId]._provider, _Certificates[CertificateTokenId]._Certificate, _Certificates[CertificateTokenId]._holder);
     }
     
-    function retrieveTotalCredential() public view returns (uint){
-        return (_credentials.length);
+    function retrieveTotalCertificate() public view returns (uint){
+        return (_Certificates.length);
     }
 
     // OWNERS CRD Operations
@@ -166,7 +166,7 @@ contract Credentials {
  Token : Proposals
 
  1- Anyone can submit proposals (paying a fee)
- 2- Chair Person can approve proposals creating Providers in Credentials Contract
+ 2- Chair Person can approve proposals creating Providers in Certificates Contract
 
 
  Proposals lifecycle
@@ -181,7 +181,7 @@ contract Proposals{
     enum proposalState { NOT_SUBMITTED, PENDING, APPROVED, REJECTED }
     uint constant _PriceWei = 10;
 
-    Credentials  _credentialsContract;
+    Certificates  _CertificatesContract;
     
     struct _proposal{
         //bool _submitted;
@@ -196,7 +196,7 @@ contract Proposals{
     constructor() payable{
         _chairperson = payable(msg.sender);
         listOfOwners.push(address(msg.sender));
-        _credentialsContract = new Credentials(listOfOwners);
+        _CertificatesContract = new Certificates(listOfOwners);
     }
     
     // PROPOSALS CRUD Operations
@@ -212,7 +212,7 @@ contract Proposals{
     function approveProposal(address provider) public{
         require(msg.sender == _chairperson, "Not allowed to approve proposals");
         require(proposalState.NOT_SUBMITTED != _proposals[provider]._state, "This proposal does not exist");
-        _credentialsContract.addProvider(provider, _proposals[provider]._providerInfo);
+        _CertificatesContract.addProvider(provider, _proposals[provider]._providerInfo);
     }
     
     function retrieveProposal(address provider) public view returns (uint, string memory) {
@@ -222,8 +222,8 @@ contract Proposals{
     
     // Contract basic information
 
-    function retrieveCredentialsContractAddress() public view returns (Credentials) {
-        return _credentialsContract;
+    function retrieveCertificatesContractAddress() public view returns (Certificates) {
+        return _CertificatesContract;
     }
     
     function retrieveChairPerson() public view returns (address) {
