@@ -12,8 +12,8 @@ pragma solidity >=0.7.0 <0.9.0;
  Token : Certificates
 
  1- Creator (an owner himslef) add Providers and manage Owners (both as creator and owner).
- 2- Owners manage other owners and Providers
- 3- Providers manage themselves and their own Certificates
+ 2- Owners manage any owner and any Provider
+ 3- Providers manage only themselves and their own Certificates
  4- Holders can remove their own Certificates
 
  Providers lifecycle
@@ -38,7 +38,9 @@ contract Certificates {
     struct _CertificateToken{
         address _provider;
         address _holder;
-        string _Certificate;
+        string _CertificateContent;
+        string _CertificateLocation;
+        bytes _CertificateHash;
     }
     
     struct _providerIdentity{
@@ -76,6 +78,7 @@ contract Certificates {
     function addProvider(address provider, string memory providerInfo) public {
        require(msg.sender == _creator, "Not allowed to add providers");
        require(false == _providers[provider]._activated, "Provider already activated") ;
+
        _providers[provider]._providerInfo = providerInfo;
        _providers[provider]._activated = true;
        _numberOfProviders += 1;
@@ -84,6 +87,7 @@ contract Certificates {
     function removeProvider(address provider) public {
        require(true == _owners[msg.sender] || msg.sender == provider, "Not allowed to remove providers");
        require(true == _providers[provider]._activated, "Provider not activated");
+
        _providers[provider]._activated = false;
        _numberOfProviders -= 1;
     }
@@ -91,11 +95,13 @@ contract Certificates {
     function updateProvider(address provider, string memory providerInfo) public {
        require(true == _owners[msg.sender] || msg.sender == provider, "Not allowed to update providers");
        require(true == _providers[provider]._activated, "Provider not activated") ;
+
        _providers[provider]._providerInfo = providerInfo;
     }
     
     function retrieveProvider(address provider) public view returns (string memory){
         require(true == _providers[provider]._activated, "Provider does not exist");
+
         return _providers[provider]._providerInfo;
     }
     
@@ -105,27 +111,38 @@ contract Certificates {
     
     // CertificateS CRUD Operations
 
-    function addCertificate(string memory Certificate, address holder) public {
+    function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) public {
        require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");
-       _Certificates.push(_CertificateToken(msg.sender, holder, Certificate));
+       require(0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length);
+
+       _Certificates.push(_CertificateToken(msg.sender, holder, CertificateContent, CertificateLocation, CertificateHash));
        emit _CertificateIdEvent(_Certificates.length - 1);
     }
     
     function removeCertificate(uint256 CertificateTokenId) public {
        require(msg.sender == _Certificates[CertificateTokenId]._provider || msg.sender == _Certificates[CertificateTokenId]._holder, "Not allowed to remove this particular Certificate");
        require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
+
        delete _Certificates[CertificateTokenId];
     }
     
-    function updateCertificate(uint256 CertificateTokenId, string memory Certificate) public {
+    function updateCertificate(uint256 CertificateTokenId, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) public {
        require(msg.sender == _Certificates[CertificateTokenId]._provider, "Not allowed to update this particular Certificate");
        require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
-       _Certificates[CertificateTokenId]._Certificate = Certificate;
+
+       if(0 < bytes(CertificateContent).length)  _Certificates[CertificateTokenId]._CertificateContent = CertificateContent;
+       if(0 < bytes(CertificateLocation).length)  _Certificates[CertificateTokenId]._CertificateLocation = CertificateLocation;
+       if(0 < bytes(CertificateHash).length)  _Certificates[CertificateTokenId]._CertificateHash = CertificateHash;
     }
 
-    function retrieveCertificate(uint256 CertificateTokenId) public view returns (address, string memory, address){
+    function retrieveCertificate(uint256 CertificateTokenId) public view returns (address, string memory, string memory, bytes memory, address){
         require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
-        return (_Certificates[CertificateTokenId]._provider, _Certificates[CertificateTokenId]._Certificate, _Certificates[CertificateTokenId]._holder);
+
+        return (_Certificates[CertificateTokenId]._provider, 
+            _Certificates[CertificateTokenId]._CertificateContent,
+            _Certificates[CertificateTokenId]._CertificateLocation,
+            _Certificates[CertificateTokenId]._CertificateHash,
+            _Certificates[CertificateTokenId]._holder);
     }
     
     function retrieveTotalCertificate() public view returns (uint){
@@ -137,6 +154,7 @@ contract Certificates {
     function addOwner(address owner) public {
        require(true == _owners[msg.sender] || msg.sender == _creator, "Not allowed to add owners");
        require(false == _owners[owner], "Owner already activated");
+
        _owners[owner] = true;
        _numberOfOwners += 1;
     }
@@ -144,6 +162,7 @@ contract Certificates {
     function removeOwner(address owner) public {
        require(true == _owners[msg.sender]  || msg.sender == _creator, "Not allowed to remove owners");
        require(true == _owners[owner], "Owner already de-activated");
+       
        _owners[owner] = false;
         _numberOfOwners -= 1;
     }
