@@ -109,7 +109,7 @@ contract Certificates {
         return (_numberOfProviders);
     }
     
-    // CertificateS CRUD Operations
+    // Certificats CRUD Operations
 
     function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) public {
        require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");

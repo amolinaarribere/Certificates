@@ -197,8 +197,10 @@ contract("Testing certificates", function(accounts){
     const NotAllowedToAddProviders = new RegExp(/(Not allowed to add providers)/g);
     const ProviderAlreadyActivated = new RegExp(/(Provider already activated)/g);
     const NotAllowedToRemoveProviders = new RegExp(/(Not allowed to remove providers)/g);
-    const ProviderNotActivated = new RegExp(/(Provider not activated)/g);
-    const ProviderDoesNotExist = new RegExp(/(Provider does not exist)/g);
+    const ProviderNotActivated_1 = new RegExp(/(Provider not activated)/g);
+    const ProviderNotActivated_2 = new RegExp(/(Provider not activated)/g);
+    const ProviderDoesNotExist_1 = new RegExp(/(Provider does not exist)/g);
+    const ProviderDoesNotExist_2 = new RegExp(/(Provider does not exist)/g);
     const NotAllowedToUpdateProviders = new RegExp(/(Not allowed to update providers)/g);
     const NotAllowedToAddCertificates = new RegExp(/(Not allowed to add Certificates)/g);
     const CertificateEmpty = new RegExp(/(Certificate is empty)/g);
@@ -225,6 +227,27 @@ contract("Testing certificates", function(accounts){
        let creator = await certificates.methods.retrieveCreator().call({from: user_1}, function(error, result){});
        // assert
        expect(creator).to.equal(proposals.address);
+    });
+
+    it("Retrieve Provider WRONG",async function(){
+        try{
+            let provider_Info = await certificates.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(ProviderDoesNotExist_1);
+        }
+        
+     });
+
+    it("Retrieve Total Provider",async function(){
+        // act
+        let _chairPerson = await proposals.retrieveChairPerson({from: user_1});
+        await proposals.sendProposal(provider_1, provider_1_Info, {from: user_1, gas: Gas, value: PriceWei});
+        await proposals.approveProposal(provider_1, {from: _chairPerson, gas: Gas});
+        let TotalProviders = await certificates.methods.retrieveTotalProviders().call({from: user_1}, function(error, result){});
+        // assert
+        expect(parseInt(TotalProviders)).to.equal(1); 
     });
 
     // ****** TESTING Adding Owners ***************************************************************** //
@@ -323,7 +346,7 @@ contract("Testing certificates", function(accounts){
             expect.fail();
         }
         catch(error){
-            expect(error.message).to.match(ProviderNotActivated);
+            expect(error.message).to.match(ProviderNotActivated_1);
         }
     });
 
@@ -339,8 +362,45 @@ contract("Testing certificates", function(accounts){
             expect.fail();
         }
         catch(error){
-            expect(error.message).to.match(ProviderDoesNotExist);
+            expect(error.message).to.match(ProviderDoesNotExist_2);
         } 
+    });
+
+    // ****** TESTING Updating Providers ***************************************************************** //
+
+    it("Update Providers WRONG",async function(){
+        let _chairPerson = await proposals.retrieveChairPerson({from: user_1});
+        await proposals.sendProposal(provider_1, provider_1_Info, {from: user_1, gas: Gas, value: PriceWei});
+        await proposals.approveProposal(provider_1, {from: _chairPerson, gas: Gas});
+        let provider_1_Info_Updated = "Updated Info 1";
+
+        try{
+            await certificates.methods.updateProvider(provider_1, provider_1_Info_Updated).send({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(NotAllowedToUpdateProviders);
+        }
+
+        try{
+            await certificates.methods.updateProvider(user_1, provider_1_Info_Updated).send({from: owner_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(ProviderNotActivated_2);
+        }
+    });
+
+    it("Update Providers CORRECT",async function(){
+        // act
+        let _chairPerson = await proposals.retrieveChairPerson({from: user_1});
+        await proposals.sendProposal(provider_1, provider_1_Info, {from: user_1, gas: Gas, value: PriceWei});
+        await proposals.approveProposal(provider_1, {from: _chairPerson, gas: Gas});
+        let provider_1_Info_Updated = "Updated Info 1";
+        await certificates.methods.updateProvider(provider_1, provider_1_Info_Updated).send({from: provider_1}, function(error, result){});
+        var infoProvider = await certificates.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+        // assert
+        expect(infoProvider).to.be.equal(provider_1_Info_Updated);
     });
 
     
