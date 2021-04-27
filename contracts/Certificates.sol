@@ -113,7 +113,7 @@ contract Certificates {
 
     function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) public {
        require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");
-       require(0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length);
+       require(0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length, "Certificate is empty");
 
        _Certificates.push(_CertificateToken(msg.sender, holder, CertificateContent, CertificateLocation, CertificateHash));
        emit _CertificateIdEvent(_Certificates.length - 1);
@@ -162,7 +162,7 @@ contract Certificates {
     function removeOwner(address owner) public {
        require(true == _owners[msg.sender]  || msg.sender == _creator, "Not allowed to remove owners");
        require(true == _owners[owner], "Owner already de-activated");
-       
+
        _owners[owner] = false;
         _numberOfOwners -= 1;
     }

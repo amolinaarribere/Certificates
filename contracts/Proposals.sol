@@ -51,20 +51,30 @@ contract Proposals{
 
     function sendProposal(address provider, string memory providerInfo) public payable {
        require(msg.value >= _PriceWei, "Not enough funds");
-       _chairperson.transfer(msg.value);
-       //_proposals[provider]._submitted = true;
+       require(proposalState.NOT_SUBMITTED == _proposals[provider]._state, "Proposal already submitted");
+
        _proposals[provider]._state = proposalState.PENDING;
        _proposals[provider]._providerInfo = providerInfo;
     }
     
     function approveProposal(address provider) public{
         require(msg.sender == _chairperson, "Not allowed to approve proposals");
-        require(proposalState.NOT_SUBMITTED != _proposals[provider]._state, "This proposal does not exist");
-        _CertificatesContract.addProvider(provider, _proposals[provider]._providerInfo);
+        require(proposalState.PENDING == _proposals[provider]._state, "This proposal cannot be modified");
+
+        _proposals[provider]._state = proposalState.APPROVED;
+        _CertificatesContract.addProvider(provider, _proposals[provider]._providerInfo);   
+    }
+
+    function rejectProposal(address provider) public{
+        require(msg.sender == _chairperson, "Not allowed to reject proposals");
+        require(proposalState.PENDING == _proposals[provider]._state, "This proposal cannot be modified");
+
+        _proposals[provider]._state = proposalState.REJECTED;
     }
     
     function retrieveProposal(address provider) public view returns (uint, string memory) {
         require(proposalState.NOT_SUBMITTED != _proposals[provider]._state, "This proposal does not exist");
+
         return (uint(_proposals[provider]._state), _proposals[provider]._providerInfo);
     }
     
