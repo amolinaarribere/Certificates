@@ -4,7 +4,7 @@
 var Proposals = artifacts.require("./Proposals.sol");
 var Certificates = artifacts.require("./Certificates.sol");
 var certificatesAbi = Certificates.abi;
-//const ProviderDoesNotExist = new RegExp(/(Provider does not exist)/g);
+const ProviderDoesNotExist = new RegExp("Provider does not exist");
 const addressesLength = 42;
 const PriceWei = 10;
 
@@ -20,13 +20,13 @@ contract("Testing Proposals",function(accounts){
     // providers info
     const provider_1_Info = "Account 1 Info";
     // test constants
-    const NotEnoughFunds = new RegExp(/(Not enough funds)/g);
-    const ProposalAlreadySubmitted = new RegExp(/(Proposal already submitted)/g);
-    const NotAllowedToApproveProposals = new RegExp(/(Not allowed to approve proposals)/g);
-    const NotAllowedToRejectProposals = new RegExp(/(Not allowed to reject proposals)/g);
-    const ProposalDoesNotExist = new RegExp(/(This proposal does not exist)/g);
-    const ProposalCannotBeModified = new RegExp(/(This proposal cannot be modified)/g);
-    const ProviderDoesNotExist = new RegExp(/(Provider does not exist)/g);
+    const NotEnoughFunds = new RegExp("Not enough funds");
+    const ProposalAlreadySubmitted = new RegExp("Proposal already submitted");
+    const NotAllowedToApproveProposals = new RegExp("Not allowed to approve proposals");
+    const NotAllowedToRejectProposals = new RegExp("Not allowed to reject proposals");
+    const ProposalDoesNotExist = new RegExp("This proposal does not exist");
+    const ProposalCannotBeModified = new RegExp("This proposal cannot be modified");
+    //const ProviderDoesNotExist = new RegExp("Provider does not exist");
     const Gas = 600000;
     const State_NOT_SUBMITTED = 0;
     const State_PENDING = 1;
@@ -194,23 +194,20 @@ contract("Testing certificates", function(accounts){
     // providers info
     const provider_1_Info = "Account 1 Info";
     // test constants
-    const NotAllowedToAddProviders = new RegExp(/(Not allowed to add providers)/g);
-    const ProviderAlreadyActivated = new RegExp(/(Provider already activated)/g);
-    const NotAllowedToRemoveProviders = new RegExp(/(Not allowed to remove providers)/g);
-    const ProviderNotActivated_1 = new RegExp(/(Provider not activated)/g);
-    const ProviderNotActivated_2 = new RegExp(/(Provider not activated)/g);
-    const ProviderDoesNotExist_1 = new RegExp(/(Provider does not exist)/g);
-    const ProviderDoesNotExist_2 = new RegExp(/(Provider does not exist)/g);
-    const NotAllowedToUpdateProviders = new RegExp(/(Not allowed to update providers)/g);
-    const NotAllowedToAddCertificates = new RegExp(/(Not allowed to add Certificates)/g);
-    const CertificateEmpty = new RegExp(/(Certificate is empty)/g);
-    const NotAllowedToRemoveCertificate = new RegExp(/(Not allowed to remove this particular Certificate)/g);
-    const CertificateDoesNotExist = new RegExp(/(Certificate does not exist)/g);
-    const NotAllowedToUpdateCertificate = new RegExp(/(Not allowed to update this particular Certificate)/g);
-    const NotAllowedToAddOwners = new RegExp(/(Not allowed to add owners)/g);
-    const OwnerAlreadyActivated = new RegExp(/(Owner already activated)/g);
-    const NotAllowedToRemoveOwners = new RegExp(/(Not allowed to remove owners)/g);
-    const OwnerAlreadyDeactivated = new RegExp(/(Owner already de-activated)/g);
+    const NotAllowedToAddProviders = new RegExp("Not allowed to add providers");
+    const ProviderAlreadyActivated = new RegExp("Provider already activated");
+    const NotAllowedToRemoveProviders = new RegExp("Not allowed to remove providers");
+    const ProviderNotActivated = new RegExp("Provider not activated");
+    const NotAllowedToUpdateProviders = new RegExp("Not allowed to update providers");
+    const NotAllowedToAddCertificates = new RegExp("Not allowed to add Certificates");
+    const CertificateEmpty = new RegExp("Certificate is empty");
+    const NotAllowedToRemoveCertificate = new RegExp("Not allowed to remove this particular Certificate");
+    const CertificateDoesNotExist = new RegExp("Certificate does not exist");
+    const NotAllowedToUpdateCertificate = new RegExp("Not allowed to update this particular Certificate");
+    const NotAllowedToAddOwners = new RegExp("Not allowed to add owners");
+    const OwnerAlreadyActivated = new RegExp("Owner already activated");
+    const NotAllowedToRemoveOwners = new RegExp("Not allowed to remove owners");
+    const OwnerAlreadyDeactivated = new RegExp("Owner already de-activated");
     const addressesLength = 42;
     const Gas = 600000;
 
@@ -235,7 +232,7 @@ contract("Testing certificates", function(accounts){
             expect.fail();
         }
         catch(error){
-            expect(error.message).to.match(ProviderDoesNotExist_1);
+            expect(error.message).to.match(ProviderDoesNotExist);
         }
         
      });
@@ -254,7 +251,7 @@ contract("Testing certificates", function(accounts){
 
     it("Add Owners WRONG",async function(){
         try{
-            await certificates.methods.addOwner(owner_2).send({from: user_1}, function(error, result){});
+            await certificates.methods.addOwner(owner_2).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         catch(error){
@@ -346,7 +343,7 @@ contract("Testing certificates", function(accounts){
             expect.fail();
         }
         catch(error){
-            expect(error.message).to.match(ProviderNotActivated_1);
+            expect(error.message).to.match(ProviderNotActivated);
         }
     });
 
@@ -362,7 +359,7 @@ contract("Testing certificates", function(accounts){
             expect.fail();
         }
         catch(error){
-            expect(error.message).to.match(ProviderDoesNotExist_2);
+            expect(error.message).to.match(ProviderDoesNotExist);
         } 
     });
 
@@ -387,7 +384,7 @@ contract("Testing certificates", function(accounts){
             expect.fail();
         }
         catch(error){
-            expect(error.message).to.match(ProviderNotActivated_2);
+            expect(error.message).to.match(ProviderNotActivated);
         }
     });
 
