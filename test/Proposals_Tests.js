@@ -257,6 +257,17 @@ contract("Testing certificates", function(accounts){
         expect(parseInt(TotalProviders)).to.equal(1); 
     });
 
+    it("Retrieve Certificate WRONG",async function(){
+        try{
+            var certificate = await certificates.methods.retrieveCertificate(0).call({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(CertificateDoesNotExist);
+        }
+        
+     });
+
     // ****** TESTING Adding Owners ***************************************************************** //
 
     it("Add Owners WRONG",async function(){
