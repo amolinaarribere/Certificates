@@ -33,7 +33,9 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Certificates {
     
-    event _CertificateIdEvent(uint256);
+    event _AddCertificateIdEvent(uint256);
+    event _RemoveCertificateIdEvent(uint256);
+    event _UpdateCertificateIdEvent(uint256);
     
     struct _CertificateToken{
         address _provider;
@@ -116,23 +118,25 @@ contract Certificates {
        require(0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length, "Certificate is empty");
 
        _Certificates.push(_CertificateToken(msg.sender, holder, CertificateContent, CertificateLocation, CertificateHash));
-       emit _CertificateIdEvent(_Certificates.length - 1);
+       emit _AddCertificateIdEvent(_Certificates.length - 1);
     }
     
     function removeCertificate(uint256 CertificateTokenId) public {
-       require(msg.sender == _Certificates[CertificateTokenId]._provider || msg.sender == _Certificates[CertificateTokenId]._holder, "Not allowed to remove this particular Certificate");
        require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
+       require(msg.sender == _Certificates[CertificateTokenId]._provider || msg.sender == _Certificates[CertificateTokenId]._holder, "Not allowed to remove this particular Certificate");
 
        delete _Certificates[CertificateTokenId];
+       emit _RemoveCertificateIdEvent(CertificateTokenId);
     }
     
     function updateCertificate(uint256 CertificateTokenId, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) public {
-       require(msg.sender == _Certificates[CertificateTokenId]._provider, "Not allowed to update this particular Certificate");
        require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
+       require(msg.sender == _Certificates[CertificateTokenId]._provider, "Not allowed to update this particular Certificate");
 
        if(0 < bytes(CertificateContent).length)  _Certificates[CertificateTokenId]._CertificateContent = CertificateContent;
        if(0 < bytes(CertificateLocation).length)  _Certificates[CertificateTokenId]._CertificateLocation = CertificateLocation;
        if(0 < bytes(CertificateHash).length)  _Certificates[CertificateTokenId]._CertificateHash = CertificateHash;
+       emit _UpdateCertificateIdEvent(CertificateTokenId);
     }
 
     function retrieveCertificate(uint256 CertificateTokenId) public view returns (address, string memory, string memory, bytes memory, address){

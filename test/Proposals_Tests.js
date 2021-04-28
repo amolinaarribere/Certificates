@@ -449,6 +449,44 @@ contract("Testing certificates", function(accounts){
         expect(holderAddress).to.be.equal(holder_1);
     });
 
+    // ****** TESTING Removing Certificates ***************************************************************** //
+
+    it("Remove Certificates WRONG",async function(){
+        await AddingProvider(provider_1, provider_1_Info, user_1);
+        await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+        
+        try{
+            await certificates.methods.removeCertificate(0).send({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(NotAllowedToRemoveCertificate);
+        }
+
+        try{
+            await certificates.methods.removeCertificate(1).send({from: holder_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(CertificateDoesNotExist);
+        }  
+    });
+
+    it("Remove Certificates CORRECT",async function(){
+        // act
+        await AddingProvider(provider_1, provider_1_Info, user_1);
+        await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+        await certificates.methods.removeCertificate(0).send({from: provider_1}, function(error, result){});
+        var certificate = await certificates.methods.retrieveCertificate(0).call({from: user_1}, function(error, result){});
+        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash, 4: holderAddress} = certificate;
+        // assert
+        expect(providerAddress).to.be.equal("0x0000000000000000000000000000000000000000");
+        expect(certificate_content).to.be.equal("");
+        expect(certificate_location).to.be.equal("");
+        expect(certificate_hash).to.be.equal(null);
+        expect(holderAddress).to.be.equal("0x0000000000000000000000000000000000000000");   
+    });
+
     
     
 });
