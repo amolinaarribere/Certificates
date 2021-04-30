@@ -193,12 +193,18 @@ contract("Testing certificates", function(accounts){
     const provider_1 = accounts[2];  
     const holder_1 = accounts[3];
     const user_1 = accounts[4];
+    const provider_2 = accounts[5];  
+    const holder_2 = accounts[6];
     // providers info
     const provider_1_Info = "Account 1 Info";
+    const provider_2_Info = "Account 2 Info";
     // Certificates info
     const certificate_content_1 = "Certificate content 1";
     const certificate_location_1 = "https://certificate.location.1.com";
     const certificate_hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
+    const certificate_content_2 = "Certificate content 2";
+    const certificate_location_2 = "https://certificate.location.2.com";
+    const certificate_hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     // test constants
     const NotAllowedToAddProviders = new RegExp("Not allowed to add providers");
     const ProviderAlreadyActivated = new RegExp("Provider already activated");
@@ -226,7 +232,7 @@ contract("Testing certificates", function(accounts){
     async function AddingProvider(providerAddress, providerInfo, AddedBy){
         _chairPerson = await proposals.retrieveChairPerson({from: AddedBy});
         await proposals.sendProposal(providerAddress, providerInfo, {from: AddedBy, gas: Gas, value: PriceWei});
-        await proposals.approveProposal(provider_1, {from: _chairPerson, gas: Gas});
+        await proposals.approveProposal(providerAddress, {from: _chairPerson, gas: Gas});
     }
 
     // ****** TESTING Retrieves ***************************************************************** //
@@ -256,17 +262,23 @@ contract("Testing certificates", function(accounts){
         // assert
         expect(parseInt(TotalProviders)).to.equal(1); 
     });
-
-    it("Retrieve Certificate WRONG",async function(){
+/*
+    it("Retrieve Certificate by Holder WRONG",async function(){
         try{
-            var certificate = await certificates.methods.retrieveCertificate(0).call({from: user_1}, function(error, result){});
+            var certificate = await certificates.methods.retrieveCertificateByHolder().call({from: user_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
             expect(error.message).to.match(CertificateDoesNotExist);
         }
         
-     });
+     });*/
+/*
+    it("Hello World",async function(){
+        let helloworld = await certificates.methods.helloWorld().call();
+        console.log(" " + helloworld);
+        expect(helloworld).to.be.equal("hello world");     
+     });*/
 
     // ****** TESTING Adding Owners ***************************************************************** //
 
@@ -462,14 +474,15 @@ contract("Testing certificates", function(accounts){
         catch(error){
             expect(error.message).to.match(NotAllowedToRemoveCertificate);
         }
-
+/*
         try{
-            await certificates.methods.removeCertificate(1).send({from: holder_1}, function(error, result){});
+            await certificates.methods.removeCertificate(0 + 1).send({from: holder_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
             expect(error.message).to.match(CertificateDoesNotExist);
         }  
+        */
     });
 
     it("Remove Certificates CORRECT",async function(){
@@ -487,6 +500,103 @@ contract("Testing certificates", function(accounts){
         expect(holderAddress).to.be.equal("0x0000000000000000000000000000000000000000");   
     });
 
-    
+    // ****** TESTING Updating Certificates ***************************************************************** //
+
+    it("Update Certificates WRONG",async function(){
+        await AddingProvider(provider_1, provider_1_Info, user_1);
+        await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+
+        try{
+            await certificates.methods.updateCertificate(0, certificate_content_2, certificate_location_2, certificate_hash_2).send({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(NotAllowedToUpdateCertificate);
+        }
+/*
+        try{
+            await certificates.methods.updateCertificate(1, certificate_content_2, certificate_location_2, certificate_hash_2).send({from: provider_1}, function(error, result){});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(CertificateDoesNotExist);
+        }
+        */
+    });
+
+    it("Update Certificates CORRECT",async function(){
+        // act
+        await AddingProvider(provider_1, provider_1_Info, user_1);
+        await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+        await certificates.methods.updateCertificate(0, certificate_content_2, certificate_location_2, certificate_hash_2).send({from: provider_1}, function(error, result){});
+        var certificate = await certificates.methods.retrieveCertificate(0).call({from: user_1}, function(error, result){});
+        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash, 4: holderAddress} = certificate;
+        // assert
+        expect(providerAddress).to.be.equal(provider_1);
+        expect(certificate_content).to.be.equal(certificate_content_2);
+        expect(certificate_location).to.be.equal(certificate_location_2);
+        expect(certificate_hash).to.be.equal(certificate_hash_2);
+        expect(holderAddress).to.be.equal(holder_1);
+    });
+
+    // ****** TESTING Retrieving Certificates ***************************************************************** //
+
+    async function AddingMultipleCertificates(){
+        await AddingProvider(provider_1, provider_1_Info, user_1);
+        await AddingProvider(provider_2, provider_2_Info, user_1);
+        await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+        await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_2).send({from: provider_1, gas: Gas}, function(error, result){});
+        await certificates.methods.addCertificate(certificate_content_2, certificate_location_2, certificate_hash_2, holder_1).send({from: provider_2, gas: Gas}, function(error, result){});
+        await certificates.methods.addCertificate(certificate_content_2, certificate_location_2, certificate_hash_2, holder_2).send({from: provider_2, gas: Gas}, function(error, result){});
+    };
+
+    it("Retreive Certificates Per Holder",async function(){
+        // act
+        await AddingMultipleCertificates();
+
+        let TotalHolder1 = await certificates.methods.retrieveTotalCertificatePerHolder(holder_1).call({from: user_1}, function(error, result){});
+        let Holder1 = await certificates.methods.retrieveCertificatesPerHolder(holder_1).call({from: user_1}, function(error, result){});
+        var Holder1Certificate1 = await certificates.methods.retrieveCertificate(Holder1[0]).call({from: user_1}, function(error, result){});
+        var Holder1Certificate2 = await certificates.methods.retrieveCertificate(Holder1[0]).call({from: user_1}, function(error, result){});
+        const {0: providerAddress11, 1: certificate_content11, 2: certificate_location11, 3: certificate_hash11, 4: holderAddress11} = Holder1Certificate1;
+        const {0: providerAddress12, 1: certificate_content12, 2: certificate_location12, 3: certificate_hash12, 4: holderAddress12} = Holder1Certificate2;
+
+        let TotalHolder2 = await certificates.methods.retrieveTotalCertificatePerHolder(holder_2).call({from: user_1}, function(error, result){});
+        let Holder2 = await certificates.methods.retrieveCertificatesPerHolder(holder_2).call({from: user_1}, function(error, result){});
+        var Holder2Certificate1 = await certificates.methods.retrieveCertificate(Holder2[0]).call({from: user_1}, function(error, result){});
+        var Holder2Certificate2 = await certificates.methods.retrieveCertificate(Holder2[0]).call({from: user_1}, function(error, result){});
+        const {0: providerAddress21, 1: certificate_content21, 2: certificate_location21, 3: certificate_hash21, 4: holderAddress21} = Holder2Certificate1;
+        const {0: providerAddress22, 1: certificate_content22, 2: certificate_location22, 3: certificate_hash22, 4: holderAddress22} = Holder2Certificate2;
+
+        // assert
+        expect(parseInt(TotalHolder1)).to.equal(2);
+        expect(parseInt(TotalHolder2)).to.equal(2);
+
+        expect(providerAddress11).to.be.equal(provider_1);
+        expect(certificate_content11).to.be.equal(certificate_content_1);
+        expect(certificate_location11).to.be.equal(certificate_location_1);
+        expect(certificate_hash11).to.be.equal(certificate_hash_1);
+        expect(holderAddress11).to.be.equal(holder_1);
+
+        expect(providerAddress12).to.be.equal(provider_1);
+        expect(certificate_content12).to.be.equal(certificate_content_1);
+        expect(certificate_location12).to.be.equal(certificate_location_1);
+        expect(certificate_hash12).to.be.equal(certificate_hash_1);
+        expect(holderAddress12).to.be.equal(holder_2);
+
+        expect(providerAddress21).to.be.equal(provider_2);
+        expect(certificate_content21).to.be.equal(certificate_content_2);
+        expect(certificate_location21).to.be.equal(certificate_location_2);
+        expect(certificate_hash21).to.be.equal(certificate_hash_2);
+        expect(holderAddress21).to.be.equal(holder_1);
+
+        expect(providerAddress22).to.be.equal(provider_2);
+        expect(certificate_content22).to.be.equal(certificate_content_2);
+        expect(certificate_location22).to.be.equal(certificate_location_2);
+        expect(certificate_hash22).to.be.equal(certificate_hash_2);
+        expect(holderAddress22).to.be.equal(holder_2);
+
+    });
+
     
 });

@@ -33,16 +33,16 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Certificates {
     
-    event _AddCertificateIdEvent(uint256);
-    event _RemoveCertificateIdEvent(uint256);
-    event _UpdateCertificateIdEvent(uint256);
+    event _AddCertificateIdEvent(address, address, uint256);
+    event _RemoveCertificateIdEvent(address, address, uint256);
+    event _UpdateCertificateIdEvent(address, address, uint256);
     
-    struct _CertificateToken{
-        address _provider;
-        address _holder;
+    struct _Certificate{
+        address _Provider;
         string _CertificateContent;
         string _CertificateLocation;
         bytes _CertificateHash;
+        address _Holder;
     }
     
     struct _providerIdentity{
@@ -50,16 +50,33 @@ contract Certificates {
         string _providerInfo;
     }
 
+    struct _providerIssuedCertificatesType{
+        uint256[] _All;
+    }
+
+    struct _CertificatesPerHolderType{
+        mapping(address => uint256[]) _byProviders;
+        uint256[] _All;
+    }
+
     // Contract Creator
     address _creator;
-    // list and number of providers
+
+    // Providers
     mapping(address => _providerIdentity) public _providers;
+    mapping(address => _providerIssuedCertificatesType) private _CertificatesByProvider;
     uint256 _numberOfProviders;
+
+    // Holders
+    mapping(address => _CertificatesPerHolderType) private _CertificatesPerHolder;
+
+    // list of Certificates
+    _Certificate[] private _Certificates;
+
     // list and number of owners
     mapping(address => bool) public _owners;
     uint256 _numberOfOwners;
-    // list of Certificates
-    _CertificateToken[] public _Certificates;
+    
 
     constructor(address[] memory owners) payable{
         _creator = msg.sender;
@@ -114,43 +131,79 @@ contract Certificates {
     // Certificats CRUD Operations
 
     function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) public {
-       require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");
-       require(0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length, "Certificate is empty");
+        require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");
+        require(0 < CertificateHash.length && (0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length), "Certificate is empty");
 
-       _Certificates.push(_CertificateToken(msg.sender, holder, CertificateContent, CertificateLocation, CertificateHash));
-       emit _AddCertificateIdEvent(_Certificates.length - 1);
+        _Certificates.push(_Certificate(msg.sender, CertificateContent, CertificateLocation, CertificateHash, holder));
+        uint256 Id = _Certificates.length - 1;
+
+        _CertificatesPerHolder[holder]._byProviders[msg.sender].push(Id);   
+        _CertificatesPerHolder[holder]._All.push(Id); 
+
+        _CertificatesByProvider[msg.sender]._All.push(Id); 
+
+        emit _AddCertificateIdEvent(msg.sender, holder, Id);
     }
     
-    function removeCertificate(uint256 CertificateTokenId) public {
-       require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
-       require(msg.sender == _Certificates[CertificateTokenId]._provider || msg.sender == _Certificates[CertificateTokenId]._holder, "Not allowed to remove this particular Certificate");
+    function removeCertificate(uint256 CertificateId) public {
+        require(CertificateId < _Certificates.length, "Certificate does not exist");
+        require(msg.sender == _Certificates[CertificateId]._Provider || msg.sender == _Certificates[CertificateId]._Holder, "Not allowed to remove this particular Certificate");
 
-       delete _Certificates[CertificateTokenId];
-       emit _RemoveCertificateIdEvent(CertificateTokenId);
+        address provider = _Certificates[CertificateId]._Provider;
+        address holder = _Certificates[CertificateId]._Holder;
+        delete _Certificates[CertificateId];
+
+        emit _RemoveCertificateIdEvent(provider, holder, CertificateId);
     }
     
-    function updateCertificate(uint256 CertificateTokenId, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) public {
-       require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
-       require(msg.sender == _Certificates[CertificateTokenId]._provider, "Not allowed to update this particular Certificate");
+    function updateCertificate(uint256 CertificateId, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) public {
+       require(CertificateId < _Certificates.length, "Certificate does not exist");
+       require(msg.sender == _Certificates[CertificateId]._Provider, "Not allowed to update this particular Certificate");
 
-       if(0 < bytes(CertificateContent).length)  _Certificates[CertificateTokenId]._CertificateContent = CertificateContent;
-       if(0 < bytes(CertificateLocation).length)  _Certificates[CertificateTokenId]._CertificateLocation = CertificateLocation;
-       if(0 < bytes(CertificateHash).length)  _Certificates[CertificateTokenId]._CertificateHash = CertificateHash;
-       emit _UpdateCertificateIdEvent(CertificateTokenId);
+       if(0 < bytes(CertificateContent).length)  _Certificates[CertificateId]._CertificateContent = CertificateContent;
+       if(0 < bytes(CertificateLocation).length)  _Certificates[CertificateId]._CertificateLocation = CertificateLocation;
+       if(0 < bytes(CertificateHash).length)  _Certificates[CertificateId]._CertificateHash = CertificateHash;
+
+       emit _UpdateCertificateIdEvent(_Certificates[CertificateId]._Provider, _Certificates[CertificateId]._Holder, CertificateId);
     }
 
-    function retrieveCertificate(uint256 CertificateTokenId) public view returns (address, string memory, string memory, bytes memory, address){
-        require(CertificateTokenId < _Certificates.length, "Certificate does not exist");
+    function retrieveCertificate(uint256 CertificateId) public view returns (address, string memory, string memory, bytes memory, address){
+        require(CertificateId < _Certificates.length, "Certificate does not exist");
 
-        return (_Certificates[CertificateTokenId]._provider, 
-            _Certificates[CertificateTokenId]._CertificateContent,
-            _Certificates[CertificateTokenId]._CertificateLocation,
-            _Certificates[CertificateTokenId]._CertificateHash,
-            _Certificates[CertificateTokenId]._holder);
+        return (_Certificates[CertificateId]._Provider, 
+            _Certificates[CertificateId]._CertificateContent,
+            _Certificates[CertificateId]._CertificateLocation,
+            _Certificates[CertificateId]._CertificateHash,
+            _Certificates[CertificateId]._Holder);
     }
+
+    function retrieveCertificatesPerHolder(address holder) public view returns (uint256[] memory){
+        return (_CertificatesPerHolder[holder]._All);
+    }
+
+    function retrieveTotalCertificatePerHolder(address holder) public view returns (uint256){
+        return (_CertificatesPerHolder[holder]._All.length);
+    }
+
+    function retrieveCertificatesByProvider(address provider) public view returns (uint256[] memory){
+        return (_CertificatesByProvider[provider]._All);
+    }
+
+    function retrieveTotalCertificateByProvider(address provider) public view returns (uint256){
+        return (_CertificatesByProvider[provider]._All.length);
+    }
+
+    function retrieveCertificatesByProviderAndHolder(address provider, address holder) public view returns (uint256[] memory){
+        return (_CertificatesPerHolder[holder]._byProviders[provider]);
+    }
+
+    function retrieveTotalCertificateByProviderAndHolder(address provider, address holder) public view returns (uint256){
+        return (_CertificatesPerHolder[holder]._byProviders[provider].length);
+    }
+
     
-    function retrieveTotalCertificate() public view returns (uint){
-        return (_Certificates.length);
+    function helloWorld() public pure returns (string memory){
+        return 'hello world';
     }
 
     // OWNERS CRD Operations
