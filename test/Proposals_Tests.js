@@ -16,7 +16,7 @@ contract("Testing Proposals",function(accounts){
     // used addresses
     const chairPerson = accounts[0];
     const provider_1 = accounts[1];  
-    const user_1 = accounts[2];
+    const user_1 = accounts[3];
     // providers info
     const provider_1_Info = "Account 1 Info";
     // test constants
@@ -27,7 +27,7 @@ contract("Testing Proposals",function(accounts){
     const ProposalDoesNotExist = new RegExp("This proposal does not exist");
     const ProposalCannotBeModified = new RegExp("This proposal cannot be modified");
     //const ProviderDoesNotExist = new RegExp("Provider does not exist");
-    const Gas = 600000;
+    const Gas = 6000000;
     const State_NOT_SUBMITTED = 0;
     const State_PENDING = 1;
     const State_APPROVED = 2;
@@ -35,6 +35,44 @@ contract("Testing Proposals",function(accounts){
 
     beforeEach(async function(){
         proposals = await Proposals.new({from: chairPerson});
+    });
+
+    // *********** TESTING Gas Consumption ***************************************************************** //
+
+    it("Send, Approve and Reject LOGS & GAS",async function(){
+        // Transactions
+        let trxResult_Send_1 = await proposals.sendProposal(accounts[1], "Test Provider 1", {from: user_1, gas: Gas, value: PriceWei});
+        let trxResult_Send_2 = await proposals.sendProposal(accounts[2], "Test Provider 2", {from: user_1, gas: Gas, value: PriceWei});
+        let trxResult_Send_3 = await proposals.sendProposal(accounts[3], "Test Provider 3 with more Info", {from: user_1, gas: Gas, value: PriceWei});
+        let trxResult_Send_4 = await proposals.sendProposal(accounts[4], "Test Provider 4 with more Info", {from: user_1, gas: Gas, value: PriceWei});
+        let trxResult_Approve_1 = await proposals.approveProposal(accounts[1], {from: chairPerson, gas: Gas});;
+        let trxResult_Reject_2 = await proposals.rejectProposal(accounts[2], {from: chairPerson, gas: Gas});
+        let trxResult_Approve_3 = await proposals.approveProposal(accounts[3], {from: chairPerson, gas: Gas});;
+        let trxResult_Reject_4 = await proposals.rejectProposal(accounts[4], {from: chairPerson, gas: Gas});
+        // Result Info
+        trxResult_Send_1.logs.forEach(log => console.log("Logs Send 1 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Send 1 : " + trxResult_Send_1.receipt.gasUsed + "\n");
+
+        trxResult_Send_2.logs.forEach(log => console.log("Logs Send 2 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Send 2 : " + trxResult_Send_2.receipt.gasUsed + "\n");
+
+        trxResult_Send_3.logs.forEach(log => console.log("Logs Send 3 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Send 3 : " + trxResult_Send_3.receipt.gasUsed + "\n");
+
+        trxResult_Send_4.logs.forEach(log => console.log("Logs Send 4 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Send 4 : " + trxResult_Send_4.receipt.gasUsed + "\n");
+
+        trxResult_Approve_1.logs.forEach(log => console.log("Logs Approve 1 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Approve 1 : " + trxResult_Approve_1.receipt.gasUsed + "\n");
+
+        trxResult_Reject_2.logs.forEach(log => console.log("Logs Reject 2 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Reject 2 : " + trxResult_Reject_2.receipt.gasUsed + "\n");
+
+        trxResult_Approve_3.logs.forEach(log => console.log("Logs Approve 3 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Approve 3 : " + trxResult_Approve_3.receipt.gasUsed + "\n");
+
+        trxResult_Reject_4.logs.forEach(log => console.log("Logs Reject 4 : \n" + JSON.stringify(log) + "\n"));
+        console.log("Gas Reject 4 : " + trxResult_Reject_4.receipt.gasUsed + "\n");
     });
 
     // ****** TESTING Retrieves ***************************************************************** //
@@ -177,7 +215,8 @@ contract("Testing Proposals",function(accounts){
         expect(info).to.be.equal(provider_1_Info);
         expect(state.toNumber()).to.equal(State_REJECTED);
     });
-    
+
+
 });
 
 // Certificates TEST -------------------------------------------------------------------------------------------------------------------------------------------
@@ -234,6 +273,65 @@ contract("Testing certificates", function(accounts){
         await proposals.sendProposal(providerAddress, providerInfo, {from: AddedBy, gas: Gas, value: PriceWei});
         await proposals.approveProposal(providerAddress, {from: _chairPerson, gas: Gas});
     }
+
+    // *********** TESTING Gas Consumption ***************************************************************** //
+
+    it("Add Update and Remove Owner Providers and Certificates LOGS & GAS",async function(){
+        // Transactions
+        let trxResult_Add_Owner = await certificates.methods.addOwner(accounts[1]).send({from: owner_1, gas: Gas}, function(error, result){});
+        await AddingProvider(accounts[2], "Test Provider 1", user_1);
+        let trxResult_Update_Provider = await certificates.methods.updateProvider(accounts[2], "Test Provider 1 Updated").send({from: owner_1}, function(error, result){});
+        let trxResult_Add_Certificate_1 = await certificates.methods.addCertificate("Certificate Content 1", "Certificate Location 1", certificate_hash_1, accounts[3]).send({from: accounts[2], gas: Gas}, function(error, result){});
+        let trxResult_Add_Certificate_2 = await certificates.methods.addCertificate("Certificate Content 2", "Certificate Location 2", certificate_hash_1, accounts[3]).send({from: accounts[2], gas: Gas}, function(error, result){});
+        let trxResult_Add_Certificate_3 = await certificates.methods.addCertificate("Certificate Content 3 longer string", "Certificate Location 3 longer string", certificate_hash_1, accounts[3]).send({from: accounts[2], gas: Gas}, function(error, result){});
+        let trxResult_Add_Certificate_4 = await certificates.methods.addCertificate("Certificate Content 4 longer string", "Certificate Location 4 longer string", certificate_hash_1, accounts[3]).send({from: accounts[2], gas: Gas}, function(error, result){});
+        let trxResult_Update_Certificate_1 = await certificates.methods.updateCertificate(0, "", "", certificate_hash_2).send({from: accounts[2]}, function(error, result){});
+        let trxResult_Update_Certificate_4 = await certificates.methods.updateCertificate(3, "Certificate Content 4 longer string", "Certificate Location 4 longer string", certificate_hash_2).send({from: accounts[2]}, function(error, result){});
+
+        let trxResult_Remove_Certificate_2 = await certificates.methods.removeCertificate(1).send({from: accounts[2]}, function(error, result){});
+        let trxResult_Remove_Certificate_3 = await certificates.methods.removeCertificate(2).send({from: accounts[2]}, function(error, result){});
+        let trxResult_Remove_Provider = await certificates.methods.removeProvider(accounts[2]).send({from: _chairPerson}, function(error, result){});
+        let trxResult_Remove_Owner = await certificates.methods.removeOwner(accounts[1]).send({from: owner_1}, function(error, result){});
+
+        // Result Info
+        console.log("logs Bloom Add Owner : " + trxResult_Add_Owner.logsBloom + "\n");
+        console.log("Gas Add Owner : " + trxResult_Add_Owner.gasUsed + "\n");
+
+        console.log("logs Bloom Update Provider : " + trxResult_Update_Provider.logsBloom + "\n");
+        console.log("Gas Update Provider : " + trxResult_Update_Provider.gasUsed + "\n");
+
+        console.log("logs Bloom Add Certificate 1 : " + trxResult_Add_Certificate_1.logsBloom + "\n");
+        console.log("Gas Add Certificate 1 : " + trxResult_Add_Certificate_1.gasUsed + "\n");
+
+        console.log("logs Bloom Add Certificate 2 : " + trxResult_Add_Certificate_2.logsBloom + "\n");
+        console.log("Gas Add Certificate 2 : " + trxResult_Add_Certificate_2.gasUsed + "\n");
+
+        console.log("logs Bloom Add Certificate 3 : " + trxResult_Add_Certificate_3.logsBloom + "\n");
+        console.log("Gas Add Certificate 3 : " + trxResult_Add_Certificate_3.gasUsed + "\n");
+
+        console.log("logs Bloom Add Certificate 4 : " + trxResult_Add_Certificate_4.logsBloom + "\n");
+        console.log("Gas Add Certificate 4 : " + trxResult_Add_Certificate_4.gasUsed + "\n");
+
+        console.log("logs Bloom Update Certificate 1 : " + trxResult_Update_Certificate_1.logsBloom + "\n");
+        console.log("Gas Update Certificate 1 : " + trxResult_Update_Certificate_1.gasUsed + "\n");
+
+        console.log("logs Bloom Update Certificate 4 : " + trxResult_Update_Certificate_4.logsBloom + "\n");
+        console.log("Gas Update Certificate 4 : " + trxResult_Update_Certificate_4.gasUsed + "\n");
+
+        console.log("logs Bloom Remove Certificate 2 : " + trxResult_Remove_Certificate_2.logsBloom + "\n");
+        console.log("Gas Remove Certificate 2 : " + trxResult_Remove_Certificate_2.gasUsed + "\n");
+
+        console.log("logs Bloom Remove Certificate 3 : " + trxResult_Remove_Certificate_3.logsBloom + "\n");
+        console.log("Gas Remove Certificate 3 : " + trxResult_Remove_Certificate_3.gasUsed + "\n");
+
+        console.log("logs Bloom Remove Provider : " + trxResult_Remove_Provider.logsBloom + "\n");
+        console.log("Gas Remove Provider : " + trxResult_Remove_Provider.gasUsed + "\n");
+
+        console.log("logs Bloom Remove Owner : " + trxResult_Remove_Owner.logsBloom + "\n");
+        console.log("Gas Remove Owner : " + trxResult_Remove_Owner.gasUsed + "\n");
+
+        
+    });
 
     // ****** TESTING Retrieves ***************************************************************** //
 
@@ -481,8 +579,8 @@ contract("Testing certificates", function(accounts){
         }
         catch(error){
             expect(error.message).to.match(CertificateDoesNotExist);
-        }  
-        */
+        }  */
+        
     });
 
     it("Remove Certificates CORRECT",async function(){
@@ -520,8 +618,8 @@ contract("Testing certificates", function(accounts){
         }
         catch(error){
             expect(error.message).to.match(CertificateDoesNotExist);
-        }
-        */
+        }*/
+        
     });
 
     it("Update Certificates CORRECT",async function(){
@@ -549,7 +647,7 @@ contract("Testing certificates", function(accounts){
         await certificates.methods.addCertificate(certificate_content_2, certificate_location_2, certificate_hash_2, holder_1).send({from: provider_2, gas: Gas}, function(error, result){});
         await certificates.methods.addCertificate(certificate_content_2, certificate_location_2, certificate_hash_2, holder_2).send({from: provider_2, gas: Gas}, function(error, result){});
     };
-
+/*
     it("Retreive Certificates Per Holder",async function(){
         // act
         await AddingMultipleCertificates();
@@ -596,7 +694,8 @@ contract("Testing certificates", function(accounts){
         expect(certificate_hash22).to.be.equal(certificate_hash_2);
         expect(holderAddress22).to.be.equal(holder_2);
 
-    });
+    });*/
 
     
 });
+

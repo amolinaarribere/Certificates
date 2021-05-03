@@ -26,13 +26,17 @@ import "./Certificates.sol";
  */
 
 contract Proposals{
+
+    event _SendProposalId(address);
+    event _ApproveProposalId(address);
+    event _RejectProposalId(address);
+
     enum proposalState { NOT_SUBMITTED, PENDING, APPROVED, REJECTED }
     uint constant _PriceWei = 10;
 
     Certificates  _CertificatesContract;
     
     struct _proposal{
-        //bool _submitted;
         proposalState _state;
         string _providerInfo;
     } 
@@ -55,6 +59,8 @@ contract Proposals{
 
        _proposals[provider]._state = proposalState.PENDING;
        _proposals[provider]._providerInfo = providerInfo;
+
+       emit _SendProposalId(provider);
     }
     
     function approveProposal(address provider) public{
@@ -63,6 +69,8 @@ contract Proposals{
 
         _proposals[provider]._state = proposalState.APPROVED;
         _CertificatesContract.addProvider(provider, _proposals[provider]._providerInfo);   
+
+        emit _ApproveProposalId(provider);
     }
 
     function rejectProposal(address provider) public{
@@ -70,6 +78,8 @@ contract Proposals{
         require(proposalState.PENDING == _proposals[provider]._state, "This proposal cannot be modified");
 
         _proposals[provider]._state = proposalState.REJECTED;
+
+        emit _RejectProposalId(provider);
     }
     
     function retrieveProposal(address provider) public view returns (uint, string memory) {
