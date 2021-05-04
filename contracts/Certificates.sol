@@ -42,7 +42,6 @@ contract Certificates {
         string _CertificateContent;
         string _CertificateLocation;
         bytes _CertificateHash;
-        address _Holder;
     }
     
     struct _providerIdentity{
@@ -50,28 +49,15 @@ contract Certificates {
         string _providerInfo;
     }
 
-    struct _providerIssuedCertificatesType{
-        uint256[] _All;
-    }
-
-    struct _CertificatesPerHolderType{
-        mapping(address => uint256[]) _byProviders;
-        uint256[] _All;
-    }
-
     // Contract Creator
     address _creator;
 
     // Providers
     mapping(address => _providerIdentity) public _providers;
-    mapping(address => _providerIssuedCertificatesType) private _CertificatesByProvider;
     uint256 _numberOfProviders;
 
     // Holders
-    mapping(address => _CertificatesPerHolderType) private _CertificatesPerHolder;
-
-    // list of Certificates
-    _Certificate[] private _Certificates;
+    mapping(address => _Certificate[]) private _CertificatesPerHolder;
 
     // list and number of owners
     mapping(address => bool) public _owners;
@@ -134,77 +120,71 @@ contract Certificates {
         require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");
         require(0 < CertificateHash.length && (0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length), "Certificate is empty");
 
-        _Certificates.push(_Certificate(msg.sender, CertificateContent, CertificateLocation, CertificateHash, holder));
-        uint256 Id = _Certificates.length - 1;
-
-        _CertificatesPerHolder[holder]._byProviders[msg.sender].push(Id);   
-        _CertificatesPerHolder[holder]._All.push(Id); 
-
-        _CertificatesByProvider[msg.sender]._All.push(Id); 
-
+        _CertificatesPerHolder[holder].push(_Certificate(msg.sender, CertificateContent, CertificateLocation, CertificateHash));
+        uint256 Id = _CertificatesPerHolder[holder].length - 1;
         emit _AddCertificateIdEvent(msg.sender, holder, Id);
     }
     
-    function removeCertificate(uint256 CertificateId) public {
-        require(CertificateId < _Certificates.length, "Certificate does not exist");
-        require(msg.sender == _Certificates[CertificateId]._Provider || msg.sender == _Certificates[CertificateId]._Holder, "Not allowed to remove this particular Certificate");
+    function removeCertificate(uint256 CertificateId, address holder) public {
+        require(CertificateId < _CertificatesPerHolder[holder].length, "Certificate does not exist");
+        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider || msg.sender == holder, "Not allowed to remove this particular Certificate");
 
-        address provider = _Certificates[CertificateId]._Provider;
-        address holder = _Certificates[CertificateId]._Holder;
-        delete _Certificates[CertificateId];
-
+        address provider = _CertificatesPerHolder[holder][CertificateId]._Provider;
+        delete _CertificatesPerHolder[holder][CertificateId];
         emit _RemoveCertificateIdEvent(provider, holder, CertificateId);
+
     }
     
-    function updateCertificate(uint256 CertificateId, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) public {
-       require(CertificateId < _Certificates.length, "Certificate does not exist");
-       require(msg.sender == _Certificates[CertificateId]._Provider, "Not allowed to update this particular Certificate");
+    function updateCertificate(uint256 CertificateId, address holder, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) public {
+       require(CertificateId < _CertificatesPerHolder[holder].length, "Certificate does not exist");
+       require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider, "Not allowed to update this particular Certificate");
 
-       if(0 < bytes(CertificateContent).length)  _Certificates[CertificateId]._CertificateContent = CertificateContent;
-       if(0 < bytes(CertificateLocation).length)  _Certificates[CertificateId]._CertificateLocation = CertificateLocation;
-       if(0 < bytes(CertificateHash).length)  _Certificates[CertificateId]._CertificateHash = CertificateHash;
+       if(0 < bytes(CertificateContent).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateContent = CertificateContent;
+       if(0 < bytes(CertificateLocation).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateLocation = CertificateLocation;
+       if(0 < bytes(CertificateHash).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateHash = CertificateHash;
 
-       emit _UpdateCertificateIdEvent(_Certificates[CertificateId]._Provider, _Certificates[CertificateId]._Holder, CertificateId);
+       emit _UpdateCertificateIdEvent(_CertificatesPerHolder[holder][CertificateId]._Provider, holder, CertificateId);
     }
 
-    function retrieveCertificate(uint256 CertificateId) public view returns (address, string memory, string memory, bytes memory, address){
-        require(CertificateId < _Certificates.length, "Certificate does not exist");
+    function retrieveCertificate(uint256 CertificateId, address holder) public view returns (address, string memory, string memory, bytes memory){
+        require(CertificateId < _CertificatesPerHolder[holder].length, "Certificate does not exist");
 
-        return (_Certificates[CertificateId]._Provider, 
-            _Certificates[CertificateId]._CertificateContent,
-            _Certificates[CertificateId]._CertificateLocation,
-            _Certificates[CertificateId]._CertificateHash,
-            _Certificates[CertificateId]._Holder);
+        return (_CertificatesPerHolder[holder][CertificateId]._Provider, 
+            _CertificatesPerHolder[holder][CertificateId]._CertificateContent,
+            _CertificatesPerHolder[holder][CertificateId]._CertificateLocation,
+            _CertificatesPerHolder[holder][CertificateId]._CertificateHash);
     }
 
-    function retrieveCertificatesPerHolder(address holder) public view returns (uint256[] memory){
-        return (_CertificatesPerHolder[holder]._All);
+    function retrieveTotalCertificatesByHolder(address holder) public view returns (uint256){
+        return (_CertificatesPerHolder[holder].length);
     }
 
-    function retrieveTotalCertificatePerHolder(address holder) public view returns (uint256){
-        return (_CertificatesPerHolder[holder]._All.length);
-    }
+    function retrieveTotalCertificatesByProviderAndHolder(address provider, address holder) public view returns (uint){
+        uint Total = 0;
 
-    function retrieveCertificatesByProvider(address provider) public view returns (uint256[] memory){
-        return (_CertificatesByProvider[provider]._All);
-    }
+        for(uint i=0; i < _CertificatesPerHolder[holder].length; i++){
+            if(_CertificatesPerHolder[holder][i]._Provider == provider){
+                Total += 1;
+            }
+        }
 
-    function retrieveTotalCertificateByProvider(address provider) public view returns (uint256){
-        return (_CertificatesByProvider[provider]._All.length);
+        return (Total);
     }
 
     function retrieveCertificatesByProviderAndHolder(address provider, address holder) public view returns (uint256[] memory){
-        return (_CertificatesPerHolder[holder]._byProviders[provider]);
+        uint[] memory ListOfCertificatesIdByProviderAndHolder = new uint[](retrieveTotalCertificatesByProviderAndHolder(provider, holder));
+        uint counter = 0;
+
+        for(uint i=0; i < _CertificatesPerHolder[holder].length; i++){
+            if(_CertificatesPerHolder[holder][i]._Provider == provider){
+                ListOfCertificatesIdByProviderAndHolder[counter] = i;
+                counter += 1;
+            }
+        }
+
+        return (ListOfCertificatesIdByProviderAndHolder);
     }
 
-    function retrieveTotalCertificateByProviderAndHolder(address provider, address holder) public view returns (uint256){
-        return (_CertificatesPerHolder[holder]._byProviders[provider].length);
-    }
-
-    
-    function helloWorld() public pure returns (string memory){
-        return 'hello world';
-    }
 
     // OWNERS CRD Operations
 

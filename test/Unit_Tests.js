@@ -285,11 +285,11 @@ contract("Testing certificates", function(accounts){
         let trxResult_Add_Certificate_2 = await certificates.methods.addCertificate("Certificate Content 2", "Certificate Location 2", certificate_hash_1, accounts[3]).send({from: accounts[2], gas: Gas}, function(error, result){});
         let trxResult_Add_Certificate_3 = await certificates.methods.addCertificate("Certificate Content 3 longer string", "Certificate Location 3 longer string", certificate_hash_1, accounts[3]).send({from: accounts[2], gas: Gas}, function(error, result){});
         let trxResult_Add_Certificate_4 = await certificates.methods.addCertificate("Certificate Content 4 longer string", "Certificate Location 4 longer string", certificate_hash_1, accounts[3]).send({from: accounts[2], gas: Gas}, function(error, result){});
-        let trxResult_Update_Certificate_1 = await certificates.methods.updateCertificate(0, "", "", certificate_hash_2).send({from: accounts[2]}, function(error, result){});
-        let trxResult_Update_Certificate_4 = await certificates.methods.updateCertificate(3, "Certificate Content 4 longer string", "Certificate Location 4 longer string", certificate_hash_2).send({from: accounts[2]}, function(error, result){});
+        let trxResult_Update_Certificate_1 = await certificates.methods.updateCertificate(0, accounts[3], "", "", certificate_hash_2).send({from: accounts[2]}, function(error, result){});
+        let trxResult_Update_Certificate_4 = await certificates.methods.updateCertificate(3, accounts[3], "Certificate Content 4 longer string", "Certificate Location 4 longer string", certificate_hash_2).send({from: accounts[2]}, function(error, result){});
 
-        let trxResult_Remove_Certificate_2 = await certificates.methods.removeCertificate(1).send({from: accounts[2]}, function(error, result){});
-        let trxResult_Remove_Certificate_3 = await certificates.methods.removeCertificate(2).send({from: accounts[2]}, function(error, result){});
+        let trxResult_Remove_Certificate_2 = await certificates.methods.removeCertificate(1, accounts[3]).send({from: accounts[2]}, function(error, result){});
+        let trxResult_Remove_Certificate_3 = await certificates.methods.removeCertificate(2, accounts[3]).send({from: accounts[2]}, function(error, result){});
         let trxResult_Remove_Provider = await certificates.methods.removeProvider(accounts[2]).send({from: _chairPerson}, function(error, result){});
         let trxResult_Remove_Owner = await certificates.methods.removeOwner(accounts[1]).send({from: owner_1}, function(error, result){});
 
@@ -360,23 +360,6 @@ contract("Testing certificates", function(accounts){
         // assert
         expect(parseInt(TotalProviders)).to.equal(1); 
     });
-/*
-    it("Retrieve Certificate by Holder WRONG",async function(){
-        try{
-            var certificate = await certificates.methods.retrieveCertificateByHolder().call({from: user_1}, function(error, result){});
-            expect.fail();
-        }
-        catch(error){
-            expect(error.message).to.match(CertificateDoesNotExist);
-        }
-        
-     });*/
-/*
-    it("Hello World",async function(){
-        let helloworld = await certificates.methods.helloWorld().call();
-        console.log(" " + helloworld);
-        expect(helloworld).to.be.equal("hello world");     
-     });*/
 
     // ****** TESTING Adding Owners ***************************************************************** //
 
@@ -549,14 +532,13 @@ contract("Testing certificates", function(accounts){
         // act
         await AddingProvider(provider_1, provider_1_Info, user_1);
         await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-        var certificate = await certificates.methods.retrieveCertificate(0).call({from: user_1}, function(error, result){});
-        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash, 4: holderAddress} = certificate;
+        var certificate = await certificates.methods.retrieveCertificate(0, holder_1).call({from: user_1}, function(error, result){});
+        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash} = certificate;
         // assert
         expect(providerAddress).to.be.equal(provider_1);
         expect(certificate_content).to.be.equal(certificate_content_1);
         expect(certificate_location).to.be.equal(certificate_location_1);
         expect(certificate_hash).to.be.equal(certificate_hash_1);
-        expect(holderAddress).to.be.equal(holder_1);
     });
 
     // ****** TESTING Removing Certificates ***************************************************************** //
@@ -566,7 +548,7 @@ contract("Testing certificates", function(accounts){
         await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
         
         try{
-            await certificates.methods.removeCertificate(0).send({from: user_1}, function(error, result){});
+            await certificates.methods.removeCertificate(0, holder_1).send({from: user_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
@@ -574,7 +556,7 @@ contract("Testing certificates", function(accounts){
         }
 /*
         try{
-            await certificates.methods.removeCertificate(0 + 1).send({from: holder_1}, function(error, result){});
+            await certificates.methods.removeCertificate(0 + 1, holder_1).send({from: holder_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
@@ -587,15 +569,14 @@ contract("Testing certificates", function(accounts){
         // act
         await AddingProvider(provider_1, provider_1_Info, user_1);
         await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-        await certificates.methods.removeCertificate(0).send({from: provider_1}, function(error, result){});
-        var certificate = await certificates.methods.retrieveCertificate(0).call({from: user_1}, function(error, result){});
-        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash, 4: holderAddress} = certificate;
+        await certificates.methods.removeCertificate(0, holder_1).send({from: provider_1}, function(error, result){});
+        var certificate = await certificates.methods.retrieveCertificate(0, holder_1).call({from: user_1}, function(error, result){});
+        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash} = certificate;
         // assert
         expect(providerAddress).to.be.equal("0x0000000000000000000000000000000000000000");
         expect(certificate_content).to.be.equal("");
         expect(certificate_location).to.be.equal("");
-        expect(certificate_hash).to.be.equal(null);
-        expect(holderAddress).to.be.equal("0x0000000000000000000000000000000000000000");   
+        expect(certificate_hash).to.be.equal(null);   
     });
 
     // ****** TESTING Updating Certificates ***************************************************************** //
@@ -605,7 +586,7 @@ contract("Testing certificates", function(accounts){
         await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
 
         try{
-            await certificates.methods.updateCertificate(0, certificate_content_2, certificate_location_2, certificate_hash_2).send({from: user_1}, function(error, result){});
+            await certificates.methods.updateCertificate(0, holder_1, certificate_content_2, certificate_location_2, certificate_hash_2).send({from: user_1}, function(error, result){});
             expect.fail();
         }
         catch(error){
@@ -626,15 +607,15 @@ contract("Testing certificates", function(accounts){
         // act
         await AddingProvider(provider_1, provider_1_Info, user_1);
         await certificates.methods.addCertificate(certificate_content_1, certificate_location_1, certificate_hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-        await certificates.methods.updateCertificate(0, certificate_content_2, certificate_location_2, certificate_hash_2).send({from: provider_1}, function(error, result){});
-        var certificate = await certificates.methods.retrieveCertificate(0).call({from: user_1}, function(error, result){});
-        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash, 4: holderAddress} = certificate;
+        await certificates.methods.updateCertificate(0, holder_1, certificate_content_2, certificate_location_2, certificate_hash_2).send({from: provider_1}, function(error, result){});
+        var certificate = await certificates.methods.retrieveCertificate(0, holder_1).call({from: user_1}, function(error, result){});
+        const {0: providerAddress, 1: certificate_content, 2: certificate_location, 3: certificate_hash} = certificate;
         // assert
         expect(providerAddress).to.be.equal(provider_1);
         expect(certificate_content).to.be.equal(certificate_content_2);
         expect(certificate_location).to.be.equal(certificate_location_2);
         expect(certificate_hash).to.be.equal(certificate_hash_2);
-        expect(holderAddress).to.be.equal(holder_1);
+
     });
 
     // ****** TESTING Retrieving Certificates ***************************************************************** //
@@ -647,24 +628,22 @@ contract("Testing certificates", function(accounts){
         await certificates.methods.addCertificate(certificate_content_2, certificate_location_2, certificate_hash_2, holder_1).send({from: provider_2, gas: Gas}, function(error, result){});
         await certificates.methods.addCertificate(certificate_content_2, certificate_location_2, certificate_hash_2, holder_2).send({from: provider_2, gas: Gas}, function(error, result){});
     };
-/*
-    it("Retreive Certificates Per Holder",async function(){
+
+    it("Retreive Certificates By Holder",async function(){
         // act
         await AddingMultipleCertificates();
 
-        let TotalHolder1 = await certificates.methods.retrieveTotalCertificatePerHolder(holder_1).call({from: user_1}, function(error, result){});
-        let Holder1 = await certificates.methods.retrieveCertificatesPerHolder(holder_1).call({from: user_1}, function(error, result){});
-        var Holder1Certificate1 = await certificates.methods.retrieveCertificate(Holder1[0]).call({from: user_1}, function(error, result){});
-        var Holder1Certificate2 = await certificates.methods.retrieveCertificate(Holder1[0]).call({from: user_1}, function(error, result){});
-        const {0: providerAddress11, 1: certificate_content11, 2: certificate_location11, 3: certificate_hash11, 4: holderAddress11} = Holder1Certificate1;
-        const {0: providerAddress12, 1: certificate_content12, 2: certificate_location12, 3: certificate_hash12, 4: holderAddress12} = Holder1Certificate2;
+        let TotalHolder1 = await certificates.methods.retrieveTotalCertificatesByHolder(holder_1).call({from: user_1}, function(error, result){});
+        var Holder1Certificate1 = await certificates.methods.retrieveCertificate(0, holder_1).call({from: user_1}, function(error, result){});
+        var Holder1Certificate2 = await certificates.methods.retrieveCertificate(1, holder_1).call({from: user_1}, function(error, result){});
+        const {0: providerAddress11, 1: certificate_content11, 2: certificate_location11, 3: certificate_hash11} = Holder1Certificate1;
+        const {0: providerAddress12, 1: certificate_content12, 2: certificate_location12, 3: certificate_hash12} = Holder1Certificate2;
 
-        let TotalHolder2 = await certificates.methods.retrieveTotalCertificatePerHolder(holder_2).call({from: user_1}, function(error, result){});
-        let Holder2 = await certificates.methods.retrieveCertificatesPerHolder(holder_2).call({from: user_1}, function(error, result){});
-        var Holder2Certificate1 = await certificates.methods.retrieveCertificate(Holder2[0]).call({from: user_1}, function(error, result){});
-        var Holder2Certificate2 = await certificates.methods.retrieveCertificate(Holder2[0]).call({from: user_1}, function(error, result){});
-        const {0: providerAddress21, 1: certificate_content21, 2: certificate_location21, 3: certificate_hash21, 4: holderAddress21} = Holder2Certificate1;
-        const {0: providerAddress22, 1: certificate_content22, 2: certificate_location22, 3: certificate_hash22, 4: holderAddress22} = Holder2Certificate2;
+        let TotalHolder2 = await certificates.methods.retrieveTotalCertificatesByHolder(holder_2).call({from: user_1}, function(error, result){});
+        var Holder2Certificate1 = await certificates.methods.retrieveCertificate(0, holder_2).call({from: user_1}, function(error, result){});
+        var Holder2Certificate2 = await certificates.methods.retrieveCertificate(1, holder_2).call({from: user_1}, function(error, result){});
+        const {0: providerAddress21, 1: certificate_content21, 2: certificate_location21, 3: certificate_hash21} = Holder2Certificate1;
+        const {0: providerAddress22, 1: certificate_content22, 2: certificate_location22, 3: certificate_hash22} = Holder2Certificate2;
 
         // assert
         expect(parseInt(TotalHolder1)).to.equal(2);
@@ -674,28 +653,50 @@ contract("Testing certificates", function(accounts){
         expect(certificate_content11).to.be.equal(certificate_content_1);
         expect(certificate_location11).to.be.equal(certificate_location_1);
         expect(certificate_hash11).to.be.equal(certificate_hash_1);
-        expect(holderAddress11).to.be.equal(holder_1);
 
-        expect(providerAddress12).to.be.equal(provider_1);
-        expect(certificate_content12).to.be.equal(certificate_content_1);
-        expect(certificate_location12).to.be.equal(certificate_location_1);
-        expect(certificate_hash12).to.be.equal(certificate_hash_1);
-        expect(holderAddress12).to.be.equal(holder_2);
+        expect(providerAddress12).to.be.equal(provider_2);
+        expect(certificate_content12).to.be.equal(certificate_content_2);
+        expect(certificate_location12).to.be.equal(certificate_location_2);
+        expect(certificate_hash12).to.be.equal(certificate_hash_2);
 
-        expect(providerAddress21).to.be.equal(provider_2);
-        expect(certificate_content21).to.be.equal(certificate_content_2);
-        expect(certificate_location21).to.be.equal(certificate_location_2);
-        expect(certificate_hash21).to.be.equal(certificate_hash_2);
-        expect(holderAddress21).to.be.equal(holder_1);
+        expect(providerAddress21).to.be.equal(provider_1);
+        expect(certificate_content21).to.be.equal(certificate_content_1);
+        expect(certificate_location21).to.be.equal(certificate_location_1);
+        expect(certificate_hash21).to.be.equal(certificate_hash_1);
 
         expect(providerAddress22).to.be.equal(provider_2);
         expect(certificate_content22).to.be.equal(certificate_content_2);
         expect(certificate_location22).to.be.equal(certificate_location_2);
         expect(certificate_hash22).to.be.equal(certificate_hash_2);
-        expect(holderAddress22).to.be.equal(holder_2);
 
-    });*/
+    });
 
+    it("Retreive Certificates By Provider and Holder",async function(){
+        // act
+        await AddingMultipleCertificates();
+
+        let TotalProvider1Holder1 = await certificates.methods.retrieveTotalCertificatesByProviderAndHolder(provider_1, holder_1).call({from: user_1}, function(error, result){});
+        let TotalProvider2Holder1 = await certificates.methods.retrieveTotalCertificatesByProviderAndHolder(provider_2, holder_1).call({from: user_1}, function(error, result){});
+        let Provider1Holder1Certificates = await certificates.methods.retrieveCertificatesByProviderAndHolder(provider_1, holder_1).call({from: user_1}, function(error, result){});
+        let Provider2Holder1Certificates = await certificates.methods.retrieveCertificatesByProviderAndHolder(provider_2, holder_1).call({from: user_1}, function(error, result){});
+    
+        let TotalProvider1Holder2 = await certificates.methods.retrieveTotalCertificatesByProviderAndHolder(provider_1, holder_2).call({from: user_1}, function(error, result){});
+        let TotalProvider2Holder2 = await certificates.methods.retrieveTotalCertificatesByProviderAndHolder(provider_2, holder_2).call({from: user_1}, function(error, result){});
+        let Provider1Holder2Certificates = await certificates.methods.retrieveCertificatesByProviderAndHolder(provider_1, holder_2).call({from: user_1}, function(error, result){});
+        let Provider2Holder2Certificates = await certificates.methods.retrieveCertificatesByProviderAndHolder(provider_2, holder_2).call({from: user_1}, function(error, result){});
+    
+        // assert
+        expect(parseInt(TotalProvider1Holder1)).to.equal(1);
+        expect(parseInt(TotalProvider2Holder1)).to.equal(1);
+        expect(parseInt(Provider1Holder1Certificates[0])).to.be.equal(0);
+        expect(parseInt(Provider2Holder1Certificates[0])).to.be.equal(1);
+
+        expect(parseInt(TotalProvider1Holder2)).to.equal(1);
+        expect(parseInt(TotalProvider2Holder2)).to.equal(1);
+        expect(parseInt(Provider1Holder2Certificates[0])).to.be.equal(0);
+        expect(parseInt(Provider2Holder2Certificates[0])).to.be.equal(1);
+
+    });
     
 });
 
