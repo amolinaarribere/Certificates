@@ -48,7 +48,7 @@ contract Proposals{
     constructor() payable{
         _chairperson = payable(msg.sender);
         listOfOwners.push(address(msg.sender));
-        _CertificatesContract = new Certificates(listOfOwners);
+        _CertificatesContract = new Certificates(listOfOwners, 1);
     }
     
     // PROPOSALS CRUD Operations

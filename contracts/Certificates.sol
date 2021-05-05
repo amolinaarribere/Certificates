@@ -51,21 +51,10 @@ contract Certificates {
         bool _activated;
         string _Info;
         uint256 _addValidations;
+        mapping(address => bool) _AddValidated;
         uint256 _removeValidations;
+        mapping(address => bool) _RemoveValidated;
     }
-   /* 
-    struct _providerIdentity{
-        bool _activated;
-        string _providerInfo;
-        uint256 _addValidations;
-        uint256 _removeValidations;
-    }
-
-    struct _owner{
-        bool _activated;
-        uint256 _addValidations;
-        uint256 _removeValidations;
-    }*/
 
     struct _entityStruct{
         mapping(address => _entityIdentity) _entities;
@@ -87,9 +76,12 @@ contract Certificates {
     
     // Constructor
 
-    constructor(address[] memory owners, uint256 minOwners) payable{
+    constructor(address[] memory owners,  uint256 minOwners) payable{
         require(minOwners <= owners.length, "Not enough owners provided to meet the minOwners requirement");
         require(minOwners > 0, "At least 1 minimum owner");
+
+        _certificateEntities.push();
+        _certificateEntities.push();
 
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
@@ -107,9 +99,11 @@ contract Certificates {
         require(_numberOfEntities.length > listId, "provided list Id is wrong");
         require(true == _certificateEntities[_ownerId]._entities[msg.sender]._activated, "Not allowed to add entities");
         require(false == _certificateEntities[listId]._entities[entity]._activated, "Entity already activated");
+        require(false == _certificateEntities[listId]._entities[entity]._AddValidated[msg.sender], "Owner has already voted");
 
         if(0 == _certificateEntities[listId]._entities[entity]._addValidations) _certificateEntities[listId]._entities[entity]._Info = entityInfo;
         _certificateEntities[listId]._entities[entity]._addValidations += 1;
+        _certificateEntities[listId]._entities[entity]._AddValidated[msg.sender] = true;
         if(CheckValidations(_certificateEntities[listId]._entities[entity]._addValidations)){
             _certificateEntities[listId]._entities[entity]._activated = true;
             _numberOfEntities[listId] += 1;
@@ -122,9 +116,10 @@ contract Certificates {
         require(_numberOfEntities.length > listId, "provided list Id is wrong");
        require(true == _certificateEntities[_ownerId]._entities[msg.sender]._activated || msg.sender == entity, "Not allowed to remove entity");
        require(true == _certificateEntities[listId]._entities[entity]._activated, "Entity not activated");
+       require(false == _certificateEntities[listId]._entities[entity]._RemoveValidated[msg.sender], "Owner has already voted");
 
        _certificateEntities[listId]._entities[entity]._removeValidations += 1;
-
+        _certificateEntities[listId]._entities[entity]._RemoveValidated[msg.sender] = true;
         if(msg.sender == entity || CheckValidations(_certificateEntities[listId]._entities[entity]._removeValidations)){
             delete(_certificateEntities[listId]._entities[entity]);
             _numberOfEntities[listId] -= 1;
