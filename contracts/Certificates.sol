@@ -8,18 +8,17 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
 /* 
- Actors : Creator, Owners, Providers, Holders
+ Actors : Owners, Providers, Holders
  Token : Certificates
 
- 1- Creator (an owner himslef) add Providers and manage Owners (both as creator and owner).
- 2- Owners manage any owner and any Provider
- 3- Providers manage only themselves and their own Certificates
- 4- Holders can remove their own Certificates
+ 1- Owners manage any owner and any Provider
+ 2- Providers manage only themselves and their own Certificates
+ 3- Holders can remove their own Certificates
 
  Providers lifecycle
-    Provider Creation : Only creator (proposal contract)
-    Provider Update : Any Owner or Provider himself
-    Provider Remove : Any Owner or Provider himself
+    Provider Creation : Minimum Number Of Owner
+    Provider Update : Provider himself
+    Provider Remove : Minimum Number Of Owner or Provider himself
 
  Certificates lifecycle
     Certificate Creation : Any Provider
@@ -27,12 +26,16 @@ pragma solidity >=0.7.0 <0.9.0;
     Certificate Remove : Only Provider that created Certificate or Holder himself    
 
  Owners lifecycle
-    Owner Creation : Any Owner or Creator
-    Owner Remove : Any Owner or Creator
+    Owner Creation : Minimum Number Of Owner
+    Owner Remove : Minimum Number Of Owner or Owner himself
  */
 
 contract Certificates {
     
+    event _AddProviderValidationIdEvent(address);
+    event _RemoveProviderValidationIdEvent(address);
+    event _AddOwnerValidationIdEvent(address);
+    event _RemoveOwnerValidationIdEvent(address);
     event _AddCertificateIdEvent(address, address, uint256);
     event _RemoveCertificateIdEvent(address, address, uint256);
     event _UpdateCertificateIdEvent(address, address, uint256);
@@ -43,81 +46,124 @@ contract Certificates {
         string _CertificateLocation;
         bytes _CertificateHash;
     }
-    
+
+    struct _entityIdentity{
+        bool _activated;
+        string _Info;
+        uint256 _addValidations;
+        uint256 _removeValidations;
+    }
+   /* 
     struct _providerIdentity{
         bool _activated;
         string _providerInfo;
+        uint256 _addValidations;
+        uint256 _removeValidations;
     }
 
-    // Contract Creator
-    address _creator;
+    struct _owner{
+        bool _activated;
+        uint256 _addValidations;
+        uint256 _removeValidations;
+    }*/
+
+    struct _entityStruct{
+        mapping(address => _entityIdentity) _entities;
+    }
+
+    // Owners
+    uint256 constant _ownerId = 0;
+    uint256 _minOwners;
 
     // Providers
-    mapping(address => _providerIdentity) public _providers;
-    uint256 _numberOfProviders;
+    uint256 constant _providerId = 1;
+
+    // Total Owners and Providers
+    uint256[] _numberOfEntities = new uint256[](2);
+    _entityStruct[] _certificateEntities;
 
     // Holders
     mapping(address => _Certificate[]) private _CertificatesPerHolder;
-
-    // list and number of owners
-    mapping(address => bool) public _owners;
-    uint256 _numberOfOwners;
     
+    // Constructor
 
-    constructor(address[] memory owners) payable{
-        _creator = msg.sender;
-        _owners[msg.sender] = true;
-        _numberOfOwners = 1;
-        for (uint i=0; i<owners.length; i++) {
-            if(false == _owners[owners[i]]){
-                _owners[owners[i]] = true;
-                _numberOfOwners += 1;
-            }
-            
+    constructor(address[] memory owners, uint256 minOwners) payable{
+        require(minOwners <= owners.length, "Not enough owners provided to meet the minOwners requirement");
+        require(minOwners > 0, "At least 1 minimum owner");
+
+        _minOwners = minOwners;
+        for (uint i=0; i < owners.length; i++) {
+            _certificateEntities[_ownerId]._entities[owners[i]]._activated = true;
+            _numberOfEntities[_ownerId] += 1;  
         }
-        _numberOfProviders = 0;
+    }
+
+    function CheckValidations(uint256 fieldToValidate) private view returns(bool){
+        if(fieldToValidate < _minOwners) return false;
+        return true;
+    }
+
+    function addEntity(address entity, string memory entityInfo, uint listId) private  {
+        require(_numberOfEntities.length > listId, "provided list Id is wrong");
+        require(true == _certificateEntities[_ownerId]._entities[msg.sender]._activated, "Not allowed to add entities");
+        require(false == _certificateEntities[listId]._entities[entity]._activated, "Entity already activated");
+
+        if(0 == _certificateEntities[listId]._entities[entity]._addValidations) _certificateEntities[listId]._entities[entity]._Info = entityInfo;
+        _certificateEntities[listId]._entities[entity]._addValidations += 1;
+        if(CheckValidations(_certificateEntities[listId]._entities[entity]._addValidations)){
+            _certificateEntities[listId]._entities[entity]._activated = true;
+            _numberOfEntities[listId] += 1;
+            if(_ownerId == listId) emit _AddOwnerValidationIdEvent(entity);
+            else emit _AddProviderValidationIdEvent(entity); 
+        }
+    }
+
+    function removeEntity(address entity, uint listId) private {
+        require(_numberOfEntities.length > listId, "provided list Id is wrong");
+       require(true == _certificateEntities[_ownerId]._entities[msg.sender]._activated || msg.sender == entity, "Not allowed to remove entity");
+       require(true == _certificateEntities[listId]._entities[entity]._activated, "Entity not activated");
+
+       _certificateEntities[listId]._entities[entity]._removeValidations += 1;
+
+        if(msg.sender == entity || CheckValidations(_certificateEntities[listId]._entities[entity]._removeValidations)){
+            delete(_certificateEntities[listId]._entities[entity]);
+            _numberOfEntities[listId] -= 1;
+            if(_ownerId == listId) emit _RemoveOwnerValidationIdEvent(entity);
+            else emit _RemoveProviderValidationIdEvent(entity); 
+        }  
+       
     }
     
     // PROVIDERS CRUD Operations
-
-    function addProvider(address provider, string memory providerInfo) public {
-       require(msg.sender == _creator, "Not allowed to add providers");
-       require(false == _providers[provider]._activated, "Provider already activated") ;
-
-       _providers[provider]._providerInfo = providerInfo;
-       _providers[provider]._activated = true;
-       _numberOfProviders += 1;
+    function addProvider(address provider, string memory providerInfo) external {
+       addEntity(provider, providerInfo, _providerId);  
     }
-    
-    function removeProvider(address provider) public {
-       require(true == _owners[msg.sender] || msg.sender == provider, "Not allowed to remove providers");
-       require(true == _providers[provider]._activated, "Provider not activated");
 
-       _providers[provider]._activated = false;
-       _numberOfProviders -= 1;
+    function removeProvider(address provider) public {
+       removeEntity(provider, _providerId); 
     }
     
     function updateProvider(address provider, string memory providerInfo) public {
-       require(true == _owners[msg.sender] || msg.sender == provider, "Not allowed to update providers");
-       require(true == _providers[provider]._activated, "Provider not activated") ;
+       require(msg.sender == provider, "Not allowed to update providers");
+       require(true == _certificateEntities[_providerId]._entities[provider]._activated, "Provider not activated") ;
 
-       _providers[provider]._providerInfo = providerInfo;
+       _certificateEntities[_providerId]._entities[provider]._Info = providerInfo;
     }
     
     function retrieveProvider(address provider) public view returns (string memory){
-        require(true == _providers[provider]._activated, "Provider does not exist");
+        require(true == _certificateEntities[_providerId]._entities[provider]._activated, "Provider does not exist");
 
-        return _providers[provider]._providerInfo;
+        return _certificateEntities[_providerId]._entities[provider]._Info;
     }
     
     function retrieveTotalProviders() public view returns (uint){
-        return (_numberOfProviders);
+        return (_numberOfEntities[_providerId]);
     }
     
     // Certificats CRUD Operations
 
     function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) public {
-        require(true == _providers[msg.sender]._activated, "Not allowed to add Certificates");
+        require(true == _certificateEntities[_providerId]._entities[msg.sender]._activated, "Not allowed to add Certificates");
         require(0 < CertificateHash.length && (0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length), "Certificate is empty");
 
         _CertificatesPerHolder[holder].push(_Certificate(msg.sender, CertificateContent, CertificateLocation, CertificateHash));
@@ -188,32 +234,20 @@ contract Certificates {
 
     // OWNERS CRD Operations
 
-    function addOwner(address owner) public {
-       require(true == _owners[msg.sender] || msg.sender == _creator, "Not allowed to add owners");
-       require(false == _owners[owner], "Owner already activated");
-
-       _owners[owner] = true;
-       _numberOfOwners += 1;
+    function addOwner(address owner, string memory ownerInfo) public {
+        addEntity(owner, ownerInfo, _ownerId);
     }
     
     function removeOwner(address owner) public {
-       require(true == _owners[msg.sender]  || msg.sender == _creator, "Not allowed to remove owners");
-       require(true == _owners[owner], "Owner already de-activated");
-
-       _owners[owner] = false;
-        _numberOfOwners -= 1;
+        removeEntity(owner, _ownerId);
     }
 
     function isOwner(address owner) public view returns (bool){
-        return(_owners[owner]);
+        return(_certificateEntities[_ownerId]._entities[owner]._activated);
     }
  
     function retrieveTotalOwners() public view returns (uint){
-        return (_numberOfOwners);
-    }
-
-     function retrieveCreator() public view returns (address){
-        return (_creator);
+        return (_numberOfEntities[_ownerId]);
     }
 
 }
