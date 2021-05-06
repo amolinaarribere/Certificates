@@ -7,21 +7,20 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import "./Certificates.sol";
+ import "./CertificatesPool.sol";
 
  /* 
  Like Private Certificates except that Providers must be sent from "Creator" who is not an owner
  */
 
- contract PublicCertificates is Certificates {
+ contract PublicCertificatesPool is CertificatesPool {
 
      address _creator;
      mapping(address => bool) _submitedByCreator;
 
      // Constructor
-    constructor(address[] memory owners,  uint256 minOwners) Certificates(owners, minOwners) payable {
+    constructor(address[] memory owners,  uint256 minOwners) CertificatesPool(owners, minOwners) payable {
         _creator = msg.sender;
-
     }
 
     function addProvider(address provider, string memory providerInfo) external override{
@@ -46,6 +45,7 @@ pragma solidity >=0.7.0 <0.9.0;
             _certificateEntities[_providerId]._entities[provider]._id = _certificateEntities[_providerId]._activatedEntities.length;
             _certificateEntities[_providerId]._activatedEntities.push(provider);
             _numberOfEntities[_providerId] += 1;
+            
             _AddProviderValidationIdEvent(provider); 
         }
 
