@@ -87,6 +87,7 @@ abstract contract CertificatesPool {
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
             _certificateEntities[_ownerId]._entities[owners[i]]._activated = true;
+            _certificateEntities[_ownerId]._activatedEntities.push(owners[i]);
             _numberOfEntities[_ownerId] += 1;  
         }
     }
