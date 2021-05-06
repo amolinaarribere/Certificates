@@ -25,22 +25,33 @@ import "./Certificates.sol";
 
  */
 
-contract Proposals{
+contract CertificatesPool{
 
+    event _NewCertificatesPool(uint256, address, Certificates);
     event _SendProposalId(address);
     event _ApproveProposalId(address);
     event _RejectProposalId(address);
 
     enum proposalState { NOT_SUBMITTED, PENDING, APPROVED, REJECTED }
     uint constant _PriceWei = 10;
-
-    Certificates  _CertificatesContract;
+    uint constant _PrivatePoolPriceWei = 10;
     
+    // Private Certificates Pool structure
+    struct _certificatesPoolStruct{
+        address _creator;
+        Certificates _CertificatesPool;
+    } 
+
+    _certificatesPoolStruct[] _PrivateCertificatesPools;
+
     struct _proposal{
         proposalState _state;
         string _providerInfo;
     } 
     
+    // Public Certificates Pool structure
+    Certificates  _PublicCertificatesPool;
+
     address payable _chairperson;
     mapping(address => _proposal) public _proposals;
     address[] listOfOwners;
@@ -48,9 +59,27 @@ contract Proposals{
     constructor() payable{
         _chairperson = payable(msg.sender);
         listOfOwners.push(address(msg.sender));
-        _CertificatesContract = new Certificates(listOfOwners, 1);
+        _PublicCertificatesPool = new Certificates(listOfOwners, 1);
     }
-    
+
+    // PRIVATE CERTIFICATE POOL /////////////////////////////////////////////////////////////
+    function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external payable{
+        require(msg.value >= _PrivatePoolPriceWei, "Not enough funds");
+
+        Certificates certificatePool = new Certificates(owners, minOwners);
+        _certificatesPoolStruct memory privateCertificatesPool = _certificatesPoolStruct(msg.sender, certificatePool);
+        _PrivateCertificatesPools.push(privateCertificatesPool);
+        emit _NewCertificatesPool(_PrivateCertificatesPools.length - 1, privateCertificatesPool._creator, privateCertificatesPool._CertificatesPool);
+    }
+
+    function retrievePrivateCertificatesPool(uint256 certificatePoolId) external view returns ( address, Certificates){
+        require(certificatePoolId < _PrivateCertificatesPools.length, "Certificates Pool does not exist");
+
+        return(_PrivateCertificatesPools[certificatePoolId]._creator, _PrivateCertificatesPools[certificatePoolId]._CertificatesPool);
+    }
+
+    // PUBLIC CERTIFICATE POOL /////////////////////////////////////////////////////////////
+
     // PROPOSALS CRUD Operations
 
     function sendProposal(address provider, string memory providerInfo) public payable {
@@ -68,7 +97,7 @@ contract Proposals{
         require(proposalState.PENDING == _proposals[provider]._state, "This proposal cannot be modified");
 
         _proposals[provider]._state = proposalState.APPROVED;
-        _CertificatesContract.addProvider(provider, _proposals[provider]._providerInfo);   
+        _PublicCertificatesPool.addProvider(provider, _proposals[provider]._providerInfo);   
 
         emit _ApproveProposalId(provider);
     }
@@ -91,7 +120,7 @@ contract Proposals{
     // Contract basic information
 
     function retrieveCertificatesContractAddress() public view returns (Certificates) {
-        return _CertificatesContract;
+        return _PublicCertificatesPool;
     }
     
     function retrieveChairPerson() public view returns (address) {
