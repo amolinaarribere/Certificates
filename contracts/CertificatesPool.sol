@@ -32,6 +32,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 abstract contract CertificatesPool {
     
+    // events logs
     event _AddProviderValidationIdEvent(address);
     event _RemoveProviderValidationIdEvent(address);
     event _AddOwnerValidationIdEvent(address);
@@ -40,6 +41,7 @@ abstract contract CertificatesPool {
     event _RemoveCertificateIdEvent(address, address, uint256);
     event _UpdateCertificateIdEvent(address, address, uint256);
     
+    // structures
     struct _Certificate{
         address _Provider;
         string _CertificateContent;
@@ -62,15 +64,80 @@ abstract contract CertificatesPool {
         address[] _activatedEntities;
     }
 
+    //Actions that can be performed on entities
+    enum Actions{
+        Add,
+        Remove
+    }
+
+    //modifiers
+    modifier isListIdCorrect(uint listId){
+        require(_numberOfEntities.length > listId, "provided list Id is wrong");
+        _;
+    }
+
+    modifier isAnOwner(){
+        require(true == isOwner(msg.sender), "Only Owners are allowed to perform this action");
+        _;
+    }
+
+    modifier isAnOwnerOrHimself(address entity){
+        require(true == isOwner(msg.sender) || msg.sender == entity, "Not allowed to remove entity");
+        _;
+    }
+
+    modifier isAProvider(){
+        require(true == isProvider(msg.sender), "Only Providers are allowed to perform this action");
+        _;
+    }
+
+    modifier isTheProvider(address holder, uint CertificateId){
+        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider, "Not allowed to update this particular Certificate");
+        _;
+    }
+
+    modifier isTheProviderOrHimself(address holder, uint CertificateId){
+        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider || msg.sender == holder, "Not allowed to remove this particular Certificate");
+        _;
+    }
+
+    modifier isEntityActivated(bool YesOrNo, address entity, uint listId){
+        if(false == YesOrNo) require(false == isEntity(entity, listId), string(abi.encodePacked(_entitiesLabel[listId]," already activated")));
+        else require(true == isEntity(entity, listId), string(abi.encodePacked(_entitiesLabel[listId]," must be activated")));
+        _;
+    }
+
+    modifier hasNotAlreadyVoted(Actions action, address entity, uint listId){
+        string memory message = string(abi.encodePacked(_entitiesLabel[listId]," has already voted"));
+        if(Actions.Remove == action) require(false == _certificateEntities[listId]._entities[entity]._RemoveValidated[msg.sender], message);
+        else require(false == _certificateEntities[listId]._entities[entity]._AddValidated[msg.sender], message);
+        _;
+    }
+
+    modifier CertificateExists(uint CertificateId, address holder){
+        require(CertificateId < _CertificatesPerHolder[holder].length, "Certificate does not exist");
+        _;
+    }
+
+    modifier isHimself(address entity){
+        require(msg.sender == entity, "It is not himself");
+        _;
+    }
+
+    uint256 constant TotalEntities = 2;
+
     // Owners
     uint256 constant _ownerId = 0;
+    string constant _ownerLabel = "Owner";
     uint256 _minOwners;
 
     // Providers
     uint256 constant _providerId = 1;
+    string constant _providerLabel = "Provider";
 
     // Total Owners and Providers
-    uint256[] _numberOfEntities = new uint256[](2);
+    uint256[] _numberOfEntities = new uint256[](TotalEntities);
+    string[] _entitiesLabel = new string[](TotalEntities);
     _entityStruct[] _certificateEntities;
 
     // Holders
@@ -83,6 +150,8 @@ abstract contract CertificatesPool {
 
         _certificateEntities.push();
         _certificateEntities.push();
+        _entitiesLabel[_ownerId] = _ownerLabel;
+        _entitiesLabel[_providerId] = _providerLabel;
 
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
@@ -98,11 +167,12 @@ abstract contract CertificatesPool {
         return true;
     }
 
-    function addEntity(address entity, string memory entityInfo, uint listId) internal  {
-        require(_numberOfEntities.length > listId, "provided list Id is wrong");
-        require(true == isOwner(msg.sender), "Not allowed to add entities");
-        require(false == _certificateEntities[listId]._entities[entity]._activated, "Entity already activated");
-        require(false == _certificateEntities[listId]._entities[entity]._AddValidated[msg.sender], "Owner has already voted");
+    function addEntity(address entity, string memory entityInfo, uint listId) internal 
+        isListIdCorrect(listId) 
+        isAnOwner 
+        isEntityActivated(false, entity, listId) 
+        hasNotAlreadyVoted(Actions.Add, entity, listId)
+    {
 
         if(0 == _certificateEntities[listId]._entities[entity]._addValidations) _certificateEntities[listId]._entities[entity]._Info = entityInfo;
         _certificateEntities[listId]._entities[entity]._addValidations += 1;
@@ -118,11 +188,12 @@ abstract contract CertificatesPool {
         }
     }
 
-    function removeEntity(address entity, uint listId) internal {
-        require(_numberOfEntities.length > listId, "provided list Id is wrong");
-        require(true == isOwner(msg.sender) || msg.sender == entity, "Not allowed to remove entity");
-        require(true == _certificateEntities[listId]._entities[entity]._activated, "Entity not activated");
-        require(false == _certificateEntities[listId]._entities[entity]._RemoveValidated[msg.sender], "Owner has already voted");
+    function removeEntity(address entity, uint listId) internal 
+        isListIdCorrect(listId) 
+        isAnOwnerOrHimself(entity) 
+        isEntityActivated(true, entity, listId) 
+        hasNotAlreadyVoted(Actions.Remove, entity, listId)
+    {
 
         _certificateEntities[listId]._entities[entity]._removeValidations += 1;
         _certificateEntities[listId]._entities[entity]._RemoveValidated[msg.sender] = true;
@@ -137,22 +208,24 @@ abstract contract CertificatesPool {
        
     }
 
-    function updateEntity(address entity, string memory entityInfo, uint listId) internal {
-       require(msg.sender == entity, "Not allowed to update entity");
-       require(true == isEntity(entity, listId), "Entity not activated") ;
-
+    function updateEntity(address entity, string memory entityInfo, uint listId) internal 
+        isHimself(entity)
+        isEntityActivated(true, entity, listId)
+    {
        _certificateEntities[listId]._entities[entity]._Info = entityInfo;
     }
 
-    function retrieveEntity(address entity, uint listId) internal view returns (string memory){
-        require(true == isEntity(entity, listId), "Entity does not exist");
-
+    function retrieveEntity(address entity, uint listId) internal 
+        isEntityActivated(true, entity, listId) 
+    view returns (string memory) 
+    {
         return _certificateEntities[listId]._entities[entity]._Info;
     }
 
-    function retrieveAllEntities(uint listId) internal view returns (address[] memory){
-        require(_numberOfEntities.length > listId, "provided list Id is wrong");
-
+    function retrieveAllEntities(uint listId) internal 
+        isListIdCorrect(listId) 
+    view returns (address[] memory) 
+    {
         address[] memory activatedEntities = new address[](_numberOfEntities[listId]);
         uint counter;
 
@@ -231,8 +304,9 @@ abstract contract CertificatesPool {
     }
     
     // Certificates CRUD Operations
-    function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) external {
-        require(true == isProvider(msg.sender), "Not allowed to manage Certificates");
+    function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) external 
+        isAProvider 
+    {
         require(0 < CertificateHash.length && (0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length), "Certificate is empty");
 
         _CertificatesPerHolder[holder].push(_Certificate(msg.sender, CertificateContent, CertificateLocation, CertificateHash));
@@ -240,22 +314,22 @@ abstract contract CertificatesPool {
         emit _AddCertificateIdEvent(msg.sender, holder, Id);
     }
     
-    function removeCertificate(uint256 CertificateId, address holder) external {
-        require(true == isProvider(msg.sender), "Not allowed to manage Certificates");
-        require(CertificateId < _CertificatesPerHolder[holder].length, "Certificate does not exist");
-        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider || msg.sender == holder, "Not allowed to remove this particular Certificate");
-
+    function removeCertificate(uint256 CertificateId, address holder) external 
+        isAProvider 
+        CertificateExists(CertificateId, holder) 
+        isTheProviderOrHimself(holder, CertificateId) 
+    {
         address provider = _CertificatesPerHolder[holder][CertificateId]._Provider;
         delete _CertificatesPerHolder[holder][CertificateId];
         emit _RemoveCertificateIdEvent(provider, holder, CertificateId);
 
     }
     
-    function updateCertificate(uint256 CertificateId, address holder, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) external {
-        require(true == isProvider(msg.sender), "Not allowed to manage Certificates");
-       require(CertificateId < _CertificatesPerHolder[holder].length, "Certificate does not exist");
-       require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider, "Not allowed to update this particular Certificate");
-
+    function updateCertificate(uint256 CertificateId, address holder, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) external 
+        isAProvider 
+        CertificateExists(CertificateId, holder) 
+        isTheProvider(holder, CertificateId)
+    {
        if(0 < bytes(CertificateContent).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateContent = CertificateContent;
        if(0 < bytes(CertificateLocation).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateLocation = CertificateLocation;
        if(0 < bytes(CertificateHash).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateHash = CertificateHash;
@@ -263,9 +337,10 @@ abstract contract CertificatesPool {
        emit _UpdateCertificateIdEvent(_CertificatesPerHolder[holder][CertificateId]._Provider, holder, CertificateId);
     }
 
-    function retrieveCertificate(uint256 CertificateId, address holder) external view returns (address, string memory, string memory, bytes memory){
-        require(CertificateId < _CertificatesPerHolder[holder].length, "Certificate does not exist");
-
+    function retrieveCertificate(uint256 CertificateId, address holder) external 
+        CertificateExists(CertificateId, holder) 
+    view returns (address, string memory, string memory, bytes memory)
+    {
         return (_CertificatesPerHolder[holder][CertificateId]._Provider, 
             _CertificatesPerHolder[holder][CertificateId]._CertificateContent,
             _CertificatesPerHolder[holder][CertificateId]._CertificateLocation,
