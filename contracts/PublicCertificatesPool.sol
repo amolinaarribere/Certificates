@@ -43,7 +43,7 @@ pragma solidity >=0.7.0 <0.9.0;
         hasBeenSubmitted(true, provider)
         isAnOwner 
         isEntityActivated(false, provider, _providerId) 
-        hasNotAlreadyVoted(Actions.Add, provider, _providerId)
+        OwnerhasNotAlreadyVoted(Actions.Add, provider)
     {
         _certificateEntities[_providerId]._entities[provider]._addValidations += 1;
         _certificateEntities[_providerId]._entities[provider]._AddValidated[msg.sender] = true;
@@ -53,8 +53,8 @@ pragma solidity >=0.7.0 <0.9.0;
             _certificateEntities[_providerId]._entities[provider]._id = _certificateEntities[_providerId]._activatedEntities.length;
             _certificateEntities[_providerId]._activatedEntities.push(provider);
             _numberOfEntities[_providerId] += 1;
-            
-            _AddProviderValidationIdEvent(provider); 
+
+            emit _AddEntityValidationIdEvent(_entitiesLabel[_providerId] ,provider);
         }
 
     }
