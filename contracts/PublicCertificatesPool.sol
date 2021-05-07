@@ -18,25 +18,33 @@ pragma solidity >=0.7.0 <0.9.0;
      address _creator;
      mapping(address => bool) _submitedByCreator;
 
+     //modifiers
+    modifier hasBeenSubmitted(bool YesOrNo, address provider){
+        if(false == YesOrNo) require(false == _submitedByCreator[provider], "Provider already activated or in progress");
+        else require(true == _submitedByCreator[provider], "Provider not submited by Creator yet");
+        _;
+    }
+
      // Constructor
     constructor(address[] memory owners,  uint256 minOwners) CertificatesPool(owners, minOwners) payable {
         _creator = msg.sender;
     }
 
-    function addProvider(address provider, string memory providerInfo) external override{
-        require(msg.sender == _creator, "Only creator can add providers");
-        require(false == _submitedByCreator[provider], "Provider already activated or in progress");
-
+    function addProvider(address provider, string memory providerInfo) external 
+        isSomeoneSpecific(_creator)
+        hasBeenSubmitted(false, provider)
+    override
+    {
         _certificateEntities[_providerId]._entities[provider]._Info = providerInfo;
         _submitedByCreator[provider] = true;
     }
 
-    function validateProvider(address provider) external {
-       require(true == _submitedByCreator[provider], "Provider not submited by Creator yet");
-       require(true == isOwner(msg.sender), "Not allowed to validate providers");
-       require(false == _certificateEntities[_providerId]._entities[provider]._activated, "Provider already activated");
-       require(false == _certificateEntities[_providerId]._entities[provider]._AddValidated[msg.sender], "Owner has already voted");
-
+    function validateProvider(address provider) external 
+        hasBeenSubmitted(true, provider)
+        isAnOwner 
+        isEntityActivated(false, provider, _providerId) 
+        hasNotAlreadyVoted(Actions.Add, provider, _providerId)
+    {
         _certificateEntities[_providerId]._entities[provider]._addValidations += 1;
         _certificateEntities[_providerId]._entities[provider]._AddValidated[msg.sender] = true;
 

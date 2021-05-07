@@ -108,7 +108,7 @@ abstract contract CertificatesPool {
     }
 
     modifier hasNotAlreadyVoted(Actions action, address entity, uint listId){
-        string memory message = string(abi.encodePacked(_entitiesLabel[listId]," has already voted"));
+        string memory message = "Has already voted";
         if(Actions.Remove == action) require(false == _certificateEntities[listId]._entities[entity]._RemoveValidated[msg.sender], message);
         else require(false == _certificateEntities[listId]._entities[entity]._AddValidated[msg.sender], message);
         _;
@@ -119,8 +119,8 @@ abstract contract CertificatesPool {
         _;
     }
 
-    modifier isHimself(address entity){
-        require(msg.sender == entity, "It is not himself");
+    modifier isSomeoneSpecific(address entity){
+        require(msg.sender == entity, "It is who it should be");
         _;
     }
 
@@ -209,7 +209,7 @@ abstract contract CertificatesPool {
     }
 
     function updateEntity(address entity, string memory entityInfo, uint listId) internal 
-        isHimself(entity)
+        isSomeoneSpecific(entity)
         isEntityActivated(true, entity, listId)
     {
        _certificateEntities[listId]._entities[entity]._Info = entityInfo;
