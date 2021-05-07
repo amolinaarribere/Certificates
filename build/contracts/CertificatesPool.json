@@ -535,7 +535,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\nimport \"./MultiSigContract.sol\";\r\n\r\n/* \r\n Actors : Owners, Providers, Holders\r\n Token : Certificates\r\n\r\n 1- Owners manage any owner and any Provider\r\n 2- Providers manage only themselves and their own Certificates\r\n 3- Holders can remove their own Certificates\r\n\r\n Providers lifecycle\r\n    Provider Creation : Minimum Number Of Owner\r\n    Provider Update : Provider himself\r\n    Provider Remove : Minimum Number Of Owner or Provider himself\r\n\r\n Certificates lifecycle\r\n    Certificate Creation : Any Provider\r\n    Certificate Update : Only Provider that created Certificate\r\n    Certificate Remove : Only Provider that created Certificate or Holder himself    \r\n\r\n Owners lifecycle\r\n    Owner Creation : Minimum Number Of Owner\r\n    Owner Remove : Minimum Number Of Owner or Owner himself\r\n */\r\n\r\nabstract contract CertificatesPool is MultiSigContract {\r\n    \r\n    // events logs\r\n    event _AddCertificateIdEvent(address, address, uint256);\r\n    event _RemoveCertificateIdEvent(address, address, uint256);\r\n    event _UpdateCertificateIdEvent(address, address, uint256);\r\n    \r\n    // structures\r\n    struct _Certificate{\r\n        address _Provider;\r\n        string _CertificateContent;\r\n        string _CertificateLocation;\r\n        bytes _CertificateHash;\r\n    }\r\n\r\n    // modifiers\r\n    modifier isAProvider(){\r\n        require(true == isProvider(msg.sender), \"Only Providers are allowed to perform this action\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProvider(address holder, uint CertificateId){\r\n        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider, \"Not allowed to update this particular Certificate\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProviderOrHimself(address holder, uint CertificateId){\r\n        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider || msg.sender == holder, \"Not allowed to remove this particular Certificate\");\r\n        _;\r\n    }\r\n\r\n    uint256 constant TotalEntities = 2;\r\n\r\n    // Owners\r\n    uint256 constant _ownerIdCertificates = 0;\r\n    string constant _ownerLabel = \"Owner\";\r\n    //uint256 _minOwners;\r\n\r\n    // Providers\r\n    uint256 constant _providerId = 1;\r\n    string constant _providerLabel = \"Provider\";\r\n\r\n    string[] _Label = [_ownerLabel, _providerLabel];\r\n\r\n    // Holders\r\n    mapping(address => _Certificate[]) private _CertificatesPerHolder;\r\n    \r\n    // Constructor\r\n    constructor(address[] memory owners,  uint256 minOwners) \r\n        MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdCertificates)\r\n    payable\r\n    {}\r\n\r\n    \r\n    // PROVIDERS CRUD Operations\r\n    function addProvider(address provider, string memory providerInfo) external virtual;\r\n\r\n    function removeProvider(address provider) external {\r\n       removeEntity(provider, _providerId); \r\n    }\r\n    \r\n    function updateProvider(address provider, string memory providerInfo) external {\r\n       updateEntity(provider, providerInfo, _providerId);\r\n    }\r\n    \r\n    function retrieveProvider(address provider) external view returns (string memory){\r\n        return retrieveEntity(provider, _providerId);\r\n    }\r\n\r\n    function retrieveAllProviders() external view returns (address[] memory){\r\n        return(retrieveAllEntities(_providerId));\r\n    }\r\n    \r\n    function retrieveTotalProviders() external view returns (uint){\r\n        return (retrieveTotalEntities(_providerId));\r\n    }\r\n\r\n    function isProvider(address provider) public view returns (bool){\r\n        return(isEntity(provider, _providerId));\r\n    }\r\n    \r\n    // Certificates CRUD Operations\r\n    function addCertificate(string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) external \r\n        isAProvider \r\n    {\r\n        require(0 < CertificateHash.length && (0 < bytes(CertificateLocation).length || 0 < bytes(CertificateContent).length), \"Certificate is empty\");\r\n\r\n        _CertificatesPerHolder[holder].push(_Certificate(msg.sender, CertificateContent, CertificateLocation, CertificateHash));\r\n        uint256 Id = _CertificatesPerHolder[holder].length - 1;\r\n        emit _AddCertificateIdEvent(msg.sender, holder, Id);\r\n    }\r\n    \r\n    function removeCertificate(uint256 CertificateId, address holder) external \r\n        isAProvider \r\n        isIdCorrect(CertificateId, _CertificatesPerHolder[holder].length)\r\n        isTheProviderOrHimself(holder, CertificateId) \r\n    {\r\n        address provider = _CertificatesPerHolder[holder][CertificateId]._Provider;\r\n        delete _CertificatesPerHolder[holder][CertificateId];\r\n        emit _RemoveCertificateIdEvent(provider, holder, CertificateId);\r\n\r\n    }\r\n    \r\n    function updateCertificate(uint256 CertificateId, address holder, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) external \r\n        isAProvider \r\n        isIdCorrect(CertificateId, _CertificatesPerHolder[holder].length)\r\n        isTheProvider(holder, CertificateId)\r\n    {\r\n       if(0 < bytes(CertificateContent).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateContent = CertificateContent;\r\n       if(0 < bytes(CertificateLocation).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateLocation = CertificateLocation;\r\n       if(0 < bytes(CertificateHash).length)  _CertificatesPerHolder[holder][CertificateId]._CertificateHash = CertificateHash;\r\n\r\n       emit _UpdateCertificateIdEvent(_CertificatesPerHolder[holder][CertificateId]._Provider, holder, CertificateId);\r\n    }\r\n\r\n    function retrieveCertificate(uint256 CertificateId, address holder) external \r\n        isIdCorrect(CertificateId, _CertificatesPerHolder[holder].length)\r\n    view returns (address, string memory, string memory, bytes memory)\r\n    {\r\n        return (_CertificatesPerHolder[holder][CertificateId]._Provider, \r\n            _CertificatesPerHolder[holder][CertificateId]._CertificateContent,\r\n            _CertificatesPerHolder[holder][CertificateId]._CertificateLocation,\r\n            _CertificatesPerHolder[holder][CertificateId]._CertificateHash);\r\n    }\r\n\r\n    function retrieveTotalCertificatesByHolder(address holder) external view returns (uint256){\r\n        return (_CertificatesPerHolder[holder].length);\r\n    }\r\n\r\n    function retrieveTotalCertificatesByProviderAndHolder(address provider, address holder) public view returns (uint){\r\n        uint Total = 0;\r\n\r\n        for(uint i=0; i < _CertificatesPerHolder[holder].length; i++){\r\n            if(_CertificatesPerHolder[holder][i]._Provider == provider){\r\n                Total += 1;\r\n            }\r\n        }\r\n\r\n        return (Total);\r\n    }\r\n\r\n    function retrieveCertificatesByProviderAndHolder(address provider, address holder) external view returns (uint256[] memory){\r\n        uint[] memory ListOfCertificatesIdByProviderAndHolder = new uint[](retrieveTotalCertificatesByProviderAndHolder(provider, holder));\r\n        uint counter = 0;\r\n\r\n        for(uint i=0; i < _CertificatesPerHolder[holder].length; i++){\r\n            if(_CertificatesPerHolder[holder][i]._Provider == provider){\r\n                ListOfCertificatesIdByProviderAndHolder[counter] = i;\r\n                counter += 1;\r\n            }\r\n        }\r\n\r\n        return (ListOfCertificatesIdByProviderAndHolder);\r\n    }\r\n\r\n\r\n    \r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\CertificatesPool.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/CertificatesPool.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/CertificatesPool.sol",
     "exportedSymbols": {
@@ -543,10 +543,10 @@
         599
       ],
       "Library": [
-        832
+        653
       ],
       "MultiSigContract": [
-        1673
+        1494
       ]
     },
     "id": 600,
@@ -573,7 +573,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 600,
-        "sourceUnit": 1674,
+        "sourceUnit": 1495,
         "src": "151:32:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -586,10 +586,10 @@
               "id": 3,
               "name": "MultiSigContract",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1673,
+              "referencedDeclaration": 1494,
               "src": "986:16:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MultiSigContract_$1673",
+                "typeIdentifier": "t_contract$_MultiSigContract_$1494",
                 "typeString": "contract MultiSigContract"
               }
             },
@@ -599,14 +599,14 @@
           }
         ],
         "contractDependencies": [
-          1673
+          1494
         ],
         "contractKind": "contract",
         "fullyImplemented": false,
         "id": 599,
         "linearizedBaseContracts": [
           599,
-          1673
+          1494
         ],
         "name": "CertificatesPool",
         "nodeType": "ContractDefinition",
@@ -2228,10 +2228,10 @@
                   "name": "MultiSigContract",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 1673,
+                  "referencedDeclaration": 1494,
                   "src": "2609:16:0",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_type$_t_contract$_MultiSigContract_$1673_$",
+                    "typeIdentifier": "t_type$_t_contract$_MultiSigContract_$1494_$",
                     "typeString": "type(contract MultiSigContract)"
                   }
                 },
@@ -2451,7 +2451,7 @@
                       "name": "removeEntity",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1423,
+                      "referencedDeclaration": 1244,
                       "src": "2911:12:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -2597,7 +2597,7 @@
                       "name": "updateEntity",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1451,
+                      "referencedDeclaration": 1272,
                       "src": "3056:12:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_string_memory_ptr_$_t_uint256_$returns$__$",
@@ -2753,7 +2753,7 @@
                       "name": "retrieveEntity",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1474,
+                      "referencedDeclaration": 1295,
                       "src": "3224:14:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_string_memory_ptr_$",
@@ -2897,7 +2897,7 @@
                           "name": "retrieveAllEntities",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1551,
+                          "referencedDeclaration": 1372,
                           "src": "3367:19:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_uint256_$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -3037,7 +3037,7 @@
                           "name": "retrieveTotalEntities",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1564,
+                          "referencedDeclaration": 1385,
                           "src": "3501:21:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_uint256_$returns$_t_uint256_$",
@@ -3183,7 +3183,7 @@
                           "name": "isEntity",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1583,
+                          "referencedDeclaration": 1404,
                           "src": "3634:8:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -4640,7 +4640,7 @@
                   "name": "isIdCorrect",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 911,
+                  "referencedDeclaration": 732,
                   "src": "4438:11:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_uint256_$_t_uint256_$",
@@ -5671,7 +5671,7 @@
                   "name": "isIdCorrect",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 911,
+                  "referencedDeclaration": 732,
                   "src": "5015:11:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_uint256_$_t_uint256_$",
@@ -6292,7 +6292,7 @@
                   "name": "isIdCorrect",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 911,
+                  "referencedDeclaration": 732,
                   "src": "5765:11:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_uint256_$_t_uint256_$",
@@ -7989,10 +7989,10 @@
           599
         ],
         "Library": [
-          832
+          653
         ],
         "MultiSigContract": [
-          1673
+          1494
         ]
       },
       "license": "GPL-3.0"
@@ -8016,7 +8016,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 1674,
+          "SourceUnit": 1495,
           "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/MultiSigContract.sol",
           "file": "./MultiSigContract.sol",
           "scope": 600,
@@ -8033,13 +8033,13 @@
         "attributes": {
           "abstract": true,
           "contractDependencies": [
-            1673
+            1494
           ],
           "contractKind": "contract",
           "fullyImplemented": false,
           "linearizedBaseContracts": [
             599,
-            1673
+            1494
           ],
           "name": "CertificatesPool",
           "scope": 600
@@ -8051,7 +8051,7 @@
               {
                 "attributes": {
                   "name": "MultiSigContract",
-                  "referencedDeclaration": 1673,
+                  "referencedDeclaration": 1494,
                   "type": "contract MultiSigContract"
                 },
                 "id": 3,
@@ -9763,7 +9763,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 1673,
+                      "referencedDeclaration": 1494,
                       "type": "type(contract MultiSigContract)",
                       "value": "MultiSigContract"
                     },
@@ -10044,7 +10044,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1423,
+                              "referencedDeclaration": 1244,
                               "type": "function (address,uint256)",
                               "value": "removeEntity"
                             },
@@ -10223,7 +10223,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1451,
+                              "referencedDeclaration": 1272,
                               "type": "function (address,string memory,uint256)",
                               "value": "updateEntity"
                             },
@@ -10410,7 +10410,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1474,
+                              "referencedDeclaration": 1295,
                               "type": "function (address,uint256) view returns (string memory)",
                               "value": "retrieveEntity"
                             },
@@ -10578,7 +10578,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1551,
+                                  "referencedDeclaration": 1372,
                                   "type": "function (uint256) view returns (address[] memory)",
                                   "value": "retrieveAllEntities"
                                 },
@@ -10727,7 +10727,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1564,
+                                  "referencedDeclaration": 1385,
                                   "type": "function (uint256) view returns (uint256)",
                                   "value": "retrieveTotalEntities"
                                 },
@@ -10903,7 +10903,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1583,
+                                  "referencedDeclaration": 1404,
                                   "type": "function (address,uint256) view returns (bool)",
                                   "value": "isEntity"
                                 },
@@ -12085,7 +12085,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 911,
+                      "referencedDeclaration": 732,
                       "type": "modifier (uint256,uint256)",
                       "value": "isIdCorrect"
                     },
@@ -12719,7 +12719,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 911,
+                      "referencedDeclaration": 732,
                       "type": "modifier (uint256,uint256)",
                       "value": "isIdCorrect"
                     },
@@ -13921,7 +13921,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 911,
+                      "referencedDeclaration": 732,
                       "type": "modifier (uint256,uint256)",
                       "value": "isIdCorrect"
                     },
@@ -15989,7 +15989,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-05-07T13:30:13.174Z",
+  "updatedAt": "2021-05-07T13:49:15.788Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
