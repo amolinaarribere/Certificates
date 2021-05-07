@@ -7,7 +7,10 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
+ import "./Library.sol";
+
 abstract contract MultiSigContract {
+    using Library for *;
 
     //events
     event _AddEntityValidationIdEvent(string, address);
@@ -46,7 +49,7 @@ abstract contract MultiSigContract {
 
     // modifiers
     modifier isIdCorrect(uint Id, uint length){
-        require(length > Id, "provided Id is wrong");
+        require(true == Library.IdCorrect(Id, length), "provided Id is wrong");
         _;
     }
 

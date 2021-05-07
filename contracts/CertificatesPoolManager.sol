@@ -7,7 +7,7 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
-import "./MultiSigContract.sol";
+import "./Library.sol";
 import "./PrivateCertificatesPool.sol";
 import "./PublicCertificatesPool.sol";
 
@@ -28,7 +28,9 @@ import "./PublicCertificatesPool.sol";
  */
 
 contract CertificatesPoolManager{
+    using Library for *;
 
+    // events
     event _NewCertificatesPool(uint256, address, CertificatesPool);
     event _SendProposalId(address);
 
@@ -36,6 +38,11 @@ contract CertificatesPoolManager{
     uint _PrivatePoolPriceWei;
 
     // modfiers
+    modifier isIdCorrect(uint Id, uint length){
+        require(true == Library.IdCorrect(Id, length), "provided Id is wrong");
+        _;
+    }
+
     modifier areFundsEnough(uint minPrice){
         require(msg.value >= minPrice, "Not enough funds");
         _;
