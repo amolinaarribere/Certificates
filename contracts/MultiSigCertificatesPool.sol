@@ -32,7 +32,7 @@ import "./MultiSigContract.sol";
     Owner Remove : Minimum Number Of Owner or Owner himself
  */
 
-abstract contract CertificatesPool is MultiSigContract {
+abstract contract MultiSigCertificatesPool is MultiSigContract {
     
     // events logs
     event _AddCertificateIdEvent(address, address, uint256);

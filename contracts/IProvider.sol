@@ -6,7 +6,7 @@ pragma solidity >=0.7.0 <0.9.0;
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
- import "./CertificatesPool.sol";
+ import "./MultiSigCertificatesPool.sol";
 
  interface IProvider  {
     function addCertificate(uint PoolId, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash, address holder) external;
@@ -17,6 +17,6 @@ pragma solidity >=0.7.0 <0.9.0;
     function removeCertificatePool(uint PoolId) external;
 
     function retrieveTotalPools() external view returns(uint256);
-    function retrievePool(uint PoolId) external view returns(CertificatesPool);
+    function retrievePool(uint PoolId) external view returns(MultiSigCertificatesPool);
     
 }

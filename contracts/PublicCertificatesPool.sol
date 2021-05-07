@@ -7,13 +7,13 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import "./CertificatesPool.sol";
+ import "./MultiSigCertificatesPool.sol";
 
  /* 
  Like Private Certificates except that Providers must be sent from "Creator" who is not an owner
  */
 
- contract PublicCertificatesPool is CertificatesPool {
+ contract PublicCertificatesPool is MultiSigCertificatesPool {
 
      address _creator;
      mapping(address => bool) _submitedByCreator;
@@ -26,7 +26,7 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
      // Constructor
-    constructor(address[] memory owners,  uint256 minOwners) CertificatesPool(owners, minOwners) payable {
+    constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {
         _creator = msg.sender;
     }
 

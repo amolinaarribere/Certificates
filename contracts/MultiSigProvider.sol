@@ -22,7 +22,7 @@ pragma solidity >=0.7.0 <0.9.0;
     string[] _Label = [_ownerLabel];
 
     // Certificates Pools
-    CertificatesPool[] _Pools;
+    MultiSigCertificatesPool[] _Pools;
      
      // Constructor
     constructor(address[] memory owners,  uint256 minOwners) 
@@ -34,7 +34,7 @@ pragma solidity >=0.7.0 <0.9.0;
     function addCertificatePool(address NewCertificatePoolAddress) external
     override
     {
-        CertificatesPool NewCertificatePool = CertificatesPool(NewCertificatePoolAddress);
+        MultiSigCertificatesPool NewCertificatePool = MultiSigCertificatesPool(NewCertificatePoolAddress);
         _Pools.push(NewCertificatePool);
     }
 
@@ -55,7 +55,7 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrievePool(uint PoolId) external 
         isIdCorrect(PoolId, _Pools.length)
     override
-    view returns(CertificatesPool)
+    view returns(MultiSigCertificatesPool)
     {
         return(_Pools[PoolId]);
     }
