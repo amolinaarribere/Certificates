@@ -10,6 +10,8 @@ pragma experimental ABIEncoderV2;
  import "./Library.sol";
  import "./IProvider.sol";
  import "./MultiSigContract.sol";
+ import "./PrivateCertificatesPool.sol";
+ import "./PublicCertificatesPool.sol";
 
 
  contract MultiSigProvider is IProvider, MultiSigContract {
@@ -89,7 +91,7 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-     function addCertificate(address pool, bytes memory CertificateHash, address holder) external
+     function addCertificate(address pool, bytes memory CertificateHash, address holder, bool poolPrivate) external
         isAPool(pool)
         isAnOwner
         isEntityActivated(false,  _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
@@ -101,13 +103,22 @@ pragma experimental ABIEncoderV2;
         _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.push(msg.sender);
 
         if(Library.CheckValidations(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length, _minOwners)){
-            // send to pool
+            MultiSigCertificatesPool poolToSend;
+            if(true == poolPrivate){
+                poolToSend = PrivateCertificatesPool(pool);
+            }
+            else {
+                poolToSend = PublicCertificatesPool(pool);
+            }
+            
+            
+            poolToSend.addCertificate(CertificateHash, holder);
         }
      }
      
-     function removeCertificate(address pool, uint256 CertificateId, address holder) external override{}
+     function removeCertificate(address pool, uint256 CertificateId, address holder, bool poolPrivate) external override{}
      
-     function updateCertificate(address pool, uint256 CertificateId, address holder, bytes memory CertificateHash) external override{}
+     function updateCertificate(address pool, uint256 CertificateId, address holder, bytes memory CertificateHash, bool poolPrivate) external override{}
 
     
  }
