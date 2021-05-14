@@ -56,16 +56,14 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
     // PROVIDERS CRUD Operations
     function addProvider(address provider, string memory providerInfo) external virtual;
 
-    function removeProvider(address provider) external {
-       removeEntity(provider, _providerId); 
-    }
+    function removeProvider(address provider) external virtual;
     
     function updateProvider(address provider, string memory providerInfo) external {
-       updateEntity(provider, providerInfo, _providerId);
+       updateEntity(provider, bytes(providerInfo), _providerId);
     }
     
     function retrieveProvider(address provider) external view returns (string memory){
-        return retrieveEntity(provider, _providerId);
+        return string(retrieveEntity(provider, _providerId));
     }
 
     function retrieveAllProviders() external view returns (address[] memory){

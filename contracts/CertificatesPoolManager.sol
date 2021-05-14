@@ -31,7 +31,7 @@ contract CertificatesPoolManager{
     using Library for *;
 
     // events
-    event _NewCertificatesPool(uint256, address, CertificatesPool);
+    event _NewCertificatesPool(uint256, address, MultiSigCertificatesPool);
     event _SendProposalId(address);
 
     uint _PublicPriceWei;
@@ -83,7 +83,7 @@ contract CertificatesPoolManager{
 
     function retrievePrivateCertificatesPool(uint certificatePoolId) external
         isIdCorrect(certificatePoolId, _PrivateCertificatesPools.length)
-    view returns (address, CertificatesPool)
+    view returns (address, MultiSigCertificatesPool)
     {
         return(_PrivateCertificatesPools[certificatePoolId]._creator, _PrivateCertificatesPools[certificatePoolId]._PrivateCertificatesPool);
     }
@@ -99,7 +99,7 @@ contract CertificatesPoolManager{
        emit _SendProposalId(provider);
     }
 
-    function retrievePublicCertificatesPool() public view returns (CertificatesPool) {
+    function retrievePublicCertificatesPool() public view returns (MultiSigCertificatesPool) {
         return _PublicCertificatesPool;
     }
     

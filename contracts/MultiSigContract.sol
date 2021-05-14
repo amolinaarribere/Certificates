@@ -71,13 +71,13 @@ abstract contract MultiSigContract {
         }
     }
 
-    function addEntity(address entity, string memory entityInfo, uint listId) internal 
+    function addEntity(address entity, bytes memory entityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwner 
     {
         Library.addEntity(entity, entityInfo, _Entities[listId], _minOwners);
 
-        if(true == Library.isEntity(entity, _Entities[listId])){
+        if(true == Library.isEntity(_Entities[listId]._entities[entity])){
             emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity);
         }
     }
@@ -88,13 +88,13 @@ abstract contract MultiSigContract {
     {
         Library.removeEntity(entity, _Entities[listId], _minOwners);
 
-        if(false == Library.isEntity(entity, _Entities[listId])){
+        if(false == Library.isEntity(_Entities[listId]._entities[entity])){
             emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity);
         }
        
     }
 
-    function updateEntity(address entity, string memory newEntityInfo, uint listId) internal 
+    function updateEntity(address entity, bytes memory newEntityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwner
     {
@@ -108,7 +108,7 @@ abstract contract MultiSigContract {
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
-    view returns (string memory) 
+    view returns (bytes memory) 
     {
         return Library.retrieveEntity(entity, _Entities[listId]);
     }
@@ -129,12 +129,12 @@ abstract contract MultiSigContract {
     function isEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
     view returns (bool){
-        return(Library.isEntity(entity, _Entities[listId]));
+        return(Library.isEntity(_Entities[listId]._entities[entity]));
     }
 
     // OWNERS CRUD Operations
     function addOwner(address owner, string memory ownerInfo) external {
-        addEntity(owner, ownerInfo, _ownerId);
+        addEntity(owner, bytes(ownerInfo), _ownerId);
     }
     
     function removeOwner(address owner) external {
@@ -142,11 +142,11 @@ abstract contract MultiSigContract {
     }
 
     function updateOwner(address owner, string memory ownerInfo) external {
-       updateEntity(owner, ownerInfo, _ownerId);
+       updateEntity(owner, bytes(ownerInfo), _ownerId);
     }
     
     function retrieveOwner(address owner) external view returns (string memory){
-        return retrieveEntity(owner, _ownerId);
+        return string(retrieveEntity(owner, _ownerId));
     }
 
     function retrieveAllOwners() external view returns (address[] memory){

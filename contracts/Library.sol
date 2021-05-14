@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -19,7 +20,7 @@ library Library{
     struct _entityIdentity{
         uint256 _id;
         bool _activated;
-        string _Info;
+        bytes _Info;
         uint256 _updatedTimes;
         address[] _AddValidated;
         address[] _RemoveValidated;
@@ -37,21 +38,29 @@ library Library{
     }
 
     // modifier
-    modifier HasNotAlreadyVoted(Actions action, address entity, _entityStruct storage Entities){
-        string memory message = "Owner has already voted";
-        if(Actions.Update == action) require(false == FindAddress(msg.sender, Entities._entities[entity]._UpdateValidated), message);
-        else if(Actions.Add == action) require(false == FindAddress(msg.sender, Entities._entities[entity]._AddValidated), message);
-        else require(false == FindAddress(msg.sender, Entities._entities[entity]._RemoveValidated), message);
+    modifier HasNotAlreadyVoted(Actions action, _entityIdentity memory Entity){
+        NotAlreadyVoted(action, Entity);
         _;
     }
-
-    modifier isEntityActivated(bool YesOrNo, address entity, _entityStruct storage Entities){
-        if(false == YesOrNo) require(false == isEntity(entity, Entities), "Entity already activated");
-        else require(true == isEntity(entity, Entities), "Entity must be activated");
+    
+    modifier isEntityActivated(bool YesOrNo, _entityIdentity memory Entity){
+        EntityActivated(YesOrNo, Entity);
         _;
     }
 
     // auxiliary functions
+    function NotAlreadyVoted(Actions action, _entityIdentity memory Entity) public view{
+        string memory message = "Owner has already voted";
+        if(Actions.Update == action) require(false == FindAddress(msg.sender, Entity._UpdateValidated), message);
+        else if(Actions.Add == action) require(false == FindAddress(msg.sender, Entity._AddValidated), message);
+        else require(false == FindAddress(msg.sender, Entity._RemoveValidated), message);
+    }
+    
+    function EntityActivated(bool YesOrNo, _entityIdentity memory Entity) public pure{
+        if(false == YesOrNo) require(false == isEntity(Entity), "Entity already activated");
+        else require(true == isEntity(Entity), "Entity must be activated");
+    }
+    
     function IdCorrect(uint Id, uint length) public pure returns (bool){
         return (length > Id);
     }
@@ -80,11 +89,11 @@ library Library{
     }
 
     // functions for entities
-    function addEntity(address entity, string memory entityInfo, _entityStruct storage Entities, uint256 minSignatures) internal 
-        isEntityActivated(false, entity, Entities) 
-        HasNotAlreadyVoted(Actions.Add, entity, Entities)
+    function addEntity(address entity, bytes memory entityInfo, _entityStruct storage Entities, uint256 minSignatures) internal 
+        isEntityActivated(false, Entities._entities[entity]) 
+        HasNotAlreadyVoted(Actions.Add, Entities._entities[entity])
     {
-        if(0 == Entities._entities[entity]._AddValidated.length) Entities._entities[entity]._Info = entityInfo;
+        if(0 == Entities._entities[entity]._AddValidated.length && 0 == Entities._entities[entity]._Info.length) Entities._entities[entity]._Info = entityInfo;
 
         Entities._entities[entity]._AddValidated.push(msg.sender);
 
@@ -96,8 +105,8 @@ library Library{
     }
 
     function removeEntity(address entity, _entityStruct storage Entities, uint256 minSignatures) internal 
-        isEntityActivated(true, entity, Entities)
-        HasNotAlreadyVoted(Actions.Remove, entity, Entities)
+        isEntityActivated(true, Entities._entities[entity])
+        HasNotAlreadyVoted(Actions.Remove, Entities._entities[entity])
     {
         Entities._entities[entity]._RemoveValidated.push(msg.sender);
 
@@ -108,9 +117,9 @@ library Library{
        
     }
 
-    function updateEntity(address entity, string memory entityInfo, _entityStruct storage Entities, uint256 minSignatures) internal 
-        isEntityActivated(true, entity, Entities)
-        HasNotAlreadyVoted(Actions.Update, entity, Entities)
+    function updateEntity(address entity, bytes memory entityInfo, _entityStruct storage Entities, uint256 minSignatures) internal 
+        isEntityActivated(true, Entities._entities[entity])
+        HasNotAlreadyVoted(Actions.Update, Entities._entities[entity])
     {   
         Entities._entities[entity]._UpdateValidated.push(msg.sender); 
 
@@ -122,8 +131,8 @@ library Library{
     }
 
     function retrieveEntity(address entity, _entityStruct storage Entities) internal 
-        isEntityActivated(true, entity, Entities)
-    view returns (string memory) 
+        isEntityActivated(true, Entities._entities[entity])
+    view returns (bytes memory) 
     {
         return Entities._entities[entity]._Info;
     }
@@ -152,13 +161,13 @@ library Library{
     }
 
     function retrieveUpdatedTimes(address entity, _entityStruct storage Entities) internal 
-        isEntityActivated(true, entity, Entities)
+        isEntityActivated(true, Entities._entities[entity])
     view returns (uint) 
     {
         return Entities._entities[entity]._updatedTimes;
     }
 
-    function isEntity(address entity, _entityStruct storage Entities) internal view returns (bool){
-        return(Entities._entities[entity]._activated);
+    function isEntity(_entityIdentity memory Entity) internal pure returns (bool){
+        return(Entity._activated);
     }
 }

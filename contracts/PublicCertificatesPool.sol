@@ -35,28 +35,22 @@ pragma solidity >=0.7.0 <0.9.0;
         hasBeenSubmitted(false, provider)
     override
     {
-        _certificateEntities[_providerId]._entities[provider]._Info = providerInfo;
+        _Entities[_providerId]._entities[provider]._Info = bytes(providerInfo);
         _submitedByCreator[provider] = true;
     }
 
     function validateProvider(address provider) external 
         hasBeenSubmitted(true, provider)
-        isAnOwner 
-        isEntityActivated(false, provider, _providerId) 
-        OwnerhasNotAlreadyVoted(Actions.Add, provider)
     {
-        _certificateEntities[_providerId]._entities[provider]._addValidations += 1;
-        _certificateEntities[_providerId]._entities[provider]._AddValidated[msg.sender] = true;
+        addEntity(provider, _Entities[_providerId]._entities[provider]._Info, _providerId);
+    }
 
-        if(CheckValidations(_certificateEntities[_providerId]._entities[provider]._addValidations)){
-            _certificateEntities[_providerId]._entities[provider]._activated = true;
-            _certificateEntities[_providerId]._entities[provider]._id = _certificateEntities[_providerId]._activatedEntities.length;
-            _certificateEntities[_providerId]._activatedEntities.push(provider);
-            _numberOfEntities[_providerId] += 1;
+    function removeProvider(address provider) external override{
+       removeEntity(provider, _providerId); 
 
-            emit _AddEntityValidationIdEvent(_entitiesLabel[_providerId] ,provider);
-        }
-
+       if(false == Library.isEntity(_Entities[_providerId]._entities[provider])){
+            delete(_submitedByCreator[provider]);
+       }
     }
 
  }

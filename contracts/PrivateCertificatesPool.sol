@@ -19,7 +19,11 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     function addProvider(address provider, string memory providerInfo) external override{
-        super.addEntity(provider, providerInfo, _providerId);
+        addEntity(provider, bytes(providerInfo), _providerId);
+    }
+
+    function removeProvider(address provider) external override{
+       removeEntity(provider, _providerId); 
     }
 
  }
