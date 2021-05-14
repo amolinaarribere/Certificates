@@ -15,47 +15,19 @@ abstract contract MultiSigContract {
     //events
     event _AddEntityValidationIdEvent(string, address);
     event _RemoveEntityValidationIdEvent(string, address);
-
-    //Structures
-    struct _entityIdentity{
-        uint256 _id;
-        bool _activated;
-        string _Info;
-        uint256 _addValidations;
-        mapping(address => bool) _AddValidated;
-        uint256 _removeValidations;
-        mapping(address => bool) _RemoveValidated;
-    }
-
-    struct _entityStruct{
-        mapping(address => _entityIdentity) _entities;
-        address[] _activatedEntities;
-    }
+    event _UpdateEntityValidationIdEvent(string, address);
 
     // owners
     uint _ownerId;
     uint256 _minOwners;
 
     // Total Owners and other Entities
-    uint256[] _numberOfEntities;
     string[] _entitiesLabel;
-    _entityStruct[] _certificateEntities;
-
-    //Actions that can be performed on entities
-    enum Actions{
-        Add,
-        Remove
-    }
+    Library._entityStruct[] _Entities;
 
     // modifiers
     modifier isIdCorrect(uint Id, uint length){
         require(true == Library.IdCorrect(Id, length), "provided Id is wrong");
-        _;
-    }
-
-    modifier isEntityActivated(bool YesOrNo, address entity, uint listId){
-        if(false == YesOrNo) require(false == isEntity(entity, listId), string(abi.encodePacked(_entitiesLabel[listId]," already activated")));
-        else require(true == isEntity(entity, listId), string(abi.encodePacked(_entitiesLabel[listId]," must be activated")));
         _;
     }
 
@@ -74,10 +46,8 @@ abstract contract MultiSigContract {
         _;
     }
 
-    modifier OwnerhasNotAlreadyVoted(Actions action, address entity){
-        string memory message = "Owner has already voted";
-        if(Actions.Remove == action) require(false == _certificateEntities[_ownerId]._entities[entity]._RemoveValidated[msg.sender], message);
-        else require(false == _certificateEntities[_ownerId]._entities[entity]._AddValidated[msg.sender], message);
+    modifier NotEmpty(bytes memory document){
+        require(0 < document.length, "Empty");
         _;
     }
 
@@ -90,100 +60,76 @@ abstract contract MultiSigContract {
         _ownerId = ownerId;
 
         for(uint j=0; j < TotalEntities; j++){
-            _certificateEntities.push();
-            _numberOfEntities.push();
+            _Entities.push();
             _entitiesLabel.push(labels[j]);
         }
 
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
-            _certificateEntities[_ownerId]._entities[owners[i]]._activated = true;
-            _certificateEntities[_ownerId]._activatedEntities.push(owners[i]);
-            _numberOfEntities[_ownerId] += 1;  
+            _Entities[_ownerId]._entities[owners[i]]._activated = true;
+            _Entities[_ownerId]._activatedEntities.push(owners[i]); 
         }
     }
 
-    // Generic Entity CRUD Operation
-    function CheckValidations(uint256 fieldToValidate) internal view returns(bool){
-        if(fieldToValidate < _minOwners) return false;
-        return true;
-    }
-
     function addEntity(address entity, string memory entityInfo, uint listId) internal 
-        isIdCorrect(listId, _numberOfEntities.length) 
+        isIdCorrect(listId, _Entities.length) 
         isAnOwner 
-        isEntityActivated(false, entity, listId) 
-        OwnerhasNotAlreadyVoted(Actions.Add, entity)
     {
-        if(0 == _certificateEntities[listId]._entities[entity]._addValidations) _certificateEntities[listId]._entities[entity]._Info = entityInfo;
-        _certificateEntities[listId]._entities[entity]._addValidations += 1;
-        _certificateEntities[listId]._entities[entity]._AddValidated[msg.sender] = true;
-        if(CheckValidations(_certificateEntities[listId]._entities[entity]._addValidations)){
-            _certificateEntities[listId]._entities[entity]._activated = true;
-            _certificateEntities[listId]._entities[entity]._id = _certificateEntities[listId]._activatedEntities.length;
-            _certificateEntities[listId]._activatedEntities.push(entity);
-            _numberOfEntities[listId] += 1;
+        Library.addEntity(entity, entityInfo, _Entities[listId], _minOwners);
 
-            emit _AddEntityValidationIdEvent(_entitiesLabel[listId] ,entity);
+        if(true == Library.isEntity(entity, _Entities[listId])){
+            emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity);
         }
     }
 
     function removeEntity(address entity, uint listId) internal 
-        isIdCorrect(listId, _numberOfEntities.length) 
+        isIdCorrect(listId, _Entities.length) 
         isAnOwnerOrHimself(entity) 
-        isEntityActivated(true, entity, listId) 
-        OwnerhasNotAlreadyVoted(Actions.Remove, entity)
     {
+        Library.removeEntity(entity, _Entities[listId], _minOwners);
 
-        _certificateEntities[listId]._entities[entity]._removeValidations += 1;
-        _certificateEntities[listId]._entities[entity]._RemoveValidated[msg.sender] = true;
-        if(msg.sender == entity || CheckValidations(_certificateEntities[listId]._entities[entity]._removeValidations)){
-            delete(_certificateEntities[listId]._activatedEntities[_certificateEntities[listId]._entities[entity]._id]);
-            delete(_certificateEntities[listId]._entities[entity]);
-            _numberOfEntities[listId] -= 1;
-
-            emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId] ,entity);
-        }  
+        if(false == Library.isEntity(entity, _Entities[listId])){
+            emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity);
+        }
        
     }
 
-    function updateEntity(address entity, string memory entityInfo, uint listId) internal 
-        isSomeoneSpecific(entity)
-        isEntityActivated(true, entity, listId)
+    function updateEntity(address entity, string memory newEntityInfo, uint listId) internal 
+        isIdCorrect(listId, _Entities.length) 
+        isAnOwner
     {
-       _certificateEntities[listId]._entities[entity]._Info = entityInfo;
+        uint UpdatedTimes = Library.retrieveUpdatedTimes(entity, _Entities[listId]);
+        Library.updateEntity(entity, newEntityInfo, _Entities[listId], _minOwners);
+
+        if(Library.retrieveUpdatedTimes(entity, _Entities[listId]) == UpdatedTimes + 1){
+            emit _UpdateEntityValidationIdEvent(_entitiesLabel[listId], entity);
+        }
     }
 
     function retrieveEntity(address entity, uint listId) internal 
-        isEntityActivated(true, entity, listId) 
+        isIdCorrect(listId, _Entities.length)
     view returns (string memory) 
     {
-        return _certificateEntities[listId]._entities[entity]._Info;
+        return Library.retrieveEntity(entity, _Entities[listId]);
     }
 
     function retrieveAllEntities(uint listId) internal 
-        isIdCorrect(listId, _numberOfEntities.length) 
+        isIdCorrect(listId, _Entities.length) 
     view returns (address[] memory) 
     {
-        address[] memory activatedEntities = new address[](_numberOfEntities[listId]);
-        uint counter;
-
-        for(uint i=0; i < _certificateEntities[listId]._activatedEntities.length; i++){
-            if(address(0) != _certificateEntities[listId]._activatedEntities[i]){
-                activatedEntities[counter] = _certificateEntities[listId]._activatedEntities[i];
-                counter += 1;
-            }
-        }
-
-        return(activatedEntities);
+        return (Library.retrieveAllEntities(_Entities[listId]));
     }
 
-    function retrieveTotalEntities(uint listId) internal view returns (uint){
-        return (_numberOfEntities[listId]);
+    function retrieveTotalEntities(uint listId) internal 
+        isIdCorrect(listId, _Entities.length)
+    view returns (uint){
+        return (Library.retrieveTotalEntities(_Entities[listId]));
     }
 
-    function isEntity(address entity, uint listId) internal view returns (bool){
-        return(_certificateEntities[listId]._entities[entity]._activated);
+    function isEntity(address entity, uint listId) internal 
+        isIdCorrect(listId, _Entities.length)
+    view returns (bool){
+        return(Library.isEntity(entity, _Entities[listId]));
     }
 
     // OWNERS CRUD Operations

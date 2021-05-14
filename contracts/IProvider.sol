@@ -13,10 +13,11 @@ pragma solidity >=0.7.0 <0.9.0;
     function removeCertificate(uint PoolId, uint256 CertificateId, address holder) external;
     function updateCertificate(uint PoolId, uint256 CertificateId, address holder, string memory CertificateContent, string memory CertificateLocation, bytes memory CertificateHash) external;
 
-    function addCertificatePool(address NewCertificatePoolAddress) external;
-    function removeCertificatePool(uint PoolId) external;
-
-    function retrieveTotalPools() external view returns(uint256);
-    function retrievePool(uint PoolId) external view returns(MultiSigCertificatesPool);
+    function addPool(address NewCertificatePoolAddress) external;
+    function removePool(uint PoolId) external;
+    function updatePool(address pool, string memory poolInfo) external;
+    function retrievePool(address pool) external view returns (string memory);
+    function retrieveAllPools() external view returns (address[] memory);
+    function retrieveTotalPools() external view returns (uint);
     
 }
