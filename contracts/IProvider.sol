@@ -9,8 +9,8 @@ pragma solidity >=0.7.0 <0.9.0;
  import "./MultiSigCertificatesPool.sol";
 
  interface IProvider  {
-    function addCertificate(address pool, bytes memory CertificateHash, address holder) external;
-    function removeCertificate(address pool, bytes memory CertificateHash, address holder) external;
+    function addCertificate(address pool, bytes32 CertificateHash, address holder) external;
+    function removeCertificate(address pool, bytes32 CertificateHash, address holder) external;
 
     function addPool(address pool, string memory poolInfo) external;
     function removePool(address pool) external;

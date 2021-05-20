@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -46,7 +47,7 @@ abstract contract MultiSigContract {
         _;
     }
 
-    modifier NotEmpty(bytes memory document){
+    modifier NotEmpty(bytes32 document){
         require(0 < document.length, "Empty");
         _;
     }

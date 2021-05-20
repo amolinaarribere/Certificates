@@ -30,7 +30,7 @@ pragma experimental ABIEncoderV2;
     string[] _Label = [_ownerLabel, _poolLabel];
     
     struct _CertificateStruct{
-        mapping(bytes => Library._entityIdentity) _cert;
+        mapping(bytes32 => Library._entityIdentity) _cert;
     }
     
     struct _CertificatesPerHolderStruct{
@@ -95,18 +95,18 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-     function addCertificate(address pool, bytes memory CertificateHash, address holder) external override
+     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
         manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Add);
      }
      
-     function removeCertificate(address pool, bytes memory CertificateHash, address holder) external override
+     function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
          manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Remove);
      }
 
     
-    function manipulateCertificate(address pool, bytes memory CertificateHash, address holder, Library.Actions act) 
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Library.Actions act) 
         isAPool(pool)
         isAnOwner
         isEntityActivated(act == Library.Actions.Remove,  _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
