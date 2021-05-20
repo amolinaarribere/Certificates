@@ -32,10 +32,6 @@ library Library{
         address[] _activatedEntities;
     }
 
-    struct _Certificate{
-        address _Provider;
-        bytes _CertificateHash;
-    }
 
     // modifier
     modifier HasNotAlreadyVoted(Actions action, _entityIdentity memory Entity){

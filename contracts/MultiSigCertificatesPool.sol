@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -12,9 +13,8 @@ import "./MultiSigContract.sol";
 abstract contract MultiSigCertificatesPool is MultiSigContract {
     
     // events logs
-    event _AddCertificateIdEvent(address, address, uint256);
-    event _RemoveCertificateIdEvent(address, address, uint256);
-    event _UpdateCertificateIdEvent(address, address, uint256);
+    event _AddCertificateIdEvent(address, address);
+    event _RemoveCertificateIdEvent(address, address);
 
     uint256 constant TotalEntities = 2;
 
@@ -29,7 +29,12 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
     string[] _Label = [_ownerLabel, _providerLabel];
 
     // Holders
-    mapping(address => Library._Certificate[]) private _CertificatesPerHolder;
+    struct _CertificatePerHolder{
+        mapping(bytes => address) _CertificateFromProvider;
+        bytes[] _ListOfCertificates;
+    }
+    
+    mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;
 
     // modifiers
     modifier isAProvider(){
@@ -37,13 +42,18 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
         _;
     }
 
-    modifier isTheProvider(address holder, uint CertificateId){
-        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider, "Not allowed to update this particular Certificate");
+    modifier isTheProvider(address holder, bytes memory CertificateHash){
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "Not allowed to update this particular Certificate");
         _;
     }
 
-    modifier isTheProviderOrHimself(address holder, uint CertificateId){
-        require(msg.sender == _CertificatesPerHolder[holder][CertificateId]._Provider || msg.sender == holder, "Not allowed to remove this particular Certificate");
+    modifier isTheProviderOrHimself(address holder, bytes memory CertificateHash){
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "Not allowed to remove this particular Certificate");
+        _;
+    }
+    
+    modifier CertificateDoesNotExist(address holder, bytes memory CertificateHash){
+        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "Certificate already exist");
         _;
     }
     
@@ -82,66 +92,66 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
     function addCertificate(bytes memory CertificateHash, address holder) external 
         isAProvider 
         NotEmpty(CertificateHash)
+        CertificateDoesNotExist(holder, CertificateHash)
     {
-        _CertificatesPerHolder[holder].push(Library._Certificate(msg.sender, CertificateHash));
-        uint256 Id = _CertificatesPerHolder[holder].length - 1;
-        emit _AddCertificateIdEvent(msg.sender, holder, Id);
+        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;
+        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
+
+        emit _AddCertificateIdEvent(msg.sender, holder);
     }
     
-    function removeCertificate(uint256 CertificateId, address holder) external 
+    function removeCertificate(bytes memory CertificateHash, address holder) external 
         isAProvider 
-        isIdCorrect(CertificateId, _CertificatesPerHolder[holder].length)
-        isTheProviderOrHimself(holder, CertificateId) 
+        isTheProviderOrHimself(holder, CertificateHash) 
     {
-        address provider = _CertificatesPerHolder[holder][CertificateId]._Provider;
-        delete _CertificatesPerHolder[holder][CertificateId];
-        emit _RemoveCertificateIdEvent(provider, holder, CertificateId);
+        address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
+        bytes[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
+        
+        for(uint i=0; i < listOfCert.length; i++){
+            if(CertificateHash == listOfCert[i]){
+                ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);
+                break;
+            }
+        }
+        
+        delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
+        
+        emit _RemoveCertificateIdEvent(provider, holder);
 
     }
     
-    function updateCertificate(uint256 CertificateId, address holder, bytes memory CertificateHash) external 
-        isAProvider 
-        isIdCorrect(CertificateId, _CertificatesPerHolder[holder].length)
-        isTheProvider(holder, CertificateId)
-        NotEmpty(CertificateHash)
-    {     
-        _CertificatesPerHolder[holder][CertificateId]._CertificateHash = CertificateHash;
-
-       emit _UpdateCertificateIdEvent(_CertificatesPerHolder[holder][CertificateId]._Provider, holder, CertificateId);
+    function ArrayRemoveResize(uint index, bytes[] memory array) internal 
+        isIdCorrect(index, array.length)
+    pure returns(bytes[] memory) 
+    {
+        for (uint i = index; i < array.length-1; i++){
+            array[i] = array[i+1];
+        }
+        
+        delete array[array.length-1];
+        
+        return array;
     }
 
-    function retrieveCertificate(uint256 CertificateId, address holder) external 
-        isIdCorrect(CertificateId, _CertificatesPerHolder[holder].length)
-    view returns (address, bytes memory)
+    function retrieveCertificateProvider(bytes memory CertificateHash, address holder) external 
+    view returns (address)
     {
-        return (_CertificatesPerHolder[holder][CertificateId]._Provider, 
-            _CertificatesPerHolder[holder][CertificateId]._CertificateHash);
+        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);
     }
 
     function retrieveTotalCertificatesByHolder(address holder) external view returns (uint256){
-        return (_CertificatesPerHolder[holder].length);
+        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);
     }
 
-    function retrieveTotalCertificatesByProviderAndHolder(address provider, address holder) public view returns (uint){
-        uint Total = 0;
 
-        for(uint i=0; i < _CertificatesPerHolder[holder].length; i++){
-            if(_CertificatesPerHolder[holder][i]._Provider == provider){
-                Total += 1;
-            }
-        }
-
-        return (Total);
-    }
-
-    function retrieveCertificatesByProviderAndHolder(address provider, address holder) external view returns (uint256[] memory){
-        uint[] memory ListOfCertificatesIdByProviderAndHolder = new uint[](retrieveTotalCertificatesByProviderAndHolder(provider, holder));
-        uint counter = 0;
-
-        for(uint i=0; i < _CertificatesPerHolder[holder].length; i++){
-            if(_CertificatesPerHolder[holder][i]._Provider == provider){
-                ListOfCertificatesIdByProviderAndHolder[counter] = i;
-                counter += 1;
+    function retrieveCertificatesByProviderAndHolder(address provider, address holder) external view returns (bytes[] memory)
+    {
+        bytes[] storage ListOfCertificatesIdByProviderAndHolder;
+        bytes[] memory  listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
+        
+        for(uint i=0; i < listOfCert.length; i++){
+            if(_CertificatesPerHolder[holder]._CertificateFromProvider[listOfCert[i]] == provider){
+                ListOfCertificatesIdByProviderAndHolder.push(listOfCert[i]);
             }
         }
 

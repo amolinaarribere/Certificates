@@ -75,6 +75,10 @@ pragma experimental ABIEncoderV2;
     }
     
     function retrievePool(address pool) external override view returns (string memory){
+        return InternalRetrievePool(pool);
+    }
+    
+    function InternalRetrievePool(address pool) internal view returns (string memory){
         return string(retrieveEntity(pool, _poolId));
     }
 
@@ -91,20 +95,39 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-     function addCertificate(address pool, bytes memory CertificateHash, address holder, bool poolPrivate) external
+     function addCertificate(address pool, bytes memory CertificateHash, address holder) external override
+     {
+        manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Add);
+     }
+     
+     function removeCertificate(address pool, bytes memory CertificateHash, address holder) external override
+     {
+         manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Remove);
+     }
+
+    
+    function manipulateCertificate(address pool, bytes memory CertificateHash, address holder, Library.Actions act) 
         isAPool(pool)
         isAnOwner
-        isEntityActivated(false,  _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+        isEntityActivated(act == Library.Actions.Remove,  _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
         HasNotAlreadyVoted(Library.Actions.Add, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
-     override
-     {
-        if(0 == _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length) _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Info = CertificateHash;
+    internal{
+        
+        uint validations;
+        
+        if(act == Library.Actions.Add){
+            _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.push(msg.sender);
+            validations = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length;
+        }
+        else{
+            _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._RemoveValidated.push(msg.sender);
+            validations = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._RemoveValidated.length;
+        }
 
-        _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.push(msg.sender);
-
-        if(Library.CheckValidations(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length, _minOwners)){
+        if(Library.CheckValidations(validations, _minOwners)){
             MultiSigCertificatesPool poolToSend;
-            if(true == poolPrivate){
+            
+            if(keccak256(abi.encodePacked("Private")) == keccak256(abi.encodePacked((InternalRetrievePool(pool))))){
                 poolToSend = PrivateCertificatesPool(pool);
             }
             else {
@@ -112,13 +135,15 @@ pragma experimental ABIEncoderV2;
             }
             
             
-            poolToSend.addCertificate(CertificateHash, holder);
+            if(act == Library.Actions.Add){
+                poolToSend.addCertificate(CertificateHash, holder);
+            }
+            else{
+               poolToSend.removeCertificate(CertificateHash, holder);
+            }
+            
+            
         }
-     }
-     
-     function removeCertificate(address pool, uint256 CertificateId, address holder, bool poolPrivate) external override{}
-     
-     function updateCertificate(address pool, uint256 CertificateId, address holder, bytes memory CertificateHash, bool poolPrivate) external override{}
-
+    }
     
  }
