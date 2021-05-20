@@ -9,8 +9,9 @@ pragma experimental ABIEncoderV2;
  */
 
 import "./MultiSigContract.sol";
+ import "../Interfaces/IPool.sol";
 
-abstract contract MultiSigCertificatesPool is MultiSigContract {
+abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     
     // events logs
     event _AddCertificateIdEvent(address, address);
@@ -64,23 +65,24 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
     {}
 
     // PROVIDERS CRUD Operations
-    function addProvider(address provider, string memory providerInfo) external virtual;
+    function addProvider(address provider, string memory providerInfo) external override virtual;
 
-    function removeProvider(address provider) external virtual;
+    function removeProvider(address provider) external override virtual;
     
-    function updateProvider(address provider, string memory providerInfo) external {
+    function updateProvider(address provider, string memory providerInfo) external  override
+    {
        updateEntity(provider, bytes(providerInfo), _providerId);
     }
     
-    function retrieveProvider(address provider) external view returns (string memory){
+    function retrieveProvider(address provider) external override view returns (string memory){
         return string(retrieveEntity(provider, _providerId));
     }
 
-    function retrieveAllProviders() external view returns (address[] memory){
+    function retrieveAllProviders() external override view returns (address[] memory){
         return(retrieveAllEntities(_providerId));
     }
     
-    function retrieveTotalProviders() external view returns (uint){
+    function retrieveTotalProviders() external override view returns (uint){
         return (retrieveTotalEntities(_providerId));
     }
 
@@ -89,7 +91,7 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
     }
     
     // Certificates CRUD Operations
-    function addCertificate(bytes32 CertificateHash, address holder) external 
+    function addCertificate(bytes32 CertificateHash, address holder) external override
         isAProvider 
         NotEmpty(CertificateHash)
         CertificateDoesNotExist(holder, CertificateHash)
@@ -100,7 +102,7 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
         emit _AddCertificateIdEvent(msg.sender, holder);
     }
     
-    function removeCertificate(bytes32 CertificateHash, address holder) external 
+    function removeCertificate(bytes32 CertificateHash, address holder) external override
         isAProvider 
         isTheProviderOrHimself(holder, CertificateHash) 
     {
@@ -133,17 +135,19 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
         return array;
     }
 
-    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external 
+    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override
     view returns (address)
     {
         return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);
     }
 
-    function retrieveTotalCertificatesByHolder(address holder) external view returns (uint256){
+    function retrieveTotalCertificatesByHolder(address holder) external override 
+    view returns (uint256)
+    {
         return (_CertificatesPerHolder[holder]._ListOfCertificates.length);
     }
     
-    function retrieveTotalCertificatesByProviderAndHolder(address provider, address holder) external 
+    function retrieveTotalCertificatesByProviderAndHolder(address provider, address holder) external override
     view returns (uint)
     {
         bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
@@ -159,7 +163,7 @@ abstract contract MultiSigCertificatesPool is MultiSigContract {
         return (count);
     } 
 
-    function retrieveCertificatesByProviderAndHolder(address provider, address holder, uint skipFirst, uint max) external 
+    function retrieveCertificatesByProviderAndHolder(address provider, address holder, uint skipFirst, uint max) external override
         isIdCorrect(skipFirst, _CertificatesPerHolder[holder]._ListOfCertificates.length)
     view returns (bytes32[] memory)
     {

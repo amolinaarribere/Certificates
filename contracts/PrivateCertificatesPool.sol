@@ -8,7 +8,7 @@ pragma experimental ABIEncoderV2;
  * @dev Store & retrieve value in a variable
  */
 
- import "./MultiSigCertificatesPool.sol";
+ import "./Abstract/MultiSigCertificatesPool.sol";
 
  /* 
  Like Private Certificates except that Providers must be sent from "Creator" who is not an owner

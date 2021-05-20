@@ -8,7 +8,7 @@ pragma experimental ABIEncoderV2;
  * @dev Store & retrieve value in a variable
  */
 
- import "./Library.sol";
+ import "../Libraries/Library.sol";
 
 abstract contract MultiSigContract {
     using Library for *;

@@ -6,7 +6,6 @@ pragma solidity >=0.7.0 <0.9.0;
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
- import "./MultiSigCertificatesPool.sol";
 
  interface IProvider  {
     function addCertificate(address pool, bytes32 CertificateHash, address holder) external;
