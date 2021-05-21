@@ -14,12 +14,13 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external view returns (address);
     function retrieveTotalCertificatesByHolder(address holder) external view returns (uint256);
     function retrieveTotalCertificatesByProviderAndHolder(address provider, address holder) external view returns (uint);
+    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external view returns (bytes32[] memory);
     function retrieveCertificatesByProviderAndHolder(address provider, address holder, uint skipFirst, uint max) external view returns (bytes32[] memory);
 
-    function addProvider(address pool, string memory poolInfo) external;
-    function removeProvider(address pool) external;
-    function updateProvider(address pool, string memory poolInfo) external;
-    function retrieveProvider(address pool) external view returns (string memory);
+    function addProvider(address provider, string memory providerInfo) external;
+    function removeProvider(address provider) external;
+    function updateProvider(address provider, string memory providerInfo) external;
+    function retrieveProvider(address provider) external view returns (string memory);
     function retrieveAllProviders() external view returns (address[] memory);
     function retrieveTotalProviders() external view returns (uint);
     

@@ -123,7 +123,8 @@ abstract contract MultiSigContract {
 
     function retrieveTotalEntities(uint listId) internal 
         isIdCorrect(listId, _Entities.length)
-    view returns (uint){
+    view returns (uint)
+    {
         return (Library.retrieveTotalEntities(_Entities[listId]));
     }
 

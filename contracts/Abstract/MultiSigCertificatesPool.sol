@@ -154,7 +154,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         uint count = 0;
         
         for(uint i=0; i < listOfCert.length; i++){
-        
             if(_CertificatesPerHolder[holder]._CertificateFromProvider[listOfCert[i]] == provider){
                 count += 1;
             }
@@ -163,11 +162,34 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         return (count);
     } 
 
+    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override
+        isIdCorrect(skipFirst, _CertificatesPerHolder[holder]._ListOfCertificates.length)
+    view returns (bytes32[] memory)
+    {
+        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](max);
+        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
+        uint count = 0;
+        uint skipped = 0;
+        
+        for(uint i=0; i < listOfCert.length; i++){
+            if(count >= max) break;
+            if(skipFirst > skipped){
+                    skipped += 1;
+            }
+            else{
+                ListOfCertificatesByHolder[count] = listOfCert[i];
+                count += 1;
+            }             
+        }
+
+        return (ListOfCertificatesByHolder);
+    }
+
     function retrieveCertificatesByProviderAndHolder(address provider, address holder, uint skipFirst, uint max) external override
         isIdCorrect(skipFirst, _CertificatesPerHolder[holder]._ListOfCertificates.length)
     view returns (bytes32[] memory)
     {
-        bytes32[] memory ListOfCertificatesIdByProviderAndHolder = new bytes32[](max);
+        bytes32[] memory ListOfCertificatesByProviderAndHolder = new bytes32[](max);
         bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
         uint count = 0;
         uint skipped = 0;
@@ -180,13 +202,13 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
                     skipped += 1;
                 }
                 else{
-                    ListOfCertificatesIdByProviderAndHolder[count] = listOfCert[i];
+                    ListOfCertificatesByProviderAndHolder[count] = listOfCert[i];
                     count += 1;
                 }
             }
         }
 
-        return (ListOfCertificatesIdByProviderAndHolder);
+        return (ListOfCertificatesByProviderAndHolder);
     } 
 
 }

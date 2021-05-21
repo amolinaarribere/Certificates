@@ -142,6 +142,7 @@ pragma experimental ABIEncoderV2;
                poolToSend.removeCertificate(CertificateHash, holder);
             }
             
+            delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
             
         }
     }

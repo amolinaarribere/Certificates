@@ -18,7 +18,6 @@ library Library{
 
     //Structures
     struct _entityIdentity{
-        uint256 _id;
         bool _activated;
         bytes _Info;
         uint256 _updatedTimes;
@@ -41,6 +40,11 @@ library Library{
     
     modifier isEntityActivated(bool YesOrNo, _entityIdentity memory Entity){
         EntityActivated(YesOrNo, Entity);
+        _;
+    }
+
+    modifier isIdCorrect(uint Id, uint length){
+        require(true == IdCorrect(Id, length), "provided Id is wrong");
         _;
     }
 
@@ -69,14 +73,25 @@ library Library{
         return false;
     }
 
-    function CountActiveItems(address[] memory list) internal pure returns (uint){
-        uint total = 0;
+    function FindAddressPosition(address add, address[] memory list) internal pure returns (uint){
         for(uint i=0; i < list.length; i++){
-            if(address(0) != list[i]){
-                total += 1;
-            }
+            if(add == list[i]) return i;
         }
-        return total;
+
+        return list.length + 1;
+    }
+
+    function ArrayRemoveResize(uint index, address[] memory array) internal 
+        isIdCorrect(index, array.length)
+    pure returns(address[] memory) 
+    {
+        for (uint i = index; i < array.length-1; i++){
+            array[i] = array[i+1];
+        }
+        
+        delete array[array.length-1];
+        
+        return array;
     }
 
     function CheckValidations(uint256 signatures, uint256 minSignatures) internal pure returns(bool){
@@ -94,8 +109,7 @@ library Library{
         Entities._entities[entity]._AddValidated.push(msg.sender);
 
         if(CheckValidations(Entities._entities[entity]._AddValidated.length, minSignatures)){
-            Entities._entities[entity]._activated = true;
-            Entities._entities[entity]._id = Entities._activatedEntities.length;
+            Entities._entities[entity]._activated = true; 
             Entities._activatedEntities.push(entity);
         }
     }
@@ -107,7 +121,7 @@ library Library{
         Entities._entities[entity]._RemoveValidated.push(msg.sender);
 
         if(msg.sender == entity || CheckValidations(Entities._entities[entity]._RemoveValidated.length, minSignatures)){
-            delete(Entities._activatedEntities[Entities._entities[entity]._id]);
+            ArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), Entities._activatedEntities);
             delete(Entities._entities[entity]);
         }  
        
@@ -136,24 +150,13 @@ library Library{
     function retrieveAllEntities(_entityStruct storage Entities) internal 
     view returns (address[] memory) 
     {
-        uint TotalEntities = retrieveTotalEntities(Entities);
-        address[] memory activatedEntities = new address[](TotalEntities);
-        uint counter;
-
-        for(uint i=0; i < Entities._activatedEntities.length; i++){
-            if(address(0) != Entities._activatedEntities[i]){
-                activatedEntities[counter] = Entities._activatedEntities[i];
-                counter += 1;
-            }
-        }
-
-        return(activatedEntities);
+        return Entities._activatedEntities;
     }
 
     function retrieveTotalEntities(_entityStruct storage Entities) internal 
     view returns (uint) 
     {
-        return(CountActiveItems(Entities._activatedEntities));
+        return Entities._activatedEntities.length;
     }
 
     function retrieveUpdatedTimes(address entity, _entityStruct storage Entities) internal 
@@ -164,6 +167,6 @@ library Library{
     }
 
     function isEntity(_entityIdentity memory Entity) internal pure returns (bool){
-        return(Entity._activated);
+        return Entity._activated;
     }
 }
