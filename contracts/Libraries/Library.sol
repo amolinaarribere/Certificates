@@ -94,7 +94,7 @@ library Library{
     }
 
     function AddressToBytes32(address addr) internal pure returns (bytes32) {
-        return bytes32(uint256(addr));
+        return bytes32(uint256(uint160(addr)));
     }
 
     function ArrayBytes32ToAddress(bytes32[] memory data) internal pure returns (address[] memory) {
