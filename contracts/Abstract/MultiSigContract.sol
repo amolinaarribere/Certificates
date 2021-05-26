@@ -16,7 +16,6 @@ abstract contract MultiSigContract {
     //events
     event _AddEntityValidationIdEvent(string, address);
     event _RemoveEntityValidationIdEvent(string, address);
-    event _UpdateEntityValidationIdEvent(string, address);
 
     // owners
     uint _ownerId;
@@ -28,27 +27,27 @@ abstract contract MultiSigContract {
 
     // modifiers
     modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "provided Id is wrong");
+        require(true == Library.IdCorrect(Id, length), "EC1");
         _;
     }
 
     modifier isSomeoneSpecific(address someone){
-        require(msg.sender == someone, "It is who it should be");
+        require(msg.sender == someone, "EC8");
         _;
     }
 
     modifier isAnOwner(){
-        require(true == isOwner(msg.sender), "Only Owners are allowed to perform this action");
+        require(true == isOwner(msg.sender), "EC9");
         _;
     }
 
     modifier isAnOwnerOrHimself(address entity){
-        require(true == isOwner(msg.sender) || msg.sender == entity, "Not allowed to remove entity");
+        require(true == isOwner(msg.sender) || msg.sender == entity, "EC10");
         _;
     }
 
     modifier NotEmpty(bytes32 document){
-        require(0 < document.length, "Empty");
+        require(0 < document.length, "EC11");
         _;
     }
 
@@ -95,18 +94,6 @@ abstract contract MultiSigContract {
        
     }
 
-    function updateEntity(address entity, bytes memory newEntityInfo, uint listId) internal 
-        isIdCorrect(listId, _Entities.length) 
-        isAnOwner
-    {
-        uint UpdatedTimes = Library.retrieveUpdatedTimes(entity, _Entities[listId]);
-        Library.updateEntity(entity, newEntityInfo, _Entities[listId], _minOwners);
-
-        if(Library.retrieveUpdatedTimes(entity, _Entities[listId]) == UpdatedTimes + 1){
-            emit _UpdateEntityValidationIdEvent(_entitiesLabel[listId], entity);
-        }
-    }
-
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
     view returns (bytes memory) 
@@ -141,10 +128,6 @@ abstract contract MultiSigContract {
     
     function removeOwner(address owner) external {
         removeEntity(owner, _ownerId);
-    }
-
-    function updateOwner(address owner, string memory ownerInfo) external {
-       updateEntity(owner, bytes(ownerInfo), _ownerId);
     }
     
     function retrieveOwner(address owner) external view returns (string memory){

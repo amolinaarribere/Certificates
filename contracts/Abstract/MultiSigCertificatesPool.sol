@@ -39,22 +39,22 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
 
     // modifiers
     modifier isAProvider(){
-        require(true == isProvider(msg.sender), "Only Providers are allowed to perform this action");
+        require(true == isProvider(msg.sender), "EC12");
         _;
     }
 
     modifier isTheProvider(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "Not allowed to update this particular Certificate");
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC13");
         _;
     }
 
     modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "Not allowed to remove this particular Certificate");
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "EC14");
         _;
     }
     
     modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){
-        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "Certificate already exist");
+        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC15");
         _;
     }
     
@@ -68,11 +68,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     function addProvider(address provider, string memory providerInfo) external override virtual;
 
     function removeProvider(address provider) external override virtual;
-    
-    function updateProvider(address provider, string memory providerInfo) external  override
-    {
-       updateEntity(provider, bytes(providerInfo), _providerId);
-    }
     
     function retrieveProvider(address provider) external override view returns (string memory){
         return string(retrieveEntity(provider, _providerId));
@@ -111,7 +106,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         
         for(uint i=0; i < listOfCert.length; i++){
             if(CertificateHash == listOfCert[i]){
-                ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);
+                _CertificatesPerHolder[holder]._ListOfCertificates = Library.ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);
                 break;
             }
         }
@@ -122,18 +117,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
 
     }
     
-    function ArrayRemoveResize(uint index, bytes32[] memory array) internal 
-        isIdCorrect(index, array.length)
-    pure returns(bytes32[] memory) 
-    {
-        for (uint i = index; i < array.length-1; i++){
-            array[i] = array[i+1];
-        }
-        
-        delete array[array.length-1];
-        
-        return array;
-    }
 
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override
     view returns (address)
@@ -146,21 +129,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     {
         return (_CertificatesPerHolder[holder]._ListOfCertificates.length);
     }
-    
-    function retrieveTotalCertificatesByProviderAndHolder(address provider, address holder) external override
-    view returns (uint)
-    {
-        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
-        uint count = 0;
-        
-        for(uint i=0; i < listOfCert.length; i++){
-            if(_CertificatesPerHolder[holder]._CertificateFromProvider[listOfCert[i]] == provider){
-                count += 1;
-            }
-        }
-
-        return (count);
-    } 
 
     function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override
         isIdCorrect(skipFirst, _CertificatesPerHolder[holder]._ListOfCertificates.length)
@@ -185,30 +153,5 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         return (ListOfCertificatesByHolder);
     }
 
-    function retrieveCertificatesByProviderAndHolder(address provider, address holder, uint skipFirst, uint max) external override
-        isIdCorrect(skipFirst, _CertificatesPerHolder[holder]._ListOfCertificates.length)
-    view returns (bytes32[] memory)
-    {
-        bytes32[] memory ListOfCertificatesByProviderAndHolder = new bytes32[](max);
-        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
-        uint count = 0;
-        uint skipped = 0;
-        
-        for(uint i=0; i < listOfCert.length; i++){
-            if(count >= max) break;
-        
-            if(_CertificatesPerHolder[holder]._CertificateFromProvider[listOfCert[i]] == provider){
-                if(skipFirst > skipped){
-                    skipped += 1;
-                }
-                else{
-                    ListOfCertificatesByProviderAndHolder[count] = listOfCert[i];
-                    count += 1;
-                }
-            }
-        }
-
-        return (ListOfCertificatesByProviderAndHolder);
-    } 
 
 }

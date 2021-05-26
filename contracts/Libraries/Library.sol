@@ -12,7 +12,6 @@ library Library{
     //Actions that can be performed on entities
     enum Actions{
         Add,
-        Update,
         Remove
     }
 
@@ -20,10 +19,8 @@ library Library{
     struct _entityIdentity{
         bool _activated;
         bytes _Info;
-        uint256 _updatedTimes;
         address[] _AddValidated;
         address[] _RemoveValidated;
-        address[] _UpdateValidated;
     }
 
     struct _entityStruct{
@@ -44,21 +41,19 @@ library Library{
     }
 
     modifier isIdCorrect(uint Id, uint length){
-        require(true == IdCorrect(Id, length), "provided Id is wrong");
+        require(true == IdCorrect(Id, length), "EC1");
         _;
     }
 
     // auxiliary functions
     function NotAlreadyVoted(Actions action, _entityIdentity memory Entity) public view{
-        string memory message = "Owner has already voted";
-        if(Actions.Update == action) require(false == FindAddress(msg.sender, Entity._UpdateValidated), message);
-        else if(Actions.Add == action) require(false == FindAddress(msg.sender, Entity._AddValidated), message);
-        else require(false == FindAddress(msg.sender, Entity._RemoveValidated), message);
+        if(Actions.Add == action) require(false == FindAddress(msg.sender, Entity._AddValidated), "EC5");
+        else require(false == FindAddress(msg.sender, Entity._RemoveValidated), "EC5");
     }
     
     function EntityActivated(bool YesOrNo, _entityIdentity memory Entity) public pure{
-        if(false == YesOrNo) require(false == isEntity(Entity), "Entity already activated");
-        else require(true == isEntity(Entity), "Entity must be activated");
+        if(false == YesOrNo) require(false == isEntity(Entity), "EC6");
+        else require(true == isEntity(Entity), "EC7");
     }
     
     function IdCorrect(uint Id, uint length) public pure returns (bool){
@@ -81,9 +76,9 @@ library Library{
         return list.length + 1;
     }
 
-    function ArrayRemoveResize(uint index, address[] memory array) internal 
+    function ArrayRemoveResize(uint index, bytes32[] memory array) internal 
         isIdCorrect(index, array.length)
-    pure returns(address[] memory) 
+    pure returns(bytes32[] memory) 
     {
         for (uint i = index; i < array.length-1; i++){
             array[i] = array[i+1];
@@ -92,6 +87,30 @@ library Library{
         delete array[array.length-1];
         
         return array;
+    }
+
+    function Bytes32ToAddress(bytes32 data) internal pure returns (address) {
+        return address(uint160(uint256(data)));
+    }
+
+    function AddressToBytes32(address addr) internal pure returns (bytes32) {
+        return bytes32(uint256(addr) << 96);
+    }
+
+    function ArrayBytes32ToAddress(bytes32[] memory data) internal pure returns (address[] memory) {
+        address[] memory returnedAddr = new address[](data.length);
+        for(uint i=0; i < data.length; i++){
+            returnedAddr[i] = Bytes32ToAddress(data[i]);
+        }
+        return returnedAddr;
+    }
+
+    function ArrayAddressToBytes32(address[] memory addr) internal pure returns (bytes32[] memory) {
+        bytes32[] memory returnedBytes = new bytes32[](addr.length);
+        for(uint i=0; i < addr.length; i++){
+            returnedBytes[i] = AddressToBytes32(addr[i]);
+        }
+        return returnedBytes;
     }
 
     function CheckValidations(uint256 signatures, uint256 minSignatures) internal pure returns(bool){
@@ -121,23 +140,10 @@ library Library{
         Entities._entities[entity]._RemoveValidated.push(msg.sender);
 
         if(msg.sender == entity || CheckValidations(Entities._entities[entity]._RemoveValidated.length, minSignatures)){
-            ArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), Entities._activatedEntities);
+            Entities._activatedEntities = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), ArrayAddressToBytes32(Entities._activatedEntities)));
             delete(Entities._entities[entity]);
         }  
        
-    }
-
-    function updateEntity(address entity, bytes memory entityInfo, _entityStruct storage Entities, uint256 minSignatures) internal 
-        isEntityActivated(true, Entities._entities[entity])
-        HasNotAlreadyVoted(Actions.Update, Entities._entities[entity])
-    {   
-        Entities._entities[entity]._UpdateValidated.push(msg.sender); 
-
-        if(CheckValidations(Entities._entities[entity]._UpdateValidated.length, minSignatures)){
-            Entities._entities[entity]._Info = entityInfo;
-            Entities._entities[entity]._updatedTimes += 1;
-            delete(Entities._entities[entity]._UpdateValidated);
-        }       
     }
 
     function retrieveEntity(address entity, _entityStruct storage Entities) internal 
@@ -157,13 +163,6 @@ library Library{
     view returns (uint) 
     {
         return Entities._activatedEntities.length;
-    }
-
-    function retrieveUpdatedTimes(address entity, _entityStruct storage Entities) internal 
-        isEntityActivated(true, Entities._entities[entity])
-    view returns (uint) 
-    {
-        return Entities._entities[entity]._updatedTimes;
     }
 
     function isEntity(_entityIdentity memory Entity) internal pure returns (bool){

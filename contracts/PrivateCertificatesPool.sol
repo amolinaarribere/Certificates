@@ -10,10 +10,6 @@ pragma experimental ABIEncoderV2;
 
  import "./Abstract/MultiSigCertificatesPool.sol";
 
- /* 
- Like Private Certificates except that Providers must be sent from "Creator" who is not an owner
- */
-
  contract PrivateCertificatesPool is MultiSigCertificatesPool {
 
      constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {

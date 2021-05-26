@@ -10,10 +10,6 @@ pragma experimental ABIEncoderV2;
 
  import "./Abstract/MultiSigCertificatesPool.sol";
 
- /* 
- Like Private Certificates except that Providers must be sent from "Creator" who is not an owner
- */
-
  contract PublicCertificatesPool is MultiSigCertificatesPool {
 
      address _creator;
@@ -21,8 +17,8 @@ pragma experimental ABIEncoderV2;
 
      //modifiers
     modifier hasBeenSubmitted(bool YesOrNo, address provider){
-        if(false == YesOrNo) require(false == _submitedByCreator[provider], "Provider already activated or in progress");
-        else require(true == _submitedByCreator[provider], "Provider not submited by Creator yet");
+        if(false == YesOrNo) require(false == _submitedByCreator[provider], "EC3");
+        else require(true == _submitedByCreator[provider], "EC4");
         _;
     }
 

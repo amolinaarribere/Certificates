@@ -11,22 +11,6 @@ import "./Libraries/Library.sol";
 import "./PrivateCertificatesPool.sol";
 import "./PublicCertificatesPool.sol";
 
- /* 
- Actors : Chair Person, Anyone
- Token : Proposals
-
- 1- Anyone can submit proposals (paying a fee)
- 2- Chair Person can approve proposals creating Providers in Certificates Contract
-
-
- Proposals lifecycle
-    Proposals Creation : Anyone (paying fee)
-    Proposals Update : 
-    Proposals Remove :   
-    Proposals Validations : Only Chair Person  
-
- */
-
 contract CertificatesPoolManager{
     using Library for *;
 
@@ -39,12 +23,12 @@ contract CertificatesPoolManager{
 
     // modfiers
     modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "provided Id is wrong");
+        require(true == Library.IdCorrect(Id, length), "EC1");
         _;
     }
 
     modifier areFundsEnough(uint minPrice){
-        require(msg.value >= minPrice, "Not enough funds");
+        require(msg.value >= minPrice, "EC2");
         _;
     }
     
@@ -103,13 +87,9 @@ contract CertificatesPoolManager{
 
        emit _SendProposalId(provider);
     }
-
-    function retrievePublicCertificatesPool() public view returns (MultiSigCertificatesPool) {
-        return _PublicCertificatesPool;
-    }
     
-    function retrieveChairPerson() public view returns (address) {
-        return _chairperson;
+    function retrieveConfiguration() public view returns (MultiSigCertificatesPool, address, uint) {
+        return (_PublicCertificatesPool, _chairperson, address(this).balance);
     }
     
 }

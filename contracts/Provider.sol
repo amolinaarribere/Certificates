@@ -70,10 +70,6 @@ pragma experimental ABIEncoderV2;
        removeEntity(pool, _poolId); 
     }
     
-    function updatePool(address pool, string memory poolInfo) external override{
-       updateEntity(pool, bytes(poolInfo), _poolId);
-    }
-    
     function retrievePool(address pool) external override view returns (string memory){
         return InternalRetrievePool(pool);
     }
