@@ -88,7 +88,7 @@ contract CertificatesPoolManager{
         return(_PrivateCertificatesPools[certificatePoolId]._creator, _PrivateCertificatesPools[certificatePoolId]._PrivateCertificatesPool);
     }
 
-    function retrieveTotalPrivateCertificatesPool(uint certificatePoolId) external view returns (uint)
+    function retrieveTotalPrivateCertificatesPool() external view returns (uint)
     {
         return(_PrivateCertificatesPools.length);
     }
