@@ -104,7 +104,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
         bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
         
-        for(uint i=0; i < listOfCert.length; i++){
+        for(uint i=0; i < Library.TotalArray(listOfCert); i++){
             if(CertificateHash == listOfCert[i]){
                 _CertificatesPerHolder[holder]._ListOfCertificates = Library.ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);
                 break;
@@ -124,14 +124,14 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);
     }
 
-    function retrieveTotalCertificatesByHolder(address holder) external override 
+    function retrieveTotalCertificatesByHolder(address holder) public override 
     view returns (uint256)
     {
-        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);
+        return (Library.TotalArray(_CertificatesPerHolder[holder]._ListOfCertificates));
     }
 
     function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override
-        isIdCorrect(skipFirst, _CertificatesPerHolder[holder]._ListOfCertificates.length)
+        isIdCorrect(skipFirst, retrieveTotalCertificatesByHolder(holder))
     view returns (bytes32[] memory)
     {
         bytes32[] memory ListOfCertificatesByHolder = new bytes32[](max);
@@ -139,7 +139,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         uint count = 0;
         uint skipped = 0;
         
-        for(uint i=0; i < listOfCert.length; i++){
+        for(uint i=0; i < Library.TotalArray(listOfCert); i++){
             if(count >= max) break;
             if(skipFirst > skipped){
                     skipped += 1;

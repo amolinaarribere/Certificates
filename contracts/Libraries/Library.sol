@@ -76,16 +76,23 @@ library Library{
         return list.length + 1;
     }
 
+    function TotalArray(bytes32[] memory array) internal pure returns(uint256) 
+    {
+        uint256 total = 0;
+        for(uint i=0; i < array.length; i++){
+            if(array[i] != 0){
+                total += 1;
+            }
+        }
+        return total;
+    }
+
     function ArrayRemoveResize(uint index, bytes32[] memory array) internal 
-        isIdCorrect(index, array.length)
+        isIdCorrect(index, TotalArray(array))
     pure returns(bytes32[] memory) 
     {
-        for (uint i = index; i < array.length-1; i++){
-            array[i] = array[i+1];
-        }
-        
-        delete array[array.length-1];
-        
+        array[index] = array[TotalArray(array)-1];
+        delete array[TotalArray(array)-1];
         return array;
     }
 
@@ -162,7 +169,7 @@ library Library{
     function retrieveTotalEntities(_entityStruct storage Entities) internal 
     view returns (uint) 
     {
-        return Entities._activatedEntities.length;
+        return TotalArray(ArrayAddressToBytes32(Entities._activatedEntities));
     }
 
     function isEntity(_entityIdentity memory Entity) internal pure returns (bool){
