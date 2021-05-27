@@ -53,9 +53,9 @@ abstract contract MultiSigContract {
 
     // Constructor
     constructor(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) payable{
-        require(minOwners <= owners.length, "Not enough owners provided to meet the minOwners requirement");
-        require(minOwners > 0, "At least 1 minimum owner");
-        require(TotalEntities == labels.length, "Not enough or too many labels");
+        require(minOwners <= owners.length, "EC16");
+        require(minOwners > 0, "EC17");
+        require(TotalEntities == labels.length, "EC18");
 
         _ownerId = ownerId;
 

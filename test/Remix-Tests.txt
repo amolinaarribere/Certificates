@@ -1,0 +1,30 @@
+TEST 1- Deploy CertificatesPoolManager (Gas Limit 30000000)
+        From : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+            owners : ["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"]
+            min owners : 2
+            publicPriceWei : 10
+            privatePriceWei : 20
+        Check : Nothing
+
+TEST 2- Create two private Certificates Pools
+      a - With less than 20 Weis => ERROR
+      b - With more than 20 Weis => SUCCESS
+      c - with min owner > than number of owners => ERROR
+        From : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+            owners : ["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"]
+            min owners : 2
+            owners : ["0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB", "0x617F2E2fD72FD9D5503197092aC168c91465E7f2", "0x17F6AD8Ef982297579C203069C1DbfFE4348c372", "0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678"]
+            min owners : 3
+        Check : Logs (Certificate Pool Ids, creator address, certificate Pool address)
+
+TEST 3- Retrieve two previously created private Certificates Pools
+      a - With ids 0 and 1 => SUCCESS
+      b - With other ids => ERROR
+        From : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+        Check : creator and certificates pool address with previous logs
+
+TEST 4- Retrieve Total private Certificates Pools
+        From : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+
+
+
