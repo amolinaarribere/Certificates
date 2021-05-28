@@ -134,7 +134,11 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         isIdCorrect(skipFirst, retrieveTotalCertificatesByHolder(holder))
     view returns (bytes32[] memory)
     {
-        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](retrieveTotalCertificatesByHolder(holder) - skipFirst);
+        uint maxSize = max;
+        if(retrieveTotalCertificatesByHolder(holder) - skipFirst < max){
+            maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst;
+        }
+        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](maxSize);
         bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
         uint count = 0;
         uint skipped = 0;
