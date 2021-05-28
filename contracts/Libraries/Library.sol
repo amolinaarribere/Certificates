@@ -76,24 +76,18 @@ library Library{
         return list.length + 1;
     }
 
-    function TotalArray(bytes32[] memory array) internal pure returns(uint256) 
-    {
-        uint256 total = 0;
-        for(uint i=0; i < array.length; i++){
-            if(array[i] != 0){
-                total += 1;
-            }
-        }
-        return total;
-    }
-
     function ArrayRemoveResize(uint index, bytes32[] memory array) internal 
-        isIdCorrect(index, TotalArray(array))
+        isIdCorrect(index, array.length)
     pure returns(bytes32[] memory) 
     {
-        array[index] = array[TotalArray(array)-1];
-        delete array[TotalArray(array)-1];
-        return array;
+        bytes32[] memory newArray = new bytes32[](array.length - 1);
+        array[index] = array[array.length - 1];
+        
+        for(uint i=0; i < newArray.length; i++){
+            newArray[i] = array[i];
+        }
+        
+        return newArray;
     }
 
     function Bytes32ToAddress(bytes32 data) internal pure returns (address) {
@@ -169,7 +163,7 @@ library Library{
     function retrieveTotalEntities(_entityStruct storage Entities) internal 
     view returns (uint) 
     {
-        return TotalArray(ArrayAddressToBytes32(Entities._activatedEntities));
+        return Entities._activatedEntities.length;
     }
 
     function isEntity(_entityIdentity memory Entity) internal pure returns (bool){

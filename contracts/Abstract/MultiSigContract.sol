@@ -50,6 +50,11 @@ abstract contract MultiSigContract {
         require(0 < document.length, "EC11");
         _;
     }
+    
+    modifier minRequired(uint min, uint number){
+        require(min <= number, "EC19");
+        _;
+    }
 
     // Constructor
     constructor(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) payable{
@@ -126,7 +131,9 @@ abstract contract MultiSigContract {
         addEntity(owner, bytes(ownerInfo), _ownerId);
     }
     
-    function removeOwner(address owner) external {
+    function removeOwner(address owner) external
+        minRequired(_minOwners, retrieveTotalOwners() - 1)
+    {
         removeEntity(owner, _ownerId);
     }
     
@@ -138,7 +145,7 @@ abstract contract MultiSigContract {
         return(retrieveAllEntities(_ownerId));
     }
 
-    function retrieveTotalOwners() external view returns (uint){
+    function retrieveTotalOwners() public view returns (uint){
         return (retrieveTotalEntities(_ownerId));
     }
 
