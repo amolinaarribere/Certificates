@@ -18,9 +18,6 @@ contract CertificatesPoolManager{
     event _NewCertificatesPool(uint256, address, MultiSigCertificatesPool);
     event _SendProposalId(address);
 
-    uint _PublicPriceWei;
-    uint _PrivatePoolPriceWei;
-
     // modfiers
     modifier isIdCorrect(uint Id, uint length){
         require(true == Library.IdCorrect(Id, length), "EC1");
@@ -42,6 +39,9 @@ contract CertificatesPoolManager{
     
     // Public Certificates Pool structure
     PublicCertificatesPool  _PublicCertificatesPool;
+
+    uint _PublicPriceWei;
+    uint _PrivatePoolPriceWei;
 
     address payable _chairperson;
     

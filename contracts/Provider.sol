@@ -15,9 +15,9 @@ pragma experimental ABIEncoderV2;
 
 
  contract Provider is IProvider, MultiSigContract {
-     using Library for *;
+    using Library for *;
 
-     uint256 constant TotalEntities = 2;
+    uint256 constant TotalEntities = 2;
 
     // Owners
     uint256 constant _ownerIdProviders = 0;
