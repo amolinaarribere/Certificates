@@ -48,7 +48,7 @@ contract CertificatesPoolManager{
     constructor(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei) payable{
         _chairperson = payable(msg.sender);
         _PublicPriceWei = PublicPriceWei;
-        _PrivatePoolPriceWei = PrivatePriceWei;
+        _PrivatePoolPriceWei = PrivatePriceWei;  
         _PublicCertificatesPool = new PublicCertificatesPool(owners, minOwners);
     }
 
@@ -78,7 +78,7 @@ contract CertificatesPoolManager{
     }
 
     // PUBLIC CERTIFICATE POOL /////////////////////////////////////////////////////////////
-
+    
     function sendProposal(address provider, string memory providerInfo) public 
         areFundsEnough(_PublicPriceWei)
     payable 

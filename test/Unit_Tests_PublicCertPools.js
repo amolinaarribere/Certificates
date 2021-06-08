@@ -1,8 +1,11 @@
 // Chai library for testing
 // ERROR tests = First we test the error message then we test the action was not carried out
 
-var CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
-var PublicCertificates = artifacts.require("PublicCertificatesPool");
+const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
+const PublicCertificates = artifacts.require("PublicCertificatesPool");
+const PrivateCertificates = artifacts.require("PrivateCertificatesPool");
+const Library = artifacts.require("./Libraries/Library");
+
 var certificatesAbi = PublicCertificates.abi;
 const ProviderDoesNotExist = new RegExp("Provider does not exist");
 const addressesLength = 42;
@@ -23,8 +26,8 @@ contract("Testing Public Pool",function(accounts){
     // providers info
     const provider_1_Info = "Account 1 Info";
     // test constants
-    const NotEnoughFunds = new RegExp("Not enough funds");
-    const ProposalAlreadySubmitted = new RegExp("Proposal already submitted");
+    const NotEnoughFunds = new RegExp("EC2");
+    const ProposalAlreadySubmitted = new RegExp("EC3");
     const NotAllowedToApproveProposals = new RegExp("Not allowed to approve proposals");
     const NotAllowedToRejectProposals = new RegExp("Not allowed to reject proposals");
     const ProposalDoesNotExist = new RegExp("This proposal does not exist");
@@ -37,7 +40,7 @@ contract("Testing Public Pool",function(accounts){
     const State_REJECTED = 3;
 
     beforeEach(async function(){
-        certPoolManager = await CertificatesPoolManager.new(["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4","0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"], 1, 10, 20, {from: chairPerson, gas: 3000000});
+        certPoolManager = await CertificatesPoolManager.new(PublicOwners, minOwners, PublicPriceWei, PrivatePriceWei, {from: chairPerson});
     });
 
     // *********** TESTING Gas Consumption ***************************************************************** //
@@ -87,6 +90,34 @@ contract("Testing Public Pool",function(accounts){
         // assert
         expect(_chairPerson).to.equal(chairPerson);
         expect(_balance.toNumber()).to.equal(0);
+    });
+
+    // ****** TESTING Sending Proposals ***************************************************************** //
+
+    it("Send Proposal WRONG",async function(){
+        try{
+            let PriceUnderFunded = PublicPriceWei - 1;
+            await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PriceUnderFunded});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(NotEnoughFunds);
+        }
+
+        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
+
+        try{
+            await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
+            expect.fail();
+        }
+        catch(error){
+            expect(error.message).to.match(ProposalAlreadySubmitted);
+        }
+    });
+
+    it("Send Proposal CORRECT",async function(){
+        // act
+        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
     });
 
     /*

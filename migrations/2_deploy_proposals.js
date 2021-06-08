@@ -3,8 +3,9 @@
 let CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 let Library = artifacts.require("./Libraries/Library");
 
-module.exports = async function(deployer){
+module.exports = async function(deployer, network, accounts){
     await deployer.deploy(Library);
     await deployer.link(Library, CertificatesPoolManager);
-    //await deployer.deploy(CertificatesPoolManager, ["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"], 1, 0, 0, {gas: 3000000});
+    await deployer.deploy(CertificatesPoolManager, [accounts[0]], 1, 10, 20);
+    //await deployer.deploy(CertificatesPoolManager, 10, 20, {gas: 672197500});
 }
