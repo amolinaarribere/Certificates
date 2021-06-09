@@ -2,8 +2,6 @@
 // ERROR tests = First we test the error message then we test the action was not carried out
 
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
-const PublicCertificates = artifacts.require("PublicCertificatesPool");
-const PrivateCertificates = artifacts.require("PrivateCertificatesPool");
 const Library = artifacts.require("./Libraries/Library");
 
 const PublicPriceWei = 10;
