@@ -118,8 +118,15 @@ contract("Testing Public Pool",function(accounts){
         // act
         await ValidatingProviders();
         // assert
+        let Provider_1 = await publicCertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+        let Provider_2 = await publicCertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
         let Total = await publicCertPool.methods.retrieveTotalProviders().call({from: user_1}, function(error, result){});
+        let AllProviders = await publicCertPool.methods.retrieveAllProviders().call({from: user_1}, function(error, result){});
+        expect(Provider_1).to.equal(provider_1_Info);
+        expect(Provider_2).to.equal(provider_2_Info);
         expect(Total).to.equal("2");
+        expect(AllProviders[0]).to.equal(provider_1);
+        expect(AllProviders[1]).to.equal(provider_2);
     });
 
     // ****** TESTING Removing Provider ***************************************************************** //
@@ -197,10 +204,31 @@ contract("Testing Public Pool",function(accounts){
     it("Adding Certificate CORRECT",async function(){
         // act
         await ValidatingProviders();
-        await publicCertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+        await AddingCertificate();
         // assert
-        let Provider = await publicCertPool.methods.retrieveCertificateProvider(hash_1, holder_1).call({from: user_1}, function(error, result){});
-        expect(Provider).to.equal(provider_1);
+        let Provider_1 = await publicCertPool.methods.retrieveCertificateProvider(hash_1, holder_1).call({from: user_1}, function(error, result){});
+        let Provider_1b = await publicCertPool.methods.retrieveCertificateProvider(hash_1, holder_2).call({from: user_1}, function(error, result){});
+        let Provider_2 = await publicCertPool.methods.retrieveCertificateProvider(hash_2, holder_1).call({from: user_1}, function(error, result){});
+        let Provider_2b = await publicCertPool.methods.retrieveCertificateProvider(hash_2, holder_2).call({from: user_1}, function(error, result){});
+        let TotalHolder_1 = await publicCertPool.methods.retrieveTotalCertificatesByHolder(holder_1).call({from: user_1}, function(error, result){});
+        let TotalHolder_2 = await publicCertPool.methods.retrieveTotalCertificatesByHolder(holder_2).call({from: user_1}, function(error, result){});
+        let CertificatesHolder1 = await publicCertPool.methods.retrieveCertificatesByHolder(holder_1, 0, 2).call({from: user_1}, function(error, result){});
+        let CertificatesHolder1b = await publicCertPool.methods.retrieveCertificatesByHolder(holder_1, 1, 20).call({from: user_1}, function(error, result){});
+        let CertificatesHolder2 = await publicCertPool.methods.retrieveCertificatesByHolder(holder_2, 0, 2).call({from: user_1}, function(error, result){});
+        let CertificatesHolder2b = await publicCertPool.methods.retrieveCertificatesByHolder(holder_2, 0, 1).call({from: user_1}, function(error, result){});
+        
+        expect(Provider_1).to.equal(provider_1);
+        expect(Provider_1b).to.equal(provider_1);
+        expect(Provider_2).to.equal(provider_2);
+        expect(Provider_2b).to.equal(provider_2);
+        expect(TotalHolder_1).to.equal("2");
+        expect(TotalHolder_2).to.equal("2");
+        expect(CertificatesHolder1[0]).to.equal(hash_1);
+        expect(CertificatesHolder1[1]).to.equal(hash_2);
+        expect(CertificatesHolder2[0]).to.equal(hash_1);
+        expect(CertificatesHolder2[1]).to.equal(hash_2);
+        expect(CertificatesHolder1b[0]).to.equal(hash_2);
+        expect(CertificatesHolder2b[0]).to.equal(hash_1);
     });
 
     // ****** TESTING Removing Certificate ***************************************************************** //
@@ -235,6 +263,9 @@ contract("Testing Public Pool",function(accounts){
         await ValidatingProviders();
         await AddingCertificate();
         await publicCertPool.methods.removeCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+        // assert
+        let Total = await publicCertPool.methods.retrieveTotalCertificatesByHolder(holder_1).call({from: user_1}, function(error, result){});
+        expect(Total).to.equal("1");
     });
  
 

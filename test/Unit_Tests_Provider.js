@@ -52,6 +52,11 @@ contract("Testing Provider",function(accounts){
         publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress);
     });
 
+    async function AddingPool(){
+        await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[0], gas: Gas});
+        await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[1], gas: Gas}); 
+    }
+
 
     // ****** TESTING Adding Provider ***************************************************************** //
 
@@ -79,25 +84,24 @@ contract("Testing Provider",function(accounts){
 
     it("Add Pool CORRECT",async function(){
         // act
-        await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[0], gas: Gas});
-        await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[1], gas: Gas});
+        await AddingPool();
         // assert
-        let _PoolInfo = provider.retrievePool(publicCertPoolAddress);
-        console.log(_PoolInfo);
-        let _Total = provider.retrieveTotalPools();
-        console.log(_Total);
-        expect(_PoolInfo).to.match(pool_Info);
+        let _PoolInfo = await provider.retrievePool(publicCertPoolAddress, {from: user_1});
+        let _Total = await provider.retrieveTotalPools({from: user_1});
+        let _Pools = await provider.retrieveAllPools({from: user_1});
+        expect(_PoolInfo).to.equal(pool_Info);
         expect(_Total.toNumber()).to.equal(1);
+        expect(_Pools[0]).to.equal(publicCertPoolAddress);
     });
-/*
+
     // ****** TESTING Removing Provider ***************************************************************** //
 
-    it("Removing Provider WRONG",async function(){
+    it("Removing Pool WRONG",async function(){
         // act
-        await AddingProviders();
+        await AddingPool();
 
         try{
-            await privateCertPool.methods.removeProvider(provider_1).send({from: user_1}, function(error, result){});
+            await provider.removePool(publicCertPoolAddress, {from: user_1});
             expect.fail();
         }
         // assert
@@ -106,7 +110,7 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await privateCertPool.methods.removeProvider(provider_3).send({from: PrivateOwners[0]}, function(error, result){});
+            await provider.removePool(accounts[0], {from: ProviderOwners[0]});
             expect.fail();
         }
         // assert
@@ -115,8 +119,8 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await privateCertPool.methods.removeProvider(provider_1).send({from: PrivateOwners[0], gas: Gas}, function(error, result){});
-            await privateCertPool.methods.removeProvider(provider_1).send({from: PrivateOwners[0], gas: Gas}, function(error, result){});
+            await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
+            await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
@@ -125,16 +129,17 @@ contract("Testing Provider",function(accounts){
         }
     });
 
-    it("Removing Provider CORRECT",async function(){
+    it("Removing Pool CORRECT",async function(){
         // act
-        await AddingProviders();
-        await privateCertPool.methods.removeProvider(provider_1).send({from: PrivateOwners[2], gas: Gas}, function(error, result){});
-        await privateCertPool.methods.removeProvider(provider_1).send({from: PrivateOwners[0], gas: Gas}, function(error, result){});
+        await AddingPool();
+        await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[2], gas: Gas});
+        await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
         // assert
-        let Total = await privateCertPool.methods.retrieveTotalProviders().call({from: user_1}, function(error, result){});
-        expect(Total).to.equal("1");
+        let _Total = await provider.retrieveTotalPools({from: user_1});
+        expect(_Total.toNumber()).to.equal(0);
     });
 
+    /*
     // ****** TESTING Adding Certificate ***************************************************************** //
 
     it("Adding Certificate WRONG",async function(){
