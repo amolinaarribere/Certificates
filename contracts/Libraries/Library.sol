@@ -124,7 +124,7 @@ library Library{
         isEntityActivated(false, Entities._entities[entity]) 
         HasNotAlreadyVoted(Actions.Add, Entities._entities[entity])
     {
-        if(0 == Entities._entities[entity]._AddValidated.length && 0 == Entities._entities[entity]._Info.length) Entities._entities[entity]._Info = entityInfo;
+        if(0 == Entities._entities[entity]._AddValidated.length) Entities._entities[entity]._Info = entityInfo;
 
         Entities._entities[entity]._AddValidated.push(msg.sender);
 

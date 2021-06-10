@@ -52,9 +52,9 @@ contract("Testing Private Pool",function(accounts){
 
     async function AddingProviders(){
         await privateCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: PrivateOwners[0], gas: Gas}, function(error, result){});
-        await privateCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: PrivateOwners[1], gas: Gas}, function(error, result){});
+        await privateCertPool.methods.addProvider(provider_1, "").send({from: PrivateOwners[1], gas: Gas}, function(error, result){});
         await privateCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: PrivateOwners[1], gas: Gas}, function(error, result){});
-        await privateCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: PrivateOwners[2], gas: Gas}, function(error, result){});
+        await privateCertPool.methods.addProvider(provider_2, "text that will not be updated").send({from: PrivateOwners[2], gas: Gas}, function(error, result){});
     }
 
     async function AddingCertificate(){
@@ -86,6 +86,21 @@ contract("Testing Private Pool",function(accounts){
         catch(error){
             expect(error.message).to.match(OwnerAlreadyvoted);
         }
+    });
+
+    it("Add Provider CORRECT",async function(){
+        // act
+        await AddingProviders();
+        // assert
+        let Provider_1 = await privateCertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+        let Provider_2 = await privateCertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
+        let Total = await privateCertPool.methods.retrieveTotalProviders().call({from: user_1}, function(error, result){});
+        let AllProviders = await privateCertPool.methods.retrieveAllProviders().call({from: user_1}, function(error, result){});
+        expect(Provider_1).to.equal(provider_1_Info);
+        expect(Provider_2).to.equal(provider_2_Info);
+        expect(Total).to.equal("2");
+        expect(AllProviders[0]).to.equal(provider_1);
+        expect(AllProviders[1]).to.equal(provider_2);
     });
 
     // ****** TESTING Removing Provider ***************************************************************** //
