@@ -32,29 +32,36 @@ contract("Testing Provider",function(accounts){
     const pool_Info = "Public Pool";
     // certificates
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
-    const hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     // test constants
     const NotAnOwner = new RegExp("EC9");
     const OwnerAlreadyvoted = new RegExp("EC5");
     const NotAllowedRemoveEntity = new RegExp("EC10");
     const MustBeActivated = new RegExp("EC7");
-    const NotAProvider = new RegExp("EC12");
-    const CertificateAlreadyExists = new RegExp("EC15");
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
 
     beforeEach(async function(){
+        // Public Pool creation and provider subscription
         certPoolManager = await CertificatesPoolManager.new(PublicOwners, minOwners, PublicPriceWei, PrivatePriceWei, {from: chairPerson});
         provider = await Provider.new(ProviderOwners, minOwners, {from: user_1});
         await certPoolManager.sendProposal(provider.address, provider_1_Info, {from: user_1, value: PublicPriceWei});
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _publicCertPoolAddress, 1: _chairPerson, 2: _balance} = result;
         publicCertPoolAddress = _publicCertPoolAddress;
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress);
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress); 
+        await publicCertPool.methods.validateProvider(provider.address).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+        await publicCertPool.methods.validateProvider(provider.address).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
     });
 
     async function AddingPool(){
         await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[0], gas: Gas});
         await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[1], gas: Gas}); 
+    }
+
+    async function AddingCertificates(){
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[2], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
     }
 
 
@@ -139,76 +146,74 @@ contract("Testing Provider",function(accounts){
         expect(_Total.toNumber()).to.equal(0);
     });
 
-    /*
+    
     // ****** TESTING Adding Certificate ***************************************************************** //
 
     it("Adding Certificate WRONG",async function(){
         // act
-        await AddingProviders();
+        await AddingPool();
 
         try{
-            await privateCertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1}, function(error, result){});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: user_1, gas: Gas});
             expect.fail();
         }
         // assert
         catch(error){
-            expect(error.message).to.match(NotAProvider);
+            expect(error.message).to.match(NotAnOwner);
         }
         // act
         try{
-            await privateCertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-            await privateCertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
             expect.fail();
         }
         // assert
         catch(error){
-            expect(error.message).to.match(CertificateAlreadyExists);
+            expect(error.message).to.match(OwnerAlreadyvoted);
         }
-        
     });
 
     it("Adding Certificate CORRECT",async function(){
         // act
-        await AddingProviders();
-        await privateCertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-        // assert
-        let Provider = await privateCertPool.methods.retrieveCertificateProvider(hash_1, holder_1).call({from: user_1}, function(error, result){});
-        expect(Provider).to.equal(provider_1);
+        await AddingPool();
+        await AddingCertificates();
     });
 
     // ****** TESTING Removing Certificate ***************************************************************** //
 
     it("Removing Certificate WRONG",async function(){
         // act
-        await AddingProviders();
-        await AddingCertificate();
+        await AddingPool();
+        await AddingCertificates();
 
         try{
-            await privateCertPool.methods.removeCertificate(hash_1, holder_1).send({from: user_1}, function(error, result){});
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: user_1});
             expect.fail();
         }
         // assert
         catch(error){
-            expect(error.message).to.match(NotAProvider);
+            expect(error.message).to.match(NotAnOwner);
         }
         // act
         try{
-            await privateCertPool.methods.removeCertificate(hash_1, holder_1).send({from: provider_2}, function(error, result){});
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
             expect.fail();
         }
         // assert
         catch(error){
-            expect(error.message).to.match(NotAllowedToRemoveCertificate);
+            expect(error.message).to.match(OwnerAlreadyvoted);
         }
         
     });
 
     it("Removing Certificate CORRECT",async function(){
         // act
-        await AddingProviders();
-        await AddingCertificate();
-        await privateCertPool.methods.removeCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-    });*/
+        await AddingPool();
+        await AddingCertificates();
+        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
+        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
+    });
  
 
 });

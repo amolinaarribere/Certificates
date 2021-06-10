@@ -105,8 +105,7 @@ pragma experimental ABIEncoderV2;
     function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Library.Actions act) 
         isAPool(pool)
         isAnOwner
-        isEntityActivated(act == Library.Actions.Remove,  _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
-        HasNotAlreadyVoted(Library.Actions.Add, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+        HasNotAlreadyVoted(act, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
     internal{
         
         uint validations;
