@@ -82,8 +82,10 @@ contract("Testing Certificate Pool Manager",function(accounts){
         await certPoolManager.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
         // assert
         let result = await certPoolManager.retrievePrivateCertificatesPool(0, {from: user_1});
+        let Total = await certPoolManager.retrieveTotalPrivateCertificatesPool({from: user_1});
         const {0: creator, 1: pool} = result;
         expect(creator).to.equal(user_1);
+        expect(Total.toNumber()).to.equal(1);
     });
 
     // ****** TESTING Retrieves ***************************************************************** //
@@ -97,20 +99,5 @@ contract("Testing Certificate Pool Manager",function(accounts){
         expect(_balance.toNumber()).to.equal(0);
     });
 
-    it("Retrieve Private Certificates",async function(){
-        // act
-        let Total = await certPoolManager.retrieveTotalPrivateCertificatesPool({from: user_1});
-        // assert
-        expect(Total.toNumber()).to.equal(0);
-        // act
-        try{
-            let response = await certPoolManager.retrievePrivateCertificatesPool(1, {from: user_1});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(ProvidedIdIsWrong);
-        }
-    });
 
 });
