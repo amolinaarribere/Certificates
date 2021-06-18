@@ -1,9 +1,11 @@
-import React from 'react';
-import Tabs from "./components/Tabs"; 
-import Admin from "./components/Admin"; 
+import React, { Component } from 'react';
+import Home from "./components/Home"; 
+import NotFound from "./components/NotFound"; 
+import { browserHistory, Router, Route } from 'react-router';
+//import Admin from "./components/Admin"; 
 import './App.css';
 
-function App() {
+/*function App() {
   return (
     <div>
       <h1>CERTIFICATES</h1>
@@ -20,6 +22,36 @@ function App() {
      </Tabs> 
     </div>
   );
+}*/
+
+class App extends Component {
+  render(){
+    return(
+      <Router history={history}>
+        <Container>
+
+          <Menu secondary>
+            <Menu.Item 
+              name='home'
+              onClick={this.navigateToHome}
+            />
+          </Menu>
+
+          <Switch>
+            <Route exact path='/' component={Home} />
+            <Route  component={NotFound} />
+          </Switch>
+
+        </Container>
+      </Router>
+    );
+  }
+
+
+  navigateToHome(e){
+    e.preventDefault();
+    history.push('/');
+  }
 }
 
 export default App;
