@@ -1,23 +1,23 @@
-import logo from './logo.svg';
+import React from 'react';
+import Tabs from "./components/Tabs"; 
+import Admin from "./components/Admin"; 
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>CERTIFICATES</h1>
+      <Tabs> 
+       <div id="AdminTab" label="Admin"> 
+         <Admin></Admin> 
+       </div> 
+       <div id="PublicTab" label="Public Pool"> 
+         After 'while, <em>Crocodile</em>! 
+       </div> 
+       <div id="PrivateTab" label="Private Pools"> 
+         Nothing to see here, this tab is <em>extinct</em>! 
+       </div> 
+     </Tabs> 
     </div>
   );
 }
