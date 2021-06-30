@@ -1,13 +1,19 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom';
 import Web3 from 'web3'
 import './App.css'
-import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './config'
+//import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './config'
+import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS } from './config'
 import TodoList from './TodoList'
+import Demo from './Demo';
+
 
 class App extends Component {
+
   componentWillMount() {
     this.loadBlockchainData()
   }
+
 
   async loadBlockchainData() {
     const web3 = new Web3(Web3.givenProvider || "http://localhost:8545")
@@ -24,6 +30,22 @@ class App extends Component {
       })
     }
     this.setState({ loading: false })
+    if(window.ethereum) {
+      await window.ethereum.enable();
+    }
+    const web3 = new Web3(window.ethereum)
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    //this.setState({ account: accounts[0] })
+    const certificatePoolManager = new web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS)
+    //this.setState({ certificatePoolManager })
+    const {0: publicPoolAddress, 1: chairPerson, 2: balance} = await certificatePoolManager.methods.retrieveConfiguration().call()
+    console.log("main address " + CERTIFICATE_POOL_MANAGER_ADDRESS)
+    console.log("public address " + publicPoolAddress)
+    console.log("chairPerson " + chairPerson)
+    console.log("balance " + balance)
+    console.log("accounts " + accounts.length)
+    console.log("first account " + accounts[0])
+
   }
 
   constructor(props) {
@@ -59,7 +81,7 @@ class App extends Component {
     return (
       <div>
         <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-          <a className="navbar-brand col-sm-3 col-md-2 mr-0" href="http://www.dappuniversity.com/free-download" target="_blank">Dapp University | Todo List</a>
+          <a className="navbar-brand col-sm-3 col-md-2 mr-0" href="http://www.dappuniversity.com/free-download" target="_blank">Certificates Manager</a>
           <ul className="navbar-nav px-3">
             <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
               <small><a className="nav-link" href="#"><span id="account"></span></a></small>
@@ -79,6 +101,19 @@ class App extends Component {
             </main>
           </div>
         </div>
+      </div>
+    );
+  }
+  
+
+  render() {
+    
+    return (
+      <div>
+        <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+        <a className="navbar-brand col-sm-3 col-md-2 mr-0">Certificates Manager</a>
+        </nav>
+          ReactDOM.render(<Demo />, document.querySelector('#root'));
       </div>
     );
   }
