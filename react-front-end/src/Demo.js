@@ -7,9 +7,10 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Web3 from 'web3'
+import Cookies from 'universal-cookie';
 import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATE_ABI } from './config'
 
-
+const cookies = new Cookies();
 var web3 = ""
 var certificatePoolManager = ""
 var publicPool = ""
@@ -26,7 +27,7 @@ var privateTotalProviders = ""
 var privateProviders = []
 var account = ""
 var privatePoolAddresses = []
-var privatePoolAddress = ""
+var privatePoolAddress = cookies.get('privatePool');
 
 async function LoadBlockchain() {
   if(window.ethereum) {
@@ -79,6 +80,14 @@ async function RemoveProvider(address){
   await publicPool.methods.removeProvider(address).send({from: account});
 }
 
+async function AddPrivateProvider(address, Info){
+  await privatePool.methods.addProvider(address, Info).send({from: account});
+}
+
+async function RemovePrivateProvider(address){
+  await privatePool.methods.removeProvider(address).send({from: account});
+}
+
 async function SelectPrivatePool(address){
   privatePoolAddress = address
   privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
@@ -94,19 +103,26 @@ async function SelectPrivatePool(address){
 
 
 class Manager extends React.Component {
+  componentWillMount() {
+    LoadBlockchain()
+ }
   state = {
     newProvider : "",
     newProviderInfo : "",
     minOwners : 0,
     listOfOwners : []
   };
-  handleNewProposal = (event) => {
+  handleNewProposal = async (event) => {
   	event.preventDefault();
-    SendnewProposal(this.state.newProvider, this.state.newProviderInfo)
+    await SendnewProposal(this.state.newProvider, this.state.newProviderInfo)
+    this.setState({ newProvider: "" })
+    this.setState({ newProviderInfo: "" })
   };
-  handleNewPrivatePool = (event) => {
+  handleNewPrivatePool = async (event) => {
   	event.preventDefault();
-    CreatenewPrivatePool(this.state.minOwners, this.state.listOfOwners)
+    await CreatenewPrivatePool(this.state.minOwners, this.state.listOfOwners)
+    this.setState({ minOwners: 0 })
+    this.setState({ listOfOwners: [] })
   };
 
   render(){
@@ -155,18 +171,22 @@ class Manager extends React.Component {
 }
 
 class Public extends React.Component {
-
+  componentWillMount() {
+    LoadBlockchain()
+ }
   state = {
     validateProvider : "",
     removeProvider : ""
   };
-  handleValidateProvider = (event) => {
+  handleValidateProvider = async (event) => {
   	event.preventDefault();
-    ValidateProposal(this.state.validateProvider)
+    await ValidateProposal(this.state.validateProvider)
+    this.setState({ validateProvider: "" })
   };
-  handleRemoveProvider = (event) => {
+  handleRemoveProvider = async (event) => {
   	event.preventDefault();
-    RemoveProvider(this.state.removeProvider)
+    await RemoveProvider(this.state.removeProvider)
+    this.setState({ removeProvider: "" })
   };
 
   render(){
@@ -203,12 +223,35 @@ class Public extends React.Component {
 }
 
 class Private extends React.Component {
+  componentWillMount() {
+    LoadBlockchain();
+    if(privatePoolAddress != null){
+      SelectPrivatePool(privatePoolAddress);
+    }
+ }
   state = {
-    privatePool : ""
+    privatePool : "",
+    addProvider : "",
+    addProviderInfo : "",
+    removeProvider : ""
   };
-  handleSelectPool = (event) => {
+  handleSelectPool = async (event) => {
   	event.preventDefault();
-    SelectPrivatePool(this.state.privatePool)
+    cookies.set('privatePool', this.state.privatePool, { path: '/' });
+    privatePoolAddress = this.state.privatePool
+    await SelectPrivatePool(privatePoolAddress);
+    this.setState({ privatePool: "" })
+  };
+  handleAddProvider = async (event) => {
+  	event.preventDefault();
+    await AddPrivateProvider(this.state.addProvider, this.state.addProviderInfo)
+    this.setState({ addProviderInfo: "" })
+    this.setState({ addProvider: "" })
+  };
+  handleRemoveProvider = async (event) => {
+  	event.preventDefault();
+    await RemovePrivateProvider(this.state.removeProvider)
+    this.setState({ removeProvider: "" })
   };
 
   render(){
@@ -217,13 +260,39 @@ class Private extends React.Component {
         <h3>Current Address : {account}</h3>
         <br />
         <br />
-        <h4> Selelcted Private Pool : {this.state.privatePool}</h4>
-        <br />
         <form onSubmit={this.handleSelectPool}>
             <input type="text" name="SelectPool" placeholder="address" 
                 value={this.state.privatePool}
                 onChange={event => this.setState({ privatePool: event.target.value })}/>
             <button>Select Pool</button>
+        </form>
+        <br />
+        <h4> Selected Private Pool : {privatePoolAddress}</h4>
+        <br />
+        <p><b>Total Private Providers :</b> {privateTotalProviders}</p>
+        <p><b>Private Providers :</b>
+          <ol>
+            {privateProviders.map(privateProvider => (
+            <li key={privateProvider[0]}>{privateProvider[0]} : {privateProvider[1]}</li>
+            ))}
+          </ol>
+        </p>
+        <br/>
+        <form onSubmit={this.handleAddProvider}>
+            <input type="text" name="addProvider" placeholder="address" 
+                value={this.state.addProvider}
+                onChange={event => this.setState({ addProvider: event.target.value })}/>
+            <input type="text" name="addProviderInfo" placeholder="Info" 
+                value={this.state.addProviderInfo}
+                onChange={event => this.setState({ addProviderInfo: event.target.value })}/>
+            <button>Add Provider</button>
+        </form>
+        <br/>
+        <form onSubmit={this.handleRemoveProvider}>
+            <input type="text" name="RemoveProvider" placeholder="address" 
+                value={this.state.removeProvider}
+                onChange={event => this.setState({ removeProvider: event.target.value })}/>
+            <button>Remove Provider</button>
         </form>
       </div>
     );
@@ -265,12 +334,17 @@ function a11yProps(index) {
 
 
 class Demo extends React.Component {
+
+  componentWillMount() {
+     LoadBlockchain()
+  }
+
   state = {
     value : 0
   };
 
   render(){
-    LoadBlockchain();
+    //LoadBlockchain();
   
     const handleChange = (event, newValue) => {
       this.setState({value: newValue});
