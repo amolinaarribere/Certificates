@@ -7,20 +7,26 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Web3 from 'web3'
-import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI } from './config'
+import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATE_ABI } from './config'
 
 
 var web3 = ""
 var certificatePoolManager = ""
 var publicPool = ""
+var privatePool = ""
 const PublicPriceWei = 10
+const PrivatePriceWei = 20
 
 var publicPoolAddress = ""
 var chairPerson = ""
 var balance = ""
 var publicTotalProviders = ""
-var publicProviders = ""
+var publicProviders = []
+var privateTotalProviders = ""
+var privateProviders = []
 var account = ""
+var privatePoolAddresses = []
+var privatePoolAddress = ""
 
 async function LoadBlockchain() {
   if(window.ethereum) {
@@ -29,27 +35,40 @@ async function LoadBlockchain() {
   web3 = new Web3(window.ethereum)
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
   account = accounts[0];
+
   certificatePoolManager = new web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS)
   const config = await certificatePoolManager.methods.retrieveConfiguration().call()
   publicPoolAddress = config[0]
   chairPerson = config[1]
   balance = config[2]
+
   publicPool = new web3.eth.Contract(PUBLIC_ABI, publicPoolAddress)
   publicTotalProviders = await publicPool.methods.retrieveTotalProviders().call()
-  publicProviders = await publicPool.methods.retrieveAllProviders().call()
+  let publicProvidersAddresses = await publicPool.methods.retrieveAllProviders().call()
+  publicProviders = []
 
+  for (let i = 0; i < publicTotalProviders; i++) {
+    let publicProviderInfo = await publicPool.methods.retrieveProvider(publicProvidersAddresses[i]).call()
+    publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
+  }
 
-  console.log("main address " + CERTIFICATE_POOL_MANAGER_ADDRESS)
-  console.log("public address " + publicPoolAddress)
-  console.log("chairPerson " + chairPerson)
-  console.log("balance " + balance)
-  console.log("accounts " + accounts.length)
-  console.log("first account " + account)
+  let privateTotalPool = await certificatePoolManager.methods.retrieveTotalPrivateCertificatesPool().call()
+  privatePoolAddresses = []
+
+  for (let i = 0; i < privateTotalPool; i++) {
+    let privatePoolAddress = await certificatePoolManager.methods.retrievePrivateCertificatesPool(i).call()
+    privatePoolAddresses[i] = privatePoolAddress
+  }
+
 }
 
 
 async function SendnewProposal(address, info){
   await certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei});
+}
+
+async function CreatenewPrivatePool(min, list){
+  await certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei});
 }
 
 async function ValidateProposal(address){
@@ -60,19 +79,34 @@ async function RemoveProvider(address){
   await publicPool.methods.removeProvider(address).send({from: account});
 }
 
-async function DisplayProvider(address) {
-  return await publicPool.methods.retrieveProvider(address).call();
+async function SelectPrivatePool(address){
+  privatePoolAddress = address
+  privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
+  privateTotalProviders = await privatePool.methods.retrieveTotalProviders().call()
+  let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
+  privateProviders = []
+
+  for (let i = 0; i < privateTotalProviders; i++) {
+    let privateProviderInfo = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
+    privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
+  }
 }
 
 
 class Manager extends React.Component {
   state = {
     newProvider : "",
-    newProviderInfo : ""
+    newProviderInfo : "",
+    minOwners : 0,
+    listOfOwners : []
   };
   handleNewProposal = (event) => {
   	event.preventDefault();
     SendnewProposal(this.state.newProvider, this.state.newProviderInfo)
+  };
+  handleNewPrivatePool = (event) => {
+  	event.preventDefault();
+    CreatenewPrivatePool(this.state.minOwners, this.state.listOfOwners)
   };
 
   render(){
@@ -81,10 +115,10 @@ class Manager extends React.Component {
         <h3>Current Address : {account}</h3>
         <br />
         <br />
-        <p>main address : {CERTIFICATE_POOL_MANAGER_ADDRESS}</p>
-        <p>Public Address : {publicPoolAddress}</p>
-        <p>Chair Person : {chairPerson}</p>
-        <p>Balance : {balance}</p>
+        <p><b>Manager address :</b> {CERTIFICATE_POOL_MANAGER_ADDRESS}</p>
+        <p><b>Public Address :</b> {publicPoolAddress}</p>
+        <p><b>Chair Person :</b> {chairPerson}</p>
+        <p><b>Balance :</b> {balance}</p>
         <br />
         <form onSubmit={this.handleNewProposal}>
             <input type="text" name="newProvider" placeholder="address" 
@@ -93,8 +127,28 @@ class Manager extends React.Component {
               <input type="text" name="newProviderInfo" placeholder="Info" 
                 value={this.state.newProviderInfo}
                 onChange={event => this.setState({ newProviderInfo: event.target.value })}/>
-            <button>Send Proposal</button>
+            <button>Send Proposal for Public Provider</button>
         </form>
+        <br />
+        <p><b>Private Pool Addresses :</b>
+          <ol>
+            {privatePoolAddresses.map(privatePoolAddress => (
+            <li key={privatePoolAddress[1]}><i>creator</i> {privatePoolAddress[0]} :  
+                                            <i> address</i> {privatePoolAddress[1]}</li>
+            ))}
+          </ol>
+        </p>
+        <br/>
+        <form onSubmit={this.handleNewPrivatePool}>
+            <input type="integer" name="minOwners" placeholder="min Owners" 
+                value={this.state.minOwners}
+                onChange={event => this.setState({ minOwners: event.target.value })}/>
+              <input type="text" name="listOfOwners" placeholder="list Of Owners" 
+                value={this.state.listOfOwners}
+                onChange={event => this.setState({ listOfOwners: event.target.value.split(",") })}/>
+            <button>Request New Private Pool</button>
+        </form>
+        <br />
       </div>
     );
   }
@@ -104,8 +158,7 @@ class Public extends React.Component {
 
   state = {
     validateProvider : "",
-    removeProvider : "",
-    displayedProvider : ""
+    removeProvider : ""
   };
   handleValidateProvider = (event) => {
   	event.preventDefault();
@@ -115,10 +168,6 @@ class Public extends React.Component {
   	event.preventDefault();
     RemoveProvider(this.state.removeProvider)
   };
-  handleDisplayProvider = (event) => {
-  	event.preventDefault();
-    return (DisplayProvider(this.state.displayedProvider))
-  };
 
   render(){
     return (
@@ -126,11 +175,11 @@ class Public extends React.Component {
         <h3>Current Address : {account}</h3>
         <br />
         <br />
-        <p>Total Public Providers : {publicTotalProviders}</p>
-        <p>Public Providers : 
+        <p><b>Total Public Providers :</b> {publicTotalProviders}</p>
+        <p><b>Public Providers :</b>
           <ol>
             {publicProviders.map(publicProvider => (
-            <li key={publicProvider}>{publicProvider}</li>
+            <li key={publicProvider[0]}>{publicProvider[0]} : {publicProvider[1]}</li>
             ))}
           </ol>
         </p>
@@ -148,12 +197,33 @@ class Public extends React.Component {
                 onChange={event => this.setState({ removeProvider: event.target.value })}/>
             <button>Remove Provider</button>
         </form>
-        <br/>
-        <form onSubmit={this.handleDisplayProvider}>
-            <input type="text" name="DisplayProvider" placeholder="address" 
-                value={this.state.displayedProvider}
-                onChange={event => this.setState({ displayedProvider: event.target.value })}/>
-            <button>Display Provider</button>
+      </div>
+    );
+  }
+}
+
+class Private extends React.Component {
+  state = {
+    privatePool : ""
+  };
+  handleSelectPool = (event) => {
+  	event.preventDefault();
+    SelectPrivatePool(this.state.privatePool)
+  };
+
+  render(){
+    return (
+      <div>
+        <h3>Current Address : {account}</h3>
+        <br />
+        <br />
+        <h4> Selelcted Private Pool : {this.state.privatePool}</h4>
+        <br />
+        <form onSubmit={this.handleSelectPool}>
+            <input type="text" name="SelectPool" placeholder="address" 
+                value={this.state.privatePool}
+                onChange={event => this.setState({ privatePool: event.target.value })}/>
+            <button>Select Pool</button>
         </form>
       </div>
     );
@@ -193,12 +263,6 @@ function a11yProps(index) {
   };
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
 
 class Demo extends React.Component {
   state = {
@@ -228,7 +292,7 @@ class Demo extends React.Component {
           <Public />
         </TabPanel>
         <TabPanel value={this.state.value} index={2}>
-          Private
+          <Private />
         </TabPanel>
       </div>
     );
