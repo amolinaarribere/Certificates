@@ -1,4 +1,4 @@
-export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0xA956BDA7C217a99D0d6bC023f71EDd12224DAa3e'
+export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x8ee8c4787e54E2aDcbA18f5390F01424351072b2'
 export const CERTIFICATE_POOL_MANAGER_ABI = [
   {
     "inputs": [
@@ -262,25 +262,6 @@ export const PUBLIC_ABI = [
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "_UpdateEntityValidationIdEvent",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -465,6 +446,19 @@ export const PUBLIC_ABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "retrieveMinOwners",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -545,42 +539,6 @@ export const PUBLIC_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "ownerInfo",
-        "type": "string"
-      }
-    ],
-    "name": "updateOwner",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "providerInfo",
-        "type": "string"
-      }
-    ],
-    "name": "updateProvider",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -723,25 +681,6 @@ export const PRIVATE_ABI = [
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "_UpdateEntityValidationIdEvent",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -926,6 +865,19 @@ export const PRIVATE_ABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "retrieveMinOwners",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -1006,42 +958,6 @@ export const PRIVATE_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "ownerInfo",
-        "type": "string"
-      }
-    ],
-    "name": "updateOwner",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "providerInfo",
-        "type": "string"
-      }
-    ],
-    "name": "updateProvider",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
