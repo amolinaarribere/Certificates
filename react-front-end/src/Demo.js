@@ -7,10 +7,9 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Web3 from 'web3'
-import Cookies from 'universal-cookie';
 import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATE_ABI } from './config'
 
-const cookies = new Cookies();
+const privatePoolKey = 'privatePool';
 var web3 = ""
 var certificatePoolManager = ""
 var publicPool = ""
@@ -27,7 +26,7 @@ var privateTotalProviders = ""
 var privateProviders = []
 var account = ""
 var privatePoolAddresses = []
-var privatePoolAddress = cookies.get('privatePool');
+var privatePoolAddress = sessionStorage.getItem(privatePoolKey);
 
 async function LoadBlockchain() {
   if(window.ethereum) {
@@ -103,9 +102,6 @@ async function SelectPrivatePool(address){
 
 
 class Manager extends React.Component {
-  componentWillMount() {
-    LoadBlockchain()
- }
   state = {
     newProvider : "",
     newProviderInfo : "",
@@ -146,15 +142,6 @@ class Manager extends React.Component {
             <button>Send Proposal for Public Provider</button>
         </form>
         <br />
-        <p><b>Private Pool Addresses :</b>
-          <ol>
-            {privatePoolAddresses.map(privatePoolAddress => (
-            <li key={privatePoolAddress[1]}><i>creator</i> {privatePoolAddress[0]} :  
-                                            <i> address</i> {privatePoolAddress[1]}</li>
-            ))}
-          </ol>
-        </p>
-        <br/>
         <form onSubmit={this.handleNewPrivatePool}>
             <input type="integer" name="minOwners" placeholder="min Owners" 
                 value={this.state.minOwners}
@@ -165,15 +152,21 @@ class Manager extends React.Component {
             <button>Request New Private Pool</button>
         </form>
         <br />
+        <p><b>Private Pool Addresses :</b>
+          <ol>
+            {privatePoolAddresses.map(privatePoolAddress => (
+            <li key={privatePoolAddress[1]}><i>creator</i> {privatePoolAddress[0]} :  
+                                            <i> address</i> {privatePoolAddress[1]}</li>
+            ))}
+          </ol>
+        </p>
+        <br/>
       </div>
     );
   }
 }
 
 class Public extends React.Component {
-  componentWillMount() {
-    LoadBlockchain()
- }
   state = {
     validateProvider : "",
     removeProvider : ""
@@ -224,7 +217,6 @@ class Public extends React.Component {
 
 class Private extends React.Component {
   componentWillMount() {
-    LoadBlockchain();
     if(privatePoolAddress != null){
       SelectPrivatePool(privatePoolAddress);
     }
@@ -237,7 +229,7 @@ class Private extends React.Component {
   };
   handleSelectPool = async (event) => {
   	event.preventDefault();
-    cookies.set('privatePool', this.state.privatePool, { path: '/' });
+    sessionStorage.setItem(privatePoolKey, this.state.privatePool, { path: '/' });
     privatePoolAddress = this.state.privatePool
     await SelectPrivatePool(privatePoolAddress);
     this.setState({ privatePool: "" })
