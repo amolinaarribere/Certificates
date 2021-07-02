@@ -150,6 +150,10 @@ abstract contract MultiSigContract is IMultiSigContract{
         return (retrieveTotalEntities(_ownerId));
     }
 
+    function retrieveMinOwners() external override view returns (uint){
+        return (_minOwners);
+    }
+
     function isOwner(address owner) public view returns (bool){
         return(isEntity(owner, _ownerId));
     }

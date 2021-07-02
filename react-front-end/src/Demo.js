@@ -22,8 +22,12 @@ var chairPerson = ""
 var balance = ""
 var publicTotalProviders = ""
 var publicProviders = []
+var publicMinOwners = ""
+var publicOwners = []
 var privateTotalProviders = ""
 var privateProviders = []
+var privateMinOwners = ""
+var privateOwners = []
 var account = ""
 var privatePoolAddresses = []
 var privatePoolAddress = sessionStorage.getItem(privatePoolKey);
@@ -51,6 +55,9 @@ async function LoadBlockchain() {
     let publicProviderInfo = await publicPool.methods.retrieveProvider(publicProvidersAddresses[i]).call()
     publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
   }
+
+  publicMinOwners = await publicPool.methods.retrieveMinOwners().call()
+  publicOwners = await publicPool.methods.retrieveAllOwners().call()
 
   let privateTotalPool = await certificatePoolManager.methods.retrieveTotalPrivateCertificatesPool().call()
   privatePoolAddresses = []
@@ -98,6 +105,10 @@ async function SelectPrivatePool(address){
     let privateProviderInfo = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
     privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
   }
+
+  privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
+  privateOwners = await privatePool.methods.retrieveAllOwners().call()
+
 }
 
 
@@ -188,6 +199,15 @@ class Public extends React.Component {
         <h3>Current Address : {account}</h3>
         <br />
         <br />
+        <p><b>Min Public Owners :</b> {publicMinOwners}</p>
+        <p><b>Public Owners :</b>
+          <ol>
+            {publicOwners.map(publicOwner => (
+            <li key={publicOwner}>{publicOwner}</li>
+            ))}
+          </ol>
+        </p>
+        <br/>
         <p><b>Total Public Providers :</b> {publicTotalProviders}</p>
         <p><b>Public Providers :</b>
           <ol>
@@ -217,7 +237,7 @@ class Public extends React.Component {
 
 class Private extends React.Component {
   componentWillMount() {
-    if(privatePoolAddress != null){
+    if(privatePoolAddress != null && privatePoolAddress !== ""){
       SelectPrivatePool(privatePoolAddress);
     }
  }
@@ -261,6 +281,15 @@ class Private extends React.Component {
         <br />
         <h4> Selected Private Pool : {privatePoolAddress}</h4>
         <br />
+        <p><b>Min Private Owners :</b> {privateMinOwners}</p>
+        <p><b>Private Owners :</b>
+          <ol>
+            {privateOwners.map(privateOwner => (
+            <li key={privateOwner}>{privateOwner}</li>
+            ))}
+          </ol>
+        </p>
+        <br/>
         <p><b>Total Private Providers :</b> {privateTotalProviders}</p>
         <p><b>Private Providers :</b>
           <ol>

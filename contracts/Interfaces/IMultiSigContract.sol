@@ -14,4 +14,5 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrieveOwner(address owner) external view returns (string memory);
     function retrieveAllOwners() external view returns (address[] memory);
     function retrieveTotalOwners() external view returns (uint);
+    function retrieveMinOwners() external view returns (uint);
 }
