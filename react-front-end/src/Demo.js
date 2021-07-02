@@ -86,6 +86,16 @@ async function RemoveProvider(address){
   await publicPool.methods.removeProvider(address).send({from: account});
 }
 
+async function AddOwner(address, info, isPrivate){
+  if(isPrivate == true) await privatePool.methods.addOwner(address, info).send({from: account});
+  else await publicPool.methods.addOwner(address, info).send({from: account});
+}
+
+async function RemoveOwner(address, isPrivate){
+  if(isPrivate == true) await privatePool.methods.removeOwner(address).send({from: account});
+  else await publicPool.methods.removeOwner(address).send({from: account});
+}
+
 async function AddPrivateProvider(address, Info){
   await privatePool.methods.addProvider(address, Info).send({from: account});
 }
@@ -180,7 +190,9 @@ class Manager extends React.Component {
 class Public extends React.Component {
   state = {
     validateProvider : "",
-    removeProvider : ""
+    removeProvider : "",
+    addOwner : "",
+    removeOwner : ""
   };
   handleValidateProvider = async (event) => {
   	event.preventDefault();
@@ -192,6 +204,16 @@ class Public extends React.Component {
     await RemoveProvider(this.state.removeProvider)
     this.setState({ removeProvider: "" })
   };
+  handleAddOwner = async (event) => {
+  	event.preventDefault();
+    await AddOwner(this.state.addOwner, "", false)
+    this.setState({ addOwner: "" })
+  };
+  handleRemoveOwner = async (event) => {
+  	event.preventDefault();
+    await RemoveOwner(this.state.removeOwner, "", false)
+    this.setState({ removeOwner: "" })
+  };
 
   render(){
     return (
@@ -199,20 +221,25 @@ class Public extends React.Component {
         <h3>Current Address : {account}</h3>
         <br />
         <br />
+        <form onSubmit={this.handleAddOwner}>
+            <input type="text" name="AddOwner" placeholder="address" 
+                value={this.state.addOwner}
+                onChange={event => this.setState({ addOwner: event.target.value })}/>
+            <button>Add Owner</button>
+        </form>
+        <br/>
+        <form onSubmit={this.handleRemoveOwner}>
+            <input type="text" name="RemoveOwner" placeholder="address" 
+                value={this.state.removeOwner}
+                onChange={event => this.setState({ removeOwner: event.target.value })}/>
+            <button>Remove Owner</button>
+        </form>
+        <br/>
         <p><b>Min Public Owners :</b> {publicMinOwners}</p>
         <p><b>Public Owners :</b>
           <ol>
             {publicOwners.map(publicOwner => (
             <li key={publicOwner}>{publicOwner}</li>
-            ))}
-          </ol>
-        </p>
-        <br/>
-        <p><b>Total Public Providers :</b> {publicTotalProviders}</p>
-        <p><b>Public Providers :</b>
-          <ol>
-            {publicProviders.map(publicProvider => (
-            <li key={publicProvider[0]}>{publicProvider[0]} : {publicProvider[1]}</li>
             ))}
           </ol>
         </p>
@@ -230,6 +257,15 @@ class Public extends React.Component {
                 onChange={event => this.setState({ removeProvider: event.target.value })}/>
             <button>Remove Provider</button>
         </form>
+        <br />
+        <p><b>Total Public Providers :</b> {publicTotalProviders}</p>
+        <p><b>Public Providers :</b>
+          <ol>
+            {publicProviders.map(publicProvider => (
+            <li key={publicProvider[0]}>{publicProvider[0]} : {publicProvider[1]}</li>
+            ))}
+          </ol>
+        </p>
       </div>
     );
   }
@@ -245,7 +281,9 @@ class Private extends React.Component {
     privatePool : "",
     addProvider : "",
     addProviderInfo : "",
-    removeProvider : ""
+    removeProvider : "",
+    addOwner : "",
+    removeOwner : ""
   };
   handleSelectPool = async (event) => {
   	event.preventDefault();
@@ -265,6 +303,16 @@ class Private extends React.Component {
     await RemovePrivateProvider(this.state.removeProvider)
     this.setState({ removeProvider: "" })
   };
+  handleAddOwner = async (event) => {
+  	event.preventDefault();
+    await AddOwner(this.state.addOwner, "", true)
+    this.setState({ addOwner: "" })
+  };
+  handleRemoveOwner = async (event) => {
+  	event.preventDefault();
+    await RemoveOwner(this.state.removeOwner, "", true)
+    this.setState({ removeOwner: "" })
+  };
 
   render(){
     return (
@@ -281,20 +329,25 @@ class Private extends React.Component {
         <br />
         <h4> Selected Private Pool : {privatePoolAddress}</h4>
         <br />
+        <form onSubmit={this.handleAddOwner}>
+            <input type="text" name="AddOwner" placeholder="address" 
+                value={this.state.addOwner}
+                onChange={event => this.setState({ addOwner: event.target.value })}/>
+            <button>Add Owner</button>
+        </form>
+        <br/>
+        <form onSubmit={this.handleRemoveOwner}>
+            <input type="text" name="RemoveOwner" placeholder="address" 
+                value={this.state.removeOwner}
+                onChange={event => this.setState({ removeOwner: event.target.value })}/>
+            <button>Remove Owner</button>
+        </form>
+        <br />
         <p><b>Min Private Owners :</b> {privateMinOwners}</p>
         <p><b>Private Owners :</b>
           <ol>
             {privateOwners.map(privateOwner => (
             <li key={privateOwner}>{privateOwner}</li>
-            ))}
-          </ol>
-        </p>
-        <br/>
-        <p><b>Total Private Providers :</b> {privateTotalProviders}</p>
-        <p><b>Private Providers :</b>
-          <ol>
-            {privateProviders.map(privateProvider => (
-            <li key={privateProvider[0]}>{privateProvider[0]} : {privateProvider[1]}</li>
             ))}
           </ol>
         </p>
@@ -315,6 +368,15 @@ class Private extends React.Component {
                 onChange={event => this.setState({ removeProvider: event.target.value })}/>
             <button>Remove Provider</button>
         </form>
+        <br/>
+        <p><b>Total Private Providers :</b> {privateTotalProviders}</p>
+        <p><b>Private Providers :</b>
+          <ol>
+            {privateProviders.map(privateProvider => (
+            <li key={privateProvider[0]}>{privateProvider[0]} : {privateProvider[1]}</li>
+            ))}
+          </ol>
+        </p>
       </div>
     );
   }
