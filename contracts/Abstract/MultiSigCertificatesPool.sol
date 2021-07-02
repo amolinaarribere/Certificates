@@ -9,7 +9,7 @@ pragma experimental ABIEncoderV2;
  */
 
 import "./MultiSigContract.sol";
- import "../Interfaces/IPool.sol";
+import "../Interfaces/IPool.sol";
 
 abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     

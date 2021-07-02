@@ -9,8 +9,9 @@ pragma experimental ABIEncoderV2;
  */
 
  import "../Libraries/Library.sol";
+ import "../Interfaces/IMultiSigContract.sol";
 
-abstract contract MultiSigContract {
+abstract contract MultiSigContract is IMultiSigContract{
     using Library for *;
 
     //events
@@ -127,25 +128,25 @@ abstract contract MultiSigContract {
     }
 
     // OWNERS CRUD Operations
-    function addOwner(address owner, string memory ownerInfo) external {
+    function addOwner(address owner, string memory ownerInfo) external override {
         addEntity(owner, bytes(ownerInfo), _ownerId);
     }
     
-    function removeOwner(address owner) external
-        minRequired(_minOwners, retrieveTotalOwners() - 1)
+    function removeOwner(address owner) external override
+        minRequired(_minOwners, retrieveTotalEntities(_ownerId) - 1)
     {
         removeEntity(owner, _ownerId);
     }
     
-    function retrieveOwner(address owner) external view returns (string memory){
+    function retrieveOwner(address owner) external override view returns (string memory){
         return string(retrieveEntity(owner, _ownerId));
     }
 
-    function retrieveAllOwners() external view returns (address[] memory){
+    function retrieveAllOwners() external override view returns (address[] memory){
         return(retrieveAllEntities(_ownerId));
     }
 
-    function retrieveTotalOwners() public view returns (uint){
+    function retrieveTotalOwners() external override view returns (uint){
         return (retrieveTotalEntities(_ownerId));
     }
 
