@@ -31,6 +31,8 @@ var privateOwners = []
 var account = ""
 var privatePoolAddresses = []
 var privatePoolAddress = sessionStorage.getItem(privatePoolKey);
+var certificatesByHolder = []
+var currentHolder = ""
 
 async function LoadBlockchain() {
   if(window.ethereum) {
@@ -121,6 +123,21 @@ async function SelectPrivatePool(address){
 
 }
 
+async function AddCertificate(hash, address, isPrivate){
+  if(isPrivate == true) await privatePool.methods.addCertificate(hash, address).send({from: account});
+  else await publicPool.methods.addCertificate(hash, address).send({from: account});
+}
+
+async function retrieveCertificatesByHolder(address, init, max, isPrivate){
+  if(isPrivate == true) {
+    currentHolder = address
+    certificatesByHolder = await privatePool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
+  }
+  else{
+    currentHolder = address
+    certificatesByHolder = await publicPool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
+  }
+}
 
 class Manager extends React.Component {
   state = {
@@ -216,10 +233,17 @@ class Public extends React.Component {
   };
 
   render(){
+    const privateEnv = false;
     return (
       <div>
         <h3>Current Address : {account}</h3>
         <br />
+        <br />
+        <h4>Certificates</h4>
+        <br />
+        <Certificate privateEnv={privateEnv}/>
+        <br />
+        <h4>Owners</h4>
         <br />
         <form onSubmit={this.handleAddOwner}>
             <input type="text" name="AddOwner" placeholder="address" 
@@ -244,6 +268,8 @@ class Public extends React.Component {
           </ol>
         </p>
         <br/>
+        <h4>Providers</h4>
+        <br />
         <form onSubmit={this.handleValidateProvider}>
             <input type="text" name="validateProvider" placeholder="address" 
                 value={this.state.validateProvider}
@@ -273,7 +299,7 @@ class Public extends React.Component {
 
 class Private extends React.Component {
   componentWillMount() {
-    if(privatePoolAddress != null && privatePoolAddress !== ""){
+    if(privatePoolAddress != null && privatePoolAddress !== "" && privatePoolAddress !== "undefined"){
       SelectPrivatePool(privatePoolAddress);
     }
  }
@@ -315,6 +341,7 @@ class Private extends React.Component {
   };
 
   render(){
+    const privateEnv = true;
     return (
       <div>
         <h3>Current Address : {account}</h3>
@@ -328,6 +355,12 @@ class Private extends React.Component {
         </form>
         <br />
         <h4> Selected Private Pool : {privatePoolAddress}</h4>
+        <br />
+        <h4>Certificates</h4>
+        <br />
+        <Certificate privateEnv={privateEnv}/>
+        <br />
+        <h4>Owners</h4>
         <br />
         <form onSubmit={this.handleAddOwner}>
             <input type="text" name="AddOwner" placeholder="address" 
@@ -352,6 +385,8 @@ class Private extends React.Component {
           </ol>
         </p>
         <br/>
+        <h4>Providers</h4>
+        <br />
         <form onSubmit={this.handleAddProvider}>
             <input type="text" name="addProvider" placeholder="address" 
                 value={this.state.addProvider}
@@ -374,6 +409,73 @@ class Private extends React.Component {
           <ol>
             {privateProviders.map(privateProvider => (
             <li key={privateProvider[0]}>{privateProvider[0]} : {privateProvider[1]}</li>
+            ))}
+          </ol>
+        </p>
+      </div>
+    );
+  }
+}
+
+class Certificate extends React.Component{
+  state = {
+    certificateHash : "",
+    holderAddress: "",
+    retrieveholderAddress: ""
+  };
+
+  captureFile = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const file = event.target.files[0];
+    let reader = new window.FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => this.convertToBuffer(reader);
+  };
+
+  convertToBuffer = async (reader) => {
+    const buffer = await Buffer.from(reader.result);
+    this.setState({certificateHash: web3.utils.keccak256(buffer)});
+  };
+
+  handleAddCertificate = async (event) => {
+  	event.preventDefault();
+    await AddCertificate(this.state.certificateHash, this.state.holderAddress, this.props.privateEnv);
+    this.setState({ certificateHash: "",  holderAddress: ""})
+  };
+
+  handleRetrieveByHolder = async (event) => {
+  	event.preventDefault();
+    await retrieveCertificatesByHolder(this.state.retrieveholderAddress, 0, 99, this.props.privateEnv)
+    this.setState({ retrieveholderAddress: ""})
+  };
+
+  render(){
+    return (
+      <div>
+        <br />
+        <form onSubmit={this.handleAddCertificate}>
+            <input type="file" onChange={this.captureFile} className="input-file" />
+            <br />
+            <input type="text" name="HolderAddress" placeholder="address" 
+                value={this.state.holderAddress}
+                onChange={event => this.setState({ holderAddress: event.target.value })}/>
+            <br />
+            <button>Add Certificate</button>
+        </form>
+        <br />
+        <br/>
+        <form onSubmit={this.handleRetrieveByHolder}>
+            <input type="text" name="RetreiveByHolder" placeholder="address" 
+                value={this.state.retrieveholderAddress}
+                onChange={event => this.setState({ retrieveholderAddress: event.target.value })}/>
+            <button>Retrieve By Holder</button>
+        </form>
+        <br />
+        <p><b>Certificates for Holder : {currentHolder}</b>
+          <ol>
+            {certificatesByHolder.map(certificateByHolder => (
+            <li key={certificateByHolder}>{certificateByHolder}</li>
             ))}
           </ol>
         </p>
