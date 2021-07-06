@@ -1,15 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Web3 from 'web3'
-import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATE_ABI } from './config'
+//import Web3 from 'web3';
+import {SendnewProposal, CreatenewPrivatePool, ValidateProposal, AddPrivateProvider,
+  RemoveProvider, AddOwner, RemoveOwner, AddCertificate, retrieveCertificatesByHolder,
+  LoadBlockchain, chairPerson, balance, publicPoolAddress, privatePoolKey, privatePoolAddress,
+  publicMinOwners, SelectPrivatePool, account, privatePoolAddresses, publicOwners, publicTotalProviders,
+publicProviders, privateMinOwners, privateOwners, privateTotalProviders, privateProviders, currentHolder,
+certificatesByHolder, web3, DisconnectBlockchain, certificateProvider, CheckCertificate} from './Functions';
+import {  CERTIFICATE_POOL_MANAGER_ADDRESS} from './config'
 
-const privatePoolKey = 'privatePool';
+var connected = false;
+var buttonText = "CONNECT";
+
+/*const privatePoolKey = 'privatePool';
+
 var web3 = ""
 var certificatePoolManager = ""
 var publicPool = ""
@@ -84,8 +93,13 @@ async function ValidateProposal(address){
   await publicPool.methods.validateProvider(address).send({from: account});
 }
 
-async function RemoveProvider(address){
-  await publicPool.methods.removeProvider(address).send({from: account});
+async function AddPrivateProvider(address, Info){
+  await privatePool.methods.addProvider(address, Info).send({from: account});
+}
+
+async function RemoveProvider(address, isPrivate){
+  if(isPrivate == true) await await privatePool.methods.removeProvider(address).send({from: account});
+  else await await publicPool.methods.removeProvider(address).send({from: account});
 }
 
 async function AddOwner(address, info, isPrivate){
@@ -96,31 +110,6 @@ async function AddOwner(address, info, isPrivate){
 async function RemoveOwner(address, isPrivate){
   if(isPrivate == true) await privatePool.methods.removeOwner(address).send({from: account});
   else await publicPool.methods.removeOwner(address).send({from: account});
-}
-
-async function AddPrivateProvider(address, Info){
-  await privatePool.methods.addProvider(address, Info).send({from: account});
-}
-
-async function RemovePrivateProvider(address){
-  await privatePool.methods.removeProvider(address).send({from: account});
-}
-
-async function SelectPrivatePool(address){
-  privatePoolAddress = address
-  privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
-  privateTotalProviders = await privatePool.methods.retrieveTotalProviders().call()
-  let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
-  privateProviders = []
-
-  for (let i = 0; i < privateTotalProviders; i++) {
-    let privateProviderInfo = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
-    privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
-  }
-
-  privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
-  privateOwners = await privatePool.methods.retrieveAllOwners().call()
-
 }
 
 async function AddCertificate(hash, address, isPrivate){
@@ -138,6 +127,24 @@ async function retrieveCertificatesByHolder(address, init, max, isPrivate){
     certificatesByHolder = await publicPool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
   }
 }
+
+
+async function SelectPrivatePool(address){
+  privatePoolAddress = address
+  privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
+  privateTotalProviders = await privatePool.methods.retrieveTotalProviders().call()
+  let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
+  privateProviders = []
+
+  for (let i = 0; i < privateTotalProviders; i++) {
+    let privateProviderInfo = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
+    privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
+  }
+
+  privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
+  privateOwners = await privatePool.methods.retrieveAllOwners().call()
+
+}*/
 
 class Manager extends React.Component {
   state = {
@@ -158,10 +165,26 @@ class Manager extends React.Component {
     this.setState({ minOwners: 0 })
     this.setState({ listOfOwners: [] })
   };
+  handleConnectButton = () => {
+    if(connected === false) this.connectToBlockchain();
+    else this.disconnectFromBlockchain();
+  };
+  connectToBlockchain = async() =>{
+    LoadBlockchain()
+    connected = true;
+    buttonText = "DISCONNECT";
+  };
+  disconnectFromBlockchain = async() =>{
+    DisconnectBlockchain()
+    connected = false;
+    buttonText = "CONNECT" ;
+  };
 
   render(){
     return (
       <div>
+        <button onClick={this.handleConnectButton}>{buttonText}</button>
+        <br />
         <h3>Current Address : {account}</h3>
         <br />
         <br />
@@ -209,7 +232,8 @@ class Public extends React.Component {
     validateProvider : "",
     removeProvider : "",
     addOwner : "",
-    removeOwner : ""
+    removeOwner : "",
+    privateEnv : false
   };
   handleValidateProvider = async (event) => {
   	event.preventDefault();
@@ -218,22 +242,21 @@ class Public extends React.Component {
   };
   handleRemoveProvider = async (event) => {
   	event.preventDefault();
-    await RemoveProvider(this.state.removeProvider)
+    await RemoveProvider(this.state.removeProvider, this.state.privateEnv)
     this.setState({ removeProvider: "" })
   };
   handleAddOwner = async (event) => {
   	event.preventDefault();
-    await AddOwner(this.state.addOwner, "", false)
+    await AddOwner(this.state.addOwner, "", this.state.privateEnv)
     this.setState({ addOwner: "" })
   };
   handleRemoveOwner = async (event) => {
   	event.preventDefault();
-    await RemoveOwner(this.state.removeOwner, "", false)
+    await RemoveOwner(this.state.removeOwner, "", this.state.privateEnv)
     this.setState({ removeOwner: "" })
   };
 
   render(){
-    const privateEnv = false;
     return (
       <div>
         <h3>Current Address : {account}</h3>
@@ -241,7 +264,7 @@ class Public extends React.Component {
         <br />
         <h4>Certificates</h4>
         <br />
-        <Certificate privateEnv={privateEnv}/>
+        <Certificate privateEnv={this.state.privateEnv}/>
         <br />
         <h4>Owners</h4>
         <br />
@@ -309,13 +332,13 @@ class Private extends React.Component {
     addProviderInfo : "",
     removeProvider : "",
     addOwner : "",
-    removeOwner : ""
+    removeOwner : "",
+    privateEnv : true
   };
   handleSelectPool = async (event) => {
   	event.preventDefault();
     sessionStorage.setItem(privatePoolKey, this.state.privatePool, { path: '/' });
-    privatePoolAddress = this.state.privatePool
-    await SelectPrivatePool(privatePoolAddress);
+    await SelectPrivatePool(this.state.privatePool);
     this.setState({ privatePool: "" })
   };
   handleAddProvider = async (event) => {
@@ -326,22 +349,21 @@ class Private extends React.Component {
   };
   handleRemoveProvider = async (event) => {
   	event.preventDefault();
-    await RemovePrivateProvider(this.state.removeProvider)
+    await RemoveProvider(this.state.removeProvider, this.state.privateEnv)
     this.setState({ removeProvider: "" })
   };
   handleAddOwner = async (event) => {
   	event.preventDefault();
-    await AddOwner(this.state.addOwner, "", true)
+    await AddOwner(this.state.addOwner, "", this.state.privateEnv)
     this.setState({ addOwner: "" })
   };
   handleRemoveOwner = async (event) => {
   	event.preventDefault();
-    await RemoveOwner(this.state.removeOwner, "", true)
+    await RemoveOwner(this.state.removeOwner, "", this.state.privateEnv)
     this.setState({ removeOwner: "" })
   };
 
   render(){
-    const privateEnv = true;
     return (
       <div>
         <h3>Current Address : {account}</h3>
@@ -358,7 +380,7 @@ class Private extends React.Component {
         <br />
         <h4>Certificates</h4>
         <br />
-        <Certificate privateEnv={privateEnv}/>
+        <Certificate privateEnv={this.state.privateEnv}/>
         <br />
         <h4>Owners</h4>
         <br />
@@ -444,6 +466,12 @@ class Certificate extends React.Component{
     this.setState({ certificateHash: "",  holderAddress: ""})
   };
 
+  handleCheckCertificate = async (event) => {
+  	event.preventDefault();
+    await CheckCertificate(this.state.certificateHash, this.state.holderAddress, this.props.privateEnv);
+    this.setState({ certificateHash: "",  holderAddress: ""})
+  };
+
   handleRetrieveByHolder = async (event) => {
   	event.preventDefault();
     await retrieveCertificatesByHolder(this.state.retrieveholderAddress, 0, 99, this.props.privateEnv)
@@ -457,16 +485,19 @@ class Certificate extends React.Component{
         <form onSubmit={this.handleAddCertificate}>
             <input type="file" onChange={this.captureFile} className="input-file" />
             <br />
-            <input type="text" name="HolderAddress" placeholder="address" 
+            <input type="text" name="HolderAddress" placeholder="holder address" 
                 value={this.state.holderAddress}
                 onChange={event => this.setState({ holderAddress: event.target.value })}/>
             <br />
-            <button>Add Certificate</button>
+            <button type="submit">Add Certificate</button>
+            <button type="button" onClick={this.handleCheckCertificate}>Check Certificate</button>
         </form>
+        <br />
+        <p>{certificateProvider}</p>
         <br />
         <br/>
         <form onSubmit={this.handleRetrieveByHolder}>
-            <input type="text" name="RetreiveByHolder" placeholder="address" 
+            <input type="text" name="RetreiveByHolder" placeholder="holder address" 
                 value={this.state.retrieveholderAddress}
                 onChange={event => this.setState({ retrieveholderAddress: event.target.value })}/>
             <button>Retrieve By Holder</button>
@@ -521,7 +552,7 @@ function a11yProps(index) {
 class Demo extends React.Component {
 
   componentWillMount() {
-     LoadBlockchain()
+     if(connected)LoadBlockchain()
   }
 
   state = {
@@ -529,8 +560,6 @@ class Demo extends React.Component {
   };
 
   render(){
-    //LoadBlockchain();
-  
     const handleChange = (event, newValue) => {
       this.setState({value: newValue});
     };
