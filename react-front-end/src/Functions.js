@@ -8,6 +8,7 @@ var privatePool = ""
 const PublicPriceWei = 10
 const PrivatePriceWei = 20
 export const privatePoolKey = 'privatePool';
+//export const currentHolderKey = 'currentHolder';
 
 export var publicPoolAddress = ""
 export var chairPerson = ""
@@ -24,7 +25,7 @@ export var account = ""
 export var privatePoolAddresses = []
 export var privatePoolAddress = sessionStorage.getItem(privatePoolKey);
 export var certificatesByHolder = []
-export var currentHolder = ""
+export var currentHolder = "";
 export var certificateProvider = ""
 
 export async function LoadBlockchain() {
@@ -64,6 +65,11 @@ export async function LoadBlockchain() {
 
 }
 
+export function SwitchContext(){
+  currentHolder = "";
+  certificatesByHolder = []
+}
+
 export async function DisconnectBlockchain() {
   web3 = ""
   certificatePoolManager = ""
@@ -93,70 +99,105 @@ export async function DisconnectBlockchain() {
 }
 
  export async function SendnewProposal(address, info){
+   try{
     await certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei});
+   }
+   catch(e) { window.alert(e); }
   }
   
   export async function CreatenewPrivatePool(min, list){
-    await certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei});
+    try{
+      await certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei});
+     }
+     catch(e) { window.alert(e); }
   }
   
   export async function ValidateProposal(address){
-    await publicPool.methods.validateProvider(address).send({from: account});
+    try{
+      await publicPool.methods.validateProvider(address).send({from: account});
+    }
+    catch(e) { window.alert(e); }
   }
   
   export async function AddPrivateProvider(address, Info){
-    await privatePool.methods.addProvider(address, Info).send({from: account});
+    try{
+      await privatePool.methods.addProvider(address, Info).send({from: account});
+    }
+    catch(e) { window.alert(e); }
   }
   
   export async function RemoveProvider(address, isPrivate){
-    if(isPrivate === true) await await privatePool.methods.removeProvider(address).send({from: account});
-    else await await publicPool.methods.removeProvider(address).send({from: account});
+    try{
+      if(isPrivate === true) await await privatePool.methods.removeProvider(address).send({from: account});
+      else await await publicPool.methods.removeProvider(address).send({from: account});
+    }
+    catch(e) { window.alert(e); }
   }
   
   export async function AddOwner(address, info, isPrivate){
-    if(isPrivate === true) await privatePool.methods.addOwner(address, info).send({from: account});
-    else await publicPool.methods.addOwner(address, info).send({from: account});
+    try{
+      if(isPrivate === true) await privatePool.methods.addOwner(address, info).send({from: account});
+      else await publicPool.methods.addOwner(address, info).send({from: account});
+     }
+     catch(e) { window.alert(e); }
   }
   
   export async function RemoveOwner(address, isPrivate){
-    if(isPrivate === true) await privatePool.methods.removeOwner(address).send({from: account});
-    else await publicPool.methods.removeOwner(address).send({from: account});
+    try{
+      if(isPrivate === true) await privatePool.methods.removeOwner(address).send({from: account});
+      else await publicPool.methods.removeOwner(address).send({from: account});
+    }
+    catch(e) { window.alert(e); }
   }
 
   export async function AddCertificate(hash, address, isPrivate){
-    if(isPrivate === true) await privatePool.methods.addCertificate(hash, address).send({from: account});
-    else await publicPool.methods.addCertificate(hash, address).send({from: account});
+    try{
+      if(isPrivate === true) await privatePool.methods.addCertificate(hash, address).send({from: account});
+      else await publicPool.methods.addCertificate(hash, address).send({from: account});
+    }
+    catch(e) { window.alert(e); }
   }
 
   export async function CheckCertificate(hash, address, isPrivate){
-    if(isPrivate === true) certificateProvider = await privatePool.methods.retrieveCertificateProvider(hash, address).call({from: account});
-    else certificateProvider = await publicPool.methods.retrieveCertificateProvider(hash, address).call({from: account});
+    try{
+      if(isPrivate === true) certificateProvider = await privatePool.methods.retrieveCertificateProvider(hash, address).call({from: account});
+      else certificateProvider = await publicPool.methods.retrieveCertificateProvider(hash, address).call({from: account});
+      if (certificateProvider == "0x0000000000000000000000000000000000000000")certificateProvider = "Certificate Does not Belong to Holder " + address
+      else certificateProvider = "Certificate Provided by " + certificateProvider + " to " + address
+    }
+    catch(e) { window.alert(e); }
   }
 
   export async function retrieveCertificatesByHolder(address, init, max, isPrivate){
-    if(isPrivate === true) {
-      currentHolder = address
-      certificatesByHolder = await privatePool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
+    try{
+      certificatesByHolder = []
+      currentHolder = address;
+      if(isPrivate === true) {
+        certificatesByHolder = await privatePool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
+      }
+      else{
+        certificatesByHolder = await publicPool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
+      }
     }
-    else{
-      currentHolder = address
-      certificatesByHolder = await publicPool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
-    }
+    catch(e) { window.alert("here " + e); }
+    
   }
 
   export async function SelectPrivatePool(address){
-    privatePoolAddress = address
-    privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
-    privateTotalProviders = await privatePool.methods.retrieveTotalProviders().call()
-    let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
-    privateProviders = []
-  
-    for (let i = 0; i < privateTotalProviders; i++) {
-      let privateProviderInfo = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
-      privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
+    try{
+      privatePoolAddress = address
+      privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
+      privateTotalProviders = await privatePool.methods.retrieveTotalProviders().call()
+      let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
+      privateProviders = []
+    
+      for (let i = 0; i < privateTotalProviders; i++) {
+        let privateProviderInfo = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
+        privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
+      }
+    
+      privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
+      privateOwners = await privatePool.methods.retrieveAllOwners().call()
     }
-  
-    privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
-    privateOwners = await privatePool.methods.retrieveAllOwners().call()
-  
+    catch(e) { window.alert(e); }
   }
