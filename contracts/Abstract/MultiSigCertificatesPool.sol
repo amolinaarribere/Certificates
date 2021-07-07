@@ -131,9 +131,12 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     }
 
     function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override
-        isIdCorrect(skipFirst, retrieveTotalCertificatesByHolder(holder))
     view returns (bytes32[] memory)
     {
+        if(retrieveTotalCertificatesByHolder(holder) <= skipFirst){
+            return (new bytes32[](0));
+        }
+
         uint maxSize = max;
         if(retrieveTotalCertificatesByHolder(holder) - skipFirst < max){
             maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst;
