@@ -8,7 +8,6 @@ var privatePool = ""
 const PublicPriceWei = 10
 const PrivatePriceWei = 20
 export const privatePoolKey = 'privatePool';
-//export const currentHolderKey = 'currentHolder';
 
 export var publicPoolAddress = ""
 export var chairPerson = ""
@@ -68,6 +67,7 @@ export async function LoadBlockchain() {
 export function SwitchContext(){
   currentHolder = "";
   certificatesByHolder = []
+  certificateProvider = ""
 }
 
 export async function DisconnectBlockchain() {
