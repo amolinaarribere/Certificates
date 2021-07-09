@@ -15,10 +15,12 @@ export var balance = ""
 export var publicTotalProviders = ""
 export var publicProviders = []
 export var publicMinOwners = ""
+export var publicTotalOwners = ""
 export var publicOwners = []
 export var privateTotalProviders = ""
 export var privateProviders = []
 export var privateMinOwners = ""
+export var privateTotalOwners = ""
 export var privateOwners = []
 export var account = ""
 export var privatePoolAddresses = []
@@ -51,6 +53,7 @@ export async function LoadBlockchain() {
     publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
   }
 
+  publicTotalOwners = await publicPool.methods.retrieveTotalOwners().call()
   publicMinOwners = await publicPool.methods.retrieveMinOwners().call()
   publicOwners = await publicPool.methods.retrieveAllOwners().call()
 
@@ -81,6 +84,7 @@ export async function DisconnectBlockchain() {
   publicPool = ""
   publicTotalProviders = ""
   publicProviders = []
+  publicTotalOwners = ""
   publicMinOwners = ""
   publicOwners = []
 
@@ -90,6 +94,7 @@ export async function DisconnectBlockchain() {
   privateTotalProviders = ""
   privateProviders = []
   privateMinOwners = ""
+  privateTotalOwners = ""
   privateOwners = ""
   sessionStorage.removeItem(privatePoolKey);
 
@@ -196,6 +201,7 @@ export async function DisconnectBlockchain() {
         privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
       }
     
+      privateTotalOwners = await privatePool.methods.retrieveTotalOwners().call()
       privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
       privateOwners = await privatePool.methods.retrieveAllOwners().call()
     }

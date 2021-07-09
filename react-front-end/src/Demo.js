@@ -9,7 +9,7 @@ import {SendnewProposal, CreatenewPrivatePool, ValidateProposal, AddPrivateProvi
   RemoveProvider, AddOwner, RemoveOwner, AddCertificate, retrieveCertificatesByHolder,
   LoadBlockchain, chairPerson, balance, publicPoolAddress, privatePoolKey, privatePoolAddress,
   publicMinOwners, SelectPrivatePool, account, privatePoolAddresses, publicOwners, publicTotalProviders,
-publicProviders, privateMinOwners, privateOwners, privateTotalProviders, privateProviders,currentHolder,
+publicProviders, privateMinOwners, privateTotalOwners, publicTotalOwners, privateOwners, privateTotalProviders, privateProviders,currentHolder,
 certificatesByHolder, web3, DisconnectBlockchain, certificateProvider, CheckCertificate, SwitchContext} from './Functions';
 import {  CERTIFICATE_POOL_MANAGER_ADDRESS} from './config'
 
@@ -308,6 +308,7 @@ class Owner extends React.Component{
               <button>Remove Owner</button>
           </form>
           <br />
+          <p><b>Total Private Owners :</b> {privateTotalOwners}</p>
           <p><b>Min Private Owners :</b> {privateMinOwners}</p>
           <p><b>Private Owners :</b>
             <ol>
@@ -338,6 +339,7 @@ class Owner extends React.Component{
               <button>Remove Owner</button>
           </form>
           <br />
+          <p><b>Total Public Owners :</b> {publicTotalOwners}</p>
           <p><b>Min Public Owners :</b> {publicMinOwners}</p>
           <p><b>Public Owners :</b>
             <ol>
