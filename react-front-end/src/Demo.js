@@ -13,7 +13,7 @@ publicProviders, privateMinOwners, privateTotalOwners, publicTotalOwners, privat
 certificatesByHolder, web3, DisconnectBlockchain, certificateProvider, CheckCertificate, SwitchContext} from './Functions';
 import {  CERTIFICATE_POOL_MANAGER_ADDRESS} from './config'
 
-class Manager extends React.Component {
+class ManagerComponent extends React.Component {
   componentWillMount() {
     LoadBlockchain()
  }
@@ -81,7 +81,7 @@ class Manager extends React.Component {
   }
 }
 
-class Public extends React.Component {
+class PublicComponent extends React.Component {
   componentWillMount() {
     LoadBlockchain()
     SwitchContext()
@@ -96,17 +96,17 @@ class Public extends React.Component {
         <h3>Current Address : {account}</h3>
         <br />
         <br />
-        <Certificate privateEnv={this.state.privateEnv}/>
+        <CertificateComponent privateEnv={this.state.privateEnv}/>
         <br />
-        <Owner privateEnv={this.state.privateEnv}/>
+        <OwnerComponent privateEnv={this.state.privateEnv}/>
         <br/>
-        <Provider privateEnv={this.state.privateEnv}/>
+        <ProviderComponent privateEnv={this.state.privateEnv}/>
       </div>
     );
   }
 }
 
-class Private extends React.Component {
+class PrivateComponent extends React.Component {
   componentWillMount() {
     LoadBlockchain()
     SwitchContext()
@@ -141,31 +141,33 @@ class Private extends React.Component {
         <br />
         <h4> Selected Private Pool : {privatePoolAddress}</h4>
         <br />
-        <Certificate privateEnv={this.state.privateEnv}/>
+        <CertificateComponent privateEnv={this.state.privateEnv}/>
         <br />
-        <Owner privateEnv={this.state.privateEnv}/>
+        <OwnerComponent privateEnv={this.state.privateEnv}/>
         <br/>
-        <Provider privateEnv={this.state.privateEnv}/>
+        <ProviderComponent privateEnv={this.state.privateEnv}/>
       </div>
     );
   }
 }
 
-class Provider extends React.Component{
+class ProviderComponent extends React.Component{
   render(){
     return(
       <div>
         <h4 class="text-primary">Providers</h4>
         <br />
-        <AddProvider privateEnv={this.props.privateEnv}/>
+        <AddProviderComponent privateEnv={this.props.privateEnv}/>
+        <br />
+        <RemoveProviderComponent privateEnv={this.props.privateEnv}/>
         <br/>
-        <ListProviders privateEnv={this.props.privateEnv} />
+        <ListProvidersComponent privateEnv={this.props.privateEnv} />
       </div>
     );
   }
 }
 
-class AddProvider extends React.Component{
+class AddProviderComponent extends React.Component{
   state = {
     validateProvider : "",
     addProvider : "",
@@ -215,7 +217,7 @@ class AddProvider extends React.Component{
   }
 }
 
-class ListProviders extends React.Component{
+class RemoveProviderComponent extends React.Component{
   state = {
     removeProvider : ""
   };
@@ -226,7 +228,6 @@ class ListProviders extends React.Component{
   };
 
   render(){
-    if(this.props.privateEnv){
       return(
         <div>
           <form onSubmit={this.handleRemoveProvider}>
@@ -234,8 +235,18 @@ class ListProviders extends React.Component{
                 value={this.state.removeProvider}
                 onChange={event => this.setState({ removeProvider: event.target.value })}/>
             <button>Remove Provider</button>
-          </form>
-          <br />
+          </form> 
+        </div>
+      );
+  }
+}
+
+class ListProvidersComponent extends React.Component{
+
+  render(){
+    if(this.props.privateEnv){
+      return(
+        <div>
           <p><b>Total Private Providers :</b> {privateTotalProviders}</p>
           <p><b>Private Providers :</b>
             <ol>
@@ -250,13 +261,6 @@ class ListProviders extends React.Component{
     else{
       return(
         <div>
-          <form onSubmit={this.handleRemoveProvider}>
-            <input type="text" name="RemoveProvider" placeholder="address" 
-                value={this.state.removeProvider}
-                onChange={event => this.setState({ removeProvider: event.target.value })}/>
-            <button>Remove Provider</button>
-          </form>
-          <br />
           <p><b>Total Public Providers :</b> {publicTotalProviders}</p>
           <p><b>Public Providers :</b>
             <ol>
@@ -271,16 +275,49 @@ class ListProviders extends React.Component{
   }
 }
 
-class Owner extends React.Component{
-  state = {
-    addOwner : "",
-    removeOwner : ""
-  };
+class OwnerComponent extends React.Component{
+  render(){
+    return(
+      <div>
+        <h4 class="text-primary">Owners</h4>
+        <br />
+        <AddOwnerComponent privateEnv={this.props.privateEnv}/>
+        <br/>
+        <RemoveOwnerComponent privateEnv={this.props.privateEnv}/>
+        <br />
+        <ListOwnersComponent privateEnv={this.props.privateEnv}/>
+      </div>
+    );
+  }
+}
 
+class AddOwnerComponent extends React.Component{
+  state = {
+    addOwner : ""
+  };
   handleAddOwner = async (event) => {
   	event.preventDefault();
     await AddOwner(this.state.addOwner, "", this.props.privateEnv)
     this.setState({ addOwner: "" })
+  };
+
+  render(){
+    return(
+      <div>
+        <form onSubmit={this.handleAddOwner}>
+            <input type="text" name="AddOwner" placeholder="address" 
+                value={this.state.addOwner}
+                onChange={event => this.setState({ addOwner: event.target.value })}/>
+            <button>Add Owner</button>
+        </form>
+      </div>
+    );
+}
+}
+
+class RemoveOwnerComponent extends React.Component{
+  state = {
+    removeOwner : ""
   };
   handleRemoveOwner = async (event) => {
   	event.preventDefault();
@@ -289,25 +326,24 @@ class Owner extends React.Component{
   };
 
   render(){
-    if(this.props.privateEnv){
       return(
         <div>
-          <h4 class="text-primary">Owners</h4>
-          <br />
-          <form onSubmit={this.handleAddOwner}>
-              <input type="text" name="AddOwner" placeholder="address" 
-                  value={this.state.addOwner}
-                  onChange={event => this.setState({ addOwner: event.target.value })}/>
-              <button>Add Owner</button>
-          </form>
-          <br/>
           <form onSubmit={this.handleRemoveOwner}>
               <input type="text" name="RemoveOwner" placeholder="address" 
                   value={this.state.removeOwner}
                   onChange={event => this.setState({ removeOwner: event.target.value })}/>
               <button>Remove Owner</button>
           </form>
-          <br />
+        </div>
+      );
+  }
+}
+
+class ListOwnersComponent extends React.Component{
+  render(){
+    if(this.props.privateEnv){
+      return(
+        <div>
           <p><b>Total Private Owners :</b> {privateTotalOwners}</p>
           <p><b>Min Private Owners :</b> {privateMinOwners}</p>
           <p><b>Private Owners :</b>
@@ -323,22 +359,6 @@ class Owner extends React.Component{
     else{
       return(
         <div>
-          <h4 class="text-primary">Owners</h4>
-          <br />
-          <form onSubmit={this.handleAddOwner}>
-              <input type="text" name="AddOwner" placeholder="address" 
-                  value={this.state.addOwner}
-                  onChange={event => this.setState({ addOwner: event.target.value })}/>
-              <button>Add Owner</button>
-          </form>
-          <br/>
-          <form onSubmit={this.handleRemoveOwner}>
-              <input type="text" name="RemoveOwner" placeholder="address" 
-                  value={this.state.removeOwner}
-                  onChange={event => this.setState({ removeOwner: event.target.value })}/>
-              <button>Remove Owner</button>
-          </form>
-          <br />
           <p><b>Total Public Owners :</b> {publicTotalOwners}</p>
           <p><b>Min Public Owners :</b> {publicMinOwners}</p>
           <p><b>Public Owners :</b>
@@ -353,9 +373,10 @@ class Owner extends React.Component{
     }
     
   }
+  
 }
 
-class Certificate extends React.Component{
+class CertificateComponent extends React.Component{
   state = {
     certificateHash : "",
     holderAddress: "",
@@ -486,13 +507,13 @@ class Demo extends React.Component {
           </Tabs>
         </AppBar>
         <TabPanel value={this.state.value} index={0}>
-          <Manager />
+          <ManagerComponent />
         </TabPanel>
         <TabPanel value={this.state.value} index={1}>
-          <Public />
+          <PublicComponent />
         </TabPanel>
         <TabPanel value={this.state.value} index={2}>
-          <Private />
+          <PrivateComponent />
         </TabPanel>
       </div>
     );

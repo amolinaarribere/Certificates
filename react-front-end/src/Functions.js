@@ -103,48 +103,65 @@ export async function DisconnectBlockchain() {
   certificateProvider = ""
 }
 
- export async function SendnewProposal(address, info){
-   try{
-    await certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei});
+async function CallBackFrame(callback){
+  try{
+    await callback;
    }
    catch(e) { window.alert(e); }
+}
+
+ export async function SendnewProposal(address, info){
+   /*try{
+    await certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei});
+   }
+   catch(e) { window.alert(e); }*/
+   await CallBackFrame(certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei}));
   }
   
   export async function CreatenewPrivatePool(min, list){
-    try{
+    await CallBackFrame(certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei}));
+    /*try{
       await certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei});
      }
-     catch(e) { window.alert(e); }
+     catch(e) { window.alert(e); }*/
   }
   
   export async function ValidateProposal(address){
-    try{
+    await CallBackFrame(publicPool.methods.validateProvider(address).send({from: account}));
+    /*try{
       await publicPool.methods.validateProvider(address).send({from: account});
     }
-    catch(e) { window.alert(e); }
+    catch(e) { window.alert(e); }*/
   }
   
   export async function AddPrivateProvider(address, Info){
-    try{
+    await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
+    /*try{
       await privatePool.methods.addProvider(address, Info).send({from: account});
     }
-    catch(e) { window.alert(e); }
+    catch(e) { window.alert(e); }*/
   }
   
   export async function RemoveProvider(address, isPrivate){
+    if(isPrivate === true) await CallBackFrame(privatePool.methods.removeProvider(address).send({from: account}));
+    else await CallBackFrame(publicPool.methods.removeProvider(address).send({from: account}));
+      /*
     try{
       if(isPrivate === true) await await privatePool.methods.removeProvider(address).send({from: account});
       else await await publicPool.methods.removeProvider(address).send({from: account});
     }
-    catch(e) { window.alert(e); }
+    catch(e) { window.alert(e); }*/
   }
   
   export async function AddOwner(address, info, isPrivate){
+    if(isPrivate === true) await CallBackFrame(privatePool.methods.addOwner(address, info).send({from: account}));
+    else await CallBackFrame(publicPool.methods.addOwner(address, info).send({from: account}));
+    /*);
     try{
       if(isPrivate === true) await privatePool.methods.addOwner(address, info).send({from: account});
       else await publicPool.methods.addOwner(address, info).send({from: account});
      }
-     catch(e) { window.alert(e); }
+     catch(e) { window.alert(e); }*/
   }
   
   export async function RemoveOwner(address, isPrivate){
