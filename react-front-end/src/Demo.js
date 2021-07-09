@@ -321,7 +321,7 @@ class RemoveOwnerComponent extends React.Component{
   };
   handleRemoveOwner = async (event) => {
   	event.preventDefault();
-    await RemoveOwner(this.state.removeOwner, "", this.props.privateEnv)
+    await RemoveOwner(this.state.removeOwner, this.props.privateEnv)
     this.setState({ removeOwner: "" })
   };
 

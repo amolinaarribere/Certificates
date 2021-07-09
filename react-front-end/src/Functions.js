@@ -111,78 +111,44 @@ async function CallBackFrame(callback){
 }
 
  export async function SendnewProposal(address, info){
-   /*try{
-    await certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei});
-   }
-   catch(e) { window.alert(e); }*/
    await CallBackFrame(certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei}));
   }
   
   export async function CreatenewPrivatePool(min, list){
     await CallBackFrame(certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei}));
-    /*try{
-      await certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei});
-     }
-     catch(e) { window.alert(e); }*/
   }
   
   export async function ValidateProposal(address){
     await CallBackFrame(publicPool.methods.validateProvider(address).send({from: account}));
-    /*try{
-      await publicPool.methods.validateProvider(address).send({from: account});
-    }
-    catch(e) { window.alert(e); }*/
   }
   
   export async function AddPrivateProvider(address, Info){
     await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
-    /*try{
-      await privatePool.methods.addProvider(address, Info).send({from: account});
-    }
-    catch(e) { window.alert(e); }*/
   }
   
   export async function RemoveProvider(address, isPrivate){
-    if(isPrivate === true) await CallBackFrame(privatePool.methods.removeProvider(address).send({from: account}));
+    if(true == isPrivate) await CallBackFrame(privatePool.methods.removeProvider(address).send({from: account}));
     else await CallBackFrame(publicPool.methods.removeProvider(address).send({from: account}));
-      /*
-    try{
-      if(isPrivate === true) await await privatePool.methods.removeProvider(address).send({from: account});
-      else await await publicPool.methods.removeProvider(address).send({from: account});
-    }
-    catch(e) { window.alert(e); }*/
   }
   
   export async function AddOwner(address, info, isPrivate){
-    if(isPrivate === true) await CallBackFrame(privatePool.methods.addOwner(address, info).send({from: account}));
+    if(true == isPrivate) await CallBackFrame(privatePool.methods.addOwner(address, info).send({from: account}));
     else await CallBackFrame(publicPool.methods.addOwner(address, info).send({from: account}));
-    /*);
-    try{
-      if(isPrivate === true) await privatePool.methods.addOwner(address, info).send({from: account});
-      else await publicPool.methods.addOwner(address, info).send({from: account});
-     }
-     catch(e) { window.alert(e); }*/
   }
   
   export async function RemoveOwner(address, isPrivate){
-    try{
-      if(isPrivate === true) await privatePool.methods.removeOwner(address).send({from: account});
-      else await publicPool.methods.removeOwner(address).send({from: account});
-    }
-    catch(e) { window.alert(e); }
+    if(true == isPrivate) await CallBackFrame(privatePool.methods.removeOwner(address).send({from: account}));
+    else await CallBackFrame(publicPool.methods.removeOwner(address).send({from: account}));
   }
 
   export async function AddCertificate(hash, address, isPrivate){
-    try{
-      if(isPrivate === true) await privatePool.methods.addCertificate(hash, address).send({from: account});
-      else await publicPool.methods.addCertificate(hash, address).send({from: account});
-    }
-    catch(e) { window.alert(e); }
+    if(true == isPrivate) await CallBackFrame(privatePool.methods.addCertificate(hash, address).send({from: account}));
+    else await CallBackFrame(publicPool.methods.addCertificate(hash, address).send({from: account}));
   }
 
   export async function CheckCertificate(hash, address, isPrivate){
     try{
-      if(isPrivate === true) certificateProvider = await privatePool.methods.retrieveCertificateProvider(hash, address).call({from: account});
+      if(true == isPrivate) certificateProvider = await privatePool.methods.retrieveCertificateProvider(hash, address).call({from: account});
       else certificateProvider = await publicPool.methods.retrieveCertificateProvider(hash, address).call({from: account});
       if (certificateProvider == "0x0000000000000000000000000000000000000000")certificateProvider = "Certificate Does not Belong to Holder " + address
       else certificateProvider = "Certificate Provided by " + certificateProvider + " to " + address
@@ -194,7 +160,7 @@ async function CallBackFrame(callback){
     try{
       certificatesByHolder = []
       currentHolder = address;
-      if(isPrivate === true) {
+      if(true == isPrivate) {
         certificatesByHolder = await privatePool.methods.retrieveCertificatesByHolder(address, init, max).call({from: account});
       }
       else{
