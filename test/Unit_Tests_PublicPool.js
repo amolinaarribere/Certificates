@@ -18,6 +18,7 @@ const Gas = 6721975;
 contract("Testing Public Pool",function(accounts){
     var certPoolManager;
     var publicCertPool;
+    var nonce;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -57,72 +58,73 @@ contract("Testing Public Pool",function(accounts){
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: publicCertPoolAddress, 1: _chairPerson, 2: _balance} = result;
         publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress);      
+        nonce = 0; 
     });
 
      // ****** TESTING Adding Owners ***************************************************************** //
 
      it("Add Owner WRONG",async function(){
-        await pool_common.AddOwnerWrong(publicCertPool, PublicOwners, extra_owner, user_1);
+        await pool_common.AddOwnerWrong(publicCertPool, PublicOwners, extra_owner, user_1, nonce);
     });
 
     it("Add Owner CORRECT",async function(){
-        await pool_common.AddOwnerCorrect(publicCertPool, PublicOwners, extra_owner, user_1);
+        await pool_common.AddOwnerCorrect(publicCertPool, PublicOwners, extra_owner, user_1, nonce);
     });
 
     // ****** TESTING Removing Owner ***************************************************************** //
 
     it("Removing Owner WRONG",async function(){
-        await pool_common.RemoveOwnerWrong(publicCertPool, PublicOwners, provider_3, user_1);
+        await pool_common.RemoveOwnerWrong(publicCertPool, PublicOwners, provider_3, user_1, nonce);
     });
 
     it("Removing Owner CORRECT",async function(){
-        await pool_common.RemoveOwnerCorrect(publicCertPool, PublicOwners, user_1);
+        await pool_common.RemoveOwnerCorrect(publicCertPool, PublicOwners, user_1, nonce);
     });
 
     // ****** TESTING Adding Provider ***************************************************************** //
 
     it("Add Provider WRONG",async function(){
-        await pool_common.AddProviderWrong(publicCertPool, PublicOwners, provider_1, user_1, false)
+        await pool_common.AddProviderWrong(publicCertPool, PublicOwners, provider_1, user_1, nonce, false)
     });
 
     // ****** TESTING Validating Provider ***************************************************************** //
 
     it("Validating Provider WRONG",async function(){
-        await pool_common.ValidateProviderWrong(publicCertPool, PublicOwners, provider_1, provider_3, user_1);
+        await pool_common.ValidateProviderWrong(publicCertPool, PublicOwners, provider_1, provider_2, provider_3, user_1, nonce);
     });
 
     it("Validating Provider CORRECT",async function(){
-        await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
+        await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1, nonce);
     });
 
     // ****** TESTING Removing Provider ***************************************************************** //
     
     it("Removing Provider WRONG",async function(){
-        await pool_common.RemoveProviderWrong(publicCertPool, PublicOwners, provider_1, provider_2, provider_3, user_1, false);
+        await pool_common.RemoveProviderWrong(publicCertPool, PublicOwners, provider_1, provider_2, provider_3, user_1, nonce, false);
     });
 
     it("Removing Provider CORRECT",async function(){
-        await pool_common.RemoveProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1, false);
+        await pool_common.RemoveProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1, nonce, false);
     });
 
     // ****** TESTING Adding Certificate ***************************************************************** //
 
     it("Adding Certificate WRONG",async function(){
-        await pool_common.AddCertificateWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, user_1);   
+        await pool_common.AddCertificateWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, user_1, nonce);   
     });
 
     it("Adding Certificate CORRECT",async function(){
-        await pool_common.AddCertificateCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
+        await pool_common.AddCertificateCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1, nonce);
     });
 
     // ****** TESTING Removing Certificate ***************************************************************** //
 
     it("Removing Certificate WRONG",async function(){
-        await pool_common.RemoveCertificateWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
+        await pool_common.RemoveCertificateWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1, nonce);
     });
 
     it("Removing Certificate CORRECT",async function(){
-        await pool_common.RemoveCertificateCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
+        await pool_common.RemoveCertificateCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1, nonce);
     });
 
 });

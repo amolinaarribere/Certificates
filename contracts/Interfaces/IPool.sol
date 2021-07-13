@@ -9,14 +9,14 @@ pragma solidity >=0.7.0 <0.9.0;
 
 
  interface IPool  {
-    function addCertificate(bytes32 CertificateHash, address holder) external;
-    function removeCertificate(bytes32 CertificateHash, address holder) external;
+    function addCertificate(bytes32 CertificateHash, address holder, uint nonce) external;
+    function removeCertificate(bytes32 CertificateHash, address holder, uint nonce) external;
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external view returns (address);
     function retrieveTotalCertificatesByHolder(address holder) external view returns (uint256);
     function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external view returns (bytes32[] memory);
 
-    function addProvider(address provider, string memory providerInfo) external;
-    function removeProvider(address provider) external;
+    function addProvider(address provider, string memory providerInfo, uint nonce) external;
+    function removeProvider(address provider, uint nonce) external;
     function retrieveProvider(address provider) external view returns (string memory);
     function retrieveAllProviders() external view returns (address[] memory);
     function retrieveTotalProviders() external view returns (uint);

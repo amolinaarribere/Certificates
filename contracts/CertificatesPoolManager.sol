@@ -42,6 +42,7 @@ contract CertificatesPoolManager{
 
     uint _PublicPriceWei;
     uint _PrivatePoolPriceWei;
+    uint _nonce;
 
     address payable _chairperson;
     
@@ -50,6 +51,7 @@ contract CertificatesPoolManager{
         _PublicPriceWei = PublicPriceWei;
         _PrivatePoolPriceWei = PrivatePriceWei;  
         _PublicCertificatesPool = new PublicCertificatesPool(owners, minOwners);
+        _nonce = 0;
     }
 
     // PRIVATE CERTIFICATE POOL /////////////////////////////////////////////////////////////
@@ -83,7 +85,8 @@ contract CertificatesPoolManager{
         areFundsEnough(_PublicPriceWei)
     payable 
     {
-       _PublicCertificatesPool.addProvider(provider, providerInfo);
+       _PublicCertificatesPool.addProvider(provider, providerInfo, _nonce);
+       _nonce += 1;
 
        emit _SendProposalId(provider);
     }

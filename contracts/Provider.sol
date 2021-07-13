@@ -62,12 +62,12 @@ pragma experimental ABIEncoderV2;
     {}
 
     // POOL CRUD Operations
-    function addPool(address pool, string memory poolInfo) external override{
-        addEntity(pool, bytes(poolInfo), _poolId);
+    function addPool(address pool, string memory poolInfo, uint nonce) external override{
+        addEntity(pool, bytes(poolInfo), _poolId, nonce);
     }
 
-    function removePool(address pool) external override{
-       removeEntity(pool, _poolId); 
+    function removePool(address pool, uint nonce) external override{
+       removeEntity(pool, _poolId, nonce); 
     }
     
     function retrievePool(address pool) external override view returns (string memory){
@@ -91,21 +91,22 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
+     function addCertificate(address pool, bytes32 CertificateHash, address holder, uint nonce) external override
      {
-        manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Add);
+        manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Add, nonce);
      }
      
-     function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
+     function removeCertificate(address pool, bytes32 CertificateHash, address holder, uint nonce) external override
      {
-         manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Remove);
+         manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Remove, nonce);
      }
 
     
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Library.Actions act) 
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Library.Actions act, uint nonce) 
         isAPool(pool)
         isAnOwner
         HasNotAlreadyVoted(act, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+        isNonceOK(nonce)
     internal{
         
         uint validations;
@@ -131,13 +132,15 @@ pragma experimental ABIEncoderV2;
             
             
             if(act == Library.Actions.Add){
-                poolToSend.addCertificate(CertificateHash, holder);
+                poolToSend.addCertificate(CertificateHash, holder, nonce);
             }
             else{
-               poolToSend.removeCertificate(CertificateHash, holder);
+               poolToSend.removeCertificate(CertificateHash, holder, nonce);
             }
             
             delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
+
+            _Nonces._noncesPerAddress[msg.sender][nonce] = true;
             
         }
     }

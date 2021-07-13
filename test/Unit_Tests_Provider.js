@@ -18,7 +18,9 @@ contract("Testing Provider",function(accounts){
     var certPoolManager;
     var publicCertPool;
     var publicCertPoolAddress;
+    const randomPoolAddress = accounts[0];
     var provider;
+    var nonce;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -38,6 +40,7 @@ contract("Testing Provider",function(accounts){
     const NotAllowedRemoveEntity = new RegExp("EC10");
     const MustBeActivated = new RegExp("EC7");
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
+    const NonceAlreadyUsed = new RegExp("EC20");
 
     beforeEach(async function(){
         // Public Pool creation and provider subscription
@@ -48,20 +51,23 @@ contract("Testing Provider",function(accounts){
         const {0: _publicCertPoolAddress, 1: _chairPerson, 2: _balance} = result;
         publicCertPoolAddress = _publicCertPoolAddress;
         publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress); 
-        await publicCertPool.methods.validateProvider(provider.address).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
-        await publicCertPool.methods.validateProvider(provider.address).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
+        nonce = 0;
+        await publicCertPool.methods.validateProvider(provider.address, nonce).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+        await publicCertPool.methods.validateProvider(provider.address, nonce + 1).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
+        nonce = 2;
+         
     });
 
-    async function AddingPool(){
-        await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[0], gas: Gas});
-        await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[1], gas: Gas}); 
+    async function AddingPool(_nonce){
+        await provider.addPool(publicCertPoolAddress, pool_Info, _nonce, {from: ProviderOwners[0], gas: Gas});
+        await provider.addPool(publicCertPoolAddress, pool_Info, _nonce, {from: ProviderOwners[1], gas: Gas}); 
     }
 
-    async function AddingCertificates(){
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[2], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+    async function AddingCertificates(_nonce){
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, _nonce, {from: ProviderOwners[0], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, _nonce, {from: ProviderOwners[1], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, _nonce, {from: ProviderOwners[2], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, _nonce + 1, {from: ProviderOwners[1], gas: Gas});
     }
 
 
@@ -70,7 +76,7 @@ contract("Testing Provider",function(accounts){
     it("Add Pool WRONG",async function(){
         // act
         try{
-            await provider.addPool(publicCertPoolAddress, pool_Info, {from: user_1});
+            await provider.addPool(publicCertPoolAddress, pool_Info, nonce, {from: user_1});
             expect.fail();
         }
         // assert
@@ -79,19 +85,28 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[0], gas: Gas});
-            await provider.addPool(publicCertPoolAddress, pool_Info, {from: ProviderOwners[0], gas: Gas});
+            await provider.addPool(publicCertPoolAddress, pool_Info, nonce, {from: ProviderOwners[0], gas: Gas});
+            await provider.addPool(publicCertPoolAddress, pool_Info, nonce + 1, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
         catch(error){
             expect(error.message).to.match(OwnerAlreadyvoted);
         }
+        // act
+        try{
+            await provider.addPool(randomPoolAddress, pool_Info, nonce, {from: ProviderOwners[0], gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NonceAlreadyUsed);
+        }
     });
 
     it("Add Pool CORRECT",async function(){
         // act
-        await AddingPool();
+        await AddingPool(nonce);
         // assert
         let _PoolInfo = await provider.retrievePool(publicCertPoolAddress, {from: user_1});
         let _Total = await provider.retrieveTotalPools({from: user_1});
@@ -105,10 +120,10 @@ contract("Testing Provider",function(accounts){
 
     it("Removing Pool WRONG",async function(){
         // act
-        await AddingPool();
+        await AddingPool(nonce);
 
         try{
-            await provider.removePool(publicCertPoolAddress, {from: user_1});
+            await provider.removePool(publicCertPoolAddress, nonce, {from: user_1});
             expect.fail();
         }
         // assert
@@ -117,17 +132,26 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.removePool(accounts[0], {from: ProviderOwners[0]});
+            await provider.removePool(accounts[0], nonce + 2, {from: ProviderOwners[0]});
             expect.fail();
         }
         // assert
         catch(error){
             expect(error.message).to.match(MustBeActivated);
         }
+         // act
+         try{
+            await provider.removePool(publicCertPoolAddress, nonce, {from: ProviderOwners[0], gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NonceAlreadyUsed);
+        }
         // act
         try{
-            await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
-            await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
+            await provider.removePool(publicCertPoolAddress, nonce + 2, {from: ProviderOwners[0], gas: Gas});
+            await provider.removePool(publicCertPoolAddress, nonce + 3, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
@@ -138,9 +162,9 @@ contract("Testing Provider",function(accounts){
 
     it("Removing Pool CORRECT",async function(){
         // act
-        await AddingPool();
-        await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[2], gas: Gas});
-        await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
+        await AddingPool(nonce);
+        await provider.removePool(publicCertPoolAddress, nonce + 2, {from: ProviderOwners[2], gas: Gas});
+        await provider.removePool(publicCertPoolAddress, nonce + 2, {from: ProviderOwners[0], gas: Gas});
         // assert
         let _Total = await provider.retrieveTotalPools({from: user_1});
         expect(_Total.toNumber()).to.equal(0);
@@ -151,10 +175,10 @@ contract("Testing Provider",function(accounts){
 
     it("Adding Certificate WRONG",async function(){
         // act
-        await AddingPool();
+        await AddingPool(nonce);
 
         try{
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: user_1, gas: Gas});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, nonce, {from: user_1, gas: Gas});
             expect.fail();
         }
         // assert
@@ -163,8 +187,17 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, nonce, {from: ProviderOwners[1], gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NonceAlreadyUsed);
+        }
+        // act
+        try{
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, nonce + 2, {from: ProviderOwners[1], gas: Gas});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, nonce + 3, {from: ProviderOwners[1], gas: Gas});
             expect.fail();
         }
         // assert
@@ -175,19 +208,19 @@ contract("Testing Provider",function(accounts){
 
     it("Adding Certificate CORRECT",async function(){
         // act
-        await AddingPool();
-        await AddingCertificates();
+        await AddingPool(nonce);
+        await AddingCertificates(nonce + 2);
     });
 
     // ****** TESTING Removing Certificate ***************************************************************** //
 
     it("Removing Certificate WRONG",async function(){
         // act
-        await AddingPool();
-        await AddingCertificates();
+        await AddingPool(nonce);
+        await AddingCertificates(nonce + 2);
 
         try{
-            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: user_1});
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, nonce, {from: user_1});
             expect.fail();
         }
         // assert
@@ -196,8 +229,17 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
-            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, nonce, {from: ProviderOwners[0], gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NonceAlreadyUsed);
+        }
+        // act
+        try{
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, nonce + 3, {from: ProviderOwners[2], gas: Gas});
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, nonce + 4, {from: ProviderOwners[2], gas: Gas});
             expect.fail();
         }
         // assert
@@ -209,10 +251,10 @@ contract("Testing Provider",function(accounts){
 
     it("Removing Certificate CORRECT",async function(){
         // act
-        await AddingPool();
-        await AddingCertificates();
-        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
-        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
+        await AddingPool(nonce);
+        await AddingCertificates(nonce + 2);
+        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, nonce + 3, {from: ProviderOwners[2], gas: Gas});
+        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, nonce + 4, {from: ProviderOwners[0], gas: Gas});
     });
  
 

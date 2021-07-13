@@ -28,6 +28,10 @@ library Library{
         address[] _activatedEntities;
     }
 
+    struct _NoncesPerAddressStruct{
+        mapping(address => mapping(uint => bool)) _noncesPerAddress;
+    }
+    
 
     // modifier
     modifier HasNotAlreadyVoted(Actions action, _entityIdentity memory Entity){
@@ -45,7 +49,16 @@ library Library{
         _;
     }
 
+    modifier isNonceOK(uint nonce, _NoncesPerAddressStruct storage Nonces){
+        isNonceNew(nonce, Nonces);
+        _;
+    }
+
     // auxiliary functions
+    function isNonceNew(uint nonce, _NoncesPerAddressStruct storage Nonces) public view{
+        require(false == Nonces._noncesPerAddress[msg.sender][nonce], "EC20");
+    }
+
     function NotAlreadyVoted(Actions action, _entityIdentity memory Entity) public view{
         if(Actions.Add == action) require(false == FindAddress(msg.sender, Entity._AddValidated), "EC5");
         else require(false == FindAddress(msg.sender, Entity._RemoveValidated), "EC5");
@@ -120,13 +133,15 @@ library Library{
     }
 
     // functions for entities
-    function addEntity(address entity, bytes memory entityInfo, _entityStruct storage Entities, uint256 minSignatures) internal 
+    function addEntity(address entity, bytes memory entityInfo, _entityStruct storage Entities, uint256 minSignatures, _NoncesPerAddressStruct storage Nonces, uint nonce) internal 
         isEntityActivated(false, Entities._entities[entity]) 
         HasNotAlreadyVoted(Actions.Add, Entities._entities[entity])
+        isNonceOK(nonce, Nonces)
     {
         if(0 == Entities._entities[entity]._AddValidated.length) Entities._entities[entity]._Info = entityInfo;
 
         Entities._entities[entity]._AddValidated.push(msg.sender);
+        Nonces._noncesPerAddress[msg.sender][nonce] = true;
 
         if(CheckValidations(Entities._entities[entity]._AddValidated.length, minSignatures)){
             Entities._entities[entity]._activated = true; 
@@ -134,11 +149,13 @@ library Library{
         }
     }
 
-    function removeEntity(address entity, _entityStruct storage Entities, uint256 minSignatures) internal 
+    function removeEntity(address entity, _entityStruct storage Entities, uint256 minSignatures, _NoncesPerAddressStruct storage Nonces, uint nonce) internal 
         isEntityActivated(true, Entities._entities[entity])
         HasNotAlreadyVoted(Actions.Remove, Entities._entities[entity])
+        isNonceOK(nonce, Nonces)
     {
         Entities._entities[entity]._RemoveValidated.push(msg.sender);
+        Nonces._noncesPerAddress[msg.sender][nonce] = true;
 
         if(msg.sender == entity || CheckValidations(Entities._entities[entity]._RemoveValidated.length, minSignatures)){
             Entities._activatedEntities = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), ArrayAddressToBytes32(Entities._activatedEntities)));
