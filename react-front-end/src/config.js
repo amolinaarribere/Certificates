@@ -1,4 +1,4 @@
-export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0xa2eea8605ce99AE79eA13855743407f550259116'
+export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x7AFd9670CDc9F127dB8cA0874fD8597Ea82E011f'
 export const CERTIFICATE_POOL_MANAGER_ABI = [
   {
     "inputs": [
@@ -519,6 +519,44 @@ export const PUBLIC_ABI = [
   {
     "inputs": [
       {
+        "internalType": "bool",
+        "name": "addedORremove",
+        "type": "bool"
+      }
+    ],
+    "name": "retrievePendingOwners",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "addedORremove",
+        "type": "bool"
+      }
+    ],
+    "name": "retrievePendingProviders",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "provider",
         "type": "address"
@@ -984,6 +1022,44 @@ export const PRIVATE_ABI = [
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "addedORremove",
+        "type": "bool"
+      }
+    ],
+    "name": "retrievePendingOwners",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "addedORremove",
+        "type": "bool"
+      }
+    ],
+    "name": "retrievePendingProviders",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",

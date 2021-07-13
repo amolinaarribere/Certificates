@@ -29,6 +29,15 @@ export var certificatesByHolder = []
 export var currentHolder = "";
 export var certificateProvider = ""
 
+export var pendingPublicOwnersAdd = []
+export var pendingPublicOwnersRemove = []
+export var pendingPrivateOwnersAdd = [] 
+export var pendingPrivateOwnersRemove = []
+export var pendingPublicProvidersAdd = [] 
+export var pendingPublicProvidersRemove = []
+export var pendingPrivateProvidersAdd = [] 
+export var pendingPrivateProvidersRemove = []
+
 export async function LoadBlockchain() {
   if(window.ethereum) {
     await window.ethereum.enable();
@@ -64,6 +73,13 @@ export async function LoadBlockchain() {
     let privatePoolAddress = await certificatePoolManager.methods.retrievePrivateCertificatesPool(i).call()
     privatePoolAddresses[i] = privatePoolAddress
   }
+
+  pendingPublicOwnersAdd = await publicPool.methods.retrievePendingOwners(true).call()
+  pendingPublicOwnersRemove = await publicPool.methods.retrievePendingOwners(false).call()
+  
+  pendingPublicProvidersAdd = await publicPool.methods.retrievePendingProviders(true).call() 
+  pendingPublicProvidersRemove = await publicPool.methods.retrievePendingProviders(false).call()
+  
 
 }
 
@@ -101,6 +117,15 @@ export async function DisconnectBlockchain() {
   certificatesByHolder = []
   currentHolder = ""
   certificateProvider = ""
+
+  pendingPublicOwnersAdd = []
+  pendingPublicOwnersRemove = []
+  pendingPrivateOwnersAdd = [] 
+  pendingPrivateOwnersRemove = []
+  pendingPublicProvidersAdd = [] 
+  pendingPublicProvidersRemove = []
+  pendingPrivateProvidersAdd = [] 
+  pendingPrivateProvidersRemove = []
 }
 
 async function CallBackFrame(callback){
@@ -193,6 +218,11 @@ async function CallBackFrame(callback){
       privateTotalOwners = await privatePool.methods.retrieveTotalOwners().call()
       privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
       privateOwners = await privatePool.methods.retrieveAllOwners().call()
+
+      pendingPrivateOwnersAdd = await privatePool.methods.retrievePendingOwners(true).call() 
+      pendingPrivateOwnersRemove = await privatePool.methods.retrievePendingOwners(false).call() 
+      pendingPrivateProvidersAdd = await privatePool.methods.retrievePendingProviders(true).call()  
+      pendingPrivateProvidersRemove = await privatePool.methods.retrievePendingProviders(false).call()  
     }
     catch(e) { window.alert(e); }
   }

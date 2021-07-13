@@ -8,7 +8,9 @@ import Tab from '@material-ui/core/Tab';
 import {SendnewProposal, CreatenewPrivatePool, ValidateProposal, AddPrivateProvider,
   RemoveProvider, AddOwner, RemoveOwner, AddCertificate, retrieveCertificatesByHolder,
   LoadBlockchain, chairPerson, balance, publicPoolAddress, privatePoolKey, privatePoolAddress,
-  publicMinOwners, SelectPrivatePool, account, privatePoolAddresses, publicOwners, publicTotalProviders,
+  publicMinOwners, SelectPrivatePool, account, privatePoolAddresses, publicOwners,  pendingPublicOwnersAdd, 
+  pendingPublicOwnersRemove, pendingPrivateOwnersAdd, pendingPrivateOwnersRemove, pendingPublicProvidersAdd, pendingPublicProvidersRemove,
+  pendingPrivateProvidersAdd, pendingPrivateProvidersRemove, publicTotalProviders,
 publicProviders, privateMinOwners, privateTotalOwners, publicTotalOwners, privateOwners, privateTotalProviders, privateProviders,currentHolder,
 certificatesByHolder, web3, DisconnectBlockchain, certificateProvider, CheckCertificate, SwitchContext} from './Functions';
 import {  CERTIFICATE_POOL_MANAGER_ADDRESS} from './config'
@@ -39,8 +41,7 @@ class ManagerComponent extends React.Component {
   render(){
     return (
       <div>
-        <h3>Current Address : {account}</h3>
-        <br />
+        <CurrentAddressComponent />
         <br />
         <p><b>Manager address :</b> {CERTIFICATE_POOL_MANAGER_ADDRESS}</p>
         <p><b>Public Address :</b> {publicPoolAddress}</p>
@@ -93,8 +94,7 @@ class PublicComponent extends React.Component {
   render(){
     return (
       <div>
-        <h3>Current Address : {account}</h3>
-        <br />
+        <CurrentAddressComponent />
         <br />
         <CertificateComponent privateEnv={this.state.privateEnv}/>
         <br />
@@ -129,8 +129,7 @@ class PrivateComponent extends React.Component {
   render(){
     return (
       <div>
-        <h3>Current Address : {account}</h3>
-        <br />
+        <CurrentAddressComponent />
         <br />
         <form onSubmit={this.handleSelectPool}>
             <input type="text" name="SelectPool" placeholder="address" 
@@ -151,6 +150,17 @@ class PrivateComponent extends React.Component {
   }
 }
 
+class CurrentAddressComponent extends React.Component{
+  render(){
+    return(
+      <div>
+        <h3>Current Address : {account}</h3>
+        <br />
+      </div>
+    );
+  }
+}
+
 class ProviderComponent extends React.Component{
   render(){
     return(
@@ -162,6 +172,8 @@ class ProviderComponent extends React.Component{
         <RemoveProviderComponent privateEnv={this.props.privateEnv}/>
         <br/>
         <ListProvidersComponent privateEnv={this.props.privateEnv} />
+        <br/>
+        <ListPendingProvidersComponent privateEnv={this.props.privateEnv} />
       </div>
     );
   }
@@ -275,6 +287,55 @@ class ListProvidersComponent extends React.Component{
   }
 }
 
+class ListPendingProvidersComponent extends React.Component{
+  render(){
+    if(this.props.privateEnv){
+      return(
+        <div>
+          <p><b>Pending Private Provider to be Added :</b>
+            <ol>
+              {pendingPrivateProvidersAdd.map(pendingPrivateProviderAdd => (
+              <li key={pendingPrivateProviderAdd}>{pendingPrivateProviderAdd}</li>
+              ))}
+            </ol>
+          </p>
+          <br />
+          <p><b>Pending Private Provider to be Removed :</b>
+            <ol>
+              {pendingPrivateProvidersRemove.map(pendingPrivateProviderRemove => (
+              <li key={pendingPrivateProviderRemove}>{pendingPrivateProviderRemove}</li>
+              ))}
+            </ol>
+          </p>
+        </div>
+      );
+    }
+    else{
+      return(
+        <div>
+          <p><b>Pending Public Provider to be Added :</b>
+            <ol>
+              {pendingPublicProvidersAdd.map(pendingPublicProviderAdd => (
+              <li key={pendingPublicProviderAdd}>{pendingPublicProviderAdd}</li>
+              ))}
+            </ol>
+          </p>
+          <br />
+          <p><b>Pending Public Provider to be Removed :</b>
+            <ol>
+              {pendingPublicProvidersRemove.map(pendingPublicProviderRemove => (
+              <li key={pendingPublicProviderRemove}>{pendingPublicProviderRemove}</li>
+              ))}
+            </ol>
+          </p>
+        </div>
+      );
+    }
+    
+  }
+  
+}
+
 class OwnerComponent extends React.Component{
   render(){
     return(
@@ -286,6 +347,8 @@ class OwnerComponent extends React.Component{
         <RemoveOwnerComponent privateEnv={this.props.privateEnv}/>
         <br />
         <ListOwnersComponent privateEnv={this.props.privateEnv}/>
+        <br />
+        <ListPendingOwnersComponent privateEnv={this.props.privateEnv}/>
       </div>
     );
   }
@@ -365,6 +428,55 @@ class ListOwnersComponent extends React.Component{
             <ol>
               {publicOwners.map(publicOwner => (
               <li key={publicOwner}>{publicOwner}</li>
+              ))}
+            </ol>
+          </p>
+        </div>
+      );
+    }
+    
+  }
+  
+}
+
+class ListPendingOwnersComponent extends React.Component{
+  render(){
+    if(this.props.privateEnv){
+      return(
+        <div>
+          <p><b>Pending Private Owners to be Added :</b>
+            <ol>
+              {pendingPrivateOwnersAdd.map(pendingPrivateOwnerAdd => (
+              <li key={pendingPrivateOwnerAdd}>{pendingPrivateOwnerAdd}</li>
+              ))}
+            </ol>
+          </p>
+          <br />
+          <p><b>Pending Private Owners to be Removed :</b>
+            <ol>
+              {pendingPrivateOwnersRemove.map(pendingPrivateOwnerRemove => (
+              <li key={pendingPrivateOwnerRemove}>{pendingPrivateOwnerRemove}</li>
+              ))}
+            </ol>
+          </p>
+        </div>
+      );
+    }
+    else{
+      return(
+        <div>
+          <p><b>Pending Public Owners to be Added :</b>
+            <ol>
+              {pendingPublicOwnersAdd.map(pendingPublicOwnerAdd => (
+              <li key={pendingPublicOwnerAdd}>{pendingPublicOwnerAdd}</li>
+              ))}
+            </ol>
+          </p>
+          <br />
+          <p><b>Pending Public Owners to be Removed :</b>
+            <ol>
+              {pendingPublicOwnersRemove.map(pendingPublicOwnerRemove => (
+              <li key={pendingPublicOwnerRemove}>{pendingPublicOwnerRemove}</li>
               ))}
             </ol>
           </p>
