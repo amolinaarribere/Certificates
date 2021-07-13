@@ -1,4 +1,4 @@
-export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x7C42B0DC983829caB7F0B25a63C343BdDbaC26c3'
+export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0xf19B9b6F5429E4F4670c6b3AA96Ec99Fe14C36F4'
 export const CERTIFICATE_POOL_MANAGER_ABI = [
   {
     "inputs": [
@@ -272,6 +272,11 @@ export const PUBLIC_ABI = [
         "internalType": "address",
         "name": "holder",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "addCertificate",
@@ -290,6 +295,11 @@ export const PUBLIC_ABI = [
         "internalType": "string",
         "name": "ownerInfo",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "addOwner",
@@ -346,6 +356,11 @@ export const PUBLIC_ABI = [
         "internalType": "address",
         "name": "holder",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "removeCertificate",
@@ -359,6 +374,11 @@ export const PUBLIC_ABI = [
         "internalType": "address",
         "name": "owner",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "removeOwner",
@@ -440,6 +460,25 @@ export const PUBLIC_ABI = [
         "internalType": "bytes32[]",
         "name": "",
         "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "retrieveHighestNonceForAddress",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -552,6 +591,11 @@ export const PUBLIC_ABI = [
         "internalType": "string",
         "name": "providerInfo",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "addProvider",
@@ -565,6 +609,11 @@ export const PUBLIC_ABI = [
         "internalType": "address",
         "name": "provider",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "validateProvider",
@@ -578,6 +627,11 @@ export const PUBLIC_ABI = [
         "internalType": "address",
         "name": "provider",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "removeProvider",
@@ -691,6 +745,11 @@ export const PRIVATE_ABI = [
         "internalType": "address",
         "name": "holder",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "addCertificate",
@@ -709,6 +768,11 @@ export const PRIVATE_ABI = [
         "internalType": "string",
         "name": "ownerInfo",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "addOwner",
@@ -765,6 +829,11 @@ export const PRIVATE_ABI = [
         "internalType": "address",
         "name": "holder",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "removeCertificate",
@@ -778,6 +847,11 @@ export const PRIVATE_ABI = [
         "internalType": "address",
         "name": "owner",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "removeOwner",
@@ -859,6 +933,25 @@ export const PRIVATE_ABI = [
         "internalType": "bytes32[]",
         "name": "",
         "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "retrieveHighestNonceForAddress",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -971,6 +1064,11 @@ export const PRIVATE_ABI = [
         "internalType": "string",
         "name": "providerInfo",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "addProvider",
@@ -984,6 +1082,11 @@ export const PRIVATE_ABI = [
         "internalType": "address",
         "name": "provider",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "removeProvider",

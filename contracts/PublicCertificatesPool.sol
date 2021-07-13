@@ -35,7 +35,7 @@ pragma experimental ABIEncoderV2;
     {
         _Entities[_providerId]._entities[provider]._Info = bytes(providerInfo);
         _submitedByCreator[provider] = true;
-        _Nonces._noncesPerAddress[msg.sender][nonce] = true;
+        Library.AddNonce(nonce, _Nonces);
     }
 
     function validateProvider(address provider, uint nonce) external 

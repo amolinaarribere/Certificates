@@ -95,7 +95,8 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.addPool(randomPoolAddress, pool_Info, nonce, {from: ProviderOwners[0], gas: Gas});
+            var wrong_nonce = await provider.retrieveHighestNonceForAddress(ProviderOwners[0]);
+            await provider.addPool(randomPoolAddress, pool_Info, wrong_nonce, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
@@ -141,7 +142,8 @@ contract("Testing Provider",function(accounts){
         }
          // act
          try{
-            await provider.removePool(publicCertPoolAddress, nonce, {from: ProviderOwners[0], gas: Gas});
+            var wrong_nonce = await provider.retrieveHighestNonceForAddress(ProviderOwners[0]);
+            await provider.removePool(publicCertPoolAddress, wrong_nonce, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
@@ -187,7 +189,8 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, nonce, {from: ProviderOwners[1], gas: Gas});
+            var wrong_nonce = await provider.retrieveHighestNonceForAddress(ProviderOwners[0]);
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, wrong_nonce, {from: ProviderOwners[1], gas: Gas});
             expect.fail();
         }
         // assert
@@ -229,7 +232,8 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, nonce, {from: ProviderOwners[0], gas: Gas});
+            var wrong_nonce = await provider.retrieveHighestNonceForAddress(ProviderOwners[0]);
+            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, wrong_nonce, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert

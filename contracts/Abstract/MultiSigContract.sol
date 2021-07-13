@@ -166,4 +166,8 @@ abstract contract MultiSigContract is IMultiSigContract{
         return(isEntity(owner, _ownerId));
     }
 
+    function retrieveHighestNonceForAddress(address addr) external override view returns (uint){
+        return(_Nonces.__highestNoncePerAddress[addr]);
+    }
+
 }

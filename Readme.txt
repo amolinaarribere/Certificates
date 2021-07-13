@@ -1,0 +1,1 @@
+- nonces added but not necessary : duplicated functionality, nonces are part of the basic ethereum platform security.

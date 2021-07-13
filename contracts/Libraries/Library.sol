@@ -29,6 +29,7 @@ library Library{
     }
 
     struct _NoncesPerAddressStruct{
+        mapping(address => uint) __highestNoncePerAddress;
         mapping(address => mapping(uint => bool)) _noncesPerAddress;
     }
     
@@ -132,6 +133,11 @@ library Library{
         return true;
     }
 
+    function AddNonce(uint nonce, _NoncesPerAddressStruct storage Nonces) public {
+        Nonces._noncesPerAddress[msg.sender][nonce] = true;
+        if(Nonces.__highestNoncePerAddress[msg.sender] < nonce) Nonces.__highestNoncePerAddress[msg.sender] = nonce;
+    }
+
     // functions for entities
     function addEntity(address entity, bytes memory entityInfo, _entityStruct storage Entities, uint256 minSignatures, _NoncesPerAddressStruct storage Nonces, uint nonce) internal 
         isEntityActivated(false, Entities._entities[entity]) 
@@ -141,7 +147,7 @@ library Library{
         if(0 == Entities._entities[entity]._AddValidated.length) Entities._entities[entity]._Info = entityInfo;
 
         Entities._entities[entity]._AddValidated.push(msg.sender);
-        Nonces._noncesPerAddress[msg.sender][nonce] = true;
+        AddNonce(nonce, Nonces);
 
         if(CheckValidations(Entities._entities[entity]._AddValidated.length, minSignatures)){
             Entities._entities[entity]._activated = true; 
@@ -155,7 +161,7 @@ library Library{
         isNonceOK(nonce, Nonces)
     {
         Entities._entities[entity]._RemoveValidated.push(msg.sender);
-        Nonces._noncesPerAddress[msg.sender][nonce] = true;
+        AddNonce(nonce, Nonces);
 
         if(msg.sender == entity || CheckValidations(Entities._entities[entity]._RemoveValidated.length, minSignatures)){
             Entities._activatedEntities = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), ArrayAddressToBytes32(Entities._activatedEntities)));

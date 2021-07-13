@@ -88,7 +88,8 @@ async function AddOwnerWrong(CertPool, Owners, extra_owner, user_1, nonce){
     }
     // act
     try{
-        await CertPool.methods.addOwner(user_1, extra_owner_Info, nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
+        var wrong_nonce = await CertPool.methods.retrieveHighestNonceForAddress(Owners[0]).call();
+        await CertPool.methods.addOwner(user_1, extra_owner_Info, wrong_nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -145,8 +146,8 @@ async function RemoveOwnerWrong(CertPool, Owners, provider_3, user_1, nonce){
     }
     // act
     try{
-        await CertPool.methods.addOwner(provider_3, "", nonce + 10).send({from: Owners[0], gas: Gas}, function(error, result){});
-        await CertPool.methods.removeOwner(Owners[1], nonce + 10).send({from: Owners[0], gas: Gas}, function(error, result){});
+        var wrong_nonce = await CertPool.methods.retrieveHighestNonceForAddress(Owners[0]).call();
+        await CertPool.methods.removeOwner(Owners[1], wrong_nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -198,7 +199,8 @@ async function AddProviderWrong(CertPool, Owners, provider_1, user_1, nonce, isP
         }
          // act
          try{
-            await CertPool.methods.addProvider(user_1, provider_1_Info, nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
+            var wrong_nonce = await CertPool.methods.retrieveHighestNonceForAddress(Owners[0]).call();
+            await CertPool.methods.addProvider(user_1, provider_1_Info, wrong_nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -242,7 +244,8 @@ async function ValidateProviderWrong(CertPool, Owners, provider_1, provider_2, p
     }
     // act
     try{
-        await CertPool.methods.validateProvider(provider_2, nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
+        var wrong_nonce = await CertPool.methods.retrieveHighestNonceForAddress(Owners[0]).call();
+        await CertPool.methods.validateProvider(provider_2, wrong_nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -323,7 +326,8 @@ async function RemoveProviderWrong(CertPool, Owners, provider_1, provider_2, pro
     }
     // act
     try{
-        await CertPool.methods.removeProvider(provider_2, nonce + 3).send({from: Owners[0], gas: Gas}, function(error, result){});
+        var wrong_nonce = await CertPool.methods.retrieveHighestNonceForAddress(Owners[0]).call();
+        await CertPool.methods.removeProvider(provider_2, wrong_nonce).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -366,7 +370,8 @@ async function AddCertificateWrong(CertPool, Owners, provider_1, provider_2, hol
     }
     // act
     try{
-        await CertPool.methods.addCertificate(hash_2, holder_1, nonce).send({from: provider_1, gas: Gas}, function(error, result){});
+        var wrong_nonce = await CertPool.methods.retrieveHighestNonceForAddress(provider_1).call();
+        await CertPool.methods.addCertificate(hash_2, holder_1, wrong_nonce).send({from: provider_1, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -430,7 +435,8 @@ async function RemoveCertificateWrong(CertPool, Owners, provider_1, provider_2, 
     }
     // act
     try{
-        await CertPool.methods.removeCertificate(hash_1, holder_1, nonce + 2).send({from: provider_1}, function(error, result){});
+        var wrong_nonce = await CertPool.methods.retrieveHighestNonceForAddress(provider_1).call();
+        await CertPool.methods.removeCertificate(hash_1, holder_1, wrong_nonce).send({from: provider_1}, function(error, result){});
         expect.fail();
     }
     // assert

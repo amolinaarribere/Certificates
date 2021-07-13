@@ -15,4 +15,5 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrieveAllOwners() external view returns (address[] memory);
     function retrieveTotalOwners() external view returns (uint);
     function retrieveMinOwners() external view returns (uint);
+    function retrieveHighestNonceForAddress(address addr) external view returns (uint);
 }

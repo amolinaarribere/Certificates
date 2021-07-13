@@ -94,7 +94,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     {
         _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;
         _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
-        _Nonces._noncesPerAddress[msg.sender][nonce] = true;
+        Library.AddNonce(nonce, _Nonces);
 
         emit _AddCertificateIdEvent(msg.sender, holder);
     }
@@ -115,7 +115,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         }
         
         delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
-        _Nonces._noncesPerAddress[msg.sender][nonce] = true;
+        Library.AddNonce(nonce, _Nonces);
         
         emit _RemoveCertificateIdEvent(provider, holder);
 

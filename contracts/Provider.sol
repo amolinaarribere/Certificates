@@ -140,7 +140,7 @@ pragma experimental ABIEncoderV2;
             
             delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
 
-            _Nonces._noncesPerAddress[msg.sender][nonce] = true;
+            Library.AddNonce(nonce, _Nonces);
             
         }
     }
