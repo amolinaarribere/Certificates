@@ -202,6 +202,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "addedORremove",
+          "type": "bool"
+        }
+      ],
+      "name": "retrievePendingOwners",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "retrieveTotalOwners",
       "outputs": [
@@ -436,9 +455,28 @@
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "addedORremove",
+          "type": "bool"
+        }
+      ],
+      "name": "retrievePendingProviders",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_AddCertificateIdEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_AddEntityValidationIdEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_RemoveCertificateIdEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_RemoveEntityValidationIdEvent\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"CertificateHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"addCertificate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"ownerInfo\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"addOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"providerInfo\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"addProvider\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"isOwner\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"}],\"name\":\"isProvider\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"CertificateHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"removeCertificate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"removeOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"removeProvider\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveAllOwners\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveAllProviders\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"CertificateHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"}],\"name\":\"retrieveCertificateProvider\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"skipFirst\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"max\",\"type\":\"uint256\"}],\"name\":\"retrieveCertificatesByHolder\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"retrieveHighestNonceForAddress\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveMinOwners\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"retrieveOwner\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"}],\"name\":\"retrieveProvider\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"}],\"name\":\"retrieveTotalCertificatesByHolder\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTotalOwners\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTotalProviders\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol\":\"MultiSigCertificatesPool\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol\":{\"keccak256\":\"0xf31d71d8c456f85c384b9c0886084486268c8d8e7575a960d28221eca9268888\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://06e039f194a39b5009223ba5eb637a1ed75b9e417d409dbbfbebfb02c8d30ae8\",\"dweb:/ipfs/QmZeStJEsEpCpF2Q6P2ryTcxSCLf9YupDaGB4Sp5L8j7HN\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigContract.sol\":{\"keccak256\":\"0xfd54e5b367e7750ef6d733d3d410b8d31b5b1cbef84e4fb41bdd4518cf9ee510\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://efcd36df8f924b354ab28e4e8bc6d503d149a622fc79e14c27f5d5f12347aa93\",\"dweb:/ipfs/QmRaZeNKwpwB6Y4G8iARZbX7GPUzmTCjM5bZJLyQpi9SF9\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IMultiSigContract.sol\":{\"keccak256\":\"0xe34484e191516fb9092541e2f7f830955e9756c7df653ad18ea69b5c0971b93e\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://3c3cf804646a4e44ded00fc0d0b8a5c8168f169a8679bb6b1507c0fb41e19c25\",\"dweb:/ipfs/QmU1aXaqVWNeUTWa2MvtzWCFCat8qKvSANugbBWV2EnpSe\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IPool.sol\":{\"keccak256\":\"0x32663edeb470e1e9eacccffbd227f4ed073b19235243b46812ca391069dc769d\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://c539202f84a2467f1e9f2287c438733aa78ce40bbc722e215baf3eb8b4198cef\",\"dweb:/ipfs/Qma3Y9ya4t4pmLzhKKcSMmYEwUnZZFCtKdVGkUd159oZ2i\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Libraries/Library.sol\":{\"keccak256\":\"0xbd19d3e91d6682bb1758cce7d123b61717c08090acdb737017037993cfa3c453\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://b94f5f10a88074d25305c4a828a28ee98d7b34fe1b0c9d71185a4b237dabc702\",\"dweb:/ipfs/QmWmodjjBwNQzF5G3iBxQYSKwq8VbAUHy8wQXt4yxiavWU\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_AddCertificateIdEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_AddEntityValidationIdEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_RemoveCertificateIdEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"_RemoveEntityValidationIdEvent\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"CertificateHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"addCertificate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"ownerInfo\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"addOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"providerInfo\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"addProvider\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"isOwner\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"}],\"name\":\"isProvider\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"CertificateHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"removeCertificate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"removeOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"}],\"name\":\"removeProvider\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveAllOwners\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveAllProviders\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"CertificateHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"}],\"name\":\"retrieveCertificateProvider\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"skipFirst\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"max\",\"type\":\"uint256\"}],\"name\":\"retrieveCertificatesByHolder\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"retrieveHighestNonceForAddress\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveMinOwners\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"retrieveOwner\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"addedORremove\",\"type\":\"bool\"}],\"name\":\"retrievePendingOwners\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"addedORremove\",\"type\":\"bool\"}],\"name\":\"retrievePendingProviders\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"provider\",\"type\":\"address\"}],\"name\":\"retrieveProvider\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"}],\"name\":\"retrieveTotalCertificatesByHolder\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTotalOwners\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTotalProviders\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol\":\"MultiSigCertificatesPool\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol\":{\"keccak256\":\"0xdaba34123eb76c1054e032f2de2bf89237418f186f9178e5c1a6767e70e10fd2\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://af6f274b640012e6dccddc62c4c91900d6fda64170440da2dd97b3183fdd43e5\",\"dweb:/ipfs/QmRHGPKmanxHPQR4fbhkyfHAyapBvEbMeo2we6zQ59zecz\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigContract.sol\":{\"keccak256\":\"0x04a421ea9c38e766be3042998148a6c0111f7cf5f1ed61dd393f206b1ccc5b5a\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://be8552d5e2a1cdb4fa23b93e12a6e77d23651617cf9296a2bfc762780e4bfb9c\",\"dweb:/ipfs/QmVrigSQZAJby8RBjKXFMgnRPtfYWLvnAj9oN5yTxxngSa\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IMultiSigContract.sol\":{\"keccak256\":\"0xa6b6a749a0694e57084328cd30a6a49e6eaa61739c668c8004c84497fac64b9f\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://9f73469478ca46cd3ae27187420d2b05372c04ce4cac3376504d9b00f403eb14\",\"dweb:/ipfs/QmNyRfN95CQPqYRPpbktreu6BFLoLHiwg1YksM8fMjq9Ej\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IPool.sol\":{\"keccak256\":\"0xc6dd7aca861ca57926b58a47f9ce6c9553902edb0ebd406b6ea243adb7e2e350\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://a2f836b48537a43c7164a33b62ce1a41339f6f8a24acecac4fd2c1eab747dba3\",\"dweb:/ipfs/QmcvUNDzqoEaE1VLJbsytSJXWbWzTwYx9BTowC13TLmSh9\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Libraries/Library.sol\":{\"keccak256\":\"0x3b18645e0d809ab8001ad91696a5e432f0f27ec2dc279add004d0d7a9b8547c2\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://eaa05be42c70e6a6d316c9200501419947abc424e4a8f1dd4e5c15400323e057\",\"dweb:/ipfs/QmVfmb4sLX3jZ6giT3au2A7mqqG16Xx9ydseETLdv87cTA\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -446,28 +484,28 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\npragma experimental ABIEncoderV2;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\nimport \"./MultiSigContract.sol\";\r\nimport \"../Interfaces/IPool.sol\";\r\n\r\nabstract contract MultiSigCertificatesPool is IPool, MultiSigContract {\r\n    \r\n    // events logs\r\n    event _AddCertificateIdEvent(address, address);\r\n    event _RemoveCertificateIdEvent(address, address);\r\n\r\n    uint256 constant TotalEntities = 2;\r\n\r\n    // Owners\r\n    uint256 constant _ownerIdCertificates = 0;\r\n    string constant _ownerLabel = \"Owner\";\r\n\r\n    // Providers\r\n    uint256 constant _providerId = 1;\r\n    string constant _providerLabel = \"Provider\";\r\n\r\n    string[] _Label = [_ownerLabel, _providerLabel];\r\n\r\n    // Holders\r\n    struct _CertificatePerHolder{\r\n        mapping(bytes32 => address) _CertificateFromProvider;\r\n        bytes32[] _ListOfCertificates;\r\n    }\r\n    \r\n    mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;\r\n\r\n    // modifiers\r\n    modifier isAProvider(){\r\n        require(true == isProvider(msg.sender), \"EC12\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProvider(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC13\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, \"EC14\");\r\n        _;\r\n    }\r\n    \r\n    modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){\r\n        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC15\");\r\n        _;\r\n    }\r\n    \r\n    // Constructor\r\n    constructor(address[] memory owners,  uint256 minOwners) \r\n        MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdCertificates)\r\n    payable\r\n    {}\r\n\r\n    // PROVIDERS CRUD Operations\r\n    function addProvider(address provider, string memory providerInfo, uint nonce) external override virtual;\r\n\r\n    function removeProvider(address provider, uint nonce) external override virtual;\r\n    \r\n    function retrieveProvider(address provider) external override view returns (string memory){\r\n        return string(retrieveEntity(provider, _providerId));\r\n    }\r\n\r\n    function retrieveAllProviders() external override view returns (address[] memory){\r\n        return(retrieveAllEntities(_providerId));\r\n    }\r\n    \r\n    function retrieveTotalProviders() external override view returns (uint){\r\n        return (retrieveTotalEntities(_providerId));\r\n    }\r\n\r\n    function isProvider(address provider) public view returns (bool){\r\n        return(isEntity(provider, _providerId));\r\n    }\r\n    \r\n    // Certificates CRUD Operations\r\n    function addCertificate(bytes32 CertificateHash, address holder, uint nonce) external override\r\n        isAProvider \r\n        NotEmpty(CertificateHash)\r\n        CertificateDoesNotExist(holder, CertificateHash)\r\n        isNonceOK(nonce)\r\n    {\r\n        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;\r\n        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);\r\n        Library.AddNonce(nonce, _Nonces);\r\n\r\n        emit _AddCertificateIdEvent(msg.sender, holder);\r\n    }\r\n    \r\n    function removeCertificate(bytes32 CertificateHash, address holder, uint nonce) external override\r\n        isAProvider \r\n        isTheProviderOrHimself(holder, CertificateHash) \r\n        isNonceOK(nonce)\r\n    {\r\n        address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(CertificateHash == listOfCert[i]){\r\n                _CertificatesPerHolder[holder]._ListOfCertificates = Library.ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);\r\n                break;\r\n            }\r\n        }\r\n        \r\n        delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];\r\n        Library.AddNonce(nonce, _Nonces);\r\n        \r\n        emit _RemoveCertificateIdEvent(provider, holder);\r\n\r\n    }\r\n    \r\n\r\n    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override\r\n    view returns (address)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);\r\n    }\r\n\r\n    function retrieveTotalCertificatesByHolder(address holder) public override \r\n    view returns (uint256)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);\r\n    }\r\n\r\n    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override\r\n    view returns (bytes32[] memory)\r\n    {\r\n        if(retrieveTotalCertificatesByHolder(holder) <= skipFirst){\r\n            return (new bytes32[](0));\r\n        }\r\n\r\n        uint maxSize = max;\r\n        if(retrieveTotalCertificatesByHolder(holder) - skipFirst < max){\r\n            maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst;\r\n        }\r\n        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](maxSize);\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        uint count = 0;\r\n        uint skipped = 0;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(count >= max) break;\r\n            if(skipFirst > skipped){\r\n                    skipped += 1;\r\n            }\r\n            else{\r\n                ListOfCertificatesByHolder[count] = listOfCert[i];\r\n                count += 1;\r\n            }             \r\n        }\r\n\r\n        return (ListOfCertificatesByHolder);\r\n    }\r\n\r\n\r\n}",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\npragma experimental ABIEncoderV2;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\nimport \"./MultiSigContract.sol\";\r\nimport \"../Interfaces/IPool.sol\";\r\n\r\nabstract contract MultiSigCertificatesPool is IPool, MultiSigContract {\r\n    \r\n    // events logs\r\n    event _AddCertificateIdEvent(address, address);\r\n    event _RemoveCertificateIdEvent(address, address);\r\n\r\n    uint256 constant TotalEntities = 2;\r\n\r\n    // Owners\r\n    uint256 constant _ownerIdCertificates = 0;\r\n    string constant _ownerLabel = \"Owner\";\r\n\r\n    // Providers\r\n    uint256 constant _providerId = 1;\r\n    string constant _providerLabel = \"Provider\";\r\n\r\n    string[] _Label = [_ownerLabel, _providerLabel];\r\n\r\n    // Holders\r\n    struct _CertificatePerHolder{\r\n        mapping(bytes32 => address) _CertificateFromProvider;\r\n        bytes32[] _ListOfCertificates;\r\n    }\r\n    \r\n    mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;\r\n\r\n    // modifiers\r\n    modifier isAProvider(){\r\n        require(true == isProvider(msg.sender), \"EC12\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProvider(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC13\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, \"EC14\");\r\n        _;\r\n    }\r\n    \r\n    modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){\r\n        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC15\");\r\n        _;\r\n    }\r\n    \r\n    // Constructor\r\n    constructor(address[] memory owners,  uint256 minOwners) \r\n        MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdCertificates)\r\n    payable\r\n    {}\r\n\r\n    // PROVIDERS CRUD Operations\r\n    function addProvider(address provider, string memory providerInfo, uint nonce) external override virtual;\r\n\r\n    function removeProvider(address provider, uint nonce) external override virtual;\r\n    \r\n    function retrieveProvider(address provider) external override view returns (string memory){\r\n        return string(retrieveEntity(provider, _providerId));\r\n    }\r\n\r\n    function retrieveAllProviders() external override view returns (address[] memory){\r\n        return(retrieveAllEntities(_providerId));\r\n    }\r\n    \r\n    function retrieveTotalProviders() external override view returns (uint){\r\n        return (retrieveTotalEntities(_providerId));\r\n    }\r\n\r\n    function isProvider(address provider) public view returns (bool){\r\n        return(isEntity(provider, _providerId));\r\n    }\r\n    \r\n    // Certificates CRUD Operations\r\n    function addCertificate(bytes32 CertificateHash, address holder, uint nonce) external override\r\n        isAProvider \r\n        NotEmpty(CertificateHash)\r\n        CertificateDoesNotExist(holder, CertificateHash)\r\n        isNonceOK(nonce)\r\n    {\r\n        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;\r\n        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);\r\n        Library.AddNonce(nonce, _Nonces);\r\n\r\n        emit _AddCertificateIdEvent(msg.sender, holder);\r\n    }\r\n    \r\n    function removeCertificate(bytes32 CertificateHash, address holder, uint nonce) external override\r\n        isAProvider \r\n        isTheProviderOrHimself(holder, CertificateHash) \r\n        isNonceOK(nonce)\r\n    {\r\n        address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(CertificateHash == listOfCert[i]){\r\n                _CertificatesPerHolder[holder]._ListOfCertificates = Library.ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);\r\n                break;\r\n            }\r\n        }\r\n        \r\n        delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];\r\n        Library.AddNonce(nonce, _Nonces);\r\n        \r\n        emit _RemoveCertificateIdEvent(provider, holder);\r\n\r\n    }\r\n    \r\n\r\n    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override\r\n    view returns (address)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);\r\n    }\r\n\r\n    function retrieveTotalCertificatesByHolder(address holder) public override \r\n    view returns (uint256)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);\r\n    }\r\n\r\n    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override\r\n    view returns (bytes32[] memory)\r\n    {\r\n        if(retrieveTotalCertificatesByHolder(holder) <= skipFirst){\r\n            return (new bytes32[](0));\r\n        }\r\n\r\n        uint maxSize = max;\r\n        if(retrieveTotalCertificatesByHolder(holder) - skipFirst < max){\r\n            maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst;\r\n        }\r\n        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](maxSize);\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        uint count = 0;\r\n        uint skipped = 0;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(count >= max) break;\r\n            if(skipFirst > skipped){\r\n                    skipped += 1;\r\n            }\r\n            else{\r\n                ListOfCertificatesByHolder[count] = listOfCert[i];\r\n                count += 1;\r\n            }             \r\n        }\r\n\r\n        return (ListOfCertificatesByHolder);\r\n    }\r\n\r\n    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory){\r\n        return(Library.retrievePendingEntities(_Entities[_providerId],addedORremove));\r\n    }\r\n\r\n\r\n}",
   "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Abstract\\MultiSigCertificatesPool.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
     "exportedSymbols": {
       "IMultiSigContract": [
-        1152
+        1436
       ],
       "IPool": [
-        1236
+        1528
       ],
       "Library": [
-        2001
+        2441
       ],
       "MultiSigCertificatesPool": [
-        532
+        551
       ],
       "MultiSigContract": [
-        1102
+        1140
       ]
     },
-    "id": 533,
+    "id": 552,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
@@ -499,8 +537,8 @@
         "file": "./MultiSigContract.sol",
         "id": 3,
         "nodeType": "ImportDirective",
-        "scope": 533,
-        "sourceUnit": 1103,
+        "scope": 552,
+        "sourceUnit": 1141,
         "src": "186:32:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -510,8 +548,8 @@
         "file": "../Interfaces/IPool.sol",
         "id": 4,
         "nodeType": "ImportDirective",
-        "scope": 533,
-        "sourceUnit": 1237,
+        "scope": 552,
+        "sourceUnit": 1529,
         "src": "220:33:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -524,10 +562,10 @@
               "id": 5,
               "name": "IPool",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1236,
+              "referencedDeclaration": 1528,
               "src": "303:5:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IPool_$1236",
+                "typeIdentifier": "t_contract$_IPool_$1528",
                 "typeString": "contract IPool"
               }
             },
@@ -540,10 +578,10 @@
               "id": 7,
               "name": "MultiSigContract",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1102,
+              "referencedDeclaration": 1140,
               "src": "310:16:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MultiSigContract_$1102",
+                "typeIdentifier": "t_contract$_MultiSigContract_$1140",
                 "typeString": "contract MultiSigContract"
               }
             },
@@ -553,18 +591,18 @@
           }
         ],
         "contractDependencies": [
-          1102,
-          1152,
-          1236
+          1140,
+          1436,
+          1528
         ],
         "contractKind": "contract",
         "fullyImplemented": false,
-        "id": 532,
+        "id": 551,
         "linearizedBaseContracts": [
-          532,
-          1102,
-          1152,
-          1236
+          551,
+          1140,
+          1436,
+          1528
         ],
         "name": "MultiSigCertificatesPool",
         "nodeType": "ContractDefinition",
@@ -715,7 +753,7 @@
             "mutability": "constant",
             "name": "TotalEntities",
             "nodeType": "VariableDeclaration",
-            "scope": 532,
+            "scope": 551,
             "src": "471:34:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -757,7 +795,7 @@
             "mutability": "constant",
             "name": "_ownerIdCertificates",
             "nodeType": "VariableDeclaration",
-            "scope": 532,
+            "scope": 551,
             "src": "529:41:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -799,7 +837,7 @@
             "mutability": "constant",
             "name": "_ownerLabel",
             "nodeType": "VariableDeclaration",
-            "scope": 532,
+            "scope": 551,
             "src": "577:37:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -841,7 +879,7 @@
             "mutability": "constant",
             "name": "_providerId",
             "nodeType": "VariableDeclaration",
-            "scope": 532,
+            "scope": 551,
             "src": "641:32:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -883,7 +921,7 @@
             "mutability": "constant",
             "name": "_providerLabel",
             "nodeType": "VariableDeclaration",
-            "scope": 532,
+            "scope": 551,
             "src": "680:43:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -925,7 +963,7 @@
             "mutability": "mutable",
             "name": "_Label",
             "nodeType": "VariableDeclaration",
-            "scope": 532,
+            "scope": 551,
             "src": "732:47:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -1082,7 +1120,7 @@
             ],
             "name": "_CertificatePerHolder",
             "nodeType": "StructDefinition",
-            "scope": 532,
+            "scope": 551,
             "src": "804:139:0",
             "visibility": "public"
           },
@@ -1092,7 +1130,7 @@
             "mutability": "mutable",
             "name": "_CertificatesPerHolder",
             "nodeType": "VariableDeclaration",
-            "scope": 532,
+            "scope": 551,
             "src": "955:72:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2301,10 +2339,10 @@
                   "name": "MultiSigContract",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 1102,
+                  "referencedDeclaration": 1140,
                   "src": "1915:16:0",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_type$_t_contract$_MultiSigContract_$1102_$",
+                    "typeIdentifier": "t_type$_t_contract$_MultiSigContract_$1140_$",
                     "typeString": "type(contract MultiSigContract)"
                   }
                 },
@@ -2389,7 +2427,7 @@
               "parameters": [],
               "src": "2014:0:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "1848:168:0",
             "stateMutability": "payable",
             "virtual": false,
@@ -2397,7 +2435,7 @@
           },
           {
             "baseFunctions": [
-              1210
+              1494
             ],
             "functionSelector": "f05d8703",
             "id": 163,
@@ -2504,7 +2542,7 @@
               "parameters": [],
               "src": "2162:0:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "2058:105:0",
             "stateMutability": "nonpayable",
             "virtual": true,
@@ -2512,7 +2550,7 @@
           },
           {
             "baseFunctions": [
-              1217
+              1501
             ],
             "functionSelector": "e4661547",
             "id": 171,
@@ -2593,7 +2631,7 @@
               "parameters": [],
               "src": "2250:0:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "2171:80:0",
             "stateMutability": "nonpayable",
             "virtual": true,
@@ -2601,7 +2639,7 @@
           },
           {
             "baseFunctions": [
-              1224
+              1508
             ],
             "body": {
               "id": 187,
@@ -2653,7 +2691,7 @@
                           "name": "retrieveEntity",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 907,
+                          "referencedDeclaration": 926,
                           "src": "2378:14:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_bytes_memory_ptr_$",
@@ -2804,7 +2842,7 @@
               ],
               "src": "2338:15:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "2263:161:0",
             "stateMutability": "view",
             "virtual": false,
@@ -2812,7 +2850,7 @@
           },
           {
             "baseFunctions": [
-              1230
+              1514
             ],
             "body": {
               "id": 200,
@@ -2848,7 +2886,7 @@
                           "name": "retrieveAllEntities",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 929,
+                          "referencedDeclaration": 948,
                           "src": "2531:19:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_uint256_$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -2953,7 +2991,7 @@
               ],
               "src": "2495:18:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "2432:140:0",
             "stateMutability": "view",
             "virtual": false,
@@ -2961,7 +2999,7 @@
           },
           {
             "baseFunctions": [
-              1235
+              1519
             ],
             "body": {
               "id": 212,
@@ -2997,7 +3035,7 @@
                           "name": "retrieveTotalEntities",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 950,
+                          "referencedDeclaration": 969,
                           "src": "2674:21:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_uint256_$returns$_t_uint256_$",
@@ -3092,7 +3130,7 @@
               ],
               "src": "2649:6:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "2584:133:0",
             "stateMutability": "view",
             "virtual": false,
@@ -3149,7 +3187,7 @@
                           "name": "isEntity",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 976,
+                          "referencedDeclaration": 995,
                           "src": "2807:8:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -3266,7 +3304,7 @@
               ],
               "src": "2783:6:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "2725:122:0",
             "stateMutability": "view",
             "virtual": false,
@@ -3274,7 +3312,7 @@
           },
           {
             "baseFunctions": [
-              1164
+              1448
             ],
             "body": {
               "id": 280,
@@ -3530,10 +3568,10 @@
                         "name": "_Nonces",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 565,
+                        "referencedDeclaration": 584,
                         "src": "3351:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1273_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1631_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       }
@@ -3545,7 +3583,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1273_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1631_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       ],
@@ -3554,10 +3592,10 @@
                         "name": "Library",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2001,
+                        "referencedDeclaration": 2441,
                         "src": "3327:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Library_$2001_$",
+                          "typeIdentifier": "t_type$_t_contract$_Library_$2441_$",
                           "typeString": "type(library Library)"
                         }
                       },
@@ -3568,10 +3606,10 @@
                       "lValueRequested": false,
                       "memberName": "AddNonce",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1755,
+                      "referencedDeclaration": 2113,
                       "src": "3327:16:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1273_storage_ptr_$returns$__$",
+                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1631_storage_ptr_$returns$__$",
                         "typeString": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                       }
                     },
@@ -3722,7 +3760,7 @@
                   "name": "NotEmpty",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 647,
+                  "referencedDeclaration": 666,
                   "src": "3022:8:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_bytes32_$",
@@ -3796,7 +3834,7 @@
                   "name": "isNonceOK",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 675,
+                  "referencedDeclaration": 694,
                   "src": "3115:9:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_uint256_$",
@@ -3907,7 +3945,7 @@
               "parameters": [],
               "src": "3137:0:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "2896:531:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -3915,7 +3953,7 @@
           },
           {
             "baseFunctions": [
-              1173
+              1457
             ],
             "body": {
               "id": 374,
@@ -4359,10 +4397,10 @@
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 2001,
+                                      "referencedDeclaration": 2441,
                                       "src": "4026:7:0",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$2001_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$2441_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
@@ -4373,7 +4411,7 @@
                                     "lValueRequested": false,
                                     "memberName": "ArrayRemoveResize",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 1569,
+                                    "referencedDeclaration": 1927,
                                     "src": "4026:25:0",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_array$_t_bytes32_$dyn_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -4676,10 +4714,10 @@
                         "name": "_Nonces",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 565,
+                        "referencedDeclaration": 584,
                         "src": "4291:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1273_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1631_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       }
@@ -4691,7 +4729,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1273_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1631_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       ],
@@ -4700,10 +4738,10 @@
                         "name": "Library",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2001,
+                        "referencedDeclaration": 2441,
                         "src": "4267:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Library_$2001_$",
+                          "typeIdentifier": "t_type$_t_contract$_Library_$2441_$",
                           "typeString": "type(library Library)"
                         }
                       },
@@ -4714,10 +4752,10 @@
                       "lValueRequested": false,
                       "memberName": "AddNonce",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1755,
+                      "referencedDeclaration": 2113,
                       "src": "4267:16:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1273_storage_ptr_$returns$__$",
+                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1631_storage_ptr_$returns$__$",
                         "typeString": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                       }
                     },
@@ -4897,7 +4935,7 @@
                   "name": "isNonceOK",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 675,
+                  "referencedDeclaration": 694,
                   "src": "3626:9:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_uint256_$",
@@ -5008,7 +5046,7 @@
               "parameters": [],
               "src": "3648:0:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "3439:939:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -5016,7 +5054,7 @@
           },
           {
             "baseFunctions": [
-              1182
+              1466
             ],
             "body": {
               "id": 393,
@@ -5231,7 +5269,7 @@
               ],
               "src": "4506:9:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "4392:229:0",
             "stateMutability": "view",
             "virtual": false,
@@ -5239,7 +5277,7 @@
           },
           {
             "baseFunctions": [
-              1189
+              1473
             ],
             "body": {
               "id": 409,
@@ -5416,7 +5454,7 @@
               ],
               "src": "4723:9:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "4629:194:0",
             "stateMutability": "view",
             "virtual": false,
@@ -5424,7 +5462,7 @@
           },
           {
             "baseFunctions": [
-              1201
+              1485
             ],
             "body": {
               "id": 530,
@@ -6835,37 +6873,269 @@
               ],
               "src": "4947:18:0"
             },
-            "scope": 532,
+            "scope": 551,
             "src": "4831:1074:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "baseFunctions": [
+              1527
+            ],
+            "body": {
+              "id": 549,
+              "nodeType": "Block",
+              "src": "6016:96:0",
+              "statements": [
+                {
+                  "expression": {
+                    "components": [
+                      {
+                        "arguments": [
+                          {
+                            "baseExpression": {
+                              "id": 542,
+                              "name": "_Entities",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 582,
+                              "src": "6066:9:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$__entityStruct_$1620_storage_$dyn_storage",
+                                "typeString": "struct Library._entityStruct storage ref[] storage ref"
+                              }
+                            },
+                            "id": 544,
+                            "indexExpression": {
+                              "id": 543,
+                              "name": "_providerId",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 32,
+                              "src": "6076:11:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "nodeType": "IndexAccess",
+                            "src": "6066:22:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$__entityStruct_$1620_storage",
+                              "typeString": "struct Library._entityStruct storage ref"
+                            }
+                          },
+                          {
+                            "id": 545,
+                            "name": "addedORremove",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 533,
+                            "src": "6089:13:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bool",
+                              "typeString": "bool"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_struct$__entityStruct_$1620_storage",
+                              "typeString": "struct Library._entityStruct storage ref"
+                            },
+                            {
+                              "typeIdentifier": "t_bool",
+                              "typeString": "bool"
+                            }
+                          ],
+                          "expression": {
+                            "id": 540,
+                            "name": "Library",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2441,
+                            "src": "6034:7:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_contract$_Library_$2441_$",
+                              "typeString": "type(library Library)"
+                            }
+                          },
+                          "id": 541,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "retrievePendingEntities",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 2429,
+                          "src": "6034:31:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$_t_struct$__entityStruct_$1620_storage_ptr_$_t_bool_$returns$_t_array$_t_address_$dyn_memory_ptr_$",
+                            "typeString": "function (struct Library._entityStruct storage pointer,bool) view returns (address[] memory)"
+                          }
+                        },
+                        "id": 546,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "6034:69:0",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
+                          "typeString": "address[] memory"
+                        }
+                      }
+                    ],
+                    "id": 547,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "6033:71:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
+                      "typeString": "address[] memory"
+                    }
+                  },
+                  "functionReturnParameters": 539,
+                  "id": 548,
+                  "nodeType": "Return",
+                  "src": "6027:77:0"
+                }
+              ]
+            },
+            "functionSelector": "6b3a0fec",
+            "id": 550,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "retrievePendingProviders",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 535,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "5976:8:0"
+            },
+            "parameters": {
+              "id": 534,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 533,
+                  "mutability": "mutable",
+                  "name": "addedORremove",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 550,
+                  "src": "5947:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 532,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5947:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5946:20:0"
+            },
+            "returnParameters": {
+              "id": 539,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 538,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 550,
+                  "src": "5999:16:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 536,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "5999:7:0",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 537,
+                    "nodeType": "ArrayTypeName",
+                    "src": "5999:9:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5998:18:0"
+            },
+            "scope": 551,
+            "src": "5913:199:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 533,
-        "src": "257:5655:0"
+        "scope": 552,
+        "src": "257:5862:0"
       }
     ],
-    "src": "39:5873:0"
+    "src": "39:6080:0"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
       "exportedSymbols": {
         "IMultiSigContract": [
-          1152
+          1436
         ],
         "IPool": [
-          1236
+          1528
         ],
         "Library": [
-          2001
+          2441
         ],
         "MultiSigCertificatesPool": [
-          532
+          551
         ],
         "MultiSigContract": [
-          1102
+          1140
         ]
       },
       "license": "GPL-3.0"
@@ -6900,10 +7170,10 @@
       },
       {
         "attributes": {
-          "SourceUnit": 1103,
+          "SourceUnit": 1141,
           "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigContract.sol",
           "file": "./MultiSigContract.sol",
-          "scope": 533,
+          "scope": 552,
           "symbolAliases": [
             null
           ],
@@ -6915,10 +7185,10 @@
       },
       {
         "attributes": {
-          "SourceUnit": 1237,
+          "SourceUnit": 1529,
           "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IPool.sol",
           "file": "../Interfaces/IPool.sol",
-          "scope": 533,
+          "scope": 552,
           "symbolAliases": [
             null
           ],
@@ -6932,20 +7202,20 @@
         "attributes": {
           "abstract": true,
           "contractDependencies": [
-            1102,
-            1152,
-            1236
+            1140,
+            1436,
+            1528
           ],
           "contractKind": "contract",
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            532,
-            1102,
-            1152,
-            1236
+            551,
+            1140,
+            1436,
+            1528
           ],
           "name": "MultiSigCertificatesPool",
-          "scope": 533
+          "scope": 552
         },
         "children": [
           {
@@ -6954,7 +7224,7 @@
               {
                 "attributes": {
                   "name": "IPool",
-                  "referencedDeclaration": 1236,
+                  "referencedDeclaration": 1528,
                   "type": "contract IPool"
                 },
                 "id": 5,
@@ -6972,7 +7242,7 @@
               {
                 "attributes": {
                   "name": "MultiSigContract",
-                  "referencedDeclaration": 1102,
+                  "referencedDeclaration": 1140,
                   "type": "contract MultiSigContract"
                 },
                 "id": 7,
@@ -7137,7 +7407,7 @@
               "constant": true,
               "mutability": "constant",
               "name": "TotalEntities",
-              "scope": 532,
+              "scope": 551,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -7178,7 +7448,7 @@
               "constant": true,
               "mutability": "constant",
               "name": "_ownerIdCertificates",
-              "scope": 532,
+              "scope": 551,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -7219,7 +7489,7 @@
               "constant": true,
               "mutability": "constant",
               "name": "_ownerLabel",
-              "scope": 532,
+              "scope": 551,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "string",
@@ -7260,7 +7530,7 @@
               "constant": true,
               "mutability": "constant",
               "name": "_providerId",
-              "scope": 532,
+              "scope": 551,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -7301,7 +7571,7 @@
               "constant": true,
               "mutability": "constant",
               "name": "_providerLabel",
-              "scope": 532,
+              "scope": 551,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "string",
@@ -7342,7 +7612,7 @@
               "constant": false,
               "mutability": "mutable",
               "name": "_Label",
-              "scope": 532,
+              "scope": 551,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "string[]",
@@ -7418,7 +7688,7 @@
             "attributes": {
               "canonicalName": "MultiSigCertificatesPool._CertificatePerHolder",
               "name": "_CertificatePerHolder",
-              "scope": 532,
+              "scope": 551,
               "visibility": "public"
             },
             "children": [
@@ -7514,7 +7784,7 @@
               "constant": false,
               "mutability": "mutable",
               "name": "_CertificatesPerHolder",
-              "scope": 532,
+              "scope": 551,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "mapping(address => struct MultiSigCertificatesPool._CertificatePerHolder)",
@@ -8717,7 +8987,7 @@
               "isConstructor": true,
               "kind": "constructor",
               "name": "",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "payable",
               "virtual": false,
               "visibility": "internal"
@@ -8811,7 +9081,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 1102,
+                      "referencedDeclaration": 1140,
                       "type": "type(contract MultiSigContract)",
                       "value": "MultiSigContract"
                     },
@@ -8908,7 +9178,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1210
+                1494
               ],
               "functionSelector": "f05d8703",
               "implemented": false,
@@ -8918,7 +9188,7 @@
                 null
               ],
               "name": "addProvider",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "nonpayable",
               "virtual": true,
               "visibility": "external"
@@ -9039,7 +9309,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1217
+                1501
               ],
               "functionSelector": "e4661547",
               "implemented": false,
@@ -9049,7 +9319,7 @@
                 null
               ],
               "name": "removeProvider",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "nonpayable",
               "virtual": true,
               "visibility": "external"
@@ -9144,7 +9414,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1224
+                1508
               ],
               "functionSelector": "37583499",
               "implemented": true,
@@ -9154,7 +9424,7 @@
                 null
               ],
               "name": "retrieveProvider",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -9317,7 +9587,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 907,
+                                  "referencedDeclaration": 926,
                                   "type": "function (address,uint256) view returns (bytes memory)",
                                   "value": "retrieveEntity"
                                 },
@@ -9379,7 +9649,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1230
+                1514
               ],
               "functionSelector": "6e4f9179",
               "implemented": true,
@@ -9389,7 +9659,7 @@
                 null
               ],
               "name": "retrieveAllProviders",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -9503,7 +9773,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 929,
+                                  "referencedDeclaration": 948,
                                   "type": "function (uint256) view returns (address[] memory)",
                                   "value": "retrieveAllEntities"
                                 },
@@ -9552,7 +9822,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1235
+                1519
               ],
               "functionSelector": "d744d2f3",
               "implemented": true,
@@ -9562,7 +9832,7 @@
                 null
               ],
               "name": "retrieveTotalProviders",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -9665,7 +9935,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 950,
+                                  "referencedDeclaration": 969,
                                   "type": "function (uint256) view returns (uint256)",
                                   "value": "retrieveTotalEntities"
                                 },
@@ -9721,7 +9991,7 @@
                 null
               ],
               "name": "isProvider",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "public"
@@ -9841,7 +10111,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 976,
+                                  "referencedDeclaration": 995,
                                   "type": "function (address,uint256) view returns (bool)",
                                   "value": "isEntity"
                                 },
@@ -9903,14 +10173,14 @@
           {
             "attributes": {
               "baseFunctions": [
-                1164
+                1448
               ],
               "functionSelector": "69767eab",
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
               "name": "addCertificate",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -10051,7 +10321,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 647,
+                      "referencedDeclaration": 666,
                       "type": "modifier (bytes32)",
                       "value": "NotEmpty"
                     },
@@ -10130,7 +10400,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 675,
+                      "referencedDeclaration": 694,
                       "type": "modifier (uint256)",
                       "value": "isNonceOK"
                     },
@@ -10433,7 +10703,7 @@
                                   "typeString": "uint256"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1273_storage",
+                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1631_storage",
                                   "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                                 }
                               ],
@@ -10442,7 +10712,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "AddNonce",
-                              "referencedDeclaration": 1755,
+                              "referencedDeclaration": 2113,
                               "type": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                             },
                             "children": [
@@ -10451,7 +10721,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2001,
+                                  "referencedDeclaration": 2441,
                                   "type": "type(library Library)",
                                   "value": "Library"
                                 },
@@ -10482,7 +10752,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 565,
+                              "referencedDeclaration": 584,
                               "type": "struct Library._NoncesPerAddressStruct storage ref",
                               "value": "_Nonces"
                             },
@@ -10604,14 +10874,14 @@
           {
             "attributes": {
               "baseFunctions": [
-                1173
+                1457
               ],
               "functionSelector": "073855ca",
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
               "name": "removeCertificate",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -10798,7 +11068,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 675,
+                      "referencedDeclaration": 694,
                       "type": "modifier (uint256)",
                       "value": "isNonceOK"
                     },
@@ -11382,7 +11652,7 @@
                                                   "isPure": false,
                                                   "lValueRequested": false,
                                                   "member_name": "ArrayRemoveResize",
-                                                  "referencedDeclaration": 1569,
+                                                  "referencedDeclaration": 1927,
                                                   "type": "function (uint256,bytes32[] memory) pure returns (bytes32[] memory)"
                                                 },
                                                 "children": [
@@ -11391,7 +11661,7 @@
                                                       "overloadedDeclarations": [
                                                         null
                                                       ],
-                                                      "referencedDeclaration": 2001,
+                                                      "referencedDeclaration": 2441,
                                                       "type": "type(library Library)",
                                                       "value": "Library"
                                                     },
@@ -11644,7 +11914,7 @@
                                   "typeString": "uint256"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1273_storage",
+                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1631_storage",
                                   "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                                 }
                               ],
@@ -11653,7 +11923,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "AddNonce",
-                              "referencedDeclaration": 1755,
+                              "referencedDeclaration": 2113,
                               "type": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                             },
                             "children": [
@@ -11662,7 +11932,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2001,
+                                  "referencedDeclaration": 2441,
                                   "type": "type(library Library)",
                                   "value": "Library"
                                 },
@@ -11693,7 +11963,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 565,
+                              "referencedDeclaration": 584,
                               "type": "struct Library._NoncesPerAddressStruct storage ref",
                               "value": "_Nonces"
                             },
@@ -11800,7 +12070,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1182
+                1466
               ],
               "functionSelector": "d0a4adfe",
               "implemented": true,
@@ -11810,7 +12080,7 @@
                 null
               ],
               "name": "retrieveCertificateProvider",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -12043,7 +12313,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1189
+                1473
               ],
               "functionSelector": "6e55d2d4",
               "implemented": true,
@@ -12053,7 +12323,7 @@
                 null
               ],
               "name": "retrieveTotalCertificatesByHolder",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "public"
@@ -12247,7 +12517,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                1201
+                1485
               ],
               "functionSelector": "58a1ba25",
               "implemented": true,
@@ -12257,7 +12527,7 @@
                 null
               ],
               "name": "retrieveCertificatesByHolder",
-              "scope": 532,
+              "scope": 551,
               "stateMutability": "view",
               "virtual": false,
               "visibility": "external"
@@ -13769,16 +14039,271 @@
             "id": 531,
             "name": "FunctionDefinition",
             "src": "4831:1074:0"
+          },
+          {
+            "attributes": {
+              "baseFunctions": [
+                1527
+              ],
+              "functionSelector": "6b3a0fec",
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "retrievePendingProviders",
+              "scope": 551,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "overrides": [
+                    null
+                  ]
+                },
+                "id": 535,
+                "name": "OverrideSpecifier",
+                "src": "5976:8:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "addedORremove",
+                      "scope": 550,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 532,
+                        "name": "ElementaryTypeName",
+                        "src": "5947:4:0"
+                      }
+                    ],
+                    "id": 533,
+                    "name": "VariableDeclaration",
+                    "src": "5947:18:0"
+                  }
+                ],
+                "id": 534,
+                "name": "ParameterList",
+                "src": "5946:20:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 550,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "address[]",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "address[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "stateMutability": "nonpayable",
+                              "type": "address"
+                            },
+                            "id": 536,
+                            "name": "ElementaryTypeName",
+                            "src": "5999:7:0"
+                          }
+                        ],
+                        "id": 537,
+                        "name": "ArrayTypeName",
+                        "src": "5999:9:0"
+                      }
+                    ],
+                    "id": 538,
+                    "name": "VariableDeclaration",
+                    "src": "5999:16:0"
+                  }
+                ],
+                "id": 539,
+                "name": "ParameterList",
+                "src": "5998:18:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 539
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "isConstant": false,
+                          "isInlineArray": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "type": "address[] memory"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "tryCall": false,
+                              "type": "address[] memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_struct$__entityStruct_$1620_storage",
+                                      "typeString": "struct Library._entityStruct storage ref"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_bool",
+                                      "typeString": "bool"
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "retrievePendingEntities",
+                                  "referencedDeclaration": 2429,
+                                  "type": "function (struct Library._entityStruct storage pointer,bool) view returns (address[] memory)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 2441,
+                                      "type": "type(library Library)",
+                                      "value": "Library"
+                                    },
+                                    "id": 540,
+                                    "name": "Identifier",
+                                    "src": "6034:7:0"
+                                  }
+                                ],
+                                "id": 541,
+                                "name": "MemberAccess",
+                                "src": "6034:31:0"
+                              },
+                              {
+                                "attributes": {
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "type": "struct Library._entityStruct storage ref"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 582,
+                                      "type": "struct Library._entityStruct storage ref[] storage ref",
+                                      "value": "_Entities"
+                                    },
+                                    "id": 542,
+                                    "name": "Identifier",
+                                    "src": "6066:9:0"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 32,
+                                      "type": "uint256",
+                                      "value": "_providerId"
+                                    },
+                                    "id": 543,
+                                    "name": "Identifier",
+                                    "src": "6076:11:0"
+                                  }
+                                ],
+                                "id": 544,
+                                "name": "IndexAccess",
+                                "src": "6066:22:0"
+                              },
+                              {
+                                "attributes": {
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 533,
+                                  "type": "bool",
+                                  "value": "addedORremove"
+                                },
+                                "id": 545,
+                                "name": "Identifier",
+                                "src": "6089:13:0"
+                              }
+                            ],
+                            "id": 546,
+                            "name": "FunctionCall",
+                            "src": "6034:69:0"
+                          }
+                        ],
+                        "id": 547,
+                        "name": "TupleExpression",
+                        "src": "6033:71:0"
+                      }
+                    ],
+                    "id": 548,
+                    "name": "Return",
+                    "src": "6027:77:0"
+                  }
+                ],
+                "id": 549,
+                "name": "Block",
+                "src": "6016:96:0"
+              }
+            ],
+            "id": 550,
+            "name": "FunctionDefinition",
+            "src": "5913:199:0"
           }
         ],
-        "id": 532,
+        "id": 551,
         "name": "ContractDefinition",
-        "src": "257:5655:0"
+        "src": "257:5862:0"
       }
     ],
-    "id": 533,
+    "id": 552,
     "name": "SourceUnit",
-    "src": "39:5873:0"
+    "src": "39:6080:0"
   },
   "compiler": {
     "name": "solc",
@@ -13786,7 +14311,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-07-13T13:19:40.364Z",
+  "updatedAt": "2021-07-13T14:16:05.518Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

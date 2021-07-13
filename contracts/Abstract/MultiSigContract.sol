@@ -170,4 +170,8 @@ abstract contract MultiSigContract is IMultiSigContract{
         return(_Nonces.__highestNoncePerAddress[addr]);
     }
 
+    function retrievePendingOwners(bool addedORremove) external override view returns (address[] memory){
+        return(Library.retrievePendingEntities(_Entities[_ownerId],addedORremove));
+    }
+
 }

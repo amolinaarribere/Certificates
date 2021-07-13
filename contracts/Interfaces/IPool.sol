@@ -20,5 +20,6 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrieveProvider(address provider) external view returns (string memory);
     function retrieveAllProviders() external view returns (address[] memory);
     function retrieveTotalProviders() external view returns (uint);
+    function retrievePendingProviders(bool addedORremove) external view returns (address[] memory);
     
 }

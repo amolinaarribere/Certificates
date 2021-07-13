@@ -26,6 +26,8 @@ library Library{
     struct _entityStruct{
         mapping(address => _entityIdentity) _entities;
         address[] _activatedEntities;
+        address[] _pendingEntitiesAdd;
+        address[] _pendingEntitiesRemove;
     }
 
     struct _NoncesPerAddressStruct{
@@ -144,7 +146,10 @@ library Library{
         HasNotAlreadyVoted(Actions.Add, Entities._entities[entity])
         isNonceOK(nonce, Nonces)
     {
-        if(0 == Entities._entities[entity]._AddValidated.length) Entities._entities[entity]._Info = entityInfo;
+        if(0 == Entities._entities[entity]._AddValidated.length){
+            Entities._entities[entity]._Info = entityInfo;
+            Entities._pendingEntitiesAdd.push(entity);
+        } 
 
         Entities._entities[entity]._AddValidated.push(msg.sender);
         AddNonce(nonce, Nonces);
@@ -152,6 +157,7 @@ library Library{
         if(CheckValidations(Entities._entities[entity]._AddValidated.length, minSignatures)){
             Entities._entities[entity]._activated = true; 
             Entities._activatedEntities.push(entity);
+            Entities._pendingEntitiesAdd = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._pendingEntitiesAdd), ArrayAddressToBytes32(Entities._pendingEntitiesAdd)));
         }
     }
 
@@ -160,11 +166,16 @@ library Library{
         HasNotAlreadyVoted(Actions.Remove, Entities._entities[entity])
         isNonceOK(nonce, Nonces)
     {
+        if(0 == Entities._entities[entity]._RemoveValidated.length){
+            Entities._pendingEntitiesRemove.push(entity);
+        } 
+
         Entities._entities[entity]._RemoveValidated.push(msg.sender);
         AddNonce(nonce, Nonces);
 
         if(msg.sender == entity || CheckValidations(Entities._entities[entity]._RemoveValidated.length, minSignatures)){
             Entities._activatedEntities = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), ArrayAddressToBytes32(Entities._activatedEntities)));
+            Entities._pendingEntitiesRemove = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._pendingEntitiesRemove), ArrayAddressToBytes32(Entities._pendingEntitiesRemove)));
             delete(Entities._entities[entity]);
         }  
        
@@ -187,6 +198,13 @@ library Library{
     view returns (uint) 
     {
         return Entities._activatedEntities.length;
+    }
+
+    function retrievePendingEntities(_entityStruct storage Entities, bool addOrRemove) internal 
+    view returns (address[] memory) 
+    {
+        if(addOrRemove) return Entities._pendingEntitiesAdd;
+        else return Entities._pendingEntitiesRemove;
     }
 
     function isEntity(_entityIdentity memory Entity) internal pure returns (bool){
