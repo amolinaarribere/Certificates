@@ -10,6 +10,7 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./Libraries/Library.sol";
 import "./PrivateCertificatesPool.sol";
 import "./PublicCertificatesPool.sol";
+import "./Treasury.sol";
 
 contract CertificatesPoolManager{
     using Library for *;
@@ -21,11 +22,6 @@ contract CertificatesPoolManager{
     // modfiers
     modifier isIdCorrect(uint Id, uint length){
         require(true == Library.IdCorrect(Id, length), "EC1");
-        _;
-    }
-
-    modifier areFundsEnough(uint minPrice){
-        require(msg.value >= minPrice, "EC2");
         _;
     }
     
@@ -40,26 +36,26 @@ contract CertificatesPoolManager{
     // Public Certificates Pool structure
     PublicCertificatesPool  _PublicCertificatesPool;
 
-    uint _PublicPriceWei;
-    uint _PrivatePoolPriceWei;
+    // Treasury
+    Treasury _Treasury;
+
     uint _nonce;
 
     address payable _chairperson;
     
-    constructor(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei) payable{
-        _chairperson = payable(msg.sender);
-        _PublicPriceWei = PublicPriceWei;
-        _PrivatePoolPriceWei = PrivatePriceWei;  
+    constructor(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei) payable{
+        _chairperson = payable(msg.sender); 
         _PublicCertificatesPool = new PublicCertificatesPool(owners, minOwners);
+        _Treasury = new Treasury(PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei, address(_PublicCertificatesPool));
         _nonce = 0;
     }
 
     // PRIVATE CERTIFICATE POOL /////////////////////////////////////////////////////////////
 
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external
-        areFundsEnough(_PrivatePoolPriceWei)
     payable
     {
+         _Treasury.payForNewPool{value:msg.value}();
         PrivateCertificatesPool certificatePool = new PrivateCertificatesPool(owners, minOwners);
         _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, certificatePool);
         _PrivateCertificatesPools.push(privateCertificatesPool);
@@ -82,9 +78,9 @@ contract CertificatesPoolManager{
     // PUBLIC CERTIFICATE POOL /////////////////////////////////////////////////////////////
     
     function sendProposal(address provider, string memory providerInfo) public 
-        areFundsEnough(_PublicPriceWei)
     payable 
     {
+        _Treasury.payForNewProposal{value:msg.value}();
        _PublicCertificatesPool.addProvider(provider, providerInfo, _nonce);
        _nonce += 1;
 

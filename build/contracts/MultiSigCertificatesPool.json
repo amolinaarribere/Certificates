@@ -505,7 +505,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\npragma experimental ABIEncoderV2;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\nimport \"./MultiSigContract.sol\";\r\nimport \"../Interfaces/IPool.sol\";\r\n\r\nabstract contract MultiSigCertificatesPool is IPool, MultiSigContract {\r\n    \r\n    // events logs\r\n    event _AddCertificateIdEvent(address, address);\r\n    event _RemoveCertificateIdEvent(address, address);\r\n\r\n    uint256 constant TotalEntities = 2;\r\n\r\n    // Owners\r\n    uint256 constant _ownerIdCertificates = 0;\r\n    string constant _ownerLabel = \"Owner\";\r\n\r\n    // Providers\r\n    uint256 constant _providerId = 1;\r\n    string constant _providerLabel = \"Provider\";\r\n\r\n    string[] _Label = [_ownerLabel, _providerLabel];\r\n\r\n    // Holders\r\n    struct _CertificatePerHolder{\r\n        mapping(bytes32 => address) _CertificateFromProvider;\r\n        bytes32[] _ListOfCertificates;\r\n    }\r\n    \r\n    mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;\r\n\r\n    // modifiers\r\n    modifier isAProvider(){\r\n        require(true == isProvider(msg.sender), \"EC12\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProvider(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC13\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, \"EC14\");\r\n        _;\r\n    }\r\n    \r\n    modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){\r\n        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC15\");\r\n        _;\r\n    }\r\n    \r\n    // Constructor\r\n    constructor(address[] memory owners,  uint256 minOwners) \r\n        MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdCertificates)\r\n    payable\r\n    {}\r\n\r\n    // PROVIDERS CRUD Operations\r\n    function addProvider(address provider, string memory providerInfo, uint nonce) external override virtual;\r\n\r\n    function removeProvider(address provider, uint nonce) external override virtual;\r\n    \r\n    function retrieveProvider(address provider) external override view returns (string memory, bool){\r\n        return (retrieveEntity(provider, _providerId));\r\n    }\r\n\r\n    function retrieveAllProviders() external override view returns (address[] memory){\r\n        return(retrieveAllEntities(_providerId));\r\n    }\r\n    \r\n    function retrieveTotalProviders() external override view returns (uint){\r\n        return (retrieveTotalEntities(_providerId));\r\n    }\r\n\r\n    function isProvider(address provider) public view returns (bool){\r\n        return(isEntity(provider, _providerId));\r\n    }\r\n    \r\n    // Certificates CRUD Operations\r\n    function addCertificate(bytes32 CertificateHash, address holder, uint nonce) external override\r\n        isAProvider \r\n        NotEmpty(CertificateHash)\r\n        CertificateDoesNotExist(holder, CertificateHash)\r\n        isNonceOK(nonce)\r\n    {\r\n        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;\r\n        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);\r\n        Library.AddNonce(nonce, _Nonces);\r\n\r\n        emit _AddCertificateIdEvent(msg.sender, holder);\r\n    }\r\n    \r\n    function removeCertificate(bytes32 CertificateHash, address holder, uint nonce) external override\r\n        isAProvider \r\n        isTheProviderOrHimself(holder, CertificateHash) \r\n        isNonceOK(nonce)\r\n    {\r\n        address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(CertificateHash == listOfCert[i]){\r\n                _CertificatesPerHolder[holder]._ListOfCertificates = Library.ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);\r\n                break;\r\n            }\r\n        }\r\n        \r\n        delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];\r\n        Library.AddNonce(nonce, _Nonces);\r\n        \r\n        emit _RemoveCertificateIdEvent(provider, holder);\r\n\r\n    }\r\n    \r\n\r\n    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override\r\n    view returns (address)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);\r\n    }\r\n\r\n    function retrieveTotalCertificatesByHolder(address holder) public override \r\n    view returns (uint256)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);\r\n    }\r\n\r\n    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override\r\n    view returns (bytes32[] memory)\r\n    {\r\n        if(retrieveTotalCertificatesByHolder(holder) <= skipFirst){\r\n            return (new bytes32[](0));\r\n        }\r\n\r\n        uint maxSize = max;\r\n        if(retrieveTotalCertificatesByHolder(holder) - skipFirst < max){\r\n            maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst;\r\n        }\r\n        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](maxSize);\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        uint count = 0;\r\n        uint skipped = 0;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(count >= max) break;\r\n            if(skipFirst > skipped){\r\n                    skipped += 1;\r\n            }\r\n            else{\r\n                ListOfCertificatesByHolder[count] = listOfCert[i];\r\n                count += 1;\r\n            }             \r\n        }\r\n\r\n        return (ListOfCertificatesByHolder);\r\n    }\r\n\r\n    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory, string[] memory){\r\n        return(Library.retrievePendingEntities(_Entities[_providerId],addedORremove));\r\n    }\r\n\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Abstract\\MultiSigCertificatesPool.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
     "exportedSymbols": {
@@ -516,7 +516,7 @@
         1307
       ],
       "Library": [
-        2289
+        2252
       ],
       "MultiSigCertificatesPool": [
         554
@@ -3589,7 +3589,7 @@
                         "referencedDeclaration": 587,
                         "src": "3351:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1423_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1386_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       }
@@ -3601,7 +3601,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1423_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1386_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       ],
@@ -3610,10 +3610,10 @@
                         "name": "Library",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2289,
+                        "referencedDeclaration": 2252,
                         "src": "3327:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Library_$2289_$",
+                          "typeIdentifier": "t_type$_t_contract$_Library_$2252_$",
                           "typeString": "type(library Library)"
                         }
                       },
@@ -3624,10 +3624,10 @@
                       "lValueRequested": false,
                       "memberName": "AddNonce",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1905,
+                      "referencedDeclaration": 1868,
                       "src": "3327:16:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1423_storage_ptr_$returns$__$",
+                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1386_storage_ptr_$returns$__$",
                         "typeString": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                       }
                     },
@@ -4415,10 +4415,10 @@
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 2289,
+                                      "referencedDeclaration": 2252,
                                       "src": "4026:7:0",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$2289_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$2252_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
@@ -4429,7 +4429,7 @@
                                     "lValueRequested": false,
                                     "memberName": "ArrayRemoveResize",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 1719,
+                                    "referencedDeclaration": 1682,
                                     "src": "4026:25:0",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_array$_t_bytes32_$dyn_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -4735,7 +4735,7 @@
                         "referencedDeclaration": 587,
                         "src": "4291:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1423_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1386_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       }
@@ -4747,7 +4747,7 @@
                           "typeString": "uint256"
                         },
                         {
-                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1423_storage",
+                          "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1386_storage",
                           "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                         }
                       ],
@@ -4756,10 +4756,10 @@
                         "name": "Library",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2289,
+                        "referencedDeclaration": 2252,
                         "src": "4267:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Library_$2289_$",
+                          "typeIdentifier": "t_type$_t_contract$_Library_$2252_$",
                           "typeString": "type(library Library)"
                         }
                       },
@@ -4770,10 +4770,10 @@
                       "lValueRequested": false,
                       "memberName": "AddNonce",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1905,
+                      "referencedDeclaration": 1868,
                       "src": "4267:16:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1423_storage_ptr_$returns$__$",
+                        "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_struct$__NoncesPerAddressStruct_$1386_storage_ptr_$returns$__$",
                         "typeString": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                       }
                     },
@@ -6920,7 +6920,7 @@
                               "referencedDeclaration": 585,
                               "src": "6083:9:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_array$_t_struct$__entityStruct_$1412_storage_$dyn_storage",
+                                "typeIdentifier": "t_array$_t_struct$__entityStruct_$1375_storage_$dyn_storage",
                                 "typeString": "struct Library._entityStruct storage ref[] storage ref"
                               }
                             },
@@ -6944,7 +6944,7 @@
                             "nodeType": "IndexAccess",
                             "src": "6083:22:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$__entityStruct_$1412_storage",
+                              "typeIdentifier": "t_struct$__entityStruct_$1375_storage",
                               "typeString": "struct Library._entityStruct storage ref"
                             }
                           },
@@ -6964,7 +6964,7 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_struct$__entityStruct_$1412_storage",
+                              "typeIdentifier": "t_struct$__entityStruct_$1375_storage",
                               "typeString": "struct Library._entityStruct storage ref"
                             },
                             {
@@ -6977,10 +6977,10 @@
                             "name": "Library",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 2289,
+                            "referencedDeclaration": 2252,
                             "src": "6051:7:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_Library_$2289_$",
+                              "typeIdentifier": "t_type$_t_contract$_Library_$2252_$",
                               "typeString": "type(library Library)"
                             }
                           },
@@ -6991,10 +6991,10 @@
                           "lValueRequested": false,
                           "memberName": "retrievePendingEntities",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 2277,
+                          "referencedDeclaration": 2240,
                           "src": "6051:31:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_function_internal_view$_t_struct$__entityStruct_$1412_storage_ptr_$_t_bool_$returns$_t_array$_t_address_$dyn_memory_ptr_$_t_array$_t_string_memory_ptr_$dyn_memory_ptr_$",
+                            "typeIdentifier": "t_function_internal_view$_t_struct$__entityStruct_$1375_storage_ptr_$_t_bool_$returns$_t_array$_t_address_$dyn_memory_ptr_$_t_array$_t_string_memory_ptr_$dyn_memory_ptr_$",
                             "typeString": "function (struct Library._entityStruct storage pointer,bool) view returns (address[] memory,string memory[] memory)"
                           }
                         },
@@ -7182,7 +7182,7 @@
           1307
         ],
         "Library": [
-          2289
+          2252
         ],
         "MultiSigCertificatesPool": [
           554
@@ -10749,7 +10749,7 @@
                                   "typeString": "uint256"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1423_storage",
+                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1386_storage",
                                   "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                                 }
                               ],
@@ -10758,7 +10758,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "AddNonce",
-                              "referencedDeclaration": 1905,
+                              "referencedDeclaration": 1868,
                               "type": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                             },
                             "children": [
@@ -10767,7 +10767,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2289,
+                                  "referencedDeclaration": 2252,
                                   "type": "type(library Library)",
                                   "value": "Library"
                                 },
@@ -11698,7 +11698,7 @@
                                                   "isPure": false,
                                                   "lValueRequested": false,
                                                   "member_name": "ArrayRemoveResize",
-                                                  "referencedDeclaration": 1719,
+                                                  "referencedDeclaration": 1682,
                                                   "type": "function (uint256,bytes32[] memory) pure returns (bytes32[] memory)"
                                                 },
                                                 "children": [
@@ -11707,7 +11707,7 @@
                                                       "overloadedDeclarations": [
                                                         null
                                                       ],
-                                                      "referencedDeclaration": 2289,
+                                                      "referencedDeclaration": 2252,
                                                       "type": "type(library Library)",
                                                       "value": "Library"
                                                     },
@@ -11960,7 +11960,7 @@
                                   "typeString": "uint256"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1423_storage",
+                                  "typeIdentifier": "t_struct$__NoncesPerAddressStruct_$1386_storage",
                                   "typeString": "struct Library._NoncesPerAddressStruct storage ref"
                                 }
                               ],
@@ -11969,7 +11969,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "AddNonce",
-                              "referencedDeclaration": 1905,
+                              "referencedDeclaration": 1868,
                               "type": "function (uint256,struct Library._NoncesPerAddressStruct storage pointer)"
                             },
                             "children": [
@@ -11978,7 +11978,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2289,
+                                  "referencedDeclaration": 2252,
                                   "type": "type(library Library)",
                                   "value": "Library"
                                 },
@@ -14264,7 +14264,7 @@
                                 "attributes": {
                                   "argumentTypes": [
                                     {
-                                      "typeIdentifier": "t_struct$__entityStruct_$1412_storage",
+                                      "typeIdentifier": "t_struct$__entityStruct_$1375_storage",
                                       "typeString": "struct Library._entityStruct storage ref"
                                     },
                                     {
@@ -14277,7 +14277,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "retrievePendingEntities",
-                                  "referencedDeclaration": 2277,
+                                  "referencedDeclaration": 2240,
                                   "type": "function (struct Library._entityStruct storage pointer,bool) view returns (address[] memory,string memory[] memory)"
                                 },
                                 "children": [
@@ -14286,7 +14286,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2289,
+                                      "referencedDeclaration": 2252,
                                       "type": "type(library Library)",
                                       "value": "Library"
                                     },
@@ -14393,7 +14393,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-07-14T12:41:25.795Z",
+  "updatedAt": "2021-07-14T13:48:52.613Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
