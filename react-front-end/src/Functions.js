@@ -38,6 +38,17 @@ export var pendingPublicProvidersRemove = []
 export var pendingPrivateProvidersAdd = [] 
 export var pendingPrivateProvidersRemove = []
 
+async function RetrievePendings(callback){
+  let{0:addr,1:info} = await callback;
+  var output = [];
+
+  for (let i = 0; i < addr.length; i++) {
+    output[i] = [addr[i], info[i]]
+  }
+
+  return output;
+}
+
 export async function LoadBlockchain() {
   if(window.ethereum) {
     await window.ethereum.enable();
@@ -58,7 +69,7 @@ export async function LoadBlockchain() {
   publicProviders = []
 
   for (let i = 0; i < publicTotalProviders; i++) {
-    let publicProviderInfo = await publicPool.methods.retrieveProvider(publicProvidersAddresses[i]).call()
+    let {0:publicProviderInfo,1:isProvider} = await publicPool.methods.retrieveProvider(publicProvidersAddresses[i]).call()
     publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
   }
 
@@ -74,13 +85,11 @@ export async function LoadBlockchain() {
     privatePoolAddresses[i] = privatePoolAddress
   }
 
-  /*
-  pendingPublicOwnersAdd = await publicPool.methods.retrievePendingOwners(true).call()
-  pendingPublicOwnersRemove = await publicPool.methods.retrievePendingOwners(false).call()
-  pendingPublicProvidersAdd = await publicPool.methods.retrievePendingProviders(true).call() 
-  pendingPublicProvidersRemove = await publicPool.methods.retrievePendingProviders(false).call()*/
+  pendingPublicOwnersAdd = await RetrievePendings(publicPool.methods.retrievePendingOwners(true).call());
+  pendingPublicOwnersRemove = await RetrievePendings(publicPool.methods.retrievePendingOwners(false).call());
+  pendingPublicProvidersAdd = await RetrievePendings(publicPool.methods.retrievePendingProviders(true).call());
+  pendingPublicProvidersRemove = await RetrievePendings(publicPool.methods.retrievePendingProviders(false).call());
   
-
 }
 
 export function SwitchContext(){
@@ -211,7 +220,7 @@ async function CallBackFrame(callback){
       privateProviders = []
     
       for (let i = 0; i < privateTotalProviders; i++) {
-        let privateProviderInfo = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
+        let {0:privateProviderInfo,1:isProvider} = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
         privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
       }
     
@@ -219,23 +228,11 @@ async function CallBackFrame(callback){
       privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
       privateOwners = await privatePool.methods.retrieveAllOwners().call()
 
-      var t = await privatePool.methods.retrievePendingOwners(true).call();
-      /*window.alert(addr);
-      window.alert(info);
-      for (let i = 0; i < addr.length; i++) {
-        pendingPrivateOwnersAdd[i] = [addr[i], info[i]]
-      }*/
-      /*if(addr != "undefined" && addr != ""){
-        for (let i = 0; i < addr.length; i++) {
-          pendingPrivateOwnersAdd[i] = [addr[i], info[i]]
-        }
-      }
-      
+      pendingPrivateOwnersAdd = await RetrievePendings(privatePool.methods.retrievePendingOwners(true).call());
+      pendingPrivateOwnersRemove = await RetrievePendings(privatePool.methods.retrievePendingOwners(false).call());
+      pendingPrivateProvidersAdd = await RetrievePendings(privatePool.methods.retrievePendingProviders(true).call());
+      pendingPrivateProvidersRemove = await RetrievePendings(privatePool.methods.retrievePendingProviders(false).call());
 
-      pendingPrivateOwnersAdd = await privatePool.methods.retrievePendingOwners(true).call() 
-      pendingPrivateOwnersRemove = await privatePool.methods.retrievePendingOwners(false).call() 
-      pendingPrivateProvidersAdd = await privatePool.methods.retrievePendingProviders(true).call()  
-      pendingPrivateProvidersRemove = await privatePool.methods.retrievePendingProviders(false).call()  */
     }
     catch(e) { window.alert(e); }
   }

@@ -263,7 +263,7 @@ class ListProvidersComponent extends React.Component{
           <p><b>Private Providers :</b>
             <ol>
               {privateProviders.map(privateProvider => (
-              <li key={privateProvider[0]}>{privateProvider[0]} : {privateProvider[1]}</li>
+              <li key={privateProvider[0]}>{privateProvider[0]}: {privateProvider[1]}</li>
               ))}
             </ol>
           </p>
@@ -277,7 +277,7 @@ class ListProvidersComponent extends React.Component{
           <p><b>Public Providers :</b>
             <ol>
               {publicProviders.map(publicProvider => (
-              <li key={publicProvider[0]}>{publicProvider[0]} : {publicProvider[1]}</li>
+              <li key={publicProvider[0]}>{publicProvider[0]}: {publicProvider[1]}</li>
               ))}
             </ol>
           </p>
@@ -295,7 +295,7 @@ class ListPendingProvidersComponent extends React.Component{
           <p><b>Pending Private Provider to be Added :</b>
             <ol>
               {pendingPrivateProvidersAdd.map(pendingPrivateProviderAdd => (
-              <li key={pendingPrivateProviderAdd}>{pendingPrivateProviderAdd}</li>
+              <li key={pendingPrivateProviderAdd[0]}>{pendingPrivateProviderAdd[0]}: {pendingPrivateProviderAdd[1]}</li>
               ))}
             </ol>
           </p>
@@ -303,7 +303,7 @@ class ListPendingProvidersComponent extends React.Component{
           <p><b>Pending Private Provider to be Removed :</b>
             <ol>
               {pendingPrivateProvidersRemove.map(pendingPrivateProviderRemove => (
-              <li key={pendingPrivateProviderRemove}>{pendingPrivateProviderRemove}</li>
+              <li key={pendingPrivateProviderRemove[0]}>{pendingPrivateProviderRemove[0]}: {pendingPrivateProviderRemove[1]}</li>
               ))}
             </ol>
           </p>
@@ -316,7 +316,7 @@ class ListPendingProvidersComponent extends React.Component{
           <p><b>Pending Public Provider to be Added :</b>
             <ol>
               {pendingPublicProvidersAdd.map(pendingPublicProviderAdd => (
-              <li key={pendingPublicProviderAdd}>{pendingPublicProviderAdd}</li>
+              <li key={pendingPublicProviderAdd[0]}>{pendingPublicProviderAdd[0]}: {pendingPublicProviderAdd[1]}</li>
               ))}
             </ol>
           </p>
@@ -324,7 +324,7 @@ class ListPendingProvidersComponent extends React.Component{
           <p><b>Pending Public Provider to be Removed :</b>
             <ol>
               {pendingPublicProvidersRemove.map(pendingPublicProviderRemove => (
-              <li key={pendingPublicProviderRemove}>{pendingPublicProviderRemove}</li>
+              <li key={pendingPublicProviderRemove[0]}>{pendingPublicProviderRemove[0]}: {pendingPublicProviderRemove[1]}</li>
               ))}
             </ol>
           </p>
@@ -455,7 +455,7 @@ class ListPendingOwnersComponent extends React.Component{
           <p><b>Pending Private Owners to be Removed :</b>
             <ol>
               {pendingPrivateOwnersRemove.map(pendingPrivateOwnerRemove => (
-              <li key={pendingPrivateOwnerRemove}>{pendingPrivateOwnerRemove}</li>
+              <li key={pendingPrivateOwnerRemove[0]}>{pendingPrivateOwnerRemove[0]}</li>
               ))}
             </ol>
           </p>
