@@ -38,7 +38,7 @@ contract("Testing Private Pool",function(accounts){
         let response = await certPoolManager.retrievePrivateCertificatesPool(0, {from: user_1});
         const {0: creator, 1: privateCertPoolAddress} = response;
         privateCertPool = new web3.eth.Contract(PrivateCertificatesAbi, privateCertPoolAddress);  
-        nonce = 0;    
+        nonce = 0; 
     });
 
     // ****** TESTING Adding Owners ***************************************************************** //

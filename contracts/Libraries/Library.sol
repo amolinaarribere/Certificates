@@ -18,7 +18,7 @@ library Library{
     //Structures
     struct _entityIdentity{
         bool _activated;
-        bytes _Info;
+        string _Info;
         address[] _AddValidated;
         address[] _RemoveValidated;
     }
@@ -31,7 +31,7 @@ library Library{
     }
 
     struct _NoncesPerAddressStruct{
-        mapping(address => uint) __highestNoncePerAddress;
+        mapping(address => uint) _highestNoncePerAddress;
         mapping(address => mapping(uint => bool)) _noncesPerAddress;
     }
     
@@ -137,11 +137,11 @@ library Library{
 
     function AddNonce(uint nonce, _NoncesPerAddressStruct storage Nonces) public {
         Nonces._noncesPerAddress[msg.sender][nonce] = true;
-        if(Nonces.__highestNoncePerAddress[msg.sender] < nonce) Nonces.__highestNoncePerAddress[msg.sender] = nonce;
+        if(Nonces._highestNoncePerAddress[msg.sender] < nonce) Nonces._highestNoncePerAddress[msg.sender] = nonce;
     }
 
     // functions for entities
-    function addEntity(address entity, bytes memory entityInfo, _entityStruct storage Entities, uint256 minSignatures, _NoncesPerAddressStruct storage Nonces, uint nonce) internal 
+    function addEntity(address entity, string memory entityInfo, _entityStruct storage Entities, uint256 minSignatures, _NoncesPerAddressStruct storage Nonces, uint nonce) internal 
         isEntityActivated(false, Entities._entities[entity]) 
         HasNotAlreadyVoted(Actions.Add, Entities._entities[entity])
         isNonceOK(nonce, Nonces)
@@ -183,7 +183,7 @@ library Library{
 
     function retrieveEntity(address entity, _entityStruct storage Entities) internal 
         isEntityActivated(true, Entities._entities[entity])
-    view returns (bytes memory) 
+    view returns (string memory) 
     {
         return Entities._entities[entity]._Info;
     }
@@ -201,10 +201,20 @@ library Library{
     }
 
     function retrievePendingEntities(_entityStruct storage Entities, bool addOrRemove) internal 
-    view returns (address[] memory) 
+    view returns (address[] memory, string[] memory) 
     {
-        if(addOrRemove) return Entities._pendingEntitiesAdd;
-        else return Entities._pendingEntitiesRemove;
+        address[] memory _Entities;
+
+        if(addOrRemove) _Entities = Entities._pendingEntitiesAdd;
+        else _Entities = Entities._pendingEntitiesRemove;
+
+        string[] memory _Entities_Info = new string[](_Entities.length);
+
+        for(uint i=0; i < _Entities.length; i++){
+            _Entities_Info[i] = retrieveEntity(_Entities[i], Entities);
+        }
+        
+        return(_Entities, _Entities_Info);
     }
 
     function isEntity(_entityIdentity memory Entity) internal pure returns (bool){

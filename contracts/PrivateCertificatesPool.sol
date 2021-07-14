@@ -16,7 +16,7 @@ pragma experimental ABIEncoderV2;
     }
 
     function addProvider(address provider, string memory providerInfo, uint nonce) external override{
-        addEntity(provider, bytes(providerInfo), _providerId, nonce);
+        addEntity(provider, providerInfo, _providerId, nonce);
     }
 
     function removeProvider(address provider, uint nonce) external override{

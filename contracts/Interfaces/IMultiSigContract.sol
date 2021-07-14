@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -17,5 +18,5 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrieveTotalOwners() external view returns (uint);
     function retrieveMinOwners() external view returns (uint);
     function retrieveHighestNonceForAddress(address addr) external view returns (uint);
-    function retrievePendingOwners(bool addedORremove) external view returns (address[] memory);
+    function retrievePendingOwners(bool addedORremove) external view returns (address[] memory, string[] memory);
 }

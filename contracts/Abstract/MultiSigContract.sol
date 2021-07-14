@@ -85,7 +85,7 @@ abstract contract MultiSigContract is IMultiSigContract{
         }
     }
 
-    function addEntity(address entity, bytes memory entityInfo, uint listId, uint nonce) internal 
+    function addEntity(address entity, string memory entityInfo, uint listId, uint nonce) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwner 
     {
@@ -110,7 +110,7 @@ abstract contract MultiSigContract is IMultiSigContract{
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
-    view returns (bytes memory) 
+    view returns (string memory) 
     {
         return Library.retrieveEntity(entity, _Entities[listId]);
     }
@@ -137,7 +137,7 @@ abstract contract MultiSigContract is IMultiSigContract{
 
     // OWNERS CRUD Operations
     function addOwner(address owner, string memory ownerInfo, uint nonce) external override {
-        addEntity(owner, bytes(ownerInfo), _ownerId, nonce);
+        addEntity(owner, ownerInfo, _ownerId, nonce);
     }
     
     function removeOwner(address owner, uint nonce) external override
@@ -167,10 +167,10 @@ abstract contract MultiSigContract is IMultiSigContract{
     }
 
     function retrieveHighestNonceForAddress(address addr) external override view returns (uint){
-        return(_Nonces.__highestNoncePerAddress[addr]);
+        return(_Nonces._highestNoncePerAddress[addr]);
     }
 
-    function retrievePendingOwners(bool addedORremove) external override view returns (address[] memory){
+    function retrievePendingOwners(bool addedORremove) external override view returns (address[] memory, string[] memory){
         return(Library.retrievePendingEntities(_Entities[_ownerId],addedORremove));
     }
 

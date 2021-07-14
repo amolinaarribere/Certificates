@@ -74,11 +74,11 @@ export async function LoadBlockchain() {
     privatePoolAddresses[i] = privatePoolAddress
   }
 
+  /*
   pendingPublicOwnersAdd = await publicPool.methods.retrievePendingOwners(true).call()
   pendingPublicOwnersRemove = await publicPool.methods.retrievePendingOwners(false).call()
-  
   pendingPublicProvidersAdd = await publicPool.methods.retrievePendingProviders(true).call() 
-  pendingPublicProvidersRemove = await publicPool.methods.retrievePendingProviders(false).call()
+  pendingPublicProvidersRemove = await publicPool.methods.retrievePendingProviders(false).call()*/
   
 
 }
@@ -219,10 +219,20 @@ async function CallBackFrame(callback){
       privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
       privateOwners = await privatePool.methods.retrieveAllOwners().call()
 
+      let {0:addr, 1:info} = await privatePool.methods.retrievePendingOwners(true).call();
+      /*window.alert(addr);
+      window.alert(info);
+      if(addr != "undefined" && addr != ""){
+        for (let i = 0; i < addr.length; i++) {
+          pendingPrivateOwnersAdd[i] = [addr[i], info[i]]
+        }
+      }
+      
+
       pendingPrivateOwnersAdd = await privatePool.methods.retrievePendingOwners(true).call() 
       pendingPrivateOwnersRemove = await privatePool.methods.retrievePendingOwners(false).call() 
       pendingPrivateProvidersAdd = await privatePool.methods.retrievePendingProviders(true).call()  
-      pendingPrivateProvidersRemove = await privatePool.methods.retrievePendingProviders(false).call()  
+      pendingPrivateProvidersRemove = await privatePool.methods.retrievePendingProviders(false).call()  */
     }
     catch(e) { window.alert(e); }
   }

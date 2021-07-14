@@ -63,7 +63,7 @@ pragma experimental ABIEncoderV2;
 
     // POOL CRUD Operations
     function addPool(address pool, string memory poolInfo, uint nonce) external override{
-        addEntity(pool, bytes(poolInfo), _poolId, nonce);
+        addEntity(pool, poolInfo, _poolId, nonce);
     }
 
     function removePool(address pool, uint nonce) external override{

@@ -164,7 +164,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         return (ListOfCertificatesByHolder);
     }
 
-    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory){
+    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory, string[] memory){
         return(Library.retrievePendingEntities(_Entities[_providerId],addedORremove));
     }
 

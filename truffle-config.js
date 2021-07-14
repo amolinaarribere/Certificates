@@ -45,18 +45,18 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
-    /* development: {
+     development: {
       host: "localhost",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
-      network_id: "*",       // Any network (default: none)
-      gas: 6721975           // gas Limit
-     },*/
-     ganache: {
+      network_id: "*" ,      // Any network (default: none)
+      gas: 6721975            // gas Limit
+     }
+    /*ganache: {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "5777",       // Any network (default: none)
       gas: 6721975
-     },
+     }*/
     // Another network with more advanced options...
     /* rinkeby: {
       port: 8777,             // Custom port
@@ -99,7 +99,7 @@ module.exports = {
        settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: true,
-          runs: 200
+          runs: 1
         },
       //  evmVersion: "byzantium"
        }

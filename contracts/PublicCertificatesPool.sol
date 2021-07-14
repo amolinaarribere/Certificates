@@ -9,8 +9,9 @@ pragma experimental ABIEncoderV2;
  */
 
  import "./Abstract/MultiSigCertificatesPool.sol";
+ import "./Interfaces/IPublicPool.sol";
 
- contract PublicCertificatesPool is MultiSigCertificatesPool {
+ contract PublicCertificatesPool is MultiSigCertificatesPool, IPublicPool {
 
      address _creator;
      mapping(address => bool) _submitedByCreator;
@@ -33,13 +34,14 @@ pragma experimental ABIEncoderV2;
         isNonceOK(nonce)
     override
     {
-        _Entities[_providerId]._entities[provider]._Info = bytes(providerInfo);
+        _Entities[_providerId]._entities[provider]._Info = providerInfo;
         _submitedByCreator[provider] = true;
         Library.AddNonce(nonce, _Nonces);
     }
 
     function validateProvider(address provider, uint nonce) external 
         hasBeenSubmitted(true, provider)
+    override
     {
         addEntity(provider, _Entities[_providerId]._entities[provider]._Info, _providerId, nonce);
     }

@@ -1,4 +1,4 @@
-export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x7AFd9670CDc9F127dB8cA0874fD8597Ea82E011f'
+export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x497B20CAF28b439F29bAEa378Ce7ca14e7427169'
 export const CERTIFICATE_POOL_MANAGER_ABI = [
   {
     "inputs": [
@@ -530,6 +530,11 @@ export const PUBLIC_ABI = [
         "internalType": "address[]",
         "name": "",
         "type": "address[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "",
+        "type": "bytes[]"
       }
     ],
     "stateMutability": "view",
@@ -549,6 +554,11 @@ export const PUBLIC_ABI = [
         "internalType": "address[]",
         "name": "",
         "type": "address[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "",
+        "type": "bytes[]"
       }
     ],
     "stateMutability": "view",
@@ -1041,6 +1051,11 @@ export const PRIVATE_ABI = [
         "internalType": "address[]",
         "name": "",
         "type": "address[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "",
+        "type": "bytes[]"
       }
     ],
     "stateMutability": "view",
@@ -1060,6 +1075,11 @@ export const PRIVATE_ABI = [
         "internalType": "address[]",
         "name": "",
         "type": "address[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "",
+        "type": "bytes[]"
       }
     ],
     "stateMutability": "view",

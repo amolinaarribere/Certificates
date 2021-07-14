@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
-
 
  interface IPool  {
     function addCertificate(bytes32 CertificateHash, address holder, uint nonce) external;
@@ -20,6 +20,6 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrieveProvider(address provider) external view returns (string memory);
     function retrieveAllProviders() external view returns (address[] memory);
     function retrieveTotalProviders() external view returns (uint);
-    function retrievePendingProviders(bool addedORremove) external view returns (address[] memory);
+    function retrievePendingProviders(bool addedORremove) external view returns (address[] memory, string[] memory);
     
 }

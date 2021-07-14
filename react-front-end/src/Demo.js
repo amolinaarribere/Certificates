@@ -447,7 +447,7 @@ class ListPendingOwnersComponent extends React.Component{
           <p><b>Pending Private Owners to be Added :</b>
             <ol>
               {pendingPrivateOwnersAdd.map(pendingPrivateOwnerAdd => (
-              <li key={pendingPrivateOwnerAdd}>{pendingPrivateOwnerAdd}</li>
+              <li key={pendingPrivateOwnerAdd[0]}>{pendingPrivateOwnerAdd[0]}</li>
               ))}
             </ol>
           </p>
