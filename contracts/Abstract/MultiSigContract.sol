@@ -110,7 +110,7 @@ abstract contract MultiSigContract is IMultiSigContract{
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
-    view returns (string memory) 
+    view returns (string memory, bool) 
     {
         return Library.retrieveEntity(entity, _Entities[listId]);
     }
@@ -146,8 +146,8 @@ abstract contract MultiSigContract is IMultiSigContract{
         removeEntity(owner, _ownerId, nonce);
     }
     
-    function retrieveOwner(address owner) external override view returns (string memory){
-        return string(retrieveEntity(owner, _ownerId));
+    function retrieveOwner(address owner) external override view returns (string memory, bool){
+        return (retrieveEntity(owner, _ownerId));
     }
 
     function retrieveAllOwners() external override view returns (address[] memory){

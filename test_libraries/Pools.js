@@ -102,11 +102,12 @@ async function AddOwnerCorrect(CertPool, Owners, extra_owner, user_1, nonce){
     // act
     await AddingOwners(CertPool, Owners, extra_owner, nonce);
     // assert
-    let Owner_Extra = await CertPool.methods.retrieveOwner(extra_owner).call({from: user_1}, function(error, result){});
+    let {0:Owner_Extra,1:isOwner} = await CertPool.methods.retrieveOwner(extra_owner).call({from: user_1}, function(error, result){});
     let Total = await CertPool.methods.retrieveTotalOwners().call({from: user_1}, function(error, result){});
     let AllOwners = await CertPool.methods.retrieveAllOwners().call({from: user_1}, function(error, result){});
     let MinOwners = await CertPool.methods.retrieveMinOwners().call({from: user_1}, function(error, result){});
     expect(Owner_Extra).to.equal(extra_owner_Info);
+    expect(isOwner).to.be.true;
     expect(Total).to.equal("4");
     expect(AllOwners[0]).to.equal(Owners[0]);
     expect(AllOwners[1]).to.equal(Owners[1]);
@@ -267,12 +268,14 @@ async function ValidateProviderCorrect(CertPool, Owners, provider_1, provider_2,
     // act
     await ValidatingProviders(CertPool, Owners, provider_1, provider_2, nonce);
     // assert
-    let Provider_1 = await CertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
-    let Provider_2 = await CertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
+    let {0:Provider_1,1:isProvider_1} = await CertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+    let {0:Provider_2,1:isProvider_2} = await CertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
     let Total = await CertPool.methods.retrieveTotalProviders().call({from: user_1}, function(error, result){});
     let AllProviders = await CertPool.methods.retrieveAllProviders().call({from: user_1}, function(error, result){});
     expect(Provider_1).to.equal(provider_1_Info);
+    expect(isProvider_1).to.be.true;
     expect(Provider_2).to.equal(provider_2_Info);
+    expect(isProvider_2).to.be.true;
     expect(Total).to.equal("2");
     expect(AllProviders[0]).to.equal(provider_1);
     expect(AllProviders[1]).to.equal(provider_2);
@@ -282,12 +285,14 @@ async function AddProviderCorrect(CertPool, Owners, provider_1, provider_2, user
     // act
     await AddingProviders(CertPool, Owners, provider_1, provider_2, nonce);
     // assert
-    let Provider_1 = await CertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
-    let Provider_2 = await CertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
+    let {0:Provider_1,1:isProvider_1} = await CertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
+    let {0:Provider_2,1:isProvider_2} = await CertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
     let Total = await CertPool.methods.retrieveTotalProviders().call({from: user_1}, function(error, result){});
     let AllProviders = await CertPool.methods.retrieveAllProviders().call({from: user_1}, function(error, result){});
     expect(Provider_1).to.equal(provider_1_Info);
+    expect(isProvider_1).to.be.true;
     expect(Provider_2).to.equal(provider_2_Info);
+    expect(isProvider_2).to.be.true;
     expect(Total).to.equal("2");
     expect(AllProviders[0]).to.equal(provider_1);
     expect(AllProviders[1]).to.equal(provider_2);

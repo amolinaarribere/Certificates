@@ -182,10 +182,9 @@ library Library{
     }
 
     function retrieveEntity(address entity, _entityStruct storage Entities) internal 
-        isEntityActivated(true, Entities._entities[entity])
-    view returns (string memory) 
+    view returns (string memory, bool) 
     {
-        return Entities._entities[entity]._Info;
+        return (Entities._entities[entity]._Info, isEntity(Entities._entities[entity]));
     }
 
     function retrieveAllEntities(_entityStruct storage Entities) internal 
@@ -211,7 +210,7 @@ library Library{
         string[] memory _Entities_Info = new string[](_Entities.length);
 
         for(uint i=0; i < _Entities.length; i++){
-            _Entities_Info[i] = retrieveEntity(_Entities[i], Entities);
+            (_Entities_Info[i],) = retrieveEntity(_Entities[i], Entities);
         }
         
         return(_Entities, _Entities_Info);

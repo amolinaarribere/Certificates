@@ -13,7 +13,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
     function addPool(address pool, string memory poolInfo, uint nonce) external;
     function removePool(address pool, uint nonce) external;
-    function retrievePool(address pool) external view returns (string memory);
+    function retrievePool(address pool) external view returns (string memory, bool);
     function retrieveAllPools() external view returns (address[] memory);
     function retrieveTotalPools() external view returns (uint);
     

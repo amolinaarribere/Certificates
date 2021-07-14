@@ -13,7 +13,7 @@ pragma experimental ABIEncoderV2;
     function addOwner(address owner, string memory ownerInfo, uint nonce) external;
     function removeOwner(address owner, uint nonce) external;
 
-    function retrieveOwner(address owner) external view returns (string memory);
+    function retrieveOwner(address owner) external view returns (string memory, bool);
     function retrieveAllOwners() external view returns (address[] memory);
     function retrieveTotalOwners() external view returns (uint);
     function retrieveMinOwners() external view returns (uint);

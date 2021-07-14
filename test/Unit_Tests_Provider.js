@@ -109,10 +109,11 @@ contract("Testing Provider",function(accounts){
         // act
         await AddingPool(nonce);
         // assert
-        let _PoolInfo = await provider.retrievePool(publicCertPoolAddress, {from: user_1});
+        let {0:_PoolInfo,1:_isPool} = await provider.retrievePool(publicCertPoolAddress, {from: user_1});
         let _Total = await provider.retrieveTotalPools({from: user_1});
         let _Pools = await provider.retrieveAllPools({from: user_1});
         expect(_PoolInfo).to.equal(pool_Info);
+        expect(_isPool).to.be.true;
         expect(_Total.toNumber()).to.equal(1);
         expect(_Pools[0]).to.equal(publicCertPoolAddress);
     });

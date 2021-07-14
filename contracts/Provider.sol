@@ -70,12 +70,12 @@ pragma experimental ABIEncoderV2;
        removeEntity(pool, _poolId, nonce); 
     }
     
-    function retrievePool(address pool) external override view returns (string memory){
+    function retrievePool(address pool) external override view returns (string memory, bool){
         return InternalRetrievePool(pool);
     }
     
-    function InternalRetrievePool(address pool) internal view returns (string memory){
-        return string(retrieveEntity(pool, _poolId));
+    function InternalRetrievePool(address pool) internal view returns (string memory, bool){
+        return (retrieveEntity(pool, _poolId));
     }
 
     function retrieveAllPools() external override view returns (address[] memory){
@@ -122,8 +122,9 @@ pragma experimental ABIEncoderV2;
 
         if(Library.CheckValidations(validations, _minOwners)){
             MultiSigCertificatesPool poolToSend;
+            (string memory p ,) = InternalRetrievePool(pool);
             
-            if(keccak256(abi.encodePacked("Private")) == keccak256(abi.encodePacked((InternalRetrievePool(pool))))){
+            if(keccak256(abi.encodePacked("Private")) == keccak256(abi.encodePacked((p)))){
                 poolToSend = PrivateCertificatesPool(pool);
             }
             else {
