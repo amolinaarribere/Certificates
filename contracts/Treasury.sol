@@ -9,7 +9,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./Interfaces/ITreasury.sol";
 import "./PublicCertificatesPool.sol";
-
+import "./Libraries/Library.sol";
 
 
 contract Treasury is ITreasury{
@@ -21,7 +21,7 @@ contract Treasury is ITreasury{
     }
 
     modifier isBalanceEnough(uint amount){
-        require(_balance[msg.sender] >= amount, "does not have enough money");
+        require(checkBalance(msg.sender) >= amount, "does not have enough money");
         _;
     }
 
@@ -37,7 +37,12 @@ contract Treasury is ITreasury{
     uint _OwnerRefundPriceWei;
 
     // data
-    mapping(address => uint) _balance;
+    struct _BalanceStruct{
+        mapping(uint => uint) _balance;
+        uint[] _factors;
+    }
+    
+    mapping(address => _BalanceStruct) _balances;
 
     constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) {
         _PublicPriceWei = PublicPriceWei;
@@ -49,33 +54,84 @@ contract Treasury is ITreasury{
     function payForNewProposal() external 
         areFundsEnough(_PublicPriceWei)
     override payable
-    {}
+    {
+        // Assign dividends propotionaly (substracting the owners cut)
+    }
 
     function payForNewPool() external 
         areFundsEnough(_PrivatePriceWei)
     override payable
-    {}
+    {
+        // Assign dividends propotionaly (substracting the owners cut)
+    }
 
-    function getRefund(address addr) external 
+    function getRefund(address addr, uint numberOfOwners) external 
         isFromPublicPool()
     override
     {
-        uint numberOfOwners = _PublicCertificatesPool.retrieveMinOwners();
-        uint amountToRefund = _OwnerRefundPriceWei / numberOfOwners;
-        _balance[addr] += amountToRefund;
+        addBalance( addr, _OwnerRefundPriceWei, numberOfOwners);
     }
 
     function withdraw(uint amount) external 
         isBalanceEnough(amount)
     override
     {
-        _balance[msg.sender] -= amount;
+        uint[] memory f = returnFactors(msg.sender);
+        uint total = 0;
+        uint i = 0;
+
+        while(total < amount){
+            uint amountForFactor = returnBalanceForFactor(msg.sender, f[i]) / f[i];
+            if(amountForFactor > (amount - total)) amountForFactor = amount - total;
+            total += amountForFactor;
+            substractBalance(msg.sender, amountForFactor, f[i]);
+            i++;
+        }
+
         msg.sender.transfer(amount);
     }
 
-    function checkBalance(address addr) external override view returns(uint)
+    function retrieveBalance(address addr) external override view returns(uint)
     {
-        return _balance[addr];
+        return checkBalance(addr);
+    }
+
+    function checkBalance(address addr) internal view returns(uint){
+        uint[] memory f = returnFactors(addr);
+        uint total = 0;
+
+        for(uint i=0; i < f.length; i++){
+            total += returnBalanceForFactor(addr, f[i]) / f[i];
+        }
+
+        return total;
+    }
+
+    function returnFactors(address addr) public view returns(uint[] memory){
+        return _balances[addr]._factors;
+    }
+
+    function returnBalanceForFactor(address addr, uint factor) public view returns(uint){
+        return _balances[addr]._balance[factor];
+    }
+
+    function addBalance(address addr, uint amount, uint factor) private{
+        if(0 == _balances[addr]._balance[factor]){
+             _balances[addr]._factors.push(factor);
+        }
+
+       _balances[addr]._balance[factor] += amount;
+    }
+
+    function substractBalance(address addr, uint amount, uint factor) private{
+        require(_balances[addr]._balance[factor] >= amount, "Not enough balance for this factor");
+
+        _balances[addr]._balance[factor] -= amount;
+
+        if(0 == _balances[addr]._balance[factor]){
+            _balances[addr]._factors = Library.UintArrayRemoveResize(Library.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
+        }
+        
     }
 
 }

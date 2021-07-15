@@ -47,6 +47,7 @@ contract CertificatesPoolManager{
         _chairperson = payable(msg.sender); 
         _PublicCertificatesPool = new PublicCertificatesPool(owners, minOwners);
         _Treasury = new Treasury(PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei, address(_PublicCertificatesPool));
+        _PublicCertificatesPool.addTreasury(address(_Treasury));
         _nonce = 0;
     }
 
@@ -77,7 +78,7 @@ contract CertificatesPoolManager{
 
     // PUBLIC CERTIFICATE POOL /////////////////////////////////////////////////////////////
     
-    function sendProposal(address provider, string memory providerInfo) public 
+    function sendProposal(address provider, string memory providerInfo) external 
     payable 
     {
         _Treasury.payForNewProposal{value:msg.value}();
@@ -87,7 +88,7 @@ contract CertificatesPoolManager{
        emit _SendProposalId(provider);
     }
     
-    function retrieveConfiguration() public view returns (MultiSigCertificatesPool, address, uint) {
+    function retrieveConfiguration() external view returns (MultiSigCertificatesPool, address, uint) {
         return (_PublicCertificatesPool, _chairperson, address(this).balance);
     }
     

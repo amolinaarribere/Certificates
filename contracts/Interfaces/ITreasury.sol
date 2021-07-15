@@ -10,7 +10,7 @@ pragma solidity >=0.7.0 <0.9.0;
  interface ITreasury  {
     function payForNewProposal() external payable;
     function payForNewPool() external payable;
-    function getRefund(address addr) external;
+    function getRefund(address addr, uint numberOfOwners) external;
     function withdraw(uint amount) external;
-    function checkBalance(address addr) external view returns(uint);
+    function retrieveBalance(address addr) external view returns(uint);
 }

@@ -85,14 +85,36 @@ library Library{
     }
 
     function FindAddressPosition(address add, address[] memory list) internal pure returns (uint){
+        return FindPosition(bytes32(uint256(uint160(add))), AddressArrayToBytes(list));
+    }
+
+    function FindUintPosition(uint value, uint[] memory list) public pure returns (uint){
+        return FindPosition(bytes32(value), UintArrayToBytes(list));
+    }
+
+    function FindPosition(bytes32 data, bytes32[] memory list) internal pure returns (uint){
         for(uint i=0; i < list.length; i++){
-            if(add == list[i]) return i;
+            if(data == list[i]) return i;
         }
 
         return list.length + 1;
     }
 
-    function ArrayRemoveResize(uint index, bytes32[] memory array) internal 
+    function AddressArrayRemoveResize(uint index, address[] memory array) internal 
+        isIdCorrect(index, array.length)
+    pure returns(address[] memory) 
+    {
+        return BytesArrayToAddress(ArrayRemoveResize(index, AddressArrayToBytes(array)));
+    }
+
+    function UintArrayRemoveResize(uint index, uint[] memory array) public 
+        isIdCorrect(index, array.length)
+    pure returns(uint[] memory) 
+    {
+        return BytesArrayToUint(ArrayRemoveResize(index, UintArrayToBytes(array)));
+    }
+
+    function ArrayRemoveResize(uint index, bytes32[] memory array) public 
         isIdCorrect(index, array.length)
     pure returns(bytes32[] memory) 
     {
@@ -106,28 +128,44 @@ library Library{
         return newArray;
     }
 
-    function Bytes32ToAddress(bytes32 data) internal pure returns (address) {
-        return address(uint160(uint256(data)));
-    }
+    function UintArrayToBytes(uint[] memory array) internal pure returns(bytes32[] memory){
+        bytes32[] memory arrayInBytes = new bytes32[](array.length);
 
-    function AddressToBytes32(address addr) internal pure returns (bytes32) {
-        return bytes32(uint256(uint160(addr)));
-    }
-
-    function ArrayBytes32ToAddress(bytes32[] memory data) internal pure returns (address[] memory) {
-        address[] memory returnedAddr = new address[](data.length);
-        for(uint i=0; i < data.length; i++){
-            returnedAddr[i] = Bytes32ToAddress(data[i]);
+        for(uint i=0; i < arrayInBytes.length; i++){
+            arrayInBytes[i] = bytes32(array[i]);
         }
-        return returnedAddr;
+
+        return arrayInBytes;
     }
 
-    function ArrayAddressToBytes32(address[] memory addr) internal pure returns (bytes32[] memory) {
-        bytes32[] memory returnedBytes = new bytes32[](addr.length);
-        for(uint i=0; i < addr.length; i++){
-            returnedBytes[i] = AddressToBytes32(addr[i]);
+    function AddressArrayToBytes(address[] memory array) internal pure returns(bytes32[] memory){
+        bytes32[] memory arrayInBytes = new bytes32[](array.length);
+
+        for(uint i=0; i < arrayInBytes.length; i++){
+            arrayInBytes[i] = bytes32(uint256(uint160(array[i])));
         }
-        return returnedBytes;
+
+        return arrayInBytes;
+    }
+
+    function BytesArrayToUint(bytes32[] memory array) internal pure returns(uint[] memory){
+        uint[] memory arrayInUint = new uint[](array.length);
+
+        for(uint i=0; i < arrayInUint.length; i++){
+            arrayInUint[i] = uint256(array[i]);
+        }
+
+        return arrayInUint;
+    }
+
+    function BytesArrayToAddress(bytes32[] memory array) internal pure returns(address[] memory){
+        address[] memory arrayInAddress = new address[](array.length);
+
+        for(uint i=0; i < arrayInAddress.length; i++){
+            arrayInAddress[i] = address(uint160(uint256(array[i])));
+        }
+
+        return arrayInAddress;
     }
 
     function CheckValidations(uint256 signatures, uint256 minSignatures) internal pure returns(bool){
@@ -157,7 +195,7 @@ library Library{
         if(CheckValidations(Entities._entities[entity]._AddValidated.length, minSignatures)){
             Entities._entities[entity]._activated = true; 
             Entities._activatedEntities.push(entity);
-            Entities._pendingEntitiesAdd = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._pendingEntitiesAdd), ArrayAddressToBytes32(Entities._pendingEntitiesAdd)));
+            Entities._pendingEntitiesAdd = AddressArrayRemoveResize(FindAddressPosition(entity, Entities._pendingEntitiesAdd), Entities._pendingEntitiesAdd);
         }
     }
 
@@ -174,8 +212,8 @@ library Library{
         AddNonce(nonce, Nonces);
 
         if(msg.sender == entity || CheckValidations(Entities._entities[entity]._RemoveValidated.length, minSignatures)){
-            Entities._activatedEntities = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), ArrayAddressToBytes32(Entities._activatedEntities)));
-            Entities._pendingEntitiesRemove = ArrayBytes32ToAddress(ArrayRemoveResize(FindAddressPosition(entity, Entities._pendingEntitiesRemove), ArrayAddressToBytes32(Entities._pendingEntitiesRemove)));
+            Entities._activatedEntities = AddressArrayRemoveResize(FindAddressPosition(entity, Entities._activatedEntities), Entities._activatedEntities);
+            Entities._pendingEntitiesRemove = AddressArrayRemoveResize(FindAddressPosition(entity, Entities._pendingEntitiesRemove), Entities._pendingEntitiesRemove);
             delete(Entities._entities[entity]);
         }  
        
