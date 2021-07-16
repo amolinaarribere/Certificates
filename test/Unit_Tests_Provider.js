@@ -48,7 +48,7 @@ contract("Testing Provider",function(accounts){
         provider = await Provider.new(ProviderOwners, minOwners, {from: user_1});
         await certPoolManager.sendProposal(provider.address, provider_1_Info, {from: user_1, value: PublicPriceWei});
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _publicCertPoolAddress, 1: _chairPerson, 2: _balance} = result;
+        const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
         publicCertPoolAddress = _publicCertPoolAddress;
         publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress); 
         await publicCertPool.methods.validateProvider(provider.address).send({from: PublicOwners[0], gas: Gas}, function(error, result){});

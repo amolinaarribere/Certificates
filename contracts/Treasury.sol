@@ -10,9 +10,11 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./Interfaces/ITreasury.sol";
 import "./PublicCertificatesPool.sol";
 import "./Libraries/UintLibrary.sol";
+import "./Libraries/Library.sol";
 
 
 contract Treasury is ITreasury{
+    using Library for *;
     using UintLibrary for *;
 
     // creator
@@ -25,17 +27,17 @@ contract Treasury is ITreasury{
     }
 
     modifier isBalanceEnough(uint amount){
-        require(checkBalance(msg.sender) >= amount, "does not have enough money");
+        require(checkBalance(msg.sender) >= amount, "EC20");
         _;
     }
 
     modifier isFromPublicPool(){
-        require(msg.sender == address(_PublicCertificatesPool), "only invocations from public pool");
+        require(true == Library.ItIsSomeone(address(_PublicCertificatesPool)), "EC8");
         _;
     }
 
     modifier isFromCreator(){
-        require(msg.sender == _creator, "only creator");
+        require(true == Library.ItIsSomeone(_creator), "EC8");
         _;
     }
 

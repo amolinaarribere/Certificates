@@ -26,6 +26,11 @@ library Library{
         return true;
     }
 
+    function ItIsSomeone(address someone) internal view returns(bool){
+        if(msg.sender == someone) return true;
+        return false;
+    }
+
     function FindPosition(bytes32 data, bytes32[] memory list) internal pure returns (uint){
         for(uint i=0; i < list.length; i++){
             if(data == list[i]) return i;

@@ -15,7 +15,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
 
     // modifier
      modifier isSomeoneSpecific(address someone){
-        require(msg.sender == someone, "EC8");
+        require(true == Library.ItIsSomeone(someone), "EC8");
         _;
     }
 

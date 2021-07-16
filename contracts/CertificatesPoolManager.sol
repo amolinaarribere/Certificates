@@ -94,8 +94,8 @@ contract CertificatesPoolManager{
        emit _SendProposalId(provider);
     }
     
-    function retrieveConfiguration() external view returns (MultiSigCertificatesPool, address, uint) {
-        return (_PublicCertificatesPool, _chairperson, address(this).balance);
+    function retrieveConfiguration() external view returns (Treasury, MultiSigCertificatesPool, address, uint) {
+        return (_Treasury, _PublicCertificatesPool, _chairperson, address(this).balance);
     }
     
 }

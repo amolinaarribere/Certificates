@@ -20,7 +20,6 @@ const Gas = 6721975;
 contract("Testing Public Pool",function(accounts){
     var certPoolManager;
     var publicCertPool;
-    var nonce;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -58,8 +57,8 @@ contract("Testing Public Pool",function(accounts){
         await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
         await certPoolManager.sendProposal(provider_2, provider_2_Info, {from: user_1, value: PublicPriceWei});
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: publicCertPoolAddress, 1: _chairPerson, 2: _balance} = result;
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress);      
+        const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);      
     });
 
      // ****** TESTING Adding Owners ***************************************************************** //
