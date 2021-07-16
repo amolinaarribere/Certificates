@@ -34,7 +34,6 @@ contract("Testing Private Pool",function(accounts){
     const extra_owner = accounts[4];
 
     beforeEach(async function(){
-        //certPoolManager = await CertificatesPoolManager.new(PublicOwners, minOwners, PublicPriceWei, PrivatePriceWei, {from: chairPerson});
         certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei);
         await certPoolManager.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
         let response = await certPoolManager.retrievePrivateCertificatesPool(0, {from: user_1});

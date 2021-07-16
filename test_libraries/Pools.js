@@ -193,7 +193,7 @@ async function AddProviderWrong(CertPool, Owners, provider_1, user_1, isPrivate)
     
 }
 
-async function ValidateProviderWrong(CertPool, Owners, provider_1, provider_2, provider_3, user_1){
+async function ValidateProviderWrong(CertPool, Owners, provider_1, provider_3, user_1){
     // act
     try{
         await CertPool.methods.validateProvider(provider_1).send({from: user_1}, function(error, result){});
@@ -206,7 +206,7 @@ async function ValidateProviderWrong(CertPool, Owners, provider_1, provider_2, p
    // act
     try{
         await CertPool.methods.validateProvider(provider_1).send({from: Owners[0], gas: Gas}, function(error, result){});
-        await CertPool.methods.validateProvider(provider_1 + 1).send({from: Owners[0], gas: Gas}, function(error, result){});
+        await CertPool.methods.validateProvider(provider_1).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
