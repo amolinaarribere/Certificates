@@ -1,5 +1,6 @@
 // Chai library for testing
 // ERROR tests = First we test the error message then we test the action was not carried out
+const BigNumber = require('bignumber.js');
 
 const pool_common = require("../test_libraries/Pools.js");
 const init = require("../test_libraries/InitializeContracts.js");
@@ -146,14 +147,15 @@ contract("Testing Treasury",function(accounts){
 
     it("Withdraw CORRECT",async function(){
         // act
+ 
         await SendingNewProviders();
         // assert
-        for(var i=0; i < PublicOwners.length; i++){
-            let balance = parseInt(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
-            let currentBalance = parseInt(await web3.eth.getBalance(PublicOwners[i]));
+        for(let i=0; i < PublicOwners.length; i++){
+            let balance = new BigNumber(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
+            let currentBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
             let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gasPrice: 1}, function(error, result){});
-            let finalBalance = parseInt(await web3.eth.getBalance(PublicOwners[i]));
-            expect(finalBalance).to.be.equal(currentBalance - request.gasUsed + balance);
+            let finalBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
+            expect(finalBalance.minus(currentBalance.minus(request.gasUsed).plus(balance)).toString()).to.be.equal("0");
         }
     });
 
