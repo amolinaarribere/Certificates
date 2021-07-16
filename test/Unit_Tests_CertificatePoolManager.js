@@ -98,7 +98,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     it("Retrieve Configuration",async function(){
         // act
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _publicPool, 1: _chairPerson, 2: _balance} = result;
+        const {0: _treasury, 1: _publicPool, 2: _chairPerson, 3: _balance} = result;
         // assert
         expect(_chairPerson).to.equal(chairPerson);
         expect(_balance.toNumber()).to.equal(0);

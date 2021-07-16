@@ -45,6 +45,7 @@ contract("Testing Treasury",function(accounts){
     // test constants
     const NotEnoughFunds = new RegExp("EC2");
     const WrongSender = new RegExp("EC8");
+    const NotEnoughBalance = new RegExp("EC20");
     const NotAnOwner = new RegExp("EC9");
     const OwnerAlreadyvoted = new RegExp("EC5");
     const NotSubmittedByCreator = new RegExp("EC4");
@@ -63,6 +64,12 @@ contract("Testing Treasury",function(accounts){
         Treasury = new web3.eth.Contract(TreasuryAbi, _treasuryAddress);   
         publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);   
     });
+
+    async function SendingNewProviders(){
+        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
+        await certPoolManager.sendProposal(provider_2, provider_2_Info, {from: user_1, value: PublicPriceWei});
+        await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
+    }
 
      // ****** TESTING Paying ***************************************************************** //
 
@@ -114,9 +121,7 @@ contract("Testing Treasury",function(accounts){
 
     it("Owners Refunding CORRECT",async function(){
         // act
-        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
-        await certPoolManager.sendProposal(provider_2, provider_2_Info, {from: user_1, value: PublicPriceWei});
-        await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
+        await SendingNewProviders();
         // asert
         var BalanceOwners = 0;
         for(var i=0; i < PublicOwners.length; i++){
@@ -125,5 +130,31 @@ contract("Testing Treasury",function(accounts){
         expect(BalanceOwners).to.be.equal(2 * OwnerRefundPriceWei);
     });
 
+    // ****** TESTING Owners Refunding ***************************************************************** //
+
+    it("Withdraw WRONG",async function(){
+        // act
+        try{
+            await Treasury.methods.withdraw(1).send({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughBalance);
+        }
+    });
+
+    it("Withdraw CORRECT",async function(){
+        // act
+        await SendingNewProviders();
+        // assert
+        for(var i=0; i < PublicOwners.length; i++){
+            let balance = parseInt(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
+            let currentBalance = parseInt(await web3.eth.getBalance(PublicOwners[i]));
+            let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gasPrice: 1}, function(error, result){});
+            let finalBalance = parseInt(await web3.eth.getBalance(PublicOwners[i]));
+            expect(finalBalance).to.be.equal(currentBalance - request.gasUsed + balance);
+        }
+    });
 
 });
