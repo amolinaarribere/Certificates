@@ -19,7 +19,6 @@ pragma experimental ABIEncoderV2;
     function removeProvider(address provider) external;
     function retrieveProvider(address provider) external view returns (string memory, bool);
     function retrieveAllProviders() external view returns (address[] memory);
-    function retrieveTotalProviders() external view returns (uint);
     function retrievePendingProviders(bool addedORremove) external view returns (address[] memory, string[] memory);
     
 }

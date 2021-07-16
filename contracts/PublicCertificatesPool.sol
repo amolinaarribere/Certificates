@@ -26,8 +26,8 @@ pragma experimental ABIEncoderV2;
     }
 
      // Constructor
-    constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {
-        _creator = msg.sender;
+    constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress) MultiSigCertificatesPool(owners, minOwners) payable {
+        _creator = managerContractAddress;
     }
 
     function addProvider(address provider, string memory providerInfo) external 
@@ -57,7 +57,7 @@ pragma experimental ABIEncoderV2;
     function removeProvider(address provider) external override{
        removeEntity(provider, _providerId); 
 
-       if(false == Library.isEntity(_Entities[_providerId]._entities[provider])){
+       if(false == isEntity(provider, _providerId)){
             delete(_submitedByCreator[provider]);
        }
     }

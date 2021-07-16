@@ -15,6 +15,5 @@ pragma solidity >=0.7.0 <0.9.0;
     function removePool(address pool) external;
     function retrievePool(address pool) external view returns (string memory, bool);
     function retrieveAllPools() external view returns (address[] memory);
-    function retrieveTotalPools() external view returns (uint);
     
 }

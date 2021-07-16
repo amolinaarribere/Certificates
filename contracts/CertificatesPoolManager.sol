@@ -50,12 +50,12 @@ contract CertificatesPoolManager{
         _chairperson = payable(msg.sender); 
     }
 
-    function Initialize(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei) 
+    function Initialize(address PublicPoolAddress, address TreasuryAddress) 
         isFromChairPerson()
     external{
-        _PublicCertificatesPool = new PublicCertificatesPool(owners, minOwners);
-        _Treasury = new Treasury(PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei, address(_PublicCertificatesPool));
-        _PublicCertificatesPool.addTreasury(address(_Treasury));
+        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+        _Treasury = Treasury(TreasuryAddress);
+        _PublicCertificatesPool.addTreasury(TreasuryAddress);
     }
 
     // PRIVATE CERTIFICATE POOL /////////////////////////////////////////////////////////////

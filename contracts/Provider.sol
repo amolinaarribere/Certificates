@@ -30,7 +30,7 @@ pragma experimental ABIEncoderV2;
     string[] _Label = [_ownerLabel, _poolLabel];
     
     struct _CertificateStruct{
-        mapping(bytes32 => Library._entityIdentity) _cert;
+        mapping(bytes32 => _entityIdentity) _cert;
     }
     
     struct _CertificatesPerHolderStruct{
@@ -42,16 +42,6 @@ pragma experimental ABIEncoderV2;
     // modifiers
     modifier isAPool(address pool){
         require(true == isPool(pool));
-        _;
-    }
-    
-    modifier isEntityActivated(bool YesOrNo, Library._entityIdentity memory Entity){
-        Library.EntityActivated(YesOrNo, Entity);
-        _;
-    }
-    
-    modifier HasNotAlreadyVoted(Library.Actions action, Library._entityIdentity memory Entity){
-        Library.NotAlreadyVoted(action, Entity);
         _;
     }
 
@@ -81,10 +71,6 @@ pragma experimental ABIEncoderV2;
     function retrieveAllPools() external override view returns (address[] memory){
         return(retrieveAllEntities(_poolId));
     }
-    
-    function retrieveTotalPools() external override view returns (uint){
-        return (retrieveTotalEntities(_poolId));
-    }
 
     function isPool(address pool) public view returns (bool){
         return(isEntity(pool, _poolId));
@@ -93,16 +79,16 @@ pragma experimental ABIEncoderV2;
     // Certificates management
      function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-        manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Add);
+        manipulateCertificate(pool, CertificateHash, holder, Actions.Add);
      }
      
      function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-         manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Remove);
+         manipulateCertificate(pool, CertificateHash, holder, Actions.Remove);
      }
 
     
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Library.Actions act) 
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Actions act) 
         isAPool(pool)
         isAnOwner
         HasNotAlreadyVoted(act, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
@@ -110,7 +96,7 @@ pragma experimental ABIEncoderV2;
         
         uint validations;
         
-        if(act == Library.Actions.Add){
+        if(act == Actions.Add){
             _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.push(msg.sender);
             validations = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length;
         }
@@ -131,7 +117,7 @@ pragma experimental ABIEncoderV2;
             }
             
             
-            if(act == Library.Actions.Add){
+            if(act == Actions.Add){
                 poolToSend.addCertificate(CertificateHash, holder);
             }
             else{

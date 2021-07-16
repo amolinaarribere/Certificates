@@ -9,10 +9,11 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./Interfaces/ITreasury.sol";
 import "./PublicCertificatesPool.sol";
-import "./Libraries/Library.sol";
+import "./Libraries/UintLibrary.sol";
 
 
 contract Treasury is ITreasury{
+    using UintLibrary for *;
 
     // creator
     address _creator;
@@ -52,17 +53,8 @@ contract Treasury is ITreasury{
     
     mapping(address => _BalanceStruct) _balances;
 
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) {
-        _creator = msg.sender; 
-        _PublicPriceWei = PublicPriceWei;
-        _PrivatePriceWei = PrivatePriceWei;
-        _OwnerRefundPriceWei = OwnerRefundPriceWei;
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
-    }
-
-    function updateConfiguration(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) 
-        isFromCreator()
-    external{
+    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress) {
+        _creator = managerContractAddress; 
         _PublicPriceWei = PublicPriceWei;
         _PrivatePriceWei = PrivatePriceWei;
         _OwnerRefundPriceWei = OwnerRefundPriceWei;
@@ -147,7 +139,7 @@ contract Treasury is ITreasury{
         _balances[addr]._balance[factor] -= amount;
 
         if(0 == _balances[addr]._balance[factor]){
-            _balances[addr]._factors = Library.UintArrayRemoveResize(Library.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
+            _balances[addr]._factors = UintLibrary.UintArrayRemoveResize(UintLibrary.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
         }
         
     }
