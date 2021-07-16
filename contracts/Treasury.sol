@@ -14,6 +14,9 @@ import "./Libraries/Library.sol";
 
 contract Treasury is ITreasury{
 
+    // creator
+    address _creator;
+
     // modifiers
     modifier areFundsEnough(uint minPrice){
         require(msg.value >= minPrice, "EC2");
@@ -27,6 +30,11 @@ contract Treasury is ITreasury{
 
     modifier isFromPublicPool(){
         require(msg.sender == address(_PublicCertificatesPool), "only invocations from public pool");
+        _;
+    }
+
+    modifier isFromCreator(){
+        require(msg.sender == _creator, "only creator");
         _;
     }
 
@@ -45,6 +53,16 @@ contract Treasury is ITreasury{
     mapping(address => _BalanceStruct) _balances;
 
     constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) {
+        _creator = msg.sender; 
+        _PublicPriceWei = PublicPriceWei;
+        _PrivatePriceWei = PrivatePriceWei;
+        _OwnerRefundPriceWei = OwnerRefundPriceWei;
+        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+    }
+
+    function updateConfiguration(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) 
+        isFromCreator()
+    external{
         _PublicPriceWei = PublicPriceWei;
         _PrivatePriceWei = PrivatePriceWei;
         _OwnerRefundPriceWei = OwnerRefundPriceWei;

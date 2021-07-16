@@ -24,6 +24,11 @@ contract CertificatesPoolManager{
         require(true == Library.IdCorrect(Id, length), "EC1");
         _;
     }
+
+    modifier isFromChairPerson(){
+        require(msg.sender == _chairperson, "only chair person");
+        _;
+    }
     
     // Private Certificates Pool structure
     struct _privateCertificatesPoolStruct{
@@ -43,12 +48,17 @@ contract CertificatesPoolManager{
 
     address payable _chairperson;
     
-    constructor(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei) payable{
+    constructor() payable{
         _chairperson = payable(msg.sender); 
+        _nonce = 0;
+    }
+
+    function Initialize(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei) 
+        isFromChairPerson()
+    external{
         _PublicCertificatesPool = new PublicCertificatesPool(owners, minOwners);
         _Treasury = new Treasury(PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei, address(_PublicCertificatesPool));
         _PublicCertificatesPool.addTreasury(address(_Treasury));
-        _nonce = 0;
     }
 
     // PRIVATE CERTIFICATE POOL /////////////////////////////////////////////////////////////
@@ -56,7 +66,7 @@ contract CertificatesPoolManager{
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external
     payable
     {
-         _Treasury.payForNewPool{value:msg.value}();
+        _Treasury.payForNewPool{value:msg.value}();
         PrivateCertificatesPool certificatePool = new PrivateCertificatesPool(owners, minOwners);
         _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, certificatePool);
         _PrivateCertificatesPools.push(privateCertificatesPool);
