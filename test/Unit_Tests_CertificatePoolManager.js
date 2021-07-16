@@ -2,7 +2,11 @@
 // ERROR tests = First we test the error message then we test the action was not carried out
 
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
+const Treasury = artifacts.require("Treasury");
+const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
 const Library = artifacts.require("./Libraries/Library");
+
+const init = require("../test_libraries/InitializeContracts.js");
 
 const PublicPriceWei = 10;
 const PrivatePriceWei = 20;
@@ -28,7 +32,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const ProvidedIdIsWrong = new RegExp("EC1");
 
     beforeEach(async function(){
-        certPoolManager = await CertificatesPoolManager.new(PublicOwners, minOwners, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei, {from: chairPerson});
+        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei);
     });
 
     // ****** TESTING Sending Proposals ***************************************************************** //
