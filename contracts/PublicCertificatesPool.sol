@@ -30,22 +30,20 @@ pragma experimental ABIEncoderV2;
         _creator = msg.sender;
     }
 
-    function addProvider(address provider, string memory providerInfo, uint nonce) external 
+    function addProvider(address provider, string memory providerInfo) external 
         isSomeoneSpecific(_creator)
         hasBeenSubmitted(false, provider)
-        isNonceOK(nonce)
     override
     {
         _Entities[_providerId]._entities[provider]._Info = providerInfo;
         _submitedByCreator[provider] = true;
-        Library.AddNonce(nonce, _Nonces);
     }
 
-    function validateProvider(address provider, uint nonce) external 
+    function validateProvider(address provider) external 
         hasBeenSubmitted(true, provider)
     override
     {
-        addEntity(provider, _Entities[_providerId]._entities[provider]._Info, _providerId, nonce);
+        addEntity(provider, _Entities[_providerId]._entities[provider]._Info, _providerId);
 
         if(true == isProvider(provider)){
             uint totalValidators = _Entities[_providerId]._entities[provider]._AddValidated.length;
@@ -56,8 +54,8 @@ pragma experimental ABIEncoderV2;
         }
     }
 
-    function removeProvider(address provider, uint nonce) external override{
-       removeEntity(provider, _providerId, nonce); 
+    function removeProvider(address provider) external override{
+       removeEntity(provider, _providerId); 
 
        if(false == Library.isEntity(_Entities[_providerId]._entities[provider])){
             delete(_submitedByCreator[provider]);

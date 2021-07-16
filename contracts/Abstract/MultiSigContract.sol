@@ -26,9 +26,6 @@ abstract contract MultiSigContract is IMultiSigContract{
     string[] _entitiesLabel;
     Library._entityStruct[] _Entities;
 
-    // Nonces
-    Library._NoncesPerAddressStruct _Nonces;
-
     // modifiers
     modifier isIdCorrect(uint Id, uint length){
         require(true == Library.IdCorrect(Id, length), "EC1");
@@ -60,11 +57,6 @@ abstract contract MultiSigContract is IMultiSigContract{
         _;
     }
 
-    modifier isNonceOK(uint nonce){
-        Library.isNonceNew(nonce, _Nonces);
-        _;
-    }
-
     // Constructor
     constructor(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) payable{
         require(minOwners <= owners.length, "EC16");
@@ -85,22 +77,22 @@ abstract contract MultiSigContract is IMultiSigContract{
         }
     }
 
-    function addEntity(address entity, string memory entityInfo, uint listId, uint nonce) internal 
+    function addEntity(address entity, string memory entityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwner 
     {
-        Library.addEntity(entity, entityInfo, _Entities[listId], _minOwners, _Nonces, nonce);
+        Library.addEntity(entity, entityInfo, _Entities[listId], _minOwners);
 
         if(true == Library.isEntity(_Entities[listId]._entities[entity])){
             emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity);
         }
     }
 
-    function removeEntity(address entity, uint listId, uint nonce) internal 
+    function removeEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwnerOrHimself(entity) 
     {
-        Library.removeEntity(entity, _Entities[listId], _minOwners, _Nonces, nonce);
+        Library.removeEntity(entity, _Entities[listId], _minOwners);
 
         if(false == Library.isEntity(_Entities[listId]._entities[entity])){
             emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity);
@@ -136,14 +128,14 @@ abstract contract MultiSigContract is IMultiSigContract{
     }
 
     // OWNERS CRUD Operations
-    function addOwner(address owner, string memory ownerInfo, uint nonce) external override {
-        addEntity(owner, ownerInfo, _ownerId, nonce);
+    function addOwner(address owner, string memory ownerInfo) external override {
+        addEntity(owner, ownerInfo, _ownerId);
     }
     
-    function removeOwner(address owner, uint nonce) external override
+    function removeOwner(address owner) external override
         minRequired(_minOwners, retrieveTotalEntities(_ownerId) - 1)
     {
-        removeEntity(owner, _ownerId, nonce);
+        removeEntity(owner, _ownerId);
     }
     
     function retrieveOwner(address owner) external override view returns (string memory, bool){
@@ -164,10 +156,6 @@ abstract contract MultiSigContract is IMultiSigContract{
 
     function isOwner(address owner) public view returns (bool){
         return(isEntity(owner, _ownerId));
-    }
-
-    function retrieveHighestNonceForAddress(address addr) external override view returns (uint){
-        return(_Nonces._highestNoncePerAddress[addr]);
     }
 
     function retrievePendingOwners(bool addedORremove) external override view returns (address[] memory, string[] memory){

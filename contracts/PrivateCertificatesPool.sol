@@ -15,12 +15,12 @@ pragma experimental ABIEncoderV2;
      constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {
     }
 
-    function addProvider(address provider, string memory providerInfo, uint nonce) external override{
-        addEntity(provider, providerInfo, _providerId, nonce);
+    function addProvider(address provider, string memory providerInfo) external override{
+        addEntity(provider, providerInfo, _providerId);
     }
 
-    function removeProvider(address provider, uint nonce) external override{
-       removeEntity(provider, _providerId, nonce); 
+    function removeProvider(address provider) external override{
+       removeEntity(provider, _providerId); 
     }
 
  }

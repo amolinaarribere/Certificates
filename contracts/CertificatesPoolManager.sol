@@ -44,13 +44,10 @@ contract CertificatesPoolManager{
     // Treasury
     Treasury _Treasury;
 
-    uint _nonce;
-
     address payable _chairperson;
     
     constructor() payable{
         _chairperson = payable(msg.sender); 
-        _nonce = 0;
     }
 
     function Initialize(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei) 
@@ -92,8 +89,7 @@ contract CertificatesPoolManager{
     payable 
     {
         _Treasury.payForNewProposal{value:msg.value}();
-       _PublicCertificatesPool.addProvider(provider, providerInfo, _nonce);
-       _nonce += 1;
+       _PublicCertificatesPool.addProvider(provider, providerInfo);
 
        emit _SendProposalId(provider);
     }

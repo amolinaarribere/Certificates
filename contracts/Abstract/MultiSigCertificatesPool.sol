@@ -65,9 +65,9 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     {}
 
     // PROVIDERS CRUD Operations
-    function addProvider(address provider, string memory providerInfo, uint nonce) external override virtual;
+    function addProvider(address provider, string memory providerInfo) external override virtual;
 
-    function removeProvider(address provider, uint nonce) external override virtual;
+    function removeProvider(address provider) external override virtual;
     
     function retrieveProvider(address provider) external override view returns (string memory, bool){
         return (retrieveEntity(provider, _providerId));
@@ -86,23 +86,20 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     }
     
     // Certificates CRUD Operations
-    function addCertificate(bytes32 CertificateHash, address holder, uint nonce) external override
+    function addCertificate(bytes32 CertificateHash, address holder) external override
         isAProvider 
         NotEmpty(CertificateHash)
         CertificateDoesNotExist(holder, CertificateHash)
-        isNonceOK(nonce)
     {
         _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;
         _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
-        Library.AddNonce(nonce, _Nonces);
 
         emit _AddCertificateIdEvent(msg.sender, holder);
     }
     
-    function removeCertificate(bytes32 CertificateHash, address holder, uint nonce) external override
+    function removeCertificate(bytes32 CertificateHash, address holder) external override
         isAProvider 
         isTheProviderOrHimself(holder, CertificateHash) 
-        isNonceOK(nonce)
     {
         address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
         bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
@@ -115,7 +112,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         }
         
         delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
-        Library.AddNonce(nonce, _Nonces);
         
         emit _RemoveCertificateIdEvent(provider, holder);
 
