@@ -65,7 +65,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     {}
 
     // PROVIDERS CRUD Operations
-    function addProvider(address provider, string memory providerInfo) external override virtual;
+    function addProvider(address provider, string memory providerInfo) external override payable virtual;
 
     function removeProvider(address provider) external override virtual;
     
@@ -82,7 +82,12 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     }
     
     // Certificates CRUD Operations
-    function addCertificate(bytes32 CertificateHash, address holder) external override
+    function addCertificate(bytes32 CertificateHash, address holder) external override payable virtual
+    {
+        addCertificateInternal(CertificateHash, holder);
+    }
+
+    function addCertificateInternal(bytes32 CertificateHash, address holder) internal
         isAProvider 
         NotEmpty(CertificateHash)
         CertificateDoesNotExist(holder, CertificateHash)

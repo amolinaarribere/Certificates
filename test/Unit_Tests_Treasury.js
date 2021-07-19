@@ -14,6 +14,7 @@ const UintLibrary = artifacts.require("./Libraries/UintLibrary");
 
 const PublicPriceWei = 10;
 const PrivatePriceWei = 20;
+const CertificatePriceWei = 5;
 const OwnerRefundPriceWei = 2;
 const Gas = 6721975;
 
@@ -59,7 +60,7 @@ contract("Testing Treasury",function(accounts){
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
 
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei);
+        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
         Treasury = new web3.eth.Contract(TreasuryAbi, _treasuryAddress);   

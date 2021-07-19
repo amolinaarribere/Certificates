@@ -8,7 +8,7 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
  interface IProvider  {
-    function addCertificate(address pool, bytes32 CertificateHash, address holder) external;
+    function addCertificate(address pool, bytes32 CertificateHash, address holder, uint256 Value) external;
     function removeCertificate(address pool, bytes32 CertificateHash, address holder) external;
 
     function addPool(address pool, string memory poolInfo) external;

@@ -49,7 +49,8 @@ pragma experimental ABIEncoderV2;
     constructor(address[] memory owners,  uint256 minOwners) 
         MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdProviders)
     payable
-    {}
+    {
+    }
 
     // POOL CRUD Operations
     function addPool(address pool, string memory poolInfo) external override{
@@ -77,18 +78,18 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
+     function addCertificate(address pool, bytes32 CertificateHash, address holder, uint256 Value) external override
      {
-        manipulateCertificate(pool, CertificateHash, holder, Actions.Add);
+        manipulateCertificate(pool, CertificateHash, holder, Actions.Add, Value);
      }
      
      function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-         manipulateCertificate(pool, CertificateHash, holder, Actions.Remove);
+         manipulateCertificate(pool, CertificateHash, holder, Actions.Remove, 0);
      }
 
     
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Actions act) 
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Actions act, uint256 Value) 
         isAPool(pool)
         isAnOwner
         HasNotAlreadyVoted(act, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
@@ -118,7 +119,7 @@ pragma experimental ABIEncoderV2;
             
             
             if(act == Actions.Add){
-                poolToSend.addCertificate(CertificateHash, holder);
+                poolToSend.addCertificate{value:Value}(CertificateHash, holder);
             }
             else{
                poolToSend.removeCertificate(CertificateHash, holder);

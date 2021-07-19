@@ -10,6 +10,7 @@ const Library = artifacts.require("./Libraries/Library");
 
 const PublicPriceWei = 10;
 const PrivatePriceWei = 20;
+const CertificatePriceWei = 5;
 const Gas = 6721975;
 const minOwners = 2;
 // providers info
@@ -32,6 +33,8 @@ const NotAllowedToRemoveCertificate = new RegExp("EC14");
 const WrongSender = new RegExp("EC8");
 const NotSubmittedByCreator = new RegExp("EC4");
 const NotEmpty = new RegExp("EC11");
+const NotEnoughFunds = new RegExp("EC2");
+const AlreadySent = new RegExp("EC3");
 
 
 async function AddingOwners(CertPool, Owners, extra_owner){
@@ -58,11 +61,13 @@ async function ValidatingProviders(CertPool, Owners, provider_1, provider_2){
     await CertPool.methods.validateProvider(provider_2).send({from: Owners[2], gas: Gas}, function(error, result){});
 }
 
-async function AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2){
-    await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-    await CertPool.methods.addCertificate(hash_1, holder_2).send({from: provider_1, gas: Gas}, function(error, result){});
-    await CertPool.methods.addCertificate(hash_2, holder_1).send({from: provider_2, gas: Gas}, function(error, result){});
-    await CertPool.methods.addCertificate(hash_2, holder_2).send({from: provider_2, gas: Gas}, function(error, result){});
+async function AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate){
+    var value_To_Pay = 0;
+    if(!isPrivate) value_To_Pay = CertificatePriceWei;
+    await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificate(hash_1, holder_2).send({from: provider_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificate(hash_2, holder_1).send({from: provider_2, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificate(hash_2, holder_2).send({from: provider_2, gas: Gas, value:value_To_Pay}, function(error, result){});
 }
 
 async function AddOwnerWrong(CertPool, Owners, extra_owner, user_1){
@@ -182,12 +187,21 @@ async function AddProviderWrong(CertPool, Owners, provider_1, user_1, isPrivate)
     else{
         // act
         try{
-            await CertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1}, function(error, result){});
+            await CertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei}, function(error, result){});
             expect.fail();
         }
         // assert
         catch(error){
-            expect(error.message).to.match(WrongSender);
+            expect(error.message).to.match(AlreadySent);
+        }
+        // act
+        try{
+            await CertPool.methods.addProvider(user_1, provider_1_Info).send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughFunds);
         }
     }
     
@@ -305,9 +319,11 @@ async function RemoveProviderCorrect(CertPool, Owners, provider_1, provider_2, u
 async function AddCertificateWrong(CertPool, Owners, provider_1, provider_2, holder_1, user_1, isPrivate){
     // act
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
+    var value_To_Pay = 0;
+    if(!isPrivate) value_To_Pay = CertificatePriceWei;
 
     try{
-        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1}, function(error, result){});
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, value:value_To_Pay}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -316,13 +332,24 @@ async function AddCertificateWrong(CertPool, Owners, provider_1, provider_2, hol
     }
     // act
     try{
-        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
-        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas, value:value_To_Pay}, function(error, result){});
         expect.fail();
     }
     // assert
     catch(error){
         expect(error.message).to.match(CertificateAlreadyExists);
+    }
+    if(!isPrivate){
+        // act
+        try{
+            await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas, value:value_To_Pay - 1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughFunds);
+        }
     }
     
 }
@@ -330,7 +357,7 @@ async function AddCertificateWrong(CertPool, Owners, provider_1, provider_2, hol
 async function AddCertificateCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
     // act
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
-    await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2);
+    await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate);
     // assert
     let Provider_1 = await CertPool.methods.retrieveCertificateProvider(hash_1, holder_1).call({from: user_1}, function(error, result){});
     let Provider_1b = await CertPool.methods.retrieveCertificateProvider(hash_1, holder_2).call({from: user_1}, function(error, result){});
@@ -360,7 +387,7 @@ async function AddCertificateCorrect(CertPool, Owners, provider_1, provider_2, h
 async function RemoveCertificateWrong(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
     // act
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
-    await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2);
+    await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate);
 
     try{
         await CertPool.methods.removeCertificate(hash_1, holder_1).send({from: user_1}, function(error, result){});
@@ -385,7 +412,7 @@ async function RemoveCertificateWrong(CertPool, Owners, provider_1, provider_2, 
 async function RemoveCertificateCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
     // act
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
-    await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2);
+    await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate);
     await CertPool.methods.removeCertificate(hash_1, holder_1).send({from: provider_1, gas: Gas}, function(error, result){});
     // assert
     let Total = await CertPool.methods.retrieveTotalCertificatesByHolder(holder_1).call({from: user_1}, function(error, result){});

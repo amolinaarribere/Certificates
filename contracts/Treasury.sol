@@ -44,6 +44,7 @@ contract Treasury is ITreasury{
     // constants
     PublicCertificatesPool  _PublicCertificatesPool;
     uint _PublicPriceWei;
+    uint _CertificatePriceWei;
     uint _PrivatePriceWei;
     uint _OwnerRefundPriceWei;
 
@@ -55,10 +56,11 @@ contract Treasury is ITreasury{
     
     mapping(address => _BalanceStruct) _balances;
 
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress) {
+    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress) {
         _creator = managerContractAddress; 
         _PublicPriceWei = PublicPriceWei;
         _PrivatePriceWei = PrivatePriceWei;
+        _CertificatePriceWei = CertificatePriceWei;
         _OwnerRefundPriceWei = OwnerRefundPriceWei;
         _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
     }
@@ -72,6 +74,13 @@ contract Treasury is ITreasury{
 
     function payForNewPool() external 
         areFundsEnough(_PrivatePriceWei)
+    override payable
+    {
+        // Assign dividends propotionaly (substracting the owners cut)
+    }
+
+    function payForNewCertificate() external 
+        areFundsEnough(_CertificatePriceWei)
     override payable
     {
         // Assign dividends propotionaly (substracting the owners cut)

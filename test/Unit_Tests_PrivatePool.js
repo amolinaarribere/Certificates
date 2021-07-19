@@ -11,6 +11,7 @@ const Library = artifacts.require("./Libraries/Library");
 
 const PublicPriceWei = 10;
 const PrivatePriceWei = 20;
+const CertificatePriceWei = 5;
 const OwnerRefundPriceWei = 2;
 const Gas = 6721975;
 
@@ -34,7 +35,7 @@ contract("Testing Private Pool",function(accounts){
     const extra_owner = accounts[4];
 
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei);
+        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await certPoolManager.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
         let response = await certPoolManager.retrievePrivateCertificatesPool(0, {from: user_1});
         const {0: creator, 1: privateCertPoolAddress} = response;

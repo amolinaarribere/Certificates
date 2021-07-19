@@ -14,14 +14,17 @@ pragma experimental ABIEncoderV2;
 
  contract PublicCertificatesPool is MultiSigCertificatesPool, IPublicPool {
 
+     // events
+    event _SendProposalId(address);
+
      address _creator;
-     mapping(address => bool) _submitedByCreator;
+     mapping(address => bool) _submited;
      Treasury _Treasury;
 
      //modifiers
     modifier hasBeenSubmitted(bool YesOrNo, address provider){
-        if(false == YesOrNo) require(false == _submitedByCreator[provider], "EC3");
-        else require(true == _submitedByCreator[provider], "EC4");
+        if(false == YesOrNo) require(false == _submited[provider], "EC3");
+        else require(true == _submited[provider], "EC4");
         _;
     }
 
@@ -31,12 +34,14 @@ pragma experimental ABIEncoderV2;
     }
 
     function addProvider(address provider, string memory providerInfo) external 
-        isSomeoneSpecific(_creator)
         hasBeenSubmitted(false, provider)
-    override
+    override payable
     {
+        _Treasury.payForNewProposal{value:msg.value}();
         _Entities[_providerId]._entities[provider]._Info = providerInfo;
-        _submitedByCreator[provider] = true;
+        _submited[provider] = true;
+
+        emit _SendProposalId(provider);
     }
 
     function validateProvider(address provider) external 
@@ -58,7 +63,7 @@ pragma experimental ABIEncoderV2;
        removeEntity(provider, _providerId); 
 
        if(false == isEntity(provider, _providerId)){
-            delete(_submitedByCreator[provider]);
+            delete(_submited[provider]);
        }
     }
 
@@ -66,6 +71,12 @@ pragma experimental ABIEncoderV2;
         isSomeoneSpecific(_creator)
     {
         _Treasury = Treasury(TreasuryAddress);
+    }
+
+    function addCertificate(bytes32 CertificateHash, address holder) external override payable
+    {
+        _Treasury.payForNewCertificate{value:msg.value}();
+        addCertificateInternal(CertificateHash, holder);
     }
 
  }

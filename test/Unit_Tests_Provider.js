@@ -10,6 +10,7 @@ const Library = artifacts.require("./Libraries/Library");
 
 const PublicPriceWei = 10;
 const PrivatePriceWei = 20;
+const CertificatePriceWei = 5;
 const OwnerRefundPriceWei = 2;
 const Gas = 6721975;
 
@@ -44,13 +45,13 @@ contract("Testing Provider",function(accounts){
 
     beforeEach(async function(){
         // Public Pool creation and provider subscription
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei);
-        provider = await Provider.new(ProviderOwners, minOwners, {from: user_1});
-        await certPoolManager.sendProposal(provider.address, provider_1_Info, {from: user_1, value: PublicPriceWei});
+        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        provider = await Provider.new(ProviderOwners, minOwners, {from: user_1, value: 2 * CertificatePriceWei});
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
         publicCertPoolAddress = _publicCertPoolAddress;
         publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, publicCertPoolAddress); 
+        await publicCertPool.methods.addProvider(provider.address, provider_1_Info).send({from: user_1, value: PublicPriceWei}, function(error, result){});
         await publicCertPool.methods.validateProvider(provider.address).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
         await publicCertPool.methods.validateProvider(provider.address).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
     });
@@ -61,10 +62,10 @@ contract("Testing Provider",function(accounts){
     }
 
     async function AddingCertificates(){
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[2], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, CertificatePriceWei, {from: ProviderOwners[0], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, CertificatePriceWei, {from: ProviderOwners[1], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, CertificatePriceWei, {from: ProviderOwners[2], gas: Gas});
+        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, CertificatePriceWei, {from: ProviderOwners[1], gas: Gas});
     }
 
 
@@ -159,7 +160,7 @@ contract("Testing Provider",function(accounts){
         await AddingPool();
 
         try{
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: user_1, gas: Gas});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, 0, {from: user_1, gas: Gas});
             expect.fail();
         }
         // assert
@@ -168,8 +169,8 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, 0, {from: ProviderOwners[1], gas: Gas});
+            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, 0, {from: ProviderOwners[1], gas: Gas});
             expect.fail();
         }
         // assert

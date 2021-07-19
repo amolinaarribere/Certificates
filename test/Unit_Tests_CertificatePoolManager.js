@@ -10,6 +10,7 @@ const init = require("../test_libraries/InitializeContracts.js");
 
 const PublicPriceWei = 10;
 const PrivatePriceWei = 20;
+const CertificatePriceWei = 5;
 const OwnerRefundPriceWei = 2;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
@@ -32,39 +33,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const ProvidedIdIsWrong = new RegExp("EC1");
 
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei);
-    });
-
-    // ****** TESTING Sending Proposals ***************************************************************** //
-
-    it("Send Proposal WRONG",async function(){
-        // act
-        try{
-            let PriceUnderFunded = PublicPriceWei - 1;
-            await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PriceUnderFunded});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughFunds);
-        }
-
-        // act
-        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
-
-        try{
-            await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(ProposalAlreadySubmitted);
-        }
-    });
-
-    it("Send Proposal CORRECT",async function(){
-        // act
-        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
+        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
     });
 
     // ****** TESTING Creating Private Pools ***************************************************************** //

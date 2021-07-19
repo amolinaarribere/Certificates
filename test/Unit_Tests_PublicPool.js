@@ -11,6 +11,7 @@ const Library = artifacts.require("./Libraries/Library");
 
 const PublicPriceWei = 10;
 const PrivatePriceWei = 20;
+const CertificatePriceWei = 5;
 const OwnerRefundPriceWei = 2;
 const Gas = 6721975;
 
@@ -53,12 +54,12 @@ contract("Testing Public Pool",function(accounts){
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
 
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, OwnerRefundPriceWei);
-        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
-        await certPoolManager.sendProposal(provider_2, provider_2_Info, {from: user_1, value: PublicPriceWei});
+        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);      
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);    
+        await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei}, function(error, result){});
+        await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei}, function(error, result){});
     });
 
      // ****** TESTING Adding Owners ***************************************************************** //

@@ -58,8 +58,6 @@ contract CertificatesPoolManager{
         _PublicCertificatesPool.addTreasury(TreasuryAddress);
     }
 
-    // PRIVATE CERTIFICATE POOL /////////////////////////////////////////////////////////////
-
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external
     payable
     {
@@ -81,17 +79,6 @@ contract CertificatesPoolManager{
     function retrieveTotalPrivateCertificatesPool() external view returns (uint)
     {
         return(_PrivateCertificatesPools.length);
-    }
-
-    // PUBLIC CERTIFICATE POOL /////////////////////////////////////////////////////////////
-    
-    function sendProposal(address provider, string memory providerInfo) external 
-    payable 
-    {
-        _Treasury.payForNewProposal{value:msg.value}();
-       _PublicCertificatesPool.addProvider(provider, providerInfo);
-
-       emit _SendProposalId(provider);
     }
     
     function retrieveConfiguration() external view returns (Treasury, MultiSigCertificatesPool, address, uint) {
