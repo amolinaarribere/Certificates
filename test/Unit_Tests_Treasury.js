@@ -68,14 +68,14 @@ contract("Testing Treasury",function(accounts){
     });
 
     async function SendingNewProviders(){
-        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
-        await certPoolManager.sendProposal(provider_2, provider_2_Info, {from: user_1, value: PublicPriceWei});
+        await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei});
+        await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei});
         await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
     }
 
      // ****** TESTING Paying ***************************************************************** //
 
-     it("Pay New Proposal & New Pool WRONG",async function(){
+     it("Pay New Proposal & New Pool & New Certificate WRONG",async function(){
         // act
         try{
             await Treasury.methods.payForNewProposal().send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
@@ -94,17 +94,28 @@ contract("Testing Treasury",function(accounts){
         catch(error){
             expect(error.message).to.match(NotEnoughFunds);
         }
+        // act
+        try{
+            await Treasury.methods.payForNewCertificate().send({from: user_1, value: CertificatePriceWei - 1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughFunds);
+        }
     });
 
-    it("Pay New Proposal CORRECT",async function(){
+    it("Pay New Proposal & New Pool & New Certificate CORRECT",async function(){
         // act
         await Treasury.methods.payForNewProposal().send({from: user_1, value: PublicPriceWei}, function(error, result){});
         await Treasury.methods.payForNewProposal().send({from: user_1, value: PublicPriceWei + 1}, function(error, result){});
         await Treasury.methods.payForNewPool().send({from: user_1, value: PrivatePriceWei}, function(error, result){});
         await Treasury.methods.payForNewPool().send({from: user_1, value: PrivatePriceWei + 1}, function(error, result){});
+        await Treasury.methods.payForNewCertificate().send({from: user_1, value: CertificatePriceWei}, function(error, result){});
+        await Treasury.methods.payForNewCertificate().send({from: user_1, value: CertificatePriceWei + 1}, function(error, result){});
         // assert
         var balance = await web3.eth.getBalance(Treasury._address);
-        expect(balance).to.be.equal((PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1)).toString());
+        expect(balance).to.be.equal((PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1)).toString());
     });
 
     // ****** TESTING Owners Refunding ***************************************************************** //
