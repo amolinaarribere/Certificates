@@ -7,11 +7,12 @@ const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
 const Library = artifacts.require("./Libraries/Library");
 
 const init = require("../test_libraries/InitializeContracts.js");
+const constants = require("../test_libraries/constants.js");
 
-const PublicPriceWei = 10;
-const PrivatePriceWei = 20;
-const CertificatePriceWei = 5;
-const OwnerRefundPriceWei = 2;
+const PublicPriceWei = constants.PublicPriceWei;
+const PrivatePriceWei = constants.PrivatePriceWei;
+const CertificatePriceWei = constants.CertificatePriceWei;
+const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------

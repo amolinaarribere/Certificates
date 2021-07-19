@@ -38,6 +38,11 @@ pragma experimental ABIEncoderV2;
     }
    
     mapping(address => _CertificatesPerHolderStruct) _CertificatesPerPool;
+    string _ProviderInfo;
+
+    mapping(address => uint256) _AddCertificatePricePerPool;
+    mapping(address => uint256) _SubscriptionPricePerPool;
+    mapping(address => bool) _submited;
 
     // modifiers
     modifier isAPool(address pool){
@@ -46,31 +51,59 @@ pragma experimental ABIEncoderV2;
     }
 
      // Constructor
-    constructor(address[] memory owners,  uint256 minOwners) 
+    constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
         MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdProviders)
     payable
     {
+        _ProviderInfo = ProviderInfo;
     }
 
     // POOL CRUD Operations
-    function addPool(address pool, string memory poolInfo) external override{
+    function subscribeToPublicPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
+        InternaladdPool(pool, poolInfo, AddCertificatePrice, SubscriptionPrice);
+        if(true == isPool(pool)){
+            MultiSigCertificatesPool poolToSubscribe = PublicCertificatesPool(pool);
+            poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
+        }
+    }
+
+    function addPool(address pool, string memory poolInfo, uint256 AddCertificatePrice) external override{
+        InternaladdPool(pool, poolInfo, AddCertificatePrice, 0);
+    }
+
+    function InternaladdPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) internal{
         addEntity(pool, poolInfo, _poolId);
+        if(false == _submited[pool]){
+            _AddCertificatePricePerPool[pool] = AddCertificatePrice;
+            _SubscriptionPricePerPool[pool] = SubscriptionPrice;
+            _submited[pool] = true;
+        }
     }
 
     function removePool(address pool) external override{
        removeEntity(pool, _poolId); 
+       if(false == isPool(pool)){
+           delete(_submited[pool]);
+           delete(_AddCertificatePricePerPool[pool]);
+           delete(_SubscriptionPricePerPool[pool]);
+       } 
+
     }
     
-    function retrievePool(address pool) external override view returns (string memory, bool){
-        return InternalRetrievePool(pool);
+    function retrievePool(address pool) external override view returns (string memory, bool, uint256){
+        string memory poolInfo;
+        bool isActivated;
+
+        (poolInfo, isActivated) = InternalRetrievePool(pool);
+        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool]);
     }
     
     function InternalRetrievePool(address pool) internal view returns (string memory, bool){
-        return (retrieveEntity(pool, _poolId));
+        return retrieveEntity(pool, _poolId);
     }
 
     function retrieveAllPools() external override view returns (address[] memory){
-        return(retrieveAllEntities(_poolId));
+        return retrieveAllEntities(_poolId);
     }
 
     function isPool(address pool) public view returns (bool){
@@ -78,18 +111,18 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-     function addCertificate(address pool, bytes32 CertificateHash, address holder, uint256 Value) external override
+     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-        manipulateCertificate(pool, CertificateHash, holder, Actions.Add, Value);
+        manipulateCertificate(pool, CertificateHash, holder, Actions.Add);
      }
      
      function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-         manipulateCertificate(pool, CertificateHash, holder, Actions.Remove, 0);
+         manipulateCertificate(pool, CertificateHash, holder, Actions.Remove);
      }
 
     
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Actions act, uint256 Value) 
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Actions act) 
         isAPool(pool)
         isAnOwner
         HasNotAlreadyVoted(act, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
@@ -119,7 +152,7 @@ pragma experimental ABIEncoderV2;
             
             
             if(act == Actions.Add){
-                poolToSend.addCertificate{value:Value}(CertificateHash, holder);
+                poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
             }
             else{
                poolToSend.removeCertificate(CertificateHash, holder);
@@ -129,5 +162,8 @@ pragma experimental ABIEncoderV2;
             
         }
     }
+
+    
+    receive() external override payable{}
     
  }

@@ -42,7 +42,7 @@ module.exports = async function(deployer, network, accounts){
     await deployer.link(Library, Provider);
     console.log("Library linked to Provider");
 
-    await deployer.deploy(Provider, [accounts[0]], 1);
+    await deployer.deploy(Provider, [accounts[0]], 1, "Provider Info");
     console.log("Provider deployed");
     
 }

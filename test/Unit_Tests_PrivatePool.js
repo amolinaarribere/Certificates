@@ -3,17 +3,18 @@
 
 const pool_common = require("../test_libraries/Pools.js");
 const init = require("../test_libraries/InitializeContracts.js");
+const constants = require("../test_libraries/constants.js");
 
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PrivateCertificates = artifacts.require("PrivateCertificatesPool");
 var PrivateCertificatesAbi = PrivateCertificates.abi;
 const Library = artifacts.require("./Libraries/Library");
 
-const PublicPriceWei = 10;
-const PrivatePriceWei = 20;
-const CertificatePriceWei = 5;
-const OwnerRefundPriceWei = 2;
-const Gas = 6721975;
+
+const PublicPriceWei = constants.PublicPriceWei;
+const PrivatePriceWei = constants.PrivatePriceWei;
+const CertificatePriceWei = constants.CertificatePriceWei;
+const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
