@@ -73,7 +73,21 @@ contract("Testing Treasury",function(accounts){
         await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
     }
 
-     // ****** TESTING Paying ***************************************************************** //
+    // ****** TESTING Paying ***************************************************************** //
+
+    it("Update Configuration WRONG",async function(){
+        // act
+        try{
+            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, publicCertPool._address).send({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(WrongSender);
+        }
+    });
+
+    // ****** TESTING Paying ***************************************************************** //
 
      it("Pay New Proposal & New Pool & New Certificate WRONG",async function(){
         // act

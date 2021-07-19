@@ -58,11 +58,7 @@ contract Treasury is ITreasury{
 
     constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress) {
         _creator = managerContractAddress; 
-        _PublicPriceWei = PublicPriceWei;
-        _PrivatePriceWei = PrivatePriceWei;
-        _CertificatePriceWei = CertificatePriceWei;
-        _OwnerRefundPriceWei = OwnerRefundPriceWei;
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress);
     }
 
     function payForNewProposal() external 
@@ -84,6 +80,21 @@ contract Treasury is ITreasury{
     override payable
     {
         // Assign dividends propotionaly (substracting the owners cut)
+    }
+
+    function updateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) external
+        isFromCreator()
+    override{
+        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress);
+    }
+
+    function InternalupdateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) internal
+    {
+        _PublicPriceWei = PublicPriceWei;
+        _PrivatePriceWei = PrivatePriceWei;
+        _CertificatePriceWei = CertificatePriceWei;
+        _OwnerRefundPriceWei = OwnerRefundPriceWei;
+        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
     }
 
     function getRefund(address addr, uint numberOfOwners) external 
