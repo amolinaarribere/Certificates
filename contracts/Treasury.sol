@@ -81,7 +81,7 @@ contract Treasury is ITreasury{
         isFromPublicPool()
     override
     {
-        addBalance( addr, _OwnerRefundPriceWei, numberOfOwners);
+        addBalance(addr, _OwnerRefundPriceWei, numberOfOwners);
     }
 
     function withdraw(uint amount) external 
@@ -92,15 +92,17 @@ contract Treasury is ITreasury{
         uint total = 0;
         uint i = 0;
 
-        while(total < amount){
+        while ((total < amount) && (i < f.length)){
             uint amountForFactor = returnBalanceForFactor(msg.sender, f[i]) / f[i];
             if(amountForFactor > (amount - total)) amountForFactor = amount - total;
             total += amountForFactor;
-            substractBalance(msg.sender, amountForFactor, f[i]);
+            substractBalance(msg.sender, amountForFactor * f[i], f[i]);
             i++;
         }
 
-        msg.sender.transfer(amount);
+        require(total == amount, "UnExpected problem calculating the amount to withdraw");
+
+        msg.sender.transfer(total);
     }
 
     function retrieveBalance(address addr) external override view returns(uint)

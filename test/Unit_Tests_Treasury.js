@@ -155,8 +155,12 @@ contract("Testing Treasury",function(accounts){
             TreasuryBalance -= balance.toNumber();
             let initialBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
             let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gasPrice: 1}, function(error, result){});
+            // assert that money has been transfered
             let finalBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
             expect(finalBalance.minus(initialBalance.minus(request.gasUsed).plus(balance)).toString()).to.be.equal("0");
+            // assert that account balance has been updated
+            balance = new BigNumber(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
+            expect(balance.toString()).to.be.equal("0");
         }
         let FinalTreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         expect(FinalTreasuryBalance).to.be.equal(TreasuryBalance);
