@@ -8,6 +8,8 @@ const constants = require("../test_libraries/constants.js");
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PrivateCertificates = artifacts.require("PrivateCertificatesPool");
 var PrivateCertificatesAbi = PrivateCertificates.abi;
+const CertisToken = artifacts.require("CertisToken");
+var CertisTokenAbi = CertisToken.abi;
 const Library = artifacts.require("./Libraries/Library");
 
 
@@ -15,12 +17,14 @@ const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Private Pool",function(accounts){
     var certPoolManager;
+    var certisToken;
     var privateCertPool;
     // used addresses
     const chairPerson = accounts[0];
@@ -36,7 +40,9 @@ contract("Testing Private Pool",function(accounts){
     const extra_owner = accounts[4];
 
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        certPoolManager = contracts[0];
+        certisToken = contracts[1];
         await certPoolManager.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
         let response = await certPoolManager.retrievePrivateCertificatesPool(0, {from: user_1});
         const {0: creator, 1: privateCertPoolAddress} = response;

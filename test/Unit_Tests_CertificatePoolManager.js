@@ -4,6 +4,8 @@
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const Treasury = artifacts.require("Treasury");
 const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
+const CertisToken = artifacts.require("CertisToken");
+var CertisTokenAbi = CertisToken.abi;
 const Library = artifacts.require("./Libraries/Library");
 
 const init = require("../test_libraries/InitializeContracts.js");
@@ -13,12 +15,14 @@ const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Certificate Pool Manager",function(accounts){
     var certPoolManager;
+    var certisToken;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -34,7 +38,9 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const ProvidedIdIsWrong = new RegExp("EC1");
 
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        certPoolManager = contracts[0];
+        certisToken = contracts[1];
     });
 
     // ****** TESTING Creating Private Pools ***************************************************************** //

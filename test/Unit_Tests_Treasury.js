@@ -11,18 +11,22 @@ const PublicCertificates = artifacts.require("PublicCertificatesPool");
 var PublicCertificatesAbi = PublicCertificates.abi;
 const Treasury = artifacts.require("Treasury");
 var TreasuryAbi = Treasury.abi;
+const CertisToken = artifacts.require("CertisToken");
+var CertisTokenAbi = CertisToken.abi;
 const UintLibrary = artifacts.require("./Libraries/UintLibrary");
 
 const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Treasury",function(accounts){
     var certPoolManager;
+    var certisToken;
     var publicCertPool;
     var Treasury;
     // used addresses
@@ -48,6 +52,7 @@ contract("Testing Treasury",function(accounts){
     const NotEnoughFunds = new RegExp("EC2");
     const WrongSender = new RegExp("EC8");
     const NotEnoughBalance = new RegExp("EC20");
+    const WrongConfig = new RegExp("EC21");
     const NotAnOwner = new RegExp("EC9");
     const OwnerAlreadyvoted = new RegExp("EC5");
     const NotSubmittedByCreator = new RegExp("EC4");
@@ -59,8 +64,11 @@ contract("Testing Treasury",function(accounts){
     const CertificateAlreadyExists = new RegExp("EC15");
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
 
+
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        certPoolManager = contracts[0];
+        certisToken = contracts[1];
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
         Treasury = new web3.eth.Contract(TreasuryAbi, _treasuryAddress);   
@@ -68,8 +76,8 @@ contract("Testing Treasury",function(accounts){
     });
 
     async function SendingNewProviders(){
-        await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei});
-        await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei});
+        await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
     }
 
@@ -78,13 +86,22 @@ contract("Testing Treasury",function(accounts){
     it("Update Configuration WRONG",async function(){
         // act
         try{
-            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, publicCertPool._address).send({from: user_1}, function(error, result){});
+            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, publicCertPool._address, certisToken.address).send({from: user_1}, function(error, result){});
             expect.fail();
         }
         // assert
         catch(error){
             expect(error.message).to.match(WrongSender);
         }
+        /*// act
+        try{
+            await Treasury.methods.updateConfig(OwnerRefundPriceWei, PrivatePriceWei, CertificatePriceWei, PublicPriceWei, publicCertPool._address, certisToken.address).send({from: certPoolManager}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(WrongConfig);
+        }*/
     });
 
     // ****** TESTING Paying ***************************************************************** //
@@ -92,7 +109,7 @@ contract("Testing Treasury",function(accounts){
      it("Pay New Proposal & New Pool & New Certificate WRONG",async function(){
         // act
         try{
-            await Treasury.methods.payForNewProvider().send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
+            await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -101,7 +118,7 @@ contract("Testing Treasury",function(accounts){
         }
         // act
         try{
-            await Treasury.methods.payForNewPool().send({from: user_1, value: PrivatePriceWei - 1}, function(error, result){});
+            await Treasury.methods.pay(1).send({from: user_1, value: PrivatePriceWei - 1}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -110,7 +127,7 @@ contract("Testing Treasury",function(accounts){
         }
         // act
         try{
-            await Treasury.methods.payForNewCertificate().send({from: user_1, value: CertificatePriceWei - 1}, function(error, result){});
+            await Treasury.methods.pay(2).send({from: user_1, value: CertificatePriceWei - 1}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -121,12 +138,12 @@ contract("Testing Treasury",function(accounts){
 
     it("Pay New Proposal & New Pool & New Certificate CORRECT",async function(){
         // act
-        await Treasury.methods.payForNewProvider().send({from: user_1, value: PublicPriceWei}, function(error, result){});
-        await Treasury.methods.payForNewProvider().send({from: user_1, value: PublicPriceWei + 1}, function(error, result){});
-        await Treasury.methods.payForNewPool().send({from: user_1, value: PrivatePriceWei}, function(error, result){});
-        await Treasury.methods.payForNewPool().send({from: user_1, value: PrivatePriceWei + 1}, function(error, result){});
-        await Treasury.methods.payForNewCertificate().send({from: user_1, value: CertificatePriceWei}, function(error, result){});
-        await Treasury.methods.payForNewCertificate().send({from: user_1, value: CertificatePriceWei + 1}, function(error, result){});
+        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei + 1, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(1).send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(1).send({from: user_1, value: PrivatePriceWei + 1, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(2).send({from: user_1, value: CertificatePriceWei, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(2).send({from: user_1, value: CertificatePriceWei + 1, gas: Gas}, function(error, result){});
         // assert
         var balance = await web3.eth.getBalance(Treasury._address);
         expect(balance).to.be.equal((PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1)).toString());

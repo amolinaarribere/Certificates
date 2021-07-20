@@ -7,19 +7,22 @@ const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PublicCertificates = artifacts.require("PublicCertificatesPool");
 const Provider = artifacts.require("Provider");
 var PublicCertificatesAbi = PublicCertificates.abi;
+const CertisToken = artifacts.require("CertisToken");
+var CertisTokenAbi = CertisToken.abi;
 const Library = artifacts.require("./Libraries/Library");
 
 const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
-const Gas = 6721975;
+const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Provider",function(accounts){
     var certPoolManager;
+    var certisToken;
     var publicCertPool;
     var publicCertPoolAddress;
     const randomPoolAddress = accounts[0];
@@ -47,7 +50,9 @@ contract("Testing Provider",function(accounts){
 
     beforeEach(async function(){
         // Public Pool creation and provider subscription
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        certPoolManager = contracts[0];
+        certisToken = contracts[1];
         provider = await Provider.new(ProviderOwners, minOwners, provider_1_Info, {from: user_1, value: (2 * CertificatePriceWei) + PublicPriceWei});
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
@@ -56,7 +61,7 @@ contract("Testing Provider",function(accounts){
     });
 
     async function AddProvider(){
-        await publicCertPool.methods.addProvider(provider.address, provider_1_Info).send({from: user_1, value: PublicPriceWei}, function(error, result){});
+        await publicCertPool.methods.addProvider(provider.address, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await ValidateProvider();
     }
 

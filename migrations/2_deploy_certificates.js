@@ -2,9 +2,11 @@ let CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 let Provider = artifacts.require("Provider");
 let Treasury = artifacts.require("Treasury");
 let PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
+let CertisToken = artifacts.require("CertisToken");
 
 let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
+let AddressLibrary = artifacts.require("./Libraries/AddressLibrary");
 
 module.exports = async function(deployer, network, accounts){
     await deployer.deploy(Library);
@@ -15,6 +17,12 @@ module.exports = async function(deployer, network, accounts){
 
     await deployer.deploy(UintLibrary);
     console.log("UintLibrary deployed");
+
+    await deployer.link(Library, AddressLibrary);
+    console.log("Library linked to Address Library");
+
+    await deployer.deploy(AddressLibrary);
+    console.log("AddressLibrary deployed");
 
     await deployer.link(Library, CertificatesPoolManager);
     console.log("Library linked to Certificate Pool Manager");
@@ -30,10 +38,20 @@ module.exports = async function(deployer, network, accounts){
     PublicCertificatesPoolInstance = await PublicCertificatesPool.deployed();
     console.log("PublicCertificatesPool deployed : " + PublicCertificatesPoolInstance.address);
 
+    await deployer.link(Library, CertisToken);
+    console.log("Library linked to CertisToken");
+
+    await deployer.link(AddressLibrary, CertisToken);
+    console.log("AddressLibrary linked to CertisToken");
+
+    await deployer.deploy(CertisToken, "CertisToken", "CERT", 0, 1000000);
+    CertisTokenInstance = await CertisToken.deployed();
+    console.log("CertisToken deployed : " + CertisTokenInstance.address);
+
     await deployer.link(UintLibrary, Treasury);
     console.log("UintLibrary linked to Treasury");
 
-    await deployer.deploy(Treasury, 10, 20, 5, 2, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address);
+    await deployer.deploy(Treasury, 10, 20, 5, 2, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address, CertisTokenInstance.address);
     TreasuryInstance = await Treasury.deployed();
     console.log("Treasury deployed : " + TreasuryInstance.address);
 

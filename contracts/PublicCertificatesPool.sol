@@ -11,8 +11,11 @@ pragma experimental ABIEncoderV2;
  import "./Abstract/MultiSigCertificatesPool.sol";
  import "./Interfaces/IPublicPool.sol";
  import "./Treasury.sol";
+ import "./Libraries/Library.sol";
 
  contract PublicCertificatesPool is MultiSigCertificatesPool, IPublicPool {
+
+    using Library for *;
 
      // events
     event _SendProposalId(address);

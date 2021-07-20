@@ -8,18 +8,22 @@ const constants = require("../test_libraries/constants.js");
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PublicCertificates = artifacts.require("PublicCertificatesPool");
 var PublicCertificatesAbi = PublicCertificates.abi;
+const CertisToken = artifacts.require("CertisToken");
+var CertisTokenAbi = CertisToken.abi;
 const Library = artifacts.require("./Libraries/Library");
 
 const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Public Pool",function(accounts){
     var certPoolManager;
+    var certisToken;
     var publicCertPool;
     // used addresses
     const chairPerson = accounts[0];
@@ -54,12 +58,14 @@ contract("Testing Public Pool",function(accounts){
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
 
     beforeEach(async function(){
-        certPoolManager = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        certPoolManager = contracts[0];
+        certisToken = contracts[1];
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
         publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);    
-        await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei}, function(error, result){});
-        await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei}, function(error, result){});
+        await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
     });
 
      // ****** TESTING Adding Owners ***************************************************************** //
