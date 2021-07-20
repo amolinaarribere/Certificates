@@ -26,7 +26,7 @@ import "./Libraries/AddressLibrary.sol";
         return _decimals;
     }
 
-    function TokenOwners() internal view returns (address[] memory, uint256[] memory){
+    function TokenOwners() external view returns (address[] memory, uint256[] memory){
         address[] memory tO = _tokenOwners;
         uint256[] memory OwnerBalance = new uint256[](tO.length);
 
