@@ -138,6 +138,8 @@ contract("Testing Treasury",function(accounts){
 
     it("Pay New Proposal & New Pool & New Certificate CORRECT",async function(){
         // act
+        var CertisTokenBalance = (new BigNumber(await certisToken.balanceOf(chairPerson))).dividedBy(2);
+        await certisToken.transfer(user_1, CertisTokenBalance.toNumber());
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei + 1, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(1).send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
@@ -145,8 +147,12 @@ contract("Testing Treasury",function(accounts){
         await Treasury.methods.pay(2).send({from: user_1, value: CertificatePriceWei, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(2).send({from: user_1, value: CertificatePriceWei + 1, gas: Gas}, function(error, result){});
         // assert
-        var balance = await web3.eth.getBalance(Treasury._address);
-        expect(balance).to.be.equal((PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1)).toString());
+        var balance = parseInt(await web3.eth.getBalance(Treasury._address));
+        expect(balance).to.be.equal(PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1));
+        var Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
+        var Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
+        expect(Balance1).to.be.equal(Balance2);
+        expect(Balance1).to.be.greaterThan(0);
     });
 
     // ****** TESTING Owners Refunding ***************************************************************** //
