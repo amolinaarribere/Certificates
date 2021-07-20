@@ -122,7 +122,7 @@ contract Treasury is ITreasury{
 
         require(total == amount, "UnExpected problem calculating the amount to withdraw");
 
-        msg.sender.transfer(total);
+        payable(msg.sender).transfer(total);
     }
 
     function retrieveBalance(address addr) external override view returns(uint)
