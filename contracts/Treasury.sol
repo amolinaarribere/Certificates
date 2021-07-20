@@ -11,6 +11,7 @@ import "./Interfaces/ITreasury.sol";
 import "./PublicCertificatesPool.sol";
 import "./Libraries/UintLibrary.sol";
 import "./Libraries/Library.sol";
+import "./CertisToken.sol";
 
 
 contract Treasury is ITreasury{
@@ -20,8 +21,13 @@ contract Treasury is ITreasury{
     // creator
     address _creator;
 
-    // modifiers
-    modifier areFundsEnough(uint minPrice){
+    modifier areFundsEnough(Library.Prices price){
+        uint256 minPrice = 2**256 - 1;
+
+        if(Library.Prices.NewProvider == price) minPrice = _PublicPriceWei;
+        else if(Library.Prices.NewPool == price) minPrice = _PrivatePriceWei;
+        else if(Library.Prices.NewCertificate == price) minPrice = _CertificatePriceWei;
+
         require(msg.value >= minPrice, "EC2");
         _;
     }
@@ -41,8 +47,14 @@ contract Treasury is ITreasury{
         _;
     }
 
+    modifier isConfigOK(uint256 PublicPriceWei, uint256 OwnerRefundPriceWei){
+        require(PublicPriceWei >= OwnerRefundPriceWei, "EC21");
+        _;
+    }
+
     // constants
     PublicCertificatesPool  _PublicCertificatesPool;
+    CertisToken _CertisToken;
     uint _PublicPriceWei;
     uint _CertificatePriceWei;
     uint _PrivatePriceWei;
@@ -56,45 +68,46 @@ contract Treasury is ITreasury{
     
     mapping(address => _BalanceStruct) _balances;
 
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress) {
+    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress, address CertisTokenAddress) {
         _creator = managerContractAddress; 
-        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress);
+        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress, CertisTokenAddress);
     }
 
-    function payForNewProposal() external 
-        areFundsEnough(_PublicPriceWei)
+
+    function pay(Library.Prices price) external 
+        areFundsEnough(price)
     override payable
     {
-        // Assign dividends propotionaly (substracting the owners cut)
+        uint256 amount = msg.value;
+        if(price == Library.Prices.NewProvider) amount -= _OwnerRefundPriceWei;
+        AssignDividends(amount);
     }
 
-    function payForNewPool() external 
-        areFundsEnough(_PrivatePriceWei)
-    override payable
-    {
-        // Assign dividends propotionaly (substracting the owners cut)
+    function AssignDividends(uint256 amount) internal{
+        (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = _CertisToken.TokenOwners();
+        uint256 TotalTokenSupply = _CertisToken.totalSupply();
+
+        for(uint i=0; i < DividendsRecipients.length; i++){
+            addBalance(DividendsRecipients[i], DividendsRecipientsTokens[i] * amount, TotalTokenSupply);
+        }
+
     }
 
-    function payForNewCertificate() external 
-        areFundsEnough(_CertificatePriceWei)
-    override payable
-    {
-        // Assign dividends propotionaly (substracting the owners cut)
-    }
-
-    function updateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) external
+    function updateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address CertisTokenAddress) external
         isFromCreator()
     override{
-        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress);
+        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress, CertisTokenAddress);
     }
 
-    function InternalupdateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress) internal
+    function InternalupdateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address CertisTokenAddress) internal
+        isConfigOK( PublicPriceWei, OwnerRefundPriceWei)
     {
         _PublicPriceWei = PublicPriceWei;
         _PrivatePriceWei = PrivatePriceWei;
         _CertificatePriceWei = CertificatePriceWei;
         _OwnerRefundPriceWei = OwnerRefundPriceWei;
         _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+        _CertisToken = CertisToken(CertisTokenAddress);
     }
 
     function getRefund(address addr, uint numberOfOwners) external 

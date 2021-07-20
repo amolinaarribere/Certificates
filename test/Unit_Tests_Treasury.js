@@ -92,7 +92,7 @@ contract("Testing Treasury",function(accounts){
      it("Pay New Proposal & New Pool & New Certificate WRONG",async function(){
         // act
         try{
-            await Treasury.methods.payForNewProposal().send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
+            await Treasury.methods.payForNewProvider().send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -121,8 +121,8 @@ contract("Testing Treasury",function(accounts){
 
     it("Pay New Proposal & New Pool & New Certificate CORRECT",async function(){
         // act
-        await Treasury.methods.payForNewProposal().send({from: user_1, value: PublicPriceWei}, function(error, result){});
-        await Treasury.methods.payForNewProposal().send({from: user_1, value: PublicPriceWei + 1}, function(error, result){});
+        await Treasury.methods.payForNewProvider().send({from: user_1, value: PublicPriceWei}, function(error, result){});
+        await Treasury.methods.payForNewProvider().send({from: user_1, value: PublicPriceWei + 1}, function(error, result){});
         await Treasury.methods.payForNewPool().send({from: user_1, value: PrivatePriceWei}, function(error, result){});
         await Treasury.methods.payForNewPool().send({from: user_1, value: PrivatePriceWei + 1}, function(error, result){});
         await Treasury.methods.payForNewCertificate().send({from: user_1, value: CertificatePriceWei}, function(error, result){});

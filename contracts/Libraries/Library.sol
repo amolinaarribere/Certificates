@@ -10,6 +10,9 @@ pragma experimental ABIEncoderV2;
 
 library Library{
 
+    // enum
+    enum Prices{NewProvider, NewPool, NewCertificate}
+
     // modifier
     modifier isIdCorrect(uint Id, uint length){
         require(true == IdCorrect(Id, length), "EC1");

@@ -37,7 +37,7 @@ pragma experimental ABIEncoderV2;
         hasBeenSubmitted(false, provider)
     override payable
     {
-        _Treasury.payForNewProposal{value:msg.value}();
+        _Treasury.pay{value:msg.value}(Library.Prices.NewProvider);
         _Entities[_providerId]._entities[provider]._Info = providerInfo;
         _submited[provider] = true;
 
@@ -75,7 +75,7 @@ pragma experimental ABIEncoderV2;
 
     function addCertificate(bytes32 CertificateHash, address holder) external override payable
     {
-        _Treasury.payForNewCertificate{value:msg.value}();
+        _Treasury.pay{value:msg.value}(Library.Prices.NewCertificate);
         addCertificateInternal(CertificateHash, holder);
     }
 

@@ -61,7 +61,7 @@ contract CertificatesPoolManager{
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external
     payable
     {
-        _Treasury.payForNewPool{value:msg.value}();
+        _Treasury.pay{value:msg.value}(Library.Prices.NewPool);
         PrivateCertificatesPool certificatePool = new PrivateCertificatesPool(owners, minOwners);
         _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, certificatePool);
         _PrivateCertificatesPools.push(privateCertificatesPool);
