@@ -51,7 +51,7 @@ module.exports = async function(deployer, network, accounts){
     await deployer.link(UintLibrary, Treasury);
     console.log("UintLibrary linked to Treasury");
 
-    await deployer.deploy(Treasury, 10, 20, 5, 2, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address, CertisTokenInstance.address);
+    await deployer.deploy(Treasury, 10, 20, 5, 2, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address, CertisTokenInstance.address, 604800, 50);
     TreasuryInstance = await Treasury.deployed();
     console.log("Treasury deployed : " + TreasuryInstance.address);
 

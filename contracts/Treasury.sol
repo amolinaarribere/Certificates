@@ -12,9 +12,10 @@ import "./PublicCertificatesPool.sol";
 import "./Libraries/UintLibrary.sol";
 import "./Libraries/Library.sol";
 import "./CertisToken.sol";
+import "./Base/TokenGovernanceBaseContract.sol";
 
 
-contract Treasury is ITreasury{
+contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using Library for *;
     using UintLibrary for *;
 
@@ -52,13 +53,28 @@ contract Treasury is ITreasury{
         _;
     }
 
+    // proposition to change
+    struct ProposedConfigStruct{
+        address  NewPublicCertificatesPool;
+        address  NewCertisToken;
+        uint NewPublicPriceWei;
+        uint NewCertificatePriceWei;
+        uint NewPrivatePriceWei;
+        uint NewOwnerRefundPriceWei;
+        uint NewPropositionLifeTime;
+        uint NewPropositionThresholdPercentage;
+    }
+
+    ProposedConfigStruct ProposedConfig;
+
     // constants
     PublicCertificatesPool  _PublicCertificatesPool;
-    CertisToken _CertisToken;
     uint _PublicPriceWei;
     uint _CertificatePriceWei;
     uint _PrivatePriceWei;
     uint _OwnerRefundPriceWei;
+    uint _PropositionLifeTime;
+    uint _PropositionThresholdPercentage;
 
     // data
     struct _BalanceStruct{
@@ -68,9 +84,9 @@ contract Treasury is ITreasury{
     
     mapping(address => _BalanceStruct) _balances;
 
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress, address CertisTokenAddress) {
+    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress, address CertisTokenAddress, uint256 PropositionLifeTime, uint256 PropositionThresholdPercentage) {
         _creator = managerContractAddress; 
-        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress, CertisTokenAddress);
+        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress, CertisTokenAddress, PropositionLifeTime, PropositionThresholdPercentage, true);
     }
 
 
@@ -93,21 +109,63 @@ contract Treasury is ITreasury{
 
     }
 
-    function updateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address CertisTokenAddress) external
-        isFromCreator()
-    override{
-        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress, CertisTokenAddress);
+    function updateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address CertisTokenAddress, uint256 PropositionLifeTime, uint256 PropositionThresholdPercentage) external override
+    {
+        InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PublicPoolAddress, CertisTokenAddress, PropositionLifeTime, PropositionThresholdPercentage, false);
     }
 
-    function InternalupdateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address CertisTokenAddress) internal
-        isConfigOK( PublicPriceWei, OwnerRefundPriceWei)
+    function InternalupdateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address CertisTokenAddress, uint256 PropositionLifeTime, uint256 PropositionThresholdPercentage, bool fromConstructor) internal
+        isConfigOK(PublicPriceWei, OwnerRefundPriceWei)
     {
-        _PublicPriceWei = PublicPriceWei;
-        _PrivatePriceWei = PrivatePriceWei;
-        _CertificatePriceWei = CertificatePriceWei;
-        _OwnerRefundPriceWei = OwnerRefundPriceWei;
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
-        _CertisToken = CertisToken(CertisTokenAddress);
+        if(fromConstructor){
+            _PublicPriceWei = PublicPriceWei;
+            _PrivatePriceWei = PrivatePriceWei;
+            _CertificatePriceWei = CertificatePriceWei;
+            _OwnerRefundPriceWei = OwnerRefundPriceWei;
+            _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+            _CertisToken = CertisToken(CertisTokenAddress);
+            _PropositionLifeTime = PropositionLifeTime;
+            _PropositionThresholdPercentage = PropositionThresholdPercentage;
+        }
+        else{
+            addProposition(block.timestamp + PropositionLifeTime, PropositionThresholdPercentage);
+            ProposedConfig.NewPublicCertificatesPool = PublicPoolAddress;
+            ProposedConfig.NewCertisToken = CertisTokenAddress;
+            ProposedConfig.NewPublicPriceWei = PublicPriceWei;
+            ProposedConfig.NewCertificatePriceWei = CertificatePriceWei;
+            ProposedConfig.NewPrivatePriceWei = PrivatePriceWei;
+            ProposedConfig.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
+            ProposedConfig.NewPropositionLifeTime = PropositionLifeTime;
+            ProposedConfig.NewPropositionThresholdPercentage = PropositionThresholdPercentage;
+        }
+        
+    }
+
+    function propositionApproved() internal override
+    {
+        _PublicPriceWei = ProposedConfig.NewPublicPriceWei;
+        _PrivatePriceWei = ProposedConfig.NewPrivatePriceWei;
+        _CertificatePriceWei = ProposedConfig.NewCertificatePriceWei;
+        _OwnerRefundPriceWei = ProposedConfig.NewOwnerRefundPriceWei;
+        _PublicCertificatesPool = PublicCertificatesPool(ProposedConfig.NewPublicCertificatesPool);
+        _CertisToken = CertisToken(ProposedConfig.NewCertisToken);
+        _PropositionLifeTime = ProposedConfig.NewPropositionLifeTime;
+        _PropositionThresholdPercentage = ProposedConfig.NewPropositionThresholdPercentage;
+        removeProposition();
+    }
+
+    function propositionRejected() internal override
+    {
+        removeProposition();
+    }
+
+    function propositionExpired() internal override
+    {
+        removeProposition();
+    }
+
+    function removeProposition() internal{
+        delete(ProposedConfig);
     }
 
     function getRefund(address addr, uint numberOfOwners) external 
