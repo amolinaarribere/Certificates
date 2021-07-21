@@ -19,8 +19,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using Library for *;
     using UintLibrary for *;
 
-    event test(bool);
-
     // manager contract
     address _managerContract;
 
@@ -181,7 +179,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         removeProposition();
     }
 
-    function removeProposition() internal{
+    function removeProposition() internal
+    {
         delete(ProposedConfig);
     }
 

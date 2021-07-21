@@ -89,22 +89,38 @@ contract("Testing Treasury",function(accounts){
     it("Update Configuration WRONG",async function(){
         // act
         try{
-            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1}, function(error, result){});
+            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
         catch(error){
             expect(error.message).to.match(WrongSender);
         }
-        /*// act
+        // act
         try{
-            await Treasury.methods.updateConfig(OwnerRefundPriceWei, PrivatePriceWei, CertificatePriceWei, PublicPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: certPoolManager}, function(error, result){});
+            await Treasury.methods.updateConfig(OwnerRefundPriceWei, PrivatePriceWei, CertificatePriceWei, PublicPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
         catch(error){
             expect(error.message).to.match(WrongConfig);
-        }*/
+        }
+        try{
+            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, 101, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(WrongConfig);
+        }
+        try{
+            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, PropositionThresholdPercentage, 101).send({from: chairPerson, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(WrongConfig);
+        }
     });
 
     // ****** TESTING Paying ***************************************************************** //
