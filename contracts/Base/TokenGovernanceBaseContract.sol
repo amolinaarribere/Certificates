@@ -14,9 +14,9 @@ contract TokenGovernanceBaseContract{
 
     using AddressLibrary for *; 
 
-    CertisToken _CertisToken;
+    address _chairperson;
 
-    uint256 minWeightToPropose;
+    CertisToken _CertisToken;
 
     struct PropositionStruct{
         address Proposer;
@@ -29,12 +29,15 @@ contract TokenGovernanceBaseContract{
     }
 
     PropositionStruct Proposition;
+
+    uint8 _minWeightToProposePercentage;
     
     // modifiers
 
     modifier isAuthorized(){
-        require(GetId(msg.sender) < Proposition.listOfAdmins.length, "EC22");
-        require(Proposition.AdminsWeight[GetId(msg.sender)] >= minWeightToPropose, "EC22");
+        require((msg.sender == _chairperson) || 
+            ((GetId(msg.sender) < Proposition.listOfAdmins.length) &&
+             (Proposition.AdminsWeight[GetId(msg.sender)] >= (_minWeightToProposePercentage * totalSupply() / 100))), "EC22");
         _;
     }
 
@@ -73,13 +76,17 @@ contract TokenGovernanceBaseContract{
 
     // functions
 
-    function addProposition(uint256 _DeadLine, uint256 _validationThresholdPercentage) internal
+    function totalSupply() internal view returns(uint256){
+        return _CertisToken.totalSupply();
+    }
+
+    function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
         isAuthorized()
     {
         Proposition.Proposer = msg.sender;
         Proposition.DeadLine = _DeadLine;
-        Proposition.validationThreshold = _CertisToken.totalSupply() * _validationThresholdPercentage / 100;
+        Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
         (Proposition.listOfAdmins, Proposition.AdminsWeight) = _CertisToken.TokenOwners();
         require(0 < Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
     }

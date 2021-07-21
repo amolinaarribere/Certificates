@@ -44,10 +44,10 @@ contract CertificatesPoolManager{
     // Treasury
     Treasury _Treasury;
 
-    address payable _chairperson;
+    address _chairperson;
     
-    constructor() payable{
-        _chairperson = payable(msg.sender); 
+    constructor() {
+        _chairperson = msg.sender; 
     }
 
     function Initialize(address PublicPoolAddress, address TreasuryAddress) 
