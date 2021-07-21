@@ -19,6 +19,9 @@ const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const PropositionLifeTime = constants.PropositionLifeTime;
+const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
+const minPercentageToPropose = constants.minPercentageToPropose;
 const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +89,7 @@ contract("Testing Treasury",function(accounts){
     it("Update Configuration WRONG",async function(){
         // act
         try{
-            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, publicCertPool._address, certisToken.address).send({from: user_1}, function(error, result){});
+            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -95,7 +98,7 @@ contract("Testing Treasury",function(accounts){
         }
         /*// act
         try{
-            await Treasury.methods.updateConfig(OwnerRefundPriceWei, PrivatePriceWei, CertificatePriceWei, PublicPriceWei, publicCertPool._address, certisToken.address).send({from: certPoolManager}, function(error, result){});
+            await Treasury.methods.updateConfig(OwnerRefundPriceWei, PrivatePriceWei, CertificatePriceWei, PublicPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: certPoolManager}, function(error, result){});
             expect.fail();
         }
         // assert

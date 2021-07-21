@@ -35,14 +35,12 @@ contract TokenGovernanceBaseContract{
     // modifiers
 
     modifier isAuthorized(){
-        require((msg.sender == _chairperson) || 
-            ((GetId(msg.sender) < Proposition.listOfAdmins.length) &&
-             (Proposition.AdminsWeight[GetId(msg.sender)] >= (_minWeightToProposePercentage * totalSupply() / 100))), "EC22");
+        require(true == Authorization(msg.sender), "EC22");
         _;
     }
 
     modifier canVote(){
-        require(GetId(msg.sender) < Proposition.listOfAdmins.length, "EC23");
+        require(GetId(msg.sender, GetAdminList()) < Proposition.listOfAdmins.length, "EC23");
          _;
     }
 
@@ -54,9 +52,37 @@ contract TokenGovernanceBaseContract{
 
     // auxiliairy function
 
-    function GetId(address add) internal view returns(uint256)
+    function Authorization(address add) internal view returns(bool) {
+        if(msg.sender == _chairperson) return true;
+        else 
+        {
+            address[] memory list = GetAdminList();
+            uint256[] memory weights = GetAdminWeights();
+            uint256 id = GetId(add, list);
+            if(id < list.length){
+                if(weights[id] >= (_minWeightToProposePercentage * totalSupply() / 100)) return true;
+            }
+            return false;
+        }
+    }
+
+    function GetId(address add, address[] memory list) internal pure returns(uint256)
     {
-        return AddressLibrary.FindAddressPosition(add, Proposition.listOfAdmins);
+        return AddressLibrary.FindAddressPosition(add, list);
+    }
+
+    function GetAdminList() internal view returns(address[] memory){
+        (address[] memory list, ) = _CertisToken.TokenOwners();
+        return list;
+    }
+
+    function GetAdminWeights() internal view returns(uint256[] memory){
+        (, uint256[] memory weights) = _CertisToken.TokenOwners();
+        return weights;
+    }
+
+    function totalSupply() internal view returns(uint256){
+        return _CertisToken.totalSupply();
     }
 
     function CheckIfPropostiionActive() internal returns(bool){
@@ -66,7 +92,7 @@ contract TokenGovernanceBaseContract{
         }
         else 
         {
-            if(0 < Proposition.listOfAdmins.length){
+            if(address(0) != Proposition.Proposer){
                 propositionExpired();
                 cancelProposition();
             } 
@@ -76,10 +102,6 @@ contract TokenGovernanceBaseContract{
 
     // functions
 
-    function totalSupply() internal view returns(uint256){
-        return _CertisToken.totalSupply();
-    }
-
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
         isAuthorized()
@@ -87,7 +109,8 @@ contract TokenGovernanceBaseContract{
         Proposition.Proposer = msg.sender;
         Proposition.DeadLine = _DeadLine;
         Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
-        (Proposition.listOfAdmins, Proposition.AdminsWeight) = _CertisToken.TokenOwners();
+        Proposition.listOfAdmins = GetAdminList();
+        Proposition.AdminsWeight = GetAdminWeights();
         require(0 < Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
     }
 
@@ -98,10 +121,10 @@ contract TokenGovernanceBaseContract{
         if(block.timestamp < Proposition.DeadLine)
         {
             if(vote){
-                Proposition.VotesFor += Proposition.AdminsWeight[GetId(msg.sender)];
+                Proposition.VotesFor += Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
             }
             else{
-                Proposition.VotesAgainst += Proposition.AdminsWeight[GetId(msg.sender)];
+                Proposition.VotesAgainst += Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
             }
 
             checkProposition();

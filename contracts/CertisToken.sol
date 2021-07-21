@@ -18,6 +18,7 @@ import "./Libraries/AddressLibrary.sol";
      address[] _tokenOwners;
 
     constructor(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) ERC20(name, symbol){
+        _tokenOwners = new address[](0);
         _decimals = decimalsValue;
         _mint(msg.sender, MaxSupply);
     }

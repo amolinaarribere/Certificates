@@ -17,7 +17,6 @@ contract CertificatesPoolManager{
 
     // events
     event _NewCertificatesPool(uint256, address, MultiSigCertificatesPool);
-    event _SendProposalId(address);
 
     // modfiers
     modifier isIdCorrect(uint Id, uint length){

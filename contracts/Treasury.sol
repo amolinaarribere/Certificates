@@ -19,6 +19,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using Library for *;
     using UintLibrary for *;
 
+    event test(bool);
+
     // manager contract
     address _managerContract;
 
