@@ -26,3 +26,5 @@ exports.PublicPriceWei = PublicPriceWei;
 exports.PrivatePriceWei = PrivatePriceWei;
 exports.CertificatePriceWei = CertificatePriceWei;
 exports.OwnerRefundPriceWei = OwnerRefundPriceWei;
+exports.PropositionLifeTime = PropositionLifeTime;
+exports.PropositionThresholdPercentage = PropositionThresholdPercentage;
