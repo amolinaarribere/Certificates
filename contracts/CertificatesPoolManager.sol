@@ -11,8 +11,10 @@ import "./Libraries/Library.sol";
 import "./PrivateCertificatesPool.sol";
 import "./PublicCertificatesPool.sol";
 import "./Treasury.sol";
+import "./Base/TokenGovernanceBaseContract.sol";
+import "./CertisToken.sol";
 
-contract CertificatesPoolManager{
+contract CertificatesPoolManager is TokenGovernanceBaseContract{
     using Library for *;
 
     // events
@@ -28,6 +30,15 @@ contract CertificatesPoolManager{
         require(msg.sender == _chairperson, "only chair person");
         _;
     }
+
+    // proposition to change
+    struct ProposedContractsStruct{
+        address NewPublicPoolAddress;
+        address NewTreasuryAddress;
+        address NewCertisTokenAddress;
+    }
+
+    ProposedContractsStruct _ProposedContracts;
     
     // Private Certificates Pool structure
     struct _privateCertificatesPoolStruct{
@@ -43,19 +54,75 @@ contract CertificatesPoolManager{
     // Treasury
     Treasury _Treasury;
 
-    address _chairperson;
-    
-    constructor() {
+    // init
+    bool _init;
+
+
+    constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
+    TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
+    {
         _chairperson = msg.sender; 
     }
 
-    function Initialize(address PublicPoolAddress, address TreasuryAddress) 
+    function Initialize(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress) 
         isFromChairPerson()
     external{
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
-        _Treasury = Treasury(TreasuryAddress);
-        _PublicCertificatesPool.addTreasury(TreasuryAddress);
+        InternalUpdateContractsVersions(PublicPoolAddress, TreasuryAddress, CertisTokenAddress, true);
     }
+
+    // contracts management
+
+    function updateContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress) external
+    {
+        InternalUpdateContractsVersions(PublicPoolAddress, TreasuryAddress, CertisTokenAddress, false);
+    }
+
+    function InternalUpdateContractsVersions(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, bool fromConstructor) internal
+    {
+        if(fromConstructor){
+            require(false == _init, "contract already initialized");
+            _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+            _CertisToken = CertisToken(CertisTokenAddress); 
+            _Treasury = Treasury(TreasuryAddress);
+            _PublicCertificatesPool.addTreasury(TreasuryAddress);
+            _init = true;
+        }
+        else{
+            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+            _ProposedContracts.NewPublicPoolAddress = PublicPoolAddress;
+            _ProposedContracts.NewTreasuryAddress = TreasuryAddress;
+            _ProposedContracts.NewCertisTokenAddress = CertisTokenAddress;
+        }
+        
+    }
+
+    function propositionApproved() internal override
+    {
+        _PublicCertificatesPool = PublicCertificatesPool(_ProposedContracts.NewPublicPoolAddress);
+        _CertisToken = CertisToken(_ProposedContracts.NewCertisTokenAddress); 
+        _Treasury = Treasury(_ProposedContracts.NewTreasuryAddress);
+        _Treasury.updateContracts(_ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewCertisTokenAddress);
+        _PublicCertificatesPool.addTreasury(_ProposedContracts.NewTreasuryAddress);
+        
+        removeProposition();
+    }
+
+    function propositionRejected() internal override
+    {
+        removeProposition();
+    }
+
+    function propositionExpired() internal override
+    {
+        removeProposition();
+    }
+
+    function removeProposition() internal
+    {
+       delete(_ProposedContracts);
+    }
+    
+    // functionality
 
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external
     payable

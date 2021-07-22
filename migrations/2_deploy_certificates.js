@@ -27,7 +27,7 @@ module.exports = async function(deployer, network, accounts){
     await deployer.link(Library, CertificatesPoolManager);
     console.log("Library linked to Certificate Pool Manager");
 
-    await deployer.deploy(CertificatesPoolManager);
+    await deployer.deploy(CertificatesPoolManager, 604800, 50, 5);
     CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
     console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
 
@@ -55,7 +55,7 @@ module.exports = async function(deployer, network, accounts){
     TreasuryInstance = await Treasury.deployed();
     console.log("Treasury deployed : " + TreasuryInstance.address);
 
-    await CertificatesPoolManagerInstance.Initialize(PublicCertificatesPoolInstance.address, TreasuryInstance.address);
+    await CertificatesPoolManagerInstance.Initialize(PublicCertificatesPoolInstance.address, TreasuryInstance.address, CertisTokenInstance.address);
 
     await deployer.link(Library, Provider);
     console.log("Library linked to Provider");

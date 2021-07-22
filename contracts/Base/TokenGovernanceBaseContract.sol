@@ -31,7 +31,19 @@ contract TokenGovernanceBaseContract{
 
     PropositionStruct Proposition;
 
+    uint _PropositionLifeTime;
+    uint8 _PropositionThresholdPercentage;
     uint8 _minWeightToProposePercentage;
+
+    struct ProposedPropositionStruct{
+        uint256 NewPropositionLifeTime;
+        uint8 NewPropositionThresholdPercentage;
+        uint8 NewMinWeightToProposePercentage;
+    }
+
+    ProposedPropositionStruct _ProposedProposition;
+
+    bool _currentPropisProp;
     
     // modifiers
 
@@ -53,6 +65,12 @@ contract TokenGovernanceBaseContract{
 
     modifier HasNotAlreadyVoted(){
         require(false == AddressLibrary.FindAddress(msg.sender, Proposition.AlreadyVoted), "EC5");
+        _;
+    }
+
+    modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
+        require(100 >= PropositionThresholdPercentage, "EC21");
+        require(100 >= minWeightToProposePercentage, "EC21");
         _;
     }
 
@@ -110,6 +128,40 @@ contract TokenGovernanceBaseContract{
         }
     }
 
+    // constructor
+    constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
+        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
+    }
+    
+    // updates prop values
+
+    function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external
+    {
+        InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);
+    }
+
+    function InternalupdateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc, bool fromConstructor) internal
+        isPropOK(PropThresholdPerc, minWeightToPropPerc)
+    {
+        if(fromConstructor){
+            _PropositionLifeTime = PropLifeTime;
+            _PropositionThresholdPercentage = PropThresholdPerc;
+            _minWeightToProposePercentage = minWeightToPropPerc;
+        }
+        else{
+            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+            _ProposedProposition.NewPropositionLifeTime = PropLifeTime;
+            _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;
+            _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;
+            _currentPropisProp = true;
+        }   
+    }
+
+    function retrievePropConfig() external view returns(uint, uint8, uint8)
+    {
+        return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
+    }
+
     // functions
 
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
@@ -152,7 +204,12 @@ contract TokenGovernanceBaseContract{
 
         else 
         {
-            propositionExpired();
+            if(_currentPropisProp){
+                removePropositionProp();
+            }
+            else{
+                propositionExpired();
+            }
             cancelProposition();
         }
     }
@@ -161,14 +218,33 @@ contract TokenGovernanceBaseContract{
     {
         if(Proposition.VotesFor > Proposition.validationThreshold) 
         {
-            propositionApproved();
+            if(_currentPropisProp){
+                _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;
+                _PropositionThresholdPercentage = _ProposedProposition.NewPropositionThresholdPercentage;
+                _minWeightToProposePercentage = _ProposedProposition.NewMinWeightToProposePercentage;
+                removePropositionProp();
+            }
+            else{
+                propositionApproved();
+            }
             cancelProposition();
         }
         else if(Proposition.VotesAgainst > Proposition.validationThreshold)
         {
-            propositionRejected();
+            if(_currentPropisProp){
+                removePropositionProp();
+            }
+            else{
+                propositionRejected();
+            }
             cancelProposition();
         } 
+    }
+
+    function removePropositionProp() internal
+    {
+        delete(_ProposedProposition);
+        _currentPropisProp = false;
     }
 
     function cancelProposition() internal

@@ -54,12 +54,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _;
     }
 
-    modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
-        require(100 >= PropositionThresholdPercentage, "EC21");
-        require(100 >= minWeightToProposePercentage, "EC21");
-        _;
-    }
-
     // proposition to change
     struct ProposedPricesStruct{
         uint NewPublicPriceWei;
@@ -70,25 +64,12 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     ProposedPricesStruct _ProposedPrices;
 
-    struct ProposedPropositionStruct{
-        uint256 NewPropositionLifeTime;
-        uint8 NewPropositionThresholdPercentage;
-        uint8 NewMinWeightToProposePercentage;
-    }
-
-    ProposedPropositionStruct _ProposedProposition;
-
-    enum PropositionType {None, Prices, Proposition}
-    PropositionType _currentProp;
-
     // constants
     PublicCertificatesPool  _PublicCertificatesPool;
     uint _PublicPriceWei;
     uint _CertificatePriceWei;
     uint _PrivatePriceWei;
     uint _OwnerRefundPriceWei;
-    uint _PropositionLifeTime;
-    uint8 _PropositionThresholdPercentage;
 
     // data
     struct _BalanceStruct{
@@ -98,43 +79,22 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     
     mapping(address => _BalanceStruct) _balances;
 
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress, address CertisTokenAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) {
+    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress, address CertisTokenAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
+    TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
+    {
         _chairperson = msg.sender;
         _managerContract = managerContractAddress; 
         
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
-        InternalupdateProp( PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
         InternalupdateContracts(PublicPoolAddress, CertisTokenAddress);
     }
 
 
-    function pay(Library.Prices price) external 
-        areFundsEnough(price)
-    override payable
-    {
-        uint256 amount = msg.value;
-        if(price == Library.Prices.NewProvider) amount -= _OwnerRefundPriceWei;
-        AssignDividends(amount);
-    }
-
-    function AssignDividends(uint256 amount) internal{
-        (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = _CertisToken.TokenOwners();
-        uint256 TotalTokenSupply = _CertisToken.totalSupply();
-
-        for(uint i=0; i < DividendsRecipients.length; i++){
-            addBalance(DividendsRecipients[i], DividendsRecipientsTokens[i] * amount, TotalTokenSupply);
-        }
-
-    }
+    // governance 
 
     function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
     {
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
-    }
-
-    function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external override
-    {
-        InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);
     }
 
     function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
@@ -159,25 +119,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
             _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
             _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
-            _currentProp = PropositionType.Prices;
-        }
-        
-    }
-
-    function InternalupdateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc, bool fromConstructor) internal
-        isPropOK(PropThresholdPerc, minWeightToPropPerc)
-    {
-        if(fromConstructor){
-            _PropositionLifeTime = PropLifeTime;
-            _PropositionThresholdPercentage = PropThresholdPerc;
-            _minWeightToProposePercentage = minWeightToPropPerc;
-        }
-        else{
-            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
-            _ProposedProposition.NewPropositionLifeTime = PropLifeTime;
-            _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;
-            _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;
-            _currentProp = PropositionType.Proposition;
         }
         
     }
@@ -190,17 +131,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     function propositionApproved() internal override
     {
-        if(PropositionType.Prices == _currentProp){
-            _PublicPriceWei = _ProposedPrices.NewPublicPriceWei;
-            _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
-            _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
-            _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
-        }
-        else if(PropositionType.Proposition == _currentProp){
-            _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;
-            _PropositionThresholdPercentage = _ProposedProposition.NewPropositionThresholdPercentage;
-            _minWeightToProposePercentage = _ProposedProposition.NewMinWeightToProposePercentage;
-        }
+        _PublicPriceWei = _ProposedPrices.NewPublicPriceWei;
+        _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
+        _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
+        _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
         
         removeProposition();
     }
@@ -217,14 +151,30 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     function removeProposition() internal
     {
-        if(PropositionType.Prices == _currentProp){
-            delete(_ProposedPrices);
-        }
-        else if(PropositionType.Proposition == _currentProp){
-            delete(_ProposedProposition);
-        }
-        _currentProp = PropositionType.None;
+         delete(_ProposedPrices);
     }
+
+    // functionality
+
+    function pay(Library.Prices price) external 
+        areFundsEnough(price)
+    override payable
+    {
+        uint256 amount = msg.value;
+        if(price == Library.Prices.NewProvider) amount -= _OwnerRefundPriceWei;
+        AssignDividends(amount);
+    }
+
+    function AssignDividends(uint256 amount) internal{
+        (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = _CertisToken.TokenOwners();
+        uint256 TotalTokenSupply = _CertisToken.totalSupply();
+
+        for(uint i=0; i < DividendsRecipients.length; i++){
+            addBalance(DividendsRecipients[i], DividendsRecipientsTokens[i] * amount, TotalTokenSupply);
+        }
+
+    }
+
 
     function getRefund(address addr, uint numberOfOwners) external 
         isFromPublicPool()
@@ -262,11 +212,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     function retrievePrices() external override view returns(uint, uint, uint, uint)
     {
         return(_PublicPriceWei, _PrivatePriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
-    }
-
-    function retrievePropConfig() external override view returns(uint, uint8, uint8)
-    {
-        return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
     function checkBalance(address addr) internal view returns(uint){
