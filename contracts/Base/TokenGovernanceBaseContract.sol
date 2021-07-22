@@ -177,6 +177,18 @@ contract TokenGovernanceBaseContract{
         delete(Proposition);
     }
 
+    function retrievePropositionStatus() external view returns(address, uint256, uint256, uint256, uint256, address[] memory, uint256[] memory, address[] memory){
+        return (Proposition.Proposer,
+            Proposition.DeadLine,
+            Proposition.validationThreshold,
+            Proposition.VotesFor,
+            Proposition.VotesAgainst,
+            Proposition.listOfAdmins,
+            Proposition.AdminsWeight,
+            Proposition.AlreadyVoted
+        );
+    }
+
     function propositionApproved() internal virtual{}
 
     function propositionRejected() internal virtual{}

@@ -38,7 +38,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const ProvidedIdIsWrong = new RegExp("EC1");
 
     beforeEach(async function(){
-        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisToken = contracts[1];
     });

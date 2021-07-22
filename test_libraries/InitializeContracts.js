@@ -2,17 +2,19 @@ const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const Treasury = artifacts.require("Treasury");
 const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
 const CertisToken = artifacts.require("CertisToken");
+const constants = require("../test_libraries/constants.js");
 
-const PublicPriceWei = 10;
-const PrivatePriceWei = 20;
-const CertificatePriceWei = 5;
-const OwnerRefundPriceWei = 2;
-const TotalTokenSupply = 1000;
-const PropositionLifeTime = 604800;
-const PropositionThresholdPercentage = 50;
-const minPercentageToPropose = 5;
+const PublicPriceWei = constants.PublicPriceWei;
+const PrivatePriceWei = constants.PrivatePriceWei;
+const CertificatePriceWei = constants.CertificatePriceWei;
+const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const PropositionLifeTime = constants.PropositionLifeTime;
+const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
+const minPercentageToPropose = constants.minPercentageToPropose;
+const TotalTokenSupply = constants.TotalTokenSupply;
+const Gas = constants.Gas;
 
-async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei){
+async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
     let certPoolManager = await CertificatesPoolManager.new({from: chairPerson});
     let certisToken = await CertisToken.new("Certis Token for Test", "CERT", 0, TotalTokenSupply, {from: chairPerson});
     let publicPool = await PublicCertificatesPool.new(PublicOwners, minOwners, certPoolManager.address, {from: user_1});
@@ -23,10 +25,3 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1,
 }
 
 exports.InitializeContracts = InitializeContracts;
-exports.PublicPriceWei = PublicPriceWei;
-exports.PrivatePriceWei = PrivatePriceWei;
-exports.CertificatePriceWei = CertificatePriceWei;
-exports.OwnerRefundPriceWei = OwnerRefundPriceWei;
-exports.PropositionLifeTime = PropositionLifeTime;
-exports.PropositionThresholdPercentage = PropositionThresholdPercentage;
-exports.minPercentageToPropose = minPercentageToPropose;

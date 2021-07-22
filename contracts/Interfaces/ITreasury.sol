@@ -13,18 +13,15 @@ pragma solidity >=0.7.0 <0.9.0;
 
     function pay(Library.Prices price) external payable;
 
-    function updateConfig(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) external;
+    
+    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external;
+    function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external;
     function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external;
     
     function getRefund(address addr, uint numberOfOwners) external;
     function withdraw(uint amount) external;
 
     function retrieveBalance(address addr) external view returns(uint);
+    function retrievePrices() external view returns(uint, uint, uint, uint);
 
-
-
-
-
-
-    function testfunction(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, uint256 P) external;
 }

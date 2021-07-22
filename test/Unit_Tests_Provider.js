@@ -50,7 +50,7 @@ contract("Testing Provider",function(accounts){
 
     beforeEach(async function(){
         // Public Pool creation and provider subscription
-        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisToken = contracts[1];
         provider = await Provider.new(ProviderOwners, minOwners, provider_1_Info, {from: user_1, value: (2 * CertificatePriceWei) + PublicPriceWei});

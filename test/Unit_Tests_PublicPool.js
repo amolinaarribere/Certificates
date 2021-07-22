@@ -58,7 +58,7 @@ contract("Testing Public Pool",function(accounts){
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
 
     beforeEach(async function(){
-        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1, PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisToken = contracts[1];
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
