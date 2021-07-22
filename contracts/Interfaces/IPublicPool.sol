@@ -8,5 +8,5 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
  interface IPublicPool  {
-    function validateProvider(address provider, uint nonce) external;
+    function validateProvider(address provider) external;
 }

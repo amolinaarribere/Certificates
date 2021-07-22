@@ -65,9 +65,9 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     {}
 
     // PROVIDERS CRUD Operations
-    function addProvider(address provider, string memory providerInfo, uint nonce) external override virtual;
+    function addProvider(address provider, string memory providerInfo) external override payable virtual;
 
-    function removeProvider(address provider, uint nonce) external override virtual;
+    function removeProvider(address provider) external override virtual;
     
     function retrieveProvider(address provider) external override view returns (string memory, bool){
         return (retrieveEntity(provider, _providerId));
@@ -76,33 +76,31 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     function retrieveAllProviders() external override view returns (address[] memory){
         return(retrieveAllEntities(_providerId));
     }
-    
-    function retrieveTotalProviders() external override view returns (uint){
-        return (retrieveTotalEntities(_providerId));
-    }
 
     function isProvider(address provider) public view returns (bool){
         return(isEntity(provider, _providerId));
     }
     
     // Certificates CRUD Operations
-    function addCertificate(bytes32 CertificateHash, address holder, uint nonce) external override
+    function addCertificate(bytes32 CertificateHash, address holder) external override payable virtual
+    {
+        addCertificateInternal(CertificateHash, holder);
+    }
+
+    function addCertificateInternal(bytes32 CertificateHash, address holder) internal
         isAProvider 
         NotEmpty(CertificateHash)
         CertificateDoesNotExist(holder, CertificateHash)
-        isNonceOK(nonce)
     {
         _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;
         _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
-        Library.AddNonce(nonce, _Nonces);
 
         emit _AddCertificateIdEvent(msg.sender, holder);
     }
     
-    function removeCertificate(bytes32 CertificateHash, address holder, uint nonce) external override
+    function removeCertificate(bytes32 CertificateHash, address holder) external override
         isAProvider 
         isTheProviderOrHimself(holder, CertificateHash) 
-        isNonceOK(nonce)
     {
         address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
         bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
@@ -115,7 +113,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         }
         
         delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
-        Library.AddNonce(nonce, _Nonces);
         
         emit _RemoveCertificateIdEvent(provider, holder);
 
@@ -165,7 +162,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     }
 
     function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory, string[] memory){
-        return(Library.retrievePendingEntities(_Entities[_providerId],addedORremove));
+        return(retrievePendingEntities(addedORremove, _providerId));
     }
 
 

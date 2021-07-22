@@ -10,13 +10,11 @@ pragma experimental ABIEncoderV2;
 
 
  interface IMultiSigContract  {
-    function addOwner(address owner, string memory ownerInfo, uint nonce) external;
-    function removeOwner(address owner, uint nonce) external;
+    function addOwner(address owner, string memory ownerInfo) external;
+    function removeOwner(address owner) external;
 
     function retrieveOwner(address owner) external view returns (string memory, bool);
     function retrieveAllOwners() external view returns (address[] memory);
-    function retrieveTotalOwners() external view returns (uint);
     function retrieveMinOwners() external view returns (uint);
-    function retrieveHighestNonceForAddress(address addr) external view returns (uint);
     function retrievePendingOwners(bool addedORremove) external view returns (address[] memory, string[] memory);
 }

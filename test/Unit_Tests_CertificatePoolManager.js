@@ -2,16 +2,27 @@
 // ERROR tests = First we test the error message then we test the action was not carried out
 
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
+const Treasury = artifacts.require("Treasury");
+const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
+const CertisToken = artifacts.require("CertisToken");
+var CertisTokenAbi = CertisToken.abi;
 const Library = artifacts.require("./Libraries/Library");
 
-const PublicPriceWei = 10;
-const PrivatePriceWei = 20;
+const init = require("../test_libraries/InitializeContracts.js");
+const constants = require("../test_libraries/constants.js");
+
+const PublicPriceWei = constants.PublicPriceWei;
+const PrivatePriceWei = constants.PrivatePriceWei;
+const CertificatePriceWei = constants.CertificatePriceWei;
+const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Certificate Pool Manager",function(accounts){
     var certPoolManager;
+    var certisToken;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -27,39 +38,9 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const ProvidedIdIsWrong = new RegExp("EC1");
 
     beforeEach(async function(){
-        certPoolManager = await CertificatesPoolManager.new(PublicOwners, minOwners, PublicPriceWei, PrivatePriceWei, {from: chairPerson});
-    });
-
-    // ****** TESTING Sending Proposals ***************************************************************** //
-
-    it("Send Proposal WRONG",async function(){
-        // act
-        try{
-            let PriceUnderFunded = PublicPriceWei - 1;
-            await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PriceUnderFunded});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughFunds);
-        }
-
-        // act
-        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
-
-        try{
-            await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(ProposalAlreadySubmitted);
-        }
-    });
-
-    it("Send Proposal CORRECT",async function(){
-        // act
-        await certPoolManager.sendProposal(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei});
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
+        certPoolManager = contracts[0];
+        certisToken = contracts[1];
     });
 
     // ****** TESTING Creating Private Pools ***************************************************************** //
@@ -93,7 +74,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     it("Retrieve Configuration",async function(){
         // act
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _publicPool, 1: _chairPerson, 2: _balance} = result;
+        const {0: _treasury, 1: _publicPool, 2: _chairPerson, 3: _balance} = result;
         // assert
         expect(_chairPerson).to.equal(chairPerson);
         expect(_balance.toNumber()).to.equal(0);

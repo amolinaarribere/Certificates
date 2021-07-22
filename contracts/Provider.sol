@@ -30,7 +30,7 @@ pragma experimental ABIEncoderV2;
     string[] _Label = [_ownerLabel, _poolLabel];
     
     struct _CertificateStruct{
-        mapping(bytes32 => Library._entityIdentity) _cert;
+        mapping(bytes32 => _entityIdentity) _cert;
     }
     
     struct _CertificatesPerHolderStruct{
@@ -38,52 +38,72 @@ pragma experimental ABIEncoderV2;
     }
    
     mapping(address => _CertificatesPerHolderStruct) _CertificatesPerPool;
+    string _ProviderInfo;
+
+    mapping(address => uint256) _AddCertificatePricePerPool;
+    mapping(address => uint256) _SubscriptionPricePerPool;
+    mapping(address => bool) _submited;
 
     // modifiers
     modifier isAPool(address pool){
         require(true == isPool(pool));
         _;
     }
-    
-    modifier isEntityActivated(bool YesOrNo, Library._entityIdentity memory Entity){
-        Library.EntityActivated(YesOrNo, Entity);
-        _;
-    }
-    
-    modifier HasNotAlreadyVoted(Library.Actions action, Library._entityIdentity memory Entity){
-        Library.NotAlreadyVoted(action, Entity);
-        _;
-    }
 
      // Constructor
-    constructor(address[] memory owners,  uint256 minOwners) 
+    constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
         MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdProviders)
     payable
-    {}
+    {
+        _ProviderInfo = ProviderInfo;
+    }
 
     // POOL CRUD Operations
-    function addPool(address pool, string memory poolInfo, uint nonce) external override{
-        addEntity(pool, poolInfo, _poolId, nonce);
+    function subscribeToPublicPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
+        InternaladdPool(pool, poolInfo, AddCertificatePrice, SubscriptionPrice);
+        if(true == isPool(pool)){
+            MultiSigCertificatesPool poolToSubscribe = PublicCertificatesPool(pool);
+            poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
+        }
     }
 
-    function removePool(address pool, uint nonce) external override{
-       removeEntity(pool, _poolId, nonce); 
+    function addPool(address pool, string memory poolInfo, uint256 AddCertificatePrice) external override{
+        InternaladdPool(pool, poolInfo, AddCertificatePrice, 0);
+    }
+
+    function InternaladdPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) internal{
+        addEntity(pool, poolInfo, _poolId);
+        if(false == _submited[pool]){
+            _AddCertificatePricePerPool[pool] = AddCertificatePrice;
+            _SubscriptionPricePerPool[pool] = SubscriptionPrice;
+            _submited[pool] = true;
+        }
+    }
+
+    function removePool(address pool) external override{
+       removeEntity(pool, _poolId); 
+       if(false == isPool(pool)){
+           delete(_submited[pool]);
+           delete(_AddCertificatePricePerPool[pool]);
+           delete(_SubscriptionPricePerPool[pool]);
+       } 
+
     }
     
-    function retrievePool(address pool) external override view returns (string memory, bool){
-        return InternalRetrievePool(pool);
+    function retrievePool(address pool) external override view returns (string memory, bool, uint256){
+        string memory poolInfo;
+        bool isActivated;
+
+        (poolInfo, isActivated) = InternalRetrievePool(pool);
+        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool]);
     }
     
     function InternalRetrievePool(address pool) internal view returns (string memory, bool){
-        return (retrieveEntity(pool, _poolId));
+        return retrieveEntity(pool, _poolId);
     }
 
     function retrieveAllPools() external override view returns (address[] memory){
-        return(retrieveAllEntities(_poolId));
-    }
-    
-    function retrieveTotalPools() external override view returns (uint){
-        return (retrieveTotalEntities(_poolId));
+        return retrieveAllEntities(_poolId);
     }
 
     function isPool(address pool) public view returns (bool){
@@ -91,27 +111,26 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-     function addCertificate(address pool, bytes32 CertificateHash, address holder, uint nonce) external override
+     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-        manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Add, nonce);
+        manipulateCertificate(pool, CertificateHash, holder, Actions.Add);
      }
      
-     function removeCertificate(address pool, bytes32 CertificateHash, address holder, uint nonce) external override
+     function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-         manipulateCertificate(pool, CertificateHash, holder, Library.Actions.Remove, nonce);
+         manipulateCertificate(pool, CertificateHash, holder, Actions.Remove);
      }
 
     
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Library.Actions act, uint nonce) 
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Actions act) 
         isAPool(pool)
         isAnOwner
         HasNotAlreadyVoted(act, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
-        isNonceOK(nonce)
     internal{
         
         uint validations;
         
-        if(act == Library.Actions.Add){
+        if(act == Actions.Add){
             _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.push(msg.sender);
             validations = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length;
         }
@@ -132,18 +151,19 @@ pragma experimental ABIEncoderV2;
             }
             
             
-            if(act == Library.Actions.Add){
-                poolToSend.addCertificate(CertificateHash, holder, nonce);
+            if(act == Actions.Add){
+                poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
             }
             else{
-               poolToSend.removeCertificate(CertificateHash, holder, nonce);
+               poolToSend.removeCertificate(CertificateHash, holder);
             }
             
             delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
-
-            Library.AddNonce(nonce, _Nonces);
             
         }
     }
+
+    
+    receive() external override payable{}
     
  }

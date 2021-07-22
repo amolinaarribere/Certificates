@@ -10,48 +10,76 @@ pragma experimental ABIEncoderV2;
 
  import "./Abstract/MultiSigCertificatesPool.sol";
  import "./Interfaces/IPublicPool.sol";
+ import "./Treasury.sol";
+ import "./Libraries/Library.sol";
 
  contract PublicCertificatesPool is MultiSigCertificatesPool, IPublicPool {
 
+    using Library for *;
+
+     // events
+    event _SendProposalId(address);
+
      address _creator;
-     mapping(address => bool) _submitedByCreator;
+     mapping(address => bool) _submited;
+     Treasury _Treasury;
 
      //modifiers
     modifier hasBeenSubmitted(bool YesOrNo, address provider){
-        if(false == YesOrNo) require(false == _submitedByCreator[provider], "EC3");
-        else require(true == _submitedByCreator[provider], "EC4");
+        if(false == YesOrNo) require(false == _submited[provider], "EC3");
+        else require(true == _submited[provider], "EC4");
         _;
     }
 
      // Constructor
-    constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {
-        _creator = msg.sender;
+    constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress) MultiSigCertificatesPool(owners, minOwners) payable {
+        _creator = managerContractAddress;
     }
 
-    function addProvider(address provider, string memory providerInfo, uint nonce) external 
-        isSomeoneSpecific(_creator)
+    function addProvider(address provider, string memory providerInfo) external 
         hasBeenSubmitted(false, provider)
-        isNonceOK(nonce)
-    override
+    override payable
     {
+        _Treasury.pay{value:msg.value}(Library.Prices.NewProvider);
         _Entities[_providerId]._entities[provider]._Info = providerInfo;
-        _submitedByCreator[provider] = true;
-        Library.AddNonce(nonce, _Nonces);
+        _submited[provider] = true;
+
+        emit _SendProposalId(provider);
     }
 
-    function validateProvider(address provider, uint nonce) external 
+    function validateProvider(address provider) external 
         hasBeenSubmitted(true, provider)
     override
     {
-        addEntity(provider, _Entities[_providerId]._entities[provider]._Info, _providerId, nonce);
+        addEntity(provider, _Entities[_providerId]._entities[provider]._Info, _providerId);
+
+        if(true == isProvider(provider)){
+            uint totalValidators = _Entities[_providerId]._entities[provider]._AddValidated.length;
+
+            for(uint i=0; i < totalValidators; i++){
+                _Treasury.getRefund(_Entities[_providerId]._entities[provider]._AddValidated[i], totalValidators);
+            }
+        }
     }
 
-    function removeProvider(address provider, uint nonce) external override{
-       removeEntity(provider, _providerId, nonce); 
+    function removeProvider(address provider) external override{
+       removeEntity(provider, _providerId); 
 
-       if(false == Library.isEntity(_Entities[_providerId]._entities[provider])){
-            delete(_submitedByCreator[provider]);
+       if(false == isEntity(provider, _providerId)){
+            delete(_submited[provider]);
        }
+    }
+
+    function addTreasury(address TreasuryAddress) external
+        isSomeoneSpecific(_creator)
+    {
+        _Treasury = Treasury(TreasuryAddress);
+    }
+
+    function addCertificate(bytes32 CertificateHash, address holder) external override payable
+    {
+        _Treasury.pay{value:msg.value}(Library.Prices.NewCertificate);
+        addCertificateInternal(CertificateHash, holder);
     }
 
  }

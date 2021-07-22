@@ -10,13 +10,13 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./Libraries/Library.sol";
 import "./PrivateCertificatesPool.sol";
 import "./PublicCertificatesPool.sol";
+import "./Treasury.sol";
 
 contract CertificatesPoolManager{
     using Library for *;
 
     // events
     event _NewCertificatesPool(uint256, address, MultiSigCertificatesPool);
-    event _SendProposalId(address);
 
     // modfiers
     modifier isIdCorrect(uint Id, uint length){
@@ -24,8 +24,8 @@ contract CertificatesPoolManager{
         _;
     }
 
-    modifier areFundsEnough(uint minPrice){
-        require(msg.value >= minPrice, "EC2");
+    modifier isFromChairPerson(){
+        require(msg.sender == _chairperson, "only chair person");
         _;
     }
     
@@ -40,26 +40,27 @@ contract CertificatesPoolManager{
     // Public Certificates Pool structure
     PublicCertificatesPool  _PublicCertificatesPool;
 
-    uint _PublicPriceWei;
-    uint _PrivatePoolPriceWei;
-    uint _nonce;
+    // Treasury
+    Treasury _Treasury;
 
-    address payable _chairperson;
+    address _chairperson;
     
-    constructor(address[] memory owners, uint256 minOwners, uint256 PublicPriceWei, uint256 PrivatePriceWei) payable{
-        _chairperson = payable(msg.sender);
-        _PublicPriceWei = PublicPriceWei;
-        _PrivatePoolPriceWei = PrivatePriceWei;  
-        _PublicCertificatesPool = new PublicCertificatesPool(owners, minOwners);
-        _nonce = 0;
+    constructor() {
+        _chairperson = msg.sender; 
     }
 
-    // PRIVATE CERTIFICATE POOL /////////////////////////////////////////////////////////////
+    function Initialize(address PublicPoolAddress, address TreasuryAddress) 
+        isFromChairPerson()
+    external{
+        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+        _Treasury = Treasury(TreasuryAddress);
+        _PublicCertificatesPool.addTreasury(TreasuryAddress);
+    }
 
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external
-        areFundsEnough(_PrivatePoolPriceWei)
     payable
     {
+        _Treasury.pay{value:msg.value}(Library.Prices.NewPool);
         PrivateCertificatesPool certificatePool = new PrivateCertificatesPool(owners, minOwners);
         _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, certificatePool);
         _PrivateCertificatesPools.push(privateCertificatesPool);
@@ -78,21 +79,9 @@ contract CertificatesPoolManager{
     {
         return(_PrivateCertificatesPools.length);
     }
-
-    // PUBLIC CERTIFICATE POOL /////////////////////////////////////////////////////////////
     
-    function sendProposal(address provider, string memory providerInfo) public 
-        areFundsEnough(_PublicPriceWei)
-    payable 
-    {
-       _PublicCertificatesPool.addProvider(provider, providerInfo, _nonce);
-       _nonce += 1;
-
-       emit _SendProposalId(provider);
-    }
-    
-    function retrieveConfiguration() public view returns (MultiSigCertificatesPool, address, uint) {
-        return (_PublicCertificatesPool, _chairperson, address(this).balance);
+    function retrieveConfiguration() external view returns (Treasury, MultiSigCertificatesPool, address, uint) {
+        return (_Treasury, _PublicCertificatesPool, _chairperson, address(this).balance);
     }
     
 }
