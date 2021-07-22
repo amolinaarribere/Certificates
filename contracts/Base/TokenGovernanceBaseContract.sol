@@ -42,7 +42,6 @@ contract TokenGovernanceBaseContract{
 
     modifier canVote(){
         require(true == AuthorizedToVote(msg.sender, Proposition.listOfAdmins), "EC23");
-        //require(GetId(msg.sender, GetAdminList()) < Proposition.listOfAdmins.length, "EC23");
          _;
     }
 

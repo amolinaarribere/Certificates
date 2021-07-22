@@ -44,6 +44,7 @@ contract("Testing Treasury",function(accounts){
     const tokenOwner_2 = accounts[8];
     const tokenOwner_3 = accounts[9];
     const tokenOwner_4 = accounts[1];
+    const tokenOwner_5 = accounts[2];
     // providers info
     const provider_1_Info = "Provider 1 Info";
     const provider_2_Info = "Provider 2 Info";
@@ -58,10 +59,10 @@ contract("Testing Treasury",function(accounts){
     const NotEnoughBalance = new RegExp("EC20");
     const Unauthorized = new RegExp("EC22");
     const WrongConfig = new RegExp("EC21");
-    const NotAnOwner = new RegExp("EC9");
-    const OwnerAlreadyvoted = new RegExp("EC5");
-    const NotSubmittedByCreator = new RegExp("EC4");
-    const NotAllowedRemoveEntity = new RegExp("EC10");
+    const NoPropositionActivated = new RegExp("EC25");
+    const PropositionAlreadyInProgress = new RegExp("EC24");
+    const CanNotVote = new RegExp("EC23");
+    const AlreadyVoted = new RegExp("EC5");
     const MustBeActivated = new RegExp("EC7");
     const MinNumberRequired = new RegExp("EC19");
     const NotAProvider = new RegExp("EC12");
@@ -91,6 +92,7 @@ contract("Testing Treasury",function(accounts){
         await certisToken.transfer(tokenOwner_2, (TotalTokenSupply / 5), {from: chairPerson});
         await certisToken.transfer(tokenOwner_3, (TotalTokenSupply / 5), {from: chairPerson});
         await certisToken.transfer(tokenOwner_4, (TotalTokenSupply / 5), {from: chairPerson});
+        await certisToken.transfer(tokenOwner_5, (TotalTokenSupply / 5), {from: chairPerson});
     }
 
     async function checkPrices(_pp, _prp, _cp, _orp){
@@ -99,6 +101,13 @@ contract("Testing Treasury",function(accounts){
         expect(parseInt(prp)).to.be.equal(_prp);
         expect(parseInt(cp)).to.be.equal(_cp);
         expect(parseInt(orp)).to.be.equal(_orp);
+    }
+
+    async function checkProp(_plt, _ptp, _mp){
+        const{0:plt,1:ptp,2:mp} = await Treasury.methods.retrievePropConfig().call({from: user_1}, function(error, result){});
+        expect(parseInt(plt)).to.be.equal(_plt);
+        expect(parseInt(ptp)).to.be.equal(_ptp);
+        expect(parseInt(mp)).to.be.equal(_mp);
     }
 
     // ****** TESTING Config ***************************************************************** //
@@ -152,6 +161,49 @@ contract("Testing Treasury",function(accounts){
         }
     });
 
+    it("Vote/Propose Configuration WRONG",async function(){
+        // act
+        await SplitTokenSupply();
+        try{
+            await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NoPropositionActivated);
+        }
+        // act
+        try{
+            await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
+            await Treasury.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(CanNotVote);
+        }
+        // act
+        try{
+            await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(PropositionAlreadyInProgress);
+        }
+        // act
+        try{
+            await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
+            await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(AlreadyVoted);
+        }
+        
+    });
+
     it("Update Price Configuration CORRECT",async function(){
         // act
         await SplitTokenSupply();
@@ -171,6 +223,8 @@ contract("Testing Treasury",function(accounts){
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
         checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
+        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await Treasury.methods.voteProposition(true).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
         checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
 
         await Treasury.methods.updatePrices(PublicPriceWei + 2, PrivatePriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2).send({from: chairPerson, gas: Gas}, function(error, result){});
@@ -182,11 +236,42 @@ contract("Testing Treasury",function(accounts){
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
         checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
+        checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await Treasury.methods.voteProposition(true).send({from: tokenOwner_5, gas: Gas}, function(error, result){});
         checkPrices(PublicPriceWei + 2, PrivatePriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2);
     });
 
     it("Update Prop Configuration CORRECT",async function(){
-        
+         // act
+         await SplitTokenSupply();
+
+         await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await Treasury.methods.voteProposition(false).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await Treasury.methods.voteProposition(false).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+ 
+ 
+         await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+ 
+         await Treasury.methods.updateProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await Treasury.methods.voteProposition(true).send({from: tokenOwner_5, gas: Gas}, function(error, result){});
+         checkProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2);
     });
 
     // ****** TESTING Paying ***************************************************************** //

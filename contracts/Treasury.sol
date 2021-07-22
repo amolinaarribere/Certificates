@@ -264,6 +264,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return(_PublicPriceWei, _PrivatePriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
     }
 
+    function retrievePropConfig() external override view returns(uint, uint8, uint8)
+    {
+        return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
+    }
+
     function checkBalance(address addr) internal view returns(uint){
         uint[] memory f = returnFactors(addr);
         uint total = 0;
