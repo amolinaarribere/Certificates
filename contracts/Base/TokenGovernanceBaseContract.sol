@@ -26,6 +26,7 @@ contract TokenGovernanceBaseContract{
         uint256 VotesAgainst;
         address[] listOfAdmins;
         uint256[] AdminsWeight;
+        address[] AlreadyVoted;
     }
 
     PropositionStruct Proposition;
@@ -34,13 +35,14 @@ contract TokenGovernanceBaseContract{
     
     // modifiers
 
-    modifier isAuthorized(){
-        require(true == Authorization(msg.sender), "EC22");
+    modifier isAuthorizedToPropose(){
+        require(true == AuthorizedToPropose(msg.sender), "EC22");
         _;
     }
 
     modifier canVote(){
-        require(GetId(msg.sender, GetAdminList()) < Proposition.listOfAdmins.length, "EC23");
+        require(true == AuthorizedToVote(msg.sender, Proposition.listOfAdmins), "EC23");
+        //require(GetId(msg.sender, GetAdminList()) < Proposition.listOfAdmins.length, "EC23");
          _;
     }
 
@@ -50,9 +52,14 @@ contract TokenGovernanceBaseContract{
         _;
     }
 
+    modifier HasNotAlreadyVoted(){
+        require(false == AddressLibrary.FindAddress(msg.sender, Proposition.AlreadyVoted), "EC5");
+        _;
+    }
+
     // auxiliairy function
 
-    function Authorization(address add) internal view returns(bool) {
+    function AuthorizedToPropose(address add) internal view returns(bool) {
         if(msg.sender == _chairperson) return true;
         else 
         {
@@ -64,6 +71,10 @@ contract TokenGovernanceBaseContract{
             }
             return false;
         }
+    }
+
+    function AuthorizedToVote(address add, address[] memory list) internal pure returns(bool) {
+        return (GetId(add, list) < list.length);
     }
 
     function GetId(address add, address[] memory list) internal pure returns(uint256)
@@ -104,22 +115,32 @@ contract TokenGovernanceBaseContract{
 
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
-        isAuthorized()
+        isAuthorizedToPropose()
     {
+        
+        Proposition.listOfAdmins = GetAdminList();
+        require(0 < Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
+
         Proposition.Proposer = msg.sender;
         Proposition.DeadLine = _DeadLine;
         Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
-        Proposition.listOfAdmins = GetAdminList();
         Proposition.AdminsWeight = GetAdminWeights();
-        require(0 < Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
+
+        if(true == AuthorizedToVote(msg.sender, Proposition.listOfAdmins)){
+            voteProposition(true);
+        }
+        
     }
 
-    function voteProposition(bool vote) external
+    function voteProposition(bool vote) public
         PropositionInProgress(true)
         canVote()
+        HasNotAlreadyVoted()
     {
         if(block.timestamp < Proposition.DeadLine)
         {
+            Proposition.AlreadyVoted.push(msg.sender);
+
             if(vote){
                 Proposition.VotesFor += Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
             }

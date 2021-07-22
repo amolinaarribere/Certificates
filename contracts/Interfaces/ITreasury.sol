@@ -20,4 +20,11 @@ pragma solidity >=0.7.0 <0.9.0;
     function withdraw(uint amount) external;
 
     function retrieveBalance(address addr) external view returns(uint);
+
+
+
+
+
+
+    function testfunction(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, uint256 P) external;
 }

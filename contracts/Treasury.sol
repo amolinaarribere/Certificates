@@ -119,6 +119,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         InternalupdateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, false);
     }
 
+    function testfunction(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, uint256 P) external override
+    {
+    }
+
     function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
         isFromManagerContract()
     override

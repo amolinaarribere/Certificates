@@ -89,7 +89,8 @@ contract("Testing Treasury",function(accounts){
     it("Update Configuration WRONG",async function(){
         // act
         try{
-            await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1, gas: Gas}, function(error, result){});
+            //await Treasury.methods.updateConfig(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1, gas: Gas}, function(error, result){});
+            await Treasury.methods.testfunction(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, PropositionLifeTime).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
