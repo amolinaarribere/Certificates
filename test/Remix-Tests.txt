@@ -1,0 +1,137 @@
+*******************************************************************************************************************
+********************* CERTIFICATES POOL MANAGER *******************************************************************
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+TEST 1- Deploy CertificatesPoolManager (Gas Limit 30000000)
+        From : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+            owners : ["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"]
+            min owners : 2
+            publicPriceWei : 10
+            privatePriceWei : 20
+        Check : Nothing
+
+TEST 2- Create two private Certificates Pools
+      a - With less than 20 Weis => ERROR
+      b - With more than 20 Weis => SUCCESS
+      c - with min owner > than number of owners => ERROR
+      d - with min owner = 0
+        From : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+            owners : ["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"]
+            min owners : 2
+            owners : ["0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB", "0x617F2E2fD72FD9D5503197092aC168c91465E7f2", "0x17F6AD8Ef982297579C203069C1DbfFE4348c372", "0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678"]
+            min owners : 3
+        Check : Logs (Certificate Pool Ids, creator address, certificate Pool address)
+
+TEST 3- Retrieve two previously created private Certificates Pools
+      a - With ids 0 and 1 => SUCCESS
+      b - With other ids => ERROR
+        From : Any
+        Check : creator and certificates pool address with previous logs
+
+TEST 4- Retrieve Total private Certificates Pools
+        From : Any
+        Check : 2 (total private certificates deployed)
+
+TEST 5- Send two Proposals
+      a - With less than 10 Weis => ERROR
+      b - With more than 10 Weis => SUCCESS
+      c - Send twice the same Proposal (same Provider) => ERROR
+        From : Any
+            Provider : 0x583031D1113aD414F02576BD6afaBfb302140225
+            Provider Info : "Provider 1"
+            Provider : 0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB
+            Provider Info : "Provider 2"
+        Check : 2 (total private certificates deployed)
+
+TEST 6- Retrieve Configuration
+        From : Any
+        Check : with previous logs
+
+
+
+*******************************************************************************************************************
+********************* PUBLIC POOL MANAGER *************************************************************************
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+TEST 1- Deploy PublicPoolManager using address from before (Gas Limit 30000000)
+        From : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+        Check : Retrieve Total providers = 0
+
+TEST 2- Validate Provider 1 and 2
+      a - Using right owners, check after 1 validation, check after 2 validations => SUCCESS
+      b - Using wrong owners => ERROR
+      c - Using wrong Provider => ERROR
+      d - Using twice the same right owner => ERROR
+        From (wrong) : 0xdD870fA1b7C4700F2BD7f44238821C26f7392148
+        From (right) : 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
+        From (right) : 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+            Provider 1 (right) : 0x583031D1113aD414F02576BD6afaBfb302140225
+            Provider 2 (right) : 0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB
+            Provider (wrong) : 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
+        Check : Retrieve Total providers = 2
+
+TEST 3- Add Provider
+        From : Any
+            Provider  : 0x0A098Eda01Ce92ff4A4CCb7A4fFFb5A43EBC70DC
+            Provider Info : "Provider 3"
+        Check : Error
+
+TEST 4- Retrieve Total Owners
+        From : Any
+        Check :  3
+
+TEST 5- Retrieve Providers 1 and 2
+      a - Right Provider => SUCCESS
+      b - Wrong Provider => ERROR 
+        From : Any
+            Provider 1 (right) : 0x583031D1113aD414F02576BD6afaBfb302140225
+            Provider 2 (right) : 0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB
+            Provider (wrong) : 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
+        Check :  Provider names : Provider 1 and Provider 2
+
+TEST 6- Retrieve Owners 1, 2 and 3
+      a - Right Owner => SUCCESS
+      b - Wrong Owner => ERROR 
+        From : Any
+            Owner 1 (right) : 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
+            Owner 2 (right) : 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+            Owner 3 (right) : 0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db
+            Owner (wrong) : 0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB
+        Check :  empty owner names
+
+TEST 7- Retrieve All Providers
+        From : Any
+        Check :  0x583031D1113aD414F02576BD6afaBfb302140225 and 0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB
+
+TEST 8- Retrieve All Owners
+        From : Any
+        Check :  ["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"]
+
+TEST 9- isProvider and isOwner
+        From : Any
+        Check :  rights and wrongs
+
+TEST 10- Add Owner and Validate it
+        From : Owners (check after each validation) => SUCCESS
+            Owner  : 0x0A098Eda01Ce92ff4A4CCb7A4fFFb5A43EBC70DC
+            Owner Info : "Owner 4"
+        Check : Owner added
+
+TEST 11- Remove Provider (0x583031D1113aD414F02576BD6afaBfb302140225)
+
+TEST 12- Remove Owner (0x0A098Eda01Ce92ff4A4CCb7A4fFFb5A43EBC70DC) As himself
+
+TEST 13- Try Removing all the owners
+
+TEST 13- Add multiple Certificates
+        Hash : 0x7465737400000000000000000000000000000000000000000000000000000000
+        Hash : 0x9995737400000000000000000000000000000000000000000000000000000000
+        holder : 0x03C6FcED478cBbC9a4FAB34eF9f40767739D1Ff7
+        holder : 0x17F6AD8Ef982297579C203069C1DbfFE4348c372
+
+TEST 15- Remove some of those certificates      
+        a - As the provider => SUCCESS
+        b - As any other one => ERROR
+
