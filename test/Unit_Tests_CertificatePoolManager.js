@@ -79,6 +79,17 @@ contract("Testing Certificate Pool Manager",function(accounts){
         expect(_ppga).to.equal(_privatePoolGeneratorAddress);
     }
 
+    async function checkProposition( _ppa, _ta, _ca, _ppga){
+        var proposition = await certPoolManager.retrieveProposition({from: user_1});
+        //let {0: ppa, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress} = proposition;
+        //console.log(proposition);
+        //console.log(_ppa);
+        //console.log(ppa);
+        //console.log(proposition[0]);
+        //expect(_ppa).to.equal(proposition[0]);
+        //expect(_ta).to.equal(proposition[1]);
+    }
+
     // ****** TESTING Retrieves ***************************************************************** //
 
     it("Retrieve Configuration",async function(){
@@ -86,9 +97,18 @@ contract("Testing Certificate Pool Manager",function(accounts){
         await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
     });
 
+    it("Retrieve Proposals Details",async function(){
+        // act
+        await SplitTokenSupply(certisToken);
+        await certPoolManager.updateContracts(address_1, address_2, address_3, address_4, {from: chairPerson, gas: Gas});
+        // assert
+        checkProposition(address_1,"","","");
+        
+    });
+
     // ****** UPDATE Contracts ***************************************************************** //
 
-    it("Vote/Propose Configuration WRONG",async function(){
+    it("Vote/Propose/Cancel Configuration WRONG",async function(){
         await SplitTokenSupply(certisToken);
         // act
         try{
@@ -102,6 +122,15 @@ contract("Testing Certificate Pool Manager",function(accounts){
         // act
         try{
             await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NoPropositionActivated);
+        }
+        // act
+        try{
+            await certPoolManager.cancelProposition({from: chairPerson, gas: Gas});
             expect.fail();
         }
         // assert
@@ -126,6 +155,15 @@ contract("Testing Certificate Pool Manager",function(accounts){
         // assert
         catch(error){
             expect(error.message).to.match(PropositionAlreadyInProgress);
+        }
+        // act
+        try{
+            await certPoolManager.cancelProposition({from: tokenOwner_1, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(Unauthorized);
         }
         // act
         try{
@@ -189,6 +227,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
         // Update contracts to second version with only one token owner 100%
         await certPoolManager.updateContracts(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address, {from: chairPerson, gas: Gas});
+        await certPoolManager.voteProposition(true, {from: chairPerson, gas: Gas});
         await checkAddresses(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address);
 
         // Rollback to original contracts

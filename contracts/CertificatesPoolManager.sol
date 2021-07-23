@@ -12,8 +12,10 @@ import "./PrivatePoolGenerator.sol";
 import "./Treasury.sol";
 import "./Base/TokenGovernanceBaseContract.sol";
 import "./CertisToken.sol";
+import "./Libraries/AddressLibrary.sol";
 
 contract CertificatesPoolManager is TokenGovernanceBaseContract{
+    using AddressLibrary for *;
 
     //modifier
     modifier isNotInitialized(){
@@ -99,6 +101,16 @@ contract CertificatesPoolManager is TokenGovernanceBaseContract{
     function removeProposition() internal
     {
        delete(_ProposedContracts);
+    }
+
+    function retrieveProposition() external override view returns(string[] memory)
+    {
+        string[] memory proposition = new string[](4);
+        proposition[0] = AddressLibrary.AddressToString(_ProposedContracts.NewPublicPoolAddress);
+        proposition[1] = AddressLibrary.AddressToString(_ProposedContracts.NewTreasuryAddress);
+        proposition[2] = AddressLibrary.AddressToString(_ProposedContracts.NewCertisTokenAddress);
+        proposition[3] = AddressLibrary.AddressToString(_ProposedContracts.NewPrivatePoolGeneratorAddress);
+        return proposition;
     }
 
     function assignContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress) internal {

@@ -55,5 +55,9 @@ library Library{
         
         return newArray;
     }
+
+    function BytesToString(bytes32 element) internal pure returns(string memory){
+        return string(abi.encodePacked(element));
+    }
     
 }

@@ -130,6 +130,16 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
          delete(_ProposedPrices);
     }
 
+    function retrieveProposition() external override view returns(string[] memory)
+    {
+        string[] memory proposition = new string[](4);
+        proposition[0] = UintLibrary.UintToString(_ProposedPrices.NewPublicPriceWei);
+        proposition[1] = UintLibrary.UintToString(_ProposedPrices.NewPrivatePriceWei);
+        proposition[2] = UintLibrary.UintToString(_ProposedPrices.NewCertificatePriceWei);
+        proposition[3] = UintLibrary.UintToString(_ProposedPrices.NewOwnerRefundPriceWei);
+        return proposition;
+    }
+
     // functionality
     function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
         isFromManagerContract()

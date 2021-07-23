@@ -31,6 +31,9 @@ module.exports = async function(deployer, network, accounts){
     await deployer.link(Library, CertificatesPoolManager);
     console.log("Library linked to Certificate Pool Manager");
 
+    await deployer.link(AddressLibrary, CertificatesPoolManager);
+    console.log("AddressLibrary linked to Certificate Pool Manager");
+
     await deployer.deploy(CertificatesPoolManager, 604800, 50, 5);
     CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
     console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);

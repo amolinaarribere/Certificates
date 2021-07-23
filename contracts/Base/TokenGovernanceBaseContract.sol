@@ -58,6 +58,11 @@ contract TokenGovernanceBaseContract {
         _;
     }
 
+    modifier isAuthorizedToCancel(){
+        require(msg.sender == Proposition.Proposer, "EC22");
+        _;
+    }
+
     modifier canVote(){
         require(true == AuthorizedToVote(msg.sender, Proposition.listOfAdmins), "EC23");
          _;
@@ -128,7 +133,7 @@ contract TokenGovernanceBaseContract {
         {
             if(address(0) != Proposition.Proposer){
                 propositionExpired();
-                cancelProposition();
+                InternalCancelProposition();
             } 
             return false;
         }
@@ -156,11 +161,11 @@ contract TokenGovernanceBaseContract {
             _minWeightToProposePercentage = minWeightToPropPerc;
         }
         else{
-            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
             _ProposedProposition.NewPropositionLifeTime = PropLifeTime;
             _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;
             _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;
             _currentPropisProp = true;
+            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
         }   
     }
 
@@ -175,7 +180,6 @@ contract TokenGovernanceBaseContract {
         PropositionInProgress(false)
         isAuthorizedToPropose()
     {
-        
         Proposition.listOfAdmins = GetAdminList();
         require(0 < Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
 
@@ -183,14 +187,16 @@ contract TokenGovernanceBaseContract {
         Proposition.DeadLine = _DeadLine;
         Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
         Proposition.AdminsWeight = GetAdminWeights();
-
-        if(true == AuthorizedToVote(msg.sender, Proposition.listOfAdmins)){
-            voteProposition(true);
-        }
-        
     }
 
-    function voteProposition(bool vote) public
+    function cancelProposition() external
+        PropositionInProgress(true)
+        isAuthorizedToCancel()
+    {
+        InternalCancelProposition();
+    }
+
+    function voteProposition(bool vote) external
         PropositionInProgress(true)
         canVote()
         HasNotAlreadyVoted()
@@ -217,7 +223,7 @@ contract TokenGovernanceBaseContract {
             else{
                 propositionExpired();
             }
-            cancelProposition();
+            InternalCancelProposition();
         }
     }
 
@@ -234,7 +240,7 @@ contract TokenGovernanceBaseContract {
             else{
                 propositionApproved();
             }
-            cancelProposition();
+            InternalCancelProposition();
         }
         else if(Proposition.VotesAgainst > Proposition.validationThreshold)
         {
@@ -244,7 +250,7 @@ contract TokenGovernanceBaseContract {
             else{
                 propositionRejected();
             }
-            cancelProposition();
+            InternalCancelProposition();
         } 
     }
 
@@ -254,7 +260,7 @@ contract TokenGovernanceBaseContract {
         _currentPropisProp = false;
     }
 
-    function cancelProposition() internal
+    function InternalCancelProposition() internal
     {
         delete(Proposition);
     }
@@ -270,6 +276,8 @@ contract TokenGovernanceBaseContract {
             Proposition.AlreadyVoted
         );
     }
+
+    function retrieveProposition() external virtual view returns(string[] memory){}
 
     function propositionApproved() internal virtual{}
 
