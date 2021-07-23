@@ -113,24 +113,24 @@ pragma experimental ABIEncoderV2;
     // Certificates management
      function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-        manipulateCertificate(pool, CertificateHash, holder, Actions.Add);
+        manipulateCertificate(pool, CertificateHash, holder, true);
      }
      
      function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
      {
-         manipulateCertificate(pool, CertificateHash, holder, Actions.Remove);
+         manipulateCertificate(pool, CertificateHash, holder, false);
      }
 
     
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, Actions act) 
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, bool addOrRemove) 
         isAPool(pool)
         isAnOwner
-        HasNotAlreadyVoted(act, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+        HasNotAlreadyVoted(addOrRemove, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
     internal{
         
         uint validations;
         
-        if(act == Actions.Add){
+        if(addOrRemove){
             _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.push(msg.sender);
             validations = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length;
         }
@@ -151,7 +151,7 @@ pragma experimental ABIEncoderV2;
             }
             
             
-            if(act == Actions.Add){
+            if(addOrRemove){
                 poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
             }
             else{
