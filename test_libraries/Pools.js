@@ -39,7 +39,7 @@ const AlreadySent = new RegExp("EC3");
 
 async function AddingOwners(CertPool, Owners, extra_owner){
     await CertPool.methods.addOwner(extra_owner, extra_owner_Info).send({from: Owners[0], gas: Gas}, function(error, result){});
-    await CertPool.methods.addOwner(extra_owner, "").send({from: Owners[1], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateOwner(extra_owner, true).send({from: Owners[1], gas: Gas}, function(error, result){});
 }
 
 async function AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate){
@@ -49,16 +49,16 @@ async function AddingOrValidatingProviders(CertPool, Owners, provider_1, provide
 
 async function AddingProviders(CertPool, Owners, provider_1, provider_2){
     await CertPool.methods.addProvider(provider_1, provider_1_Info).send({from: Owners[0], gas: Gas}, function(error, result){});
-    await CertPool.methods.addProvider(provider_1, "").send({from: Owners[1], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateProvider(provider_1, true).send({from: Owners[1], gas: Gas}, function(error, result){});
     await CertPool.methods.addProvider(provider_2, provider_2_Info).send({from: Owners[1], gas: Gas}, function(error, result){});
-    await CertPool.methods.addProvider(provider_2, "text that will not be updated" + 1).send({from: Owners[2], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateProvider(provider_2, true).send({from: Owners[2], gas: Gas}, function(error, result){});
 }
 
 async function ValidatingProviders(CertPool, Owners, provider_1, provider_2){
-    await CertPool.methods.validateProvider(provider_1).send({from: Owners[0], gas: Gas}, function(error, result){});
-    await CertPool.methods.validateProvider(provider_1).send({from: Owners[1], gas: Gas}, function(error, result){});
-    await CertPool.methods.validateProvider(provider_2).send({from: Owners[1], gas: Gas}, function(error, result){});
-    await CertPool.methods.validateProvider(provider_2).send({from: Owners[2], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateProvider(provider_1, true).send({from: Owners[0], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateProvider(provider_1, true).send({from: Owners[1], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateProvider(provider_2, true).send({from: Owners[1], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateProvider(provider_2, true).send({from: Owners[2], gas: Gas}, function(error, result){});
 }
 
 async function AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate){
@@ -83,7 +83,7 @@ async function AddOwnerWrong(CertPool, Owners, extra_owner, user_1){
     // act
     try{
         await CertPool.methods.addOwner(extra_owner, extra_owner_Info).send({from: Owners[0], gas: Gas}, function(error, result){});
-        await CertPool.methods.addOwner(extra_owner, extra_owner_Info + 1).send({from: Owners[0], gas: Gas}, function(error, result){});
+        await CertPool.methods.validateOwner(extra_owner, true).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -132,7 +132,7 @@ async function RemoveOwnerWrong(CertPool, Owners, provider_3, user_1){
     // act
     try{
         await CertPool.methods.removeOwner(Owners[2]).send({from: Owners[0], gas: Gas}, function(error, result){});
-        await CertPool.methods.removeOwner(Owners[2]).send({from: Owners[0], gas: Gas}, function(error, result){});
+        await CertPool.methods.validateOwner(Owners[2], false).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -142,8 +142,8 @@ async function RemoveOwnerWrong(CertPool, Owners, provider_3, user_1){
     // act
     try{
         await CertPool.methods.removeOwner(Owners[1]).send({from: Owners[0], gas: Gas}, function(error, result){});
-        await CertPool.methods.removeOwner(Owners[1]).send({from: Owners[2], gas: Gas}, function(error, result){});
-        await CertPool.methods.removeOwner(Owners[2]).send({from: Owners[1], gas: Gas}, function(error, result){});
+        await CertPool.methods.validateOwner(Owners[1], false).send({from: Owners[2], gas: Gas}, function(error, result){});
+        await CertPool.methods.validateOwner(Owners[2], false).send({from: Owners[1], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -155,7 +155,7 @@ async function RemoveOwnerWrong(CertPool, Owners, provider_3, user_1){
 async function RemoveOwnerCorrect(CertPool, Owners, user_1){
     // act
     await CertPool.methods.removeOwner(Owners[2]).send({from: Owners[0], gas: Gas}, function(error, result){});
-    await CertPool.methods.removeOwner(Owners[2]).send({from: Owners[1], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateOwner(Owners[2], false).send({from: Owners[1], gas: Gas}, function(error, result){});
     // assert
     let All = await CertPool.methods.retrieveAllOwners().call({from: user_1}, function(error, result){});
     let Total = All.length;
@@ -176,7 +176,7 @@ async function AddProviderWrong(CertPool, Owners, provider_1, user_1, isPrivate)
         // act
         try{
             await CertPool.methods.addProvider(provider_1, provider_1_Info).send({from: Owners[0], gas: Gas}, function(error, result){});
-            await CertPool.methods.addProvider(provider_1, provider_1_Info + 1).send({from: Owners[0], gas: Gas}, function(error, result){});
+            await CertPool.methods.validateProvider(provider_1, true).send({from: Owners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -296,7 +296,7 @@ async function RemoveProviderWrong(CertPool, Owners, provider_1, provider_2, pro
     // act
     try{
         await CertPool.methods.removeProvider(provider_1).send({from: Owners[0], gas: Gas}, function(error, result){});
-        await CertPool.methods.removeProvider(provider_1).send({from: Owners[0], gas: Gas}, function(error, result){});
+        await CertPool.methods.validateProvider(provider_1, false).send({from: Owners[0], gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -309,7 +309,7 @@ async function RemoveProviderCorrect(CertPool, Owners, provider_1, provider_2, u
     // act
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
     await CertPool.methods.removeProvider(provider_1).send({from: Owners[2], gas: Gas}, function(error, result){});
-    await CertPool.methods.removeProvider(provider_1).send({from: Owners[0], gas: Gas}, function(error, result){});
+    await CertPool.methods.validateProvider(provider_1, false).send({from: Owners[0], gas: Gas}, function(error, result){});
     // assert
     let All = await CertPool.methods.retrieveAllProviders().call({from: user_1}, function(error, result){});
     let Total = All.length;
