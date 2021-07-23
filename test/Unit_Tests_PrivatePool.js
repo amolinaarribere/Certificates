@@ -26,6 +26,9 @@ contract("Testing Private Pool",function(accounts){
     var certPoolManager;
     var certisToken;
     var privateCertPool;
+    var publicPool;
+    var treasury;
+    var privatePoolGenerator;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -43,8 +46,10 @@ contract("Testing Private Pool",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisToken = contracts[1];
-        await certPoolManager.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
-        let response = await certPoolManager.retrievePrivateCertificatesPool(0, {from: user_1});
+        treasury = contracts[3];
+        privatePoolGenerator = contracts[4];
+        await privatePoolGenerator.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
+        let response = await privatePoolGenerator.retrievePrivateCertificatesPool(0, {from: user_1});
         const {0: creator, 1: privateCertPoolAddress} = response;
         privateCertPool = new web3.eth.Contract(PrivateCertificatesAbi, privateCertPoolAddress);  
     });

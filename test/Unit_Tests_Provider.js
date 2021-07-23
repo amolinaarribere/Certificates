@@ -56,18 +56,18 @@ contract("Testing Provider",function(accounts){
         publicCertPool = contracts[2];
         provider = await Provider.new(ProviderOwners, minOwners, provider_1_Info, {from: user_1, value: (2 * CertificatePriceWei) + PublicPriceWei});
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
+        const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
         publicCertPoolAddress = _publicCertPoolAddress;
     });
 
     async function AddProvider(){
-        await publicCertPool.addProvider(provider.address, provider_1_Info, {from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await publicCertPool.addProvider(provider.address, provider_1_Info, {from: user_1, value: PublicPriceWei, gas: Gas});
         await ValidateProvider();
     }
 
     async function ValidateProvider(){
-        await publicCertPool.validateProvider(provider.address, {from: PublicOwners[0], gas: Gas}, function(error, result){});
-        await publicCertPool.validateProvider(provider.address, {from: PublicOwners[1], gas: Gas}, function(error, result){});
+        await publicCertPool.validateProvider(provider.address, {from: PublicOwners[0], gas: Gas});
+        await publicCertPool.validateProvider(provider.address, {from: PublicOwners[1], gas: Gas});
     }
 
     async function SubscribingToPublicPool(){
