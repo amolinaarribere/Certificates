@@ -59,6 +59,11 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
     {
         removeEntity(owner, _ownerId);
     }
+
+    function validateOwner(address owner, bool addedORremove) external override
+    {
+        validateEntity(owner, _ownerId, addedORremove);
+    }
     
     function retrieveOwner(address owner) external override view returns (string memory, bool){
         return (retrieveEntity(owner, _ownerId));

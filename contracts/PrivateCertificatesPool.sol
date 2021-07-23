@@ -19,8 +19,12 @@ pragma experimental ABIEncoderV2;
         addEntity(provider, providerInfo, _providerId);
     }
 
-    function removeProvider(address provider) external override{
-       removeEntity(provider, _providerId); 
+    function validateProvider(address provider, bool addedORremove) external override{
+        validateEntity(provider, _providerId, addedORremove);
     }
+
+    function onEntityAdded(address entity, uint listId) internal override{}
+
+    function onEntityRemoved(address entity, uint listId) internal override{}
 
  }

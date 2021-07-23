@@ -82,12 +82,22 @@ pragma experimental ABIEncoderV2;
 
     function removePool(address pool) external override{
        removeEntity(pool, _poolId); 
-       if(false == isPool(pool)){
-           delete(_submited[pool]);
-           delete(_AddCertificatePricePerPool[pool]);
-           delete(_SubscriptionPricePerPool[pool]);
-       } 
+    }
 
+    function validatePool(address pool, bool addedORremove) external override{
+        validateEntity(pool, _poolId, addedORremove);
+    }
+
+    function onEntityAdded(address entity, uint listId) internal override
+    {}
+
+    function onEntityRemoved(address entity, uint listId) internal override
+    {
+        if(listId == _poolId){
+            delete(_submited[entity]);
+            delete(_AddCertificatePricePerPool[entity]);
+            delete(_SubscriptionPricePerPool[entity]);
+        }
     }
     
     function retrievePool(address pool) external override view returns (string memory, bool, uint256){

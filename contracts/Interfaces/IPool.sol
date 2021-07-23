@@ -17,6 +17,7 @@ pragma experimental ABIEncoderV2;
 
     function addProvider(address provider, string memory providerInfo) external payable;
     function removeProvider(address provider) external;
+    function validateProvider(address provider, bool addedORremove) external;
     function retrieveProvider(address provider) external view returns (string memory, bool);
     function retrieveAllProviders() external view returns (address[] memory);
     function retrievePendingProviders(bool addedORremove) external view returns (address[] memory, string[] memory);

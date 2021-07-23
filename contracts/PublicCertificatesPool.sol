@@ -9,26 +9,15 @@ pragma experimental ABIEncoderV2;
  */
 
  import "./Abstract/MultiSigCertificatesPool.sol";
- import "./Interfaces/IPublicPool.sol";
  import "./Treasury.sol";
  import "./Libraries/Library.sol";
  import "./Base/ManagedBaseContract.sol";
 
- contract PublicCertificatesPool is MultiSigCertificatesPool, IPublicPool, ManagedBaseContract {
+ contract PublicCertificatesPool is MultiSigCertificatesPool, ManagedBaseContract {
     using Library for *;
 
     // events
     event _SendProposalId(address);
-
-    //modifiers
-    modifier hasBeenSubmitted(bool YesOrNo, address provider){
-        if(false == YesOrNo) require(false == _submited[provider], "EC3");
-        else require(true == _submited[provider], "EC4");
-        _;
-    }
-
-    // submitted providers (in progress or already validated)
-    mapping(address => bool) _submited;
 
     // Treasury
     Treasury _Treasury;
@@ -47,38 +36,36 @@ pragma experimental ABIEncoderV2;
     }
 
     function addProvider(address provider, string memory providerInfo) external 
-        hasBeenSubmitted(false, provider)
+        isEntityActivated(false, provider, _providerId) 
+        isEntityPending(false, provider, _providerId, true)
     override payable
     {
         _Treasury.pay{value:msg.value}(Library.Prices.NewProvider);
         _Entities[_providerId]._entities[provider]._Info = providerInfo;
-        _submited[provider] = true;
+        _Entities[_providerId]._pendingEntitiesAdd.push(provider);
 
         emit _SendProposalId(provider);
     }
 
-    function validateProvider(address provider) external 
-        hasBeenSubmitted(true, provider)
-    override
+    function validateProvider(address provider, bool addedORremove) external override
     {
-        addEntity(provider, _Entities[_providerId]._entities[provider]._Info, _providerId);
+        validateEntity(provider, _providerId, addedORremove);
+    }
 
-        if(true == isProvider(provider)){
-            uint totalValidators = _Entities[_providerId]._entities[provider]._AddValidated.length;
+    function onEntityAdded(address entity, uint listId) internal override
+    {
+        if(listId == _providerId){
+            if(true == isProvider(entity)){
+                uint totalValidators = _Entities[_providerId]._entities[entity]._AddValidated.length;
 
-            for(uint i=0; i < totalValidators; i++){
-                _Treasury.getRefund(_Entities[_providerId]._entities[provider]._AddValidated[i], totalValidators);
+                for(uint i=0; i < totalValidators; i++){
+                    _Treasury.getRefund(_Entities[_providerId]._entities[entity]._AddValidated[i], totalValidators);
+                }
             }
         }
     }
 
-    function removeProvider(address provider) external override{
-       removeEntity(provider, _providerId); 
-
-       if(false == isEntity(provider, _providerId)){
-            delete(_submited[provider]);
-       }
-    }
+    function onEntityRemoved(address entity, uint listId) internal override{}
 
     function addCertificate(bytes32 CertificateHash, address holder) external override payable
     {

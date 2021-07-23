@@ -124,7 +124,7 @@ contract EntitiesBaseContract{
                 _Entities[listId]._entities[entity]._activated = true; 
                 _Entities[listId]._activatedEntities.push(entity);
                 _Entities[listId]._pendingEntitiesAdd = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesAdd), _Entities[listId]._pendingEntitiesAdd);
-
+                onEntityAdded( entity, listId);
                 emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity);
             }
         }
@@ -136,11 +136,16 @@ contract EntitiesBaseContract{
                 _Entities[listId]._activatedEntities = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._activatedEntities), _Entities[listId]._activatedEntities);
                 _Entities[listId]._pendingEntitiesRemove = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesRemove), _Entities[listId]._pendingEntitiesRemove);
                 delete(_Entities[listId]._entities[entity]);
+                onEntityRemoved( entity, listId);
                 emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity);
             }  
         }
         
     }
+
+    function onEntityAdded(address entity, uint listId) internal virtual{}
+
+    function onEntityRemoved(address entity, uint listId) internal virtual{}
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)

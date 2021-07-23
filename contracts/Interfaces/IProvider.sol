@@ -14,6 +14,7 @@ pragma solidity >=0.7.0 <0.9.0;
     function subscribeToPublicPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external;
     function addPool(address pool, string memory poolInfo, uint256 AddCertificatePrice) external;
     function removePool(address pool) external;
+    function validatePool(address pool, bool addedORremove) external;
     function retrievePool(address pool) external view returns (string memory, bool, uint256);
     function retrieveAllPools() external view returns (address[] memory);
 
