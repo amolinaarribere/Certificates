@@ -13,14 +13,12 @@ import "./Libraries/UintLibrary.sol";
 import "./Libraries/Library.sol";
 import "./CertisToken.sol";
 import "./Base/TokenGovernanceBaseContract.sol";
+import "./Base/ManagedBaseContract.sol";
 
 
-contract Treasury is ITreasury, TokenGovernanceBaseContract{
+contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract{
     using Library for *;
     using UintLibrary for *;
-
-    // manager contract
-    address _managerContract;
 
     // modifiers
     modifier areFundsEnough(Library.Prices price){
@@ -41,11 +39,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     modifier isFromPublicPool(){
         require(true == Library.ItIsSomeone(address(_PublicCertificatesPool)), "EC8");
-        _;
-    }
-
-    modifier isFromManagerContract(){
-        require(true == Library.ItIsSomeone(_managerContract), "EC8");
         _;
     }
 
@@ -79,29 +72,18 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     
     mapping(address => _BalanceStruct) _balances;
 
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress, address CertisTokenAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
+    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
     TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
+    ManagedBaseContract(managerContractAddress)
     {
-        _chairperson = msg.sender;
-        _managerContract = managerContractAddress; 
-        
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
-        InternalupdateContracts(PublicPoolAddress, CertisTokenAddress);
     }
 
 
     // governance 
-
     function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
     {
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
-    }
-
-    function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
-        isFromManagerContract()
-    override
-    {
-        InternalupdateContracts(PublicPoolAddress, CertisTokenAddress);
     }
 
     function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
@@ -121,12 +103,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
         }
         
-    }
-
-    function InternalupdateContracts(address PublicPoolAddress, address CertisTokenAddress) internal
-    {
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
-        _CertisToken = CertisToken(CertisTokenAddress); 
     }
 
     function propositionApproved() internal override
@@ -155,6 +131,13 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
     // functionality
+    function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
+        isFromManagerContract()
+    override
+    {
+        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+        _CertisToken = CertisToken(CertisTokenAddress); 
+    }
 
     function pay(Library.Prices price) external 
         areFundsEnough(price)

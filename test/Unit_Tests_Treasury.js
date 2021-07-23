@@ -75,15 +75,15 @@ contract("Testing Treasury",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisToken = contracts[1];
+        publicCertPool = contracts[2];
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _chairPerson, 3: _balance} = result;
-        Treasury = new web3.eth.Contract(TreasuryAbi, _treasuryAddress);   
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);   
+        const {0: _treasuryAddress, 1: _publicCertPoolAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
+        Treasury = new web3.eth.Contract(TreasuryAbi, _treasuryAddress);
     });
 
     async function SendingNewProviders(){
-        await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
-        await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await publicCertPool.addProvider(provider_1, provider_1_Info, {from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await publicCertPool.addProvider(provider_2, provider_2_Info, {from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
     }
 
@@ -200,6 +200,17 @@ contract("Testing Treasury",function(accounts){
         // assert
         catch(error){
             expect(error.message).to.match(AlreadyVoted);
+        }
+        // act
+        try{
+            await Treasury.methods.voteProposition(false).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
+            await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
+            await Treasury.methods.voteProposition(false).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NoPropositionActivated);
         }
         
     });

@@ -15,6 +15,7 @@ const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const TotalTokenSupply = constants.TotalTokenSupply;
 const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,61 +24,188 @@ const Gas = constants.Gas;
 contract("Testing Certificate Pool Manager",function(accounts){
     var certPoolManager;
     var certisToken;
+    var publicPool;
+    var treasury;
+    var privatePoolGenerator;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
-    const PrivateOwners = [accounts[1], accounts[2], accounts[3]];
     const minOwners = 2;
-    const provider_1 = accounts[4];  
-    const user_1 = accounts[5];
+    const user_1 = accounts[4];
+    const tokenOwner_1 = accounts[5];
+    const tokenOwner_2 = accounts[6];
+    const tokenOwner_3 = accounts[7];
+    const tokenOwner_4 = accounts[8];
+    const tokenOwner_5 = accounts[9];
+    const address_1 = "0x0000000000000000000000000000000000000001";
+    const address_2 = "0x0000000000000000000000000000000000000002";
+    const address_3 = "0x0000000000000000000000000000000000000003";
+    const address_4 = "0x0000000000000000000000000000000000000004";
     // providers info
     const provider_1_Info = "Account 1 Info";
     // test constants
-    const NotEnoughFunds = new RegExp("EC2");
-    const ProposalAlreadySubmitted = new RegExp("EC3");
-    const ProvidedIdIsWrong = new RegExp("EC1");
+    const WrongSender = new RegExp("EC8");
+    const NotEnoughBalance = new RegExp("EC20");
+    const Unauthorized = new RegExp("EC22");
+    const WrongConfig = new RegExp("EC21");
+    const NoPropositionActivated = new RegExp("EC25");
+    const PropositionAlreadyInProgress = new RegExp("EC24");
+    const CanNotVote = new RegExp("EC23");
+    const AlreadyVoted = new RegExp("EC5");
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisToken = contracts[1];
+        publicPool = contracts[2];
+        treasury = contracts[3];
+        privatePoolGenerator = contracts[4];
     });
 
-    // ****** TESTING Creating Private Pools ***************************************************************** //
+    async function SplitTokenSupply(CT){
+        await CT.transfer(tokenOwner_1, (TotalTokenSupply / 5), {from: chairPerson});
+        await CT.transfer(tokenOwner_2, (TotalTokenSupply / 5), {from: chairPerson});
+        await CT.transfer(tokenOwner_3, (TotalTokenSupply / 5), {from: chairPerson});
+        await CT.transfer(tokenOwner_4, (TotalTokenSupply / 5), {from: chairPerson});
+        await CT.transfer(tokenOwner_5, (TotalTokenSupply / 5), {from: chairPerson});
+    }
 
-    it("Create Private Pool WRONG",async function(){
-        // act
-        try{
-            let PriceUnderFunded = PrivatePriceWei - 1;
-            let response = await certPoolManager.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PriceUnderFunded});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughFunds);
-        }
-    });
-
-    it("Create Private Pool CORRECT",async function(){
-        // act
-        await certPoolManager.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
-        // assert
-        let result = await certPoolManager.retrievePrivateCertificatesPool(0, {from: user_1});
-        let Total = await certPoolManager.retrieveTotalPrivateCertificatesPool({from: user_1});
-        const {0: creator, 1: pool} = result;
-        expect(creator).to.equal(user_1);
-        expect(Total.toNumber()).to.equal(1);
-    });
+    async function checkAddresses( _ppa, _ta, _ca, _ppga){
+        let result = await certPoolManager.retrieveConfiguration({from: user_1});
+        let {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
+        expect(_ppa).to.equal(_publicCertPoolAddress);
+        expect(_ta).to.equal(_treasuryAddress);
+        expect(_ca).to.equal(_certisAddress);
+        expect(_ppga).to.equal(_privatePoolGeneratorAddress);
+    }
 
     // ****** TESTING Retrieves ***************************************************************** //
 
     it("Retrieve Configuration",async function(){
-        // act
-        let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _treasury, 1: _publicPool, 2: _chairPerson, 3: _balance} = result;
         // assert
-        expect(_chairPerson).to.equal(chairPerson);
-        expect(_balance.toNumber()).to.equal(0);
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+    });
+
+    // ****** UPDATE Contracts ***************************************************************** //
+
+    it("Vote/Propose Configuration WRONG",async function(){
+        await SplitTokenSupply(certisToken);
+        // act
+        try{
+            await certPoolManager.updateContracts(address_1, address_2, address_3, address_4, {from: user_1, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(Unauthorized);
+        }
+        // act
+        try{
+            await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NoPropositionActivated);
+        }
+        // act
+        try{
+            await certPoolManager.updateContracts(address_1, address_2, address_3, address_4, {from: chairPerson, gas: Gas});
+            await certPoolManager.voteProposition(false, {from: chairPerson, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(CanNotVote);
+        }
+        // act
+        try{
+            await certPoolManager.updateContracts(address_1, address_2, address_3, address_4, {from: tokenOwner_1, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(PropositionAlreadyInProgress);
+        }
+        // act
+        try{
+            await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
+            await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(AlreadyVoted);
+        }
+        // act
+        try{
+            await certPoolManager.voteProposition(false, {from: tokenOwner_2, gas: Gas});
+            await certPoolManager.voteProposition(false, {from: tokenOwner_3, gas: Gas});
+            await certPoolManager.voteProposition(true, {from: tokenOwner_4, gas: Gas});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NoPropositionActivated);
+        }
+        
+    });
+
+    it("Vote/Propose Configuration CORRECT",async function(){
+        // act
+        let contracts = await init.InitializeManagedBaseContracts(chairPerson, PublicOwners, minOwners, user_1, certPoolManager.address);
+        var NewcertisToken = contracts[0];
+        var NewpublicPool = contracts[1];
+        var Newtreasury = contracts[2];
+        var NewprivatePoolGenerator = contracts[3]; 
+        let contracts2 = await init.InitializeManagedBaseContracts(chairPerson, PublicOwners, minOwners, user_1, certPoolManager.address);
+        var NewcertisToken2 = contracts2[0];
+        var NewpublicPool2 = contracts2[1];
+        var Newtreasury2 = contracts2[2];
+        var NewprivatePoolGenerator2 = contracts2[3]; 
+
+        await SplitTokenSupply(certisToken);
+        await SplitTokenSupply(NewcertisToken2);
+
+        // Update contracts Not validated
+        await certPoolManager.updateContracts(NewpublicPool.address, Newtreasury.address, NewcertisToken.address, NewprivatePoolGenerator.address, {from: chairPerson, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+        await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+        await certPoolManager.voteProposition(false, {from: tokenOwner_2, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+        await certPoolManager.voteProposition(false, {from: tokenOwner_3, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+
+        // Update contracts validated
+        await certPoolManager.updateContracts(NewpublicPool.address, Newtreasury.address, NewcertisToken.address, NewprivatePoolGenerator.address, {from: chairPerson, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_1, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_2, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_3, gas: Gas});
+        await checkAddresses(NewpublicPool.address, Newtreasury.address, NewcertisToken.address, NewprivatePoolGenerator.address);
+
+        // Update contracts to second version with only one token owner 100%
+        await certPoolManager.updateContracts(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address, {from: chairPerson, gas: Gas});
+        await checkAddresses(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address);
+
+        // Rollback to original contracts
+        await certPoolManager.updateContracts(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address, {from: chairPerson, gas: Gas});
+        await checkAddresses(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address);
+        await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
+        await checkAddresses(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_2, gas: Gas});
+        await checkAddresses(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address);
+        await certPoolManager.voteProposition(false, {from: tokenOwner_3, gas: Gas});
+        await checkAddresses(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_4, gas: Gas});
+        await checkAddresses(NewpublicPool2.address, Newtreasury2.address, NewcertisToken2.address, NewprivatePoolGenerator2.address);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_5, gas: Gas});
+        await checkAddresses(publicPool.address, treasury.address, certisToken.address, privatePoolGenerator.address);
+
+        
     });
 
 

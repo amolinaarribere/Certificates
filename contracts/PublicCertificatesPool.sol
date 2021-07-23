@@ -12,28 +12,38 @@ pragma experimental ABIEncoderV2;
  import "./Interfaces/IPublicPool.sol";
  import "./Treasury.sol";
  import "./Libraries/Library.sol";
+ import "./Base/ManagedBaseContract.sol";
 
- contract PublicCertificatesPool is MultiSigCertificatesPool, IPublicPool {
-
+ contract PublicCertificatesPool is MultiSigCertificatesPool, IPublicPool, ManagedBaseContract {
     using Library for *;
 
-     // events
+    // events
     event _SendProposalId(address);
 
-     address _creator;
-     mapping(address => bool) _submited;
-     Treasury _Treasury;
-
-     //modifiers
+    //modifiers
     modifier hasBeenSubmitted(bool YesOrNo, address provider){
         if(false == YesOrNo) require(false == _submited[provider], "EC3");
         else require(true == _submited[provider], "EC4");
         _;
     }
 
-     // Constructor
-    constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress) MultiSigCertificatesPool(owners, minOwners) payable {
-        _creator = managerContractAddress;
+    // submitted providers (in progress or already validated)
+    mapping(address => bool) _submited;
+
+    // Treasury
+    Treasury _Treasury;
+
+    // Constructor
+    constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress)
+    MultiSigCertificatesPool(owners, minOwners) 
+    ManagedBaseContract(managerContractAddress) 
+    {}
+
+    // functionality
+    function updateContracts(address TreasuryAddress) external
+        isFromManagerContract()
+    {
+        _Treasury = Treasury(TreasuryAddress);
     }
 
     function addProvider(address provider, string memory providerInfo) external 
@@ -68,12 +78,6 @@ pragma experimental ABIEncoderV2;
        if(false == isEntity(provider, _providerId)){
             delete(_submited[provider]);
        }
-    }
-
-    function addTreasury(address TreasuryAddress) external
-        isSomeoneSpecific(_creator)
-    {
-        _Treasury = Treasury(TreasuryAddress);
     }
 
     function addCertificate(bytes32 CertificateHash, address holder) external override payable

@@ -9,9 +9,10 @@ pragma solidity >=0.7.0 <0.9.0;
 
  import "../CertisToken.sol";
  import "../Libraries/AddressLibrary.sol";
+ import "../Libraries/Library.sol";
 
-contract TokenGovernanceBaseContract{
-
+contract TokenGovernanceBaseContract {
+    using Library for *;
     using AddressLibrary for *; 
 
     address _chairperson;
@@ -46,6 +47,11 @@ contract TokenGovernanceBaseContract{
     bool _currentPropisProp;
     
     // modifiers
+
+    modifier isFromChairPerson(){
+        require(true == Library.ItIsSomeone(_chairperson), "EC8");
+        _;
+    }
 
     modifier isAuthorizedToPropose(){
         require(true == AuthorizedToPropose(msg.sender), "EC22");
@@ -130,6 +136,7 @@ contract TokenGovernanceBaseContract{
 
     // constructor
     constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
+        _chairperson = msg.sender; 
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
     
