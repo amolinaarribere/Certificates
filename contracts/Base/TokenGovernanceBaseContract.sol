@@ -9,9 +9,10 @@ pragma solidity >=0.7.0 <0.9.0;
 
  import "../CertisToken.sol";
  import "../Libraries/AddressLibrary.sol";
+ import "../Libraries/Library.sol";
 
-contract TokenGovernanceBaseContract{
-
+contract TokenGovernanceBaseContract {
+    using Library for *;
     using AddressLibrary for *; 
 
     address _chairperson;
@@ -31,12 +32,34 @@ contract TokenGovernanceBaseContract{
 
     PropositionStruct Proposition;
 
+    uint _PropositionLifeTime;
+    uint8 _PropositionThresholdPercentage;
     uint8 _minWeightToProposePercentage;
+
+    struct ProposedPropositionStruct{
+        uint256 NewPropositionLifeTime;
+        uint8 NewPropositionThresholdPercentage;
+        uint8 NewMinWeightToProposePercentage;
+    }
+
+    ProposedPropositionStruct _ProposedProposition;
+
+    bool _currentPropisProp;
     
     // modifiers
 
+    modifier isFromChairPerson(){
+        require(true == Library.ItIsSomeone(_chairperson), "EC8");
+        _;
+    }
+
     modifier isAuthorizedToPropose(){
         require(true == AuthorizedToPropose(msg.sender), "EC22");
+        _;
+    }
+
+    modifier isAuthorizedToCancel(){
+        require(msg.sender == Proposition.Proposer, "EC22");
         _;
     }
 
@@ -53,6 +76,12 @@ contract TokenGovernanceBaseContract{
 
     modifier HasNotAlreadyVoted(){
         require(false == AddressLibrary.FindAddress(msg.sender, Proposition.AlreadyVoted), "EC5");
+        _;
+    }
+
+    modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
+        require(100 >= PropositionThresholdPercentage, "EC21");
+        require(100 >= minWeightToProposePercentage, "EC21");
         _;
     }
 
@@ -104,10 +133,45 @@ contract TokenGovernanceBaseContract{
         {
             if(address(0) != Proposition.Proposer){
                 propositionExpired();
-                cancelProposition();
+                InternalCancelProposition();
             } 
             return false;
         }
+    }
+
+    // constructor
+    constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
+        _chairperson = msg.sender; 
+        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
+    }
+    
+    // updates prop values
+
+    function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external
+    {
+        InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);
+    }
+
+    function InternalupdateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc, bool fromConstructor) internal
+        isPropOK(PropThresholdPerc, minWeightToPropPerc)
+    {
+        if(fromConstructor){
+            _PropositionLifeTime = PropLifeTime;
+            _PropositionThresholdPercentage = PropThresholdPerc;
+            _minWeightToProposePercentage = minWeightToPropPerc;
+        }
+        else{
+            _ProposedProposition.NewPropositionLifeTime = PropLifeTime;
+            _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;
+            _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;
+            _currentPropisProp = true;
+            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+        }   
+    }
+
+    function retrievePropConfig() external view returns(uint, uint8, uint8)
+    {
+        return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
     // functions
@@ -116,7 +180,6 @@ contract TokenGovernanceBaseContract{
         PropositionInProgress(false)
         isAuthorizedToPropose()
     {
-        
         Proposition.listOfAdmins = GetAdminList();
         require(0 < Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
 
@@ -124,14 +187,16 @@ contract TokenGovernanceBaseContract{
         Proposition.DeadLine = _DeadLine;
         Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
         Proposition.AdminsWeight = GetAdminWeights();
-
-        if(true == AuthorizedToVote(msg.sender, Proposition.listOfAdmins)){
-            voteProposition(true);
-        }
-        
     }
 
-    function voteProposition(bool vote) public
+    function cancelProposition() external
+        PropositionInProgress(true)
+        isAuthorizedToCancel()
+    {
+        InternalCancelProposition();
+    }
+
+    function voteProposition(bool vote) external
         PropositionInProgress(true)
         canVote()
         HasNotAlreadyVoted()
@@ -152,8 +217,13 @@ contract TokenGovernanceBaseContract{
 
         else 
         {
-            propositionExpired();
-            cancelProposition();
+            if(_currentPropisProp){
+                removePropositionProp();
+            }
+            else{
+                propositionExpired();
+            }
+            InternalCancelProposition();
         }
     }
 
@@ -161,17 +231,36 @@ contract TokenGovernanceBaseContract{
     {
         if(Proposition.VotesFor > Proposition.validationThreshold) 
         {
-            propositionApproved();
-            cancelProposition();
+            if(_currentPropisProp){
+                _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;
+                _PropositionThresholdPercentage = _ProposedProposition.NewPropositionThresholdPercentage;
+                _minWeightToProposePercentage = _ProposedProposition.NewMinWeightToProposePercentage;
+                removePropositionProp();
+            }
+            else{
+                propositionApproved();
+            }
+            InternalCancelProposition();
         }
         else if(Proposition.VotesAgainst > Proposition.validationThreshold)
         {
-            propositionRejected();
-            cancelProposition();
+            if(_currentPropisProp){
+                removePropositionProp();
+            }
+            else{
+                propositionRejected();
+            }
+            InternalCancelProposition();
         } 
     }
 
-    function cancelProposition() internal
+    function removePropositionProp() internal
+    {
+        delete(_ProposedProposition);
+        _currentPropisProp = false;
+    }
+
+    function InternalCancelProposition() internal
     {
         delete(Proposition);
     }
@@ -187,6 +276,8 @@ contract TokenGovernanceBaseContract{
             Proposition.AlreadyVoted
         );
     }
+
+    function retrieveProposition() external virtual view returns(string[] memory){}
 
     function propositionApproved() internal virtual{}
 

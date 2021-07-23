@@ -13,14 +13,12 @@ import "./Libraries/UintLibrary.sol";
 import "./Libraries/Library.sol";
 import "./CertisToken.sol";
 import "./Base/TokenGovernanceBaseContract.sol";
+import "./Base/ManagedBaseContract.sol";
 
 
-contract Treasury is ITreasury, TokenGovernanceBaseContract{
+contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract{
     using Library for *;
     using UintLibrary for *;
-
-    // manager contract
-    address _managerContract;
 
     // modifiers
     modifier areFundsEnough(Library.Prices price){
@@ -44,19 +42,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _;
     }
 
-    modifier isFromManagerContract(){
-        require(true == Library.ItIsSomeone(_managerContract), "EC8");
-        _;
-    }
-
     modifier isPriceOK(uint256 PublicPriceWei, uint256 OwnerRefundPriceWei){
         require(PublicPriceWei >= OwnerRefundPriceWei, "EC21");
-        _;
-    }
-
-    modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
-        require(100 >= PropositionThresholdPercentage, "EC21");
-        require(100 >= minWeightToProposePercentage, "EC21");
         _;
     }
 
@@ -70,25 +57,12 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     ProposedPricesStruct _ProposedPrices;
 
-    struct ProposedPropositionStruct{
-        uint256 NewPropositionLifeTime;
-        uint8 NewPropositionThresholdPercentage;
-        uint8 NewMinWeightToProposePercentage;
-    }
-
-    ProposedPropositionStruct _ProposedProposition;
-
-    enum PropositionType {None, Prices, Proposition}
-    PropositionType _currentProp;
-
     // constants
     PublicCertificatesPool  _PublicCertificatesPool;
     uint _PublicPriceWei;
     uint _CertificatePriceWei;
     uint _PrivatePriceWei;
     uint _OwnerRefundPriceWei;
-    uint _PropositionLifeTime;
-    uint8 _PropositionThresholdPercentage;
 
     // data
     struct _BalanceStruct{
@@ -98,15 +72,82 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     
     mapping(address => _BalanceStruct) _balances;
 
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address PublicPoolAddress, address managerContractAddress, address CertisTokenAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) {
-        _chairperson = msg.sender;
-        _managerContract = managerContractAddress; 
-        
+    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
+    TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
+    ManagedBaseContract(managerContractAddress)
+    {
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
-        InternalupdateProp( PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
-        InternalupdateContracts(PublicPoolAddress, CertisTokenAddress);
     }
 
+
+    // governance 
+    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
+    {
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
+    }
+
+    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
+        isPriceOK(PublicPriceWei, OwnerRefundPriceWei)
+    {
+        if(fromConstructor){
+            _PublicPriceWei = PublicPriceWei;
+            _PrivatePriceWei = PrivatePriceWei;
+            _CertificatePriceWei = CertificatePriceWei;
+            _OwnerRefundPriceWei = OwnerRefundPriceWei;
+        }
+        else{
+            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+            _ProposedPrices.NewPublicPriceWei = PublicPriceWei;
+            _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
+            _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
+            _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
+        }
+        
+    }
+
+    function propositionApproved() internal override
+    {
+        _PublicPriceWei = _ProposedPrices.NewPublicPriceWei;
+        _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
+        _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
+        _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
+        
+        removeProposition();
+    }
+
+    function propositionRejected() internal override
+    {
+        removeProposition();
+    }
+
+    function propositionExpired() internal override
+    {
+        removeProposition();
+    }
+
+    function removeProposition() internal
+    {
+         delete(_ProposedPrices);
+    }
+
+    function retrieveProposition() external override view returns(string[] memory)
+    {
+        string[] memory proposition = new string[](4);
+        proposition[0] = UintLibrary.UintToString(_ProposedPrices.NewPublicPriceWei);
+        proposition[1] = UintLibrary.UintToString(_ProposedPrices.NewPrivatePriceWei);
+        proposition[2] = UintLibrary.UintToString(_ProposedPrices.NewCertificatePriceWei);
+        proposition[3] = UintLibrary.UintToString(_ProposedPrices.NewOwnerRefundPriceWei);
+        return proposition;
+    }
+
+    // functionality
+    function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
+        isFromManagerContract()
+    override
+    {
+        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+        _CertisToken = CertisToken(CertisTokenAddress); 
+    }
 
     function pay(Library.Prices price) external 
         areFundsEnough(price)
@@ -127,104 +168,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     }
 
-    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
-    {
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
-    }
-
-    function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external override
-    {
-        InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);
-    }
-
-    function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
-        isFromManagerContract()
-    override
-    {
-        InternalupdateContracts(PublicPoolAddress, CertisTokenAddress);
-    }
-
-    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
-        isPriceOK(PublicPriceWei, OwnerRefundPriceWei)
-    {
-        if(fromConstructor){
-            _PublicPriceWei = PublicPriceWei;
-            _PrivatePriceWei = PrivatePriceWei;
-            _CertificatePriceWei = CertificatePriceWei;
-            _OwnerRefundPriceWei = OwnerRefundPriceWei;
-        }
-        else{
-            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
-            _ProposedPrices.NewPublicPriceWei = PublicPriceWei;
-            _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
-            _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
-            _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
-            _currentProp = PropositionType.Prices;
-        }
-        
-    }
-
-    function InternalupdateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc, bool fromConstructor) internal
-        isPropOK(PropThresholdPerc, minWeightToPropPerc)
-    {
-        if(fromConstructor){
-            _PropositionLifeTime = PropLifeTime;
-            _PropositionThresholdPercentage = PropThresholdPerc;
-            _minWeightToProposePercentage = minWeightToPropPerc;
-        }
-        else{
-            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
-            _ProposedProposition.NewPropositionLifeTime = PropLifeTime;
-            _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;
-            _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;
-            _currentProp = PropositionType.Proposition;
-        }
-        
-    }
-
-    function InternalupdateContracts(address PublicPoolAddress, address CertisTokenAddress) internal
-    {
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
-        _CertisToken = CertisToken(CertisTokenAddress); 
-    }
-
-    function propositionApproved() internal override
-    {
-        if(PropositionType.Prices == _currentProp){
-            _PublicPriceWei = _ProposedPrices.NewPublicPriceWei;
-            _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
-            _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
-            _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
-        }
-        else if(PropositionType.Proposition == _currentProp){
-            _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;
-            _PropositionThresholdPercentage = _ProposedProposition.NewPropositionThresholdPercentage;
-            _minWeightToProposePercentage = _ProposedProposition.NewMinWeightToProposePercentage;
-        }
-        
-        removeProposition();
-    }
-
-    function propositionRejected() internal override
-    {
-        removeProposition();
-    }
-
-    function propositionExpired() internal override
-    {
-        removeProposition();
-    }
-
-    function removeProposition() internal
-    {
-        if(PropositionType.Prices == _currentProp){
-            delete(_ProposedPrices);
-        }
-        else if(PropositionType.Proposition == _currentProp){
-            delete(_ProposedProposition);
-        }
-        _currentProp = PropositionType.None;
-    }
 
     function getRefund(address addr, uint numberOfOwners) external 
         isFromPublicPool()
@@ -262,11 +205,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     function retrievePrices() external override view returns(uint, uint, uint, uint)
     {
         return(_PublicPriceWei, _PrivatePriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
-    }
-
-    function retrievePropConfig() external override view returns(uint, uint8, uint8)
-    {
-        return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
     function checkBalance(address addr) internal view returns(uint){

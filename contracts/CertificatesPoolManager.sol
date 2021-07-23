@@ -7,81 +7,126 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
-import "./Libraries/Library.sol";
-import "./PrivateCertificatesPool.sol";
 import "./PublicCertificatesPool.sol";
+import "./PrivatePoolGenerator.sol";
 import "./Treasury.sol";
+import "./Base/TokenGovernanceBaseContract.sol";
+import "./CertisToken.sol";
+import "./Libraries/AddressLibrary.sol";
 
-contract CertificatesPoolManager{
-    using Library for *;
+contract CertificatesPoolManager is TokenGovernanceBaseContract{
+    using AddressLibrary for *;
 
-    // events
-    event _NewCertificatesPool(uint256, address, MultiSigCertificatesPool);
-
-    // modfiers
-    modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "EC1");
+    //modifier
+    modifier isNotInitialized(){
+        require(false == _init, "EC26");
         _;
     }
 
-    modifier isFromChairPerson(){
-        require(msg.sender == _chairperson, "only chair person");
-        _;
+    // proposition to change
+    struct ProposedContractsStruct{
+        address NewPublicPoolAddress;
+        address NewTreasuryAddress;
+        address NewCertisTokenAddress;
+        address NewPrivatePoolGeneratorAddress;
     }
-    
-    // Private Certificates Pool structure
-    struct _privateCertificatesPoolStruct{
-        address _creator;
-        PrivateCertificatesPool _PrivateCertificatesPool;
-    } 
 
-    _privateCertificatesPoolStruct[] _PrivateCertificatesPools;
+    ProposedContractsStruct _ProposedContracts;
     
+    // Private Certificate Pools Generator
+    PrivatePoolGenerator _PrivatePoolGenerator;
+
     // Public Certificates Pool structure
     PublicCertificatesPool  _PublicCertificatesPool;
 
     // Treasury
     Treasury _Treasury;
 
-    address _chairperson;
-    
-    constructor() {
-        _chairperson = msg.sender; 
+    // init
+    bool _init;
+
+    // constructor and Initialization
+    constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
+    TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
+    {
+        _init = false;
     }
 
-    function Initialize(address PublicPoolAddress, address TreasuryAddress) 
+    function Initialize(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress) 
         isFromChairPerson()
-    external{
+        isNotInitialized()
+    external
+    {
+        _init = true;
+        InternalUpdateContractsVersions(PublicPoolAddress, TreasuryAddress, CertisTokenAddress, PrivatePoolGeneratorAddress, true);
+    }
+
+    // governance : contracts assignment and management
+    function updateContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress) external
+    {
+        InternalUpdateContractsVersions(PublicPoolAddress, TreasuryAddress, CertisTokenAddress, PrivatePoolGeneratorAddress, false);
+    }
+
+    function InternalUpdateContractsVersions(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress, bool fromConstructor) internal
+    {
+        if(fromConstructor){
+            assignContracts(PublicPoolAddress, TreasuryAddress, CertisTokenAddress, PrivatePoolGeneratorAddress);
+        }
+        else{
+            _ProposedContracts.NewPublicPoolAddress = PublicPoolAddress;
+            _ProposedContracts.NewTreasuryAddress = TreasuryAddress;
+            _ProposedContracts.NewCertisTokenAddress = CertisTokenAddress;
+            _ProposedContracts.NewPrivatePoolGeneratorAddress = PrivatePoolGeneratorAddress;
+            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+        }
+        
+    }
+
+    function propositionApproved() internal override
+    {
+        assignContracts(_ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewTreasuryAddress, _ProposedContracts.NewCertisTokenAddress, _ProposedContracts.NewPrivatePoolGeneratorAddress);
+        removeProposition();
+    }
+
+    function propositionRejected() internal override
+    {
+        removeProposition();
+    }
+
+    function propositionExpired() internal override
+    {
+        removeProposition();
+    }
+
+    function removeProposition() internal
+    {
+       delete(_ProposedContracts);
+    }
+
+    function retrieveProposition() external override view returns(string[] memory)
+    {
+        string[] memory proposition = new string[](4);
+        proposition[0] = AddressLibrary.AddressToString(_ProposedContracts.NewPublicPoolAddress);
+        proposition[1] = AddressLibrary.AddressToString(_ProposedContracts.NewTreasuryAddress);
+        proposition[2] = AddressLibrary.AddressToString(_ProposedContracts.NewCertisTokenAddress);
+        proposition[3] = AddressLibrary.AddressToString(_ProposedContracts.NewPrivatePoolGeneratorAddress);
+        return proposition;
+    }
+
+    function assignContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress) internal {
         _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
+        _CertisToken = CertisToken(CertisTokenAddress); 
         _Treasury = Treasury(TreasuryAddress);
-        _PublicCertificatesPool.addTreasury(TreasuryAddress);
-    }
-
-    function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external
-    payable
-    {
-        _Treasury.pay{value:msg.value}(Library.Prices.NewPool);
-        PrivateCertificatesPool certificatePool = new PrivateCertificatesPool(owners, minOwners);
-        _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, certificatePool);
-        _PrivateCertificatesPools.push(privateCertificatesPool);
-
-        emit _NewCertificatesPool(_PrivateCertificatesPools.length - 1, privateCertificatesPool._creator, privateCertificatesPool._PrivateCertificatesPool);
-    }
-
-    function retrievePrivateCertificatesPool(uint certificatePoolId) external
-        isIdCorrect(certificatePoolId, _PrivateCertificatesPools.length)
-    view returns (address, MultiSigCertificatesPool)
-    {
-        return(_PrivateCertificatesPools[certificatePoolId]._creator, _PrivateCertificatesPools[certificatePoolId]._PrivateCertificatesPool);
-    }
-
-    function retrieveTotalPrivateCertificatesPool() external view returns (uint)
-    {
-        return(_PrivateCertificatesPools.length);
+        _PrivatePoolGenerator = PrivatePoolGenerator(PrivatePoolGeneratorAddress);
+        _Treasury.updateContracts(PublicPoolAddress, CertisTokenAddress);
+        _PublicCertificatesPool.updateContracts(TreasuryAddress);
+        _PrivatePoolGenerator.updateContracts(TreasuryAddress);
+       
     }
     
-    function retrieveConfiguration() external view returns (Treasury, MultiSigCertificatesPool, address, uint) {
-        return (_Treasury, _PublicCertificatesPool, _chairperson, address(this).balance);
+    // configuration
+    function retrieveConfiguration() external view returns (address, address, address, address, address, uint) {
+        return (address(_PublicCertificatesPool), address(_Treasury), address(_CertisToken), address(_PrivatePoolGenerator), _chairperson, address(this).balance);
     }
     
 }
