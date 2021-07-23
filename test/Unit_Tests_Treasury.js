@@ -220,36 +220,36 @@ contract("Testing Treasury",function(accounts){
         await SplitTokenSupply();
 
         await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
 
 
         await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
 
         await Treasury.methods.updatePrices(PublicPriceWei + 2, PrivatePriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2).send({from: chairPerson, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_5, gas: Gas}, function(error, result){});
-        checkPrices(PublicPriceWei + 2, PrivatePriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2);
+        await checkPrices(PublicPriceWei + 2, PrivatePriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2);
     });
 
     it("Update Prop Configuration CORRECT",async function(){
@@ -258,34 +258,34 @@ contract("Testing Treasury",function(accounts){
 
          await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
          await Treasury.methods.voteProposition(false).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
          await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
          await Treasury.methods.voteProposition(false).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
  
  
          await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+         await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
  
          await Treasury.methods.updateProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
          await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
          await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
+         await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_5, gas: Gas}, function(error, result){});
-         checkProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2);
+         await checkProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2);
     });
 
     // ****** TESTING Paying ***************************************************************** //
