@@ -17,7 +17,7 @@ pragma experimental ABIEncoderV2;
     using Library for *;
 
     // events
-    event _SendProposalId(address);
+    event _SendProposalId(address indexed,  string indexed);
 
     // Treasury
     Treasury _Treasury;
@@ -37,35 +37,38 @@ pragma experimental ABIEncoderV2;
 
     function addProvider(address provider, string memory providerInfo) external 
         isEntityActivated(false, provider, _providerId) 
-        isEntityPending(false, provider, _providerId, true)
+        isEntityPendingToAdd(false, provider, _providerId)
     override payable
     {
         _Treasury.pay{value:msg.value}(Library.Prices.NewProvider);
         _Entities[_providerId]._entities[provider]._Info = providerInfo;
         _Entities[_providerId]._pendingEntitiesAdd.push(provider);
 
-        emit _SendProposalId(provider);
+        emit _SendProposalId(provider, providerInfo);
     }
 
-    function validateProvider(address provider, bool addedORremove) external override
+    function onEntityValidated(address entity, uint listId, bool addOrRemove) internal override
     {
-        validateEntity(provider, _providerId, addedORremove);
+        if(addOrRemove)payBack( entity, listId, true);
     }
 
-    function onEntityAdded(address entity, uint listId) internal override
+    function onEntityRejected(address entity, uint listId, bool addOrRemove) internal override
+    {
+        if(addOrRemove)payBack( entity, listId, false);
+    }
+
+    function payBack(address entity, uint listId, bool validatedOrRejected) internal
     {
         if(listId == _providerId){
             if(true == isProvider(entity)){
-                uint totalValidators = _Entities[_providerId]._entities[entity]._AddValidated.length;
+                address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._entities[entity]._Validations : _Entities[_providerId]._entities[entity]._Rejections;
 
-                for(uint i=0; i < totalValidators; i++){
-                    _Treasury.getRefund(_Entities[_providerId]._entities[entity]._AddValidated[i], totalValidators);
+                for(uint i=0; i < Voters.length; i++){
+                    _Treasury.getRefund(Voters[i], Voters.length);
                 }
             }
         }
     }
-
-    function onEntityRemoved(address entity, uint listId) internal override{}
 
     function addCertificate(bytes32 CertificateHash, address holder) external override payable
     {

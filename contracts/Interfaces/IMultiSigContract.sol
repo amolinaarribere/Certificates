@@ -10,9 +10,10 @@ pragma experimental ABIEncoderV2;
 
 
  interface IMultiSigContract  {
-    function addOwner(address owner, string memory ownerInfo) external;
+    function addOwner(address owner, string calldata ownerInfo) external;
     function removeOwner(address owner) external;
-    function validateOwner(address owner, bool addedORremove) external;
+    function validateOwner(address owner) external;
+    function rejectOwner(address owner) external;
 
     function retrieveOwner(address owner) external view returns (string memory, bool);
     function retrieveAllOwners() external view returns (address[] memory);

@@ -10,11 +10,14 @@ pragma solidity >=0.7.0 <0.9.0;
  interface IProvider  {
     function addCertificate(address pool, bytes32 CertificateHash, address holder) external;
     function removeCertificate(address pool, bytes32 CertificateHash, address holder) external;
+    function validateCertificate(address pool, bytes32 CertificateHash, address holder) external;
+    function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external;
 
-    function subscribeToPublicPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external;
-    function addPool(address pool, string memory poolInfo, uint256 AddCertificatePrice) external;
+    function subscribeToPublicPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external;
+    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice) external;
     function removePool(address pool) external;
-    function validatePool(address pool, bool addedORremove) external;
+    function validatePool(address pool) external;
+    function rejectPool(address pool) external;
     function retrievePool(address pool) external view returns (string memory, bool, uint256);
     function retrieveAllPools() external view returns (address[] memory);
 

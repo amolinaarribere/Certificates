@@ -50,7 +50,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
     }
 
     // OWNERS CRUD Operations
-    function addOwner(address owner, string memory ownerInfo) external override {
+    function addOwner(address owner, string calldata ownerInfo) external override {
         addEntity(owner, ownerInfo, _ownerId);
     }
     
@@ -60,9 +60,14 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
         removeEntity(owner, _ownerId);
     }
 
-    function validateOwner(address owner, bool addedORremove) external override
+    function validateOwner(address owner) external override
     {
-        validateEntity(owner, _ownerId, addedORremove);
+        validateEntity(owner, _ownerId);
+    }
+
+    function rejectOwner(address owner) external override
+    {
+        rejectEntity(owner, _ownerId);
     }
     
     function retrieveOwner(address owner) external override view returns (string memory, bool){

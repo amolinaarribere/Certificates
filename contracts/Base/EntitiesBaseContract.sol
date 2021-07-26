@@ -15,18 +15,24 @@ contract EntitiesBaseContract{
     using Library for *;
     using AddressLibrary for *;
 
+    //events
+    event _AddEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
+    event _RemoveEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
+    event _AddEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
+    event _RemoveEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
+
     //Actions that can be performed on entities
-    enum Actions{
+    /*enum Actions{
         Add,
         Remove
-    }
+    }*/
 
     //Structures
     struct _entityIdentity{
         bool _activated;
         string _Info;
-        address[] _AddValidated;
-        address[] _RemoveValidated;
+        address[] _Validations;
+        address[] _Rejections;
     }
 
     struct _entityStruct{
@@ -35,10 +41,6 @@ contract EntitiesBaseContract{
         address[] _pendingEntitiesAdd;
         address[] _pendingEntitiesRemove;
     }
-
-    //events
-    event _AddEntityValidationIdEvent(string, address);
-    event _RemoveEntityValidationIdEvent(string, address);
 
     // owners
     uint _ownerId;
@@ -58,15 +60,10 @@ contract EntitiesBaseContract{
         require(true == isEntity(msg.sender, _ownerId), "EC9");
         _;
     }
-
-    modifier isAnOwnerOrHimself(address entity){
-        require(true == isEntity(msg.sender, _ownerId) || msg.sender == entity, "EC10");
-        _;
-    }
-
-    modifier HasNotAlreadyVoted(bool addedORremove, _entityIdentity memory Entity){
-        if(true == addedORremove) require(false == AddressLibrary.FindAddress(msg.sender, Entity._AddValidated), "EC5");
-        else require(false == AddressLibrary.FindAddress(msg.sender, Entity._RemoveValidated), "EC5");
+    
+    modifier HasNotAlreadyVoted(_entityIdentity memory Entity){
+        require(false == AddressLibrary.FindAddress(msg.sender, Entity._Validations) &&
+            false == AddressLibrary.FindAddress(msg.sender, Entity._Rejections), "EC5");
         _;
     }
     
@@ -76,76 +73,116 @@ contract EntitiesBaseContract{
         _;
     }
 
-    modifier isEntityPending(bool YesOrNo, address entity, uint listId, bool addedORremove){
-        if(true == addedORremove) {
-            if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId), "EC27");
-            else require(true == isEntityPendingToAdded(entity, listId), "EC28");
-        }
-        else{
-            if(false == YesOrNo) require(false == isEntityPendingToRemoved(entity, listId), "EC27");
-            else require(true == isEntityPendingToRemoved(entity, listId), "EC28");
-        }
+    modifier isEntityPending(bool YesOrNo, address entity, uint listId){
+        if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId) && 
+                                    false == isEntityPendingToRemoved(entity, listId), "EC27");
+        else require(true == isEntityPendingToAdded(entity, listId) || 
+                    true == isEntityPendingToRemoved(entity, listId), "EC28");
+        _;
+    }
+
+    modifier isEntityPendingToAdd(bool YesOrNo, address entity, uint listId){
+        if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId), "EC27");
+        else require(true == isEntityPendingToAdded(entity, listId), "EC28");
+        _;
+    }
+
+    modifier isEntityPendingToRemove(bool YesOrNo, address entity, uint listId){
+        if(false == YesOrNo) require(false == isEntityPendingToRemoved(entity, listId), "EC27");
+        else require(true == isEntityPendingToRemoved(entity, listId), "EC28");
         _;
     }
 
     // Entities functions
-    function addEntity(address entity, string memory entityInfo, uint listId) internal 
+    function addEntity(address entity, string calldata entityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isEntityActivated(false, entity, listId) 
-        isEntityPending(false, entity, listId, true)
+        isEntityPendingToAdd(false, entity, listId)
     { 
         _Entities[listId]._entities[entity]._Info = entityInfo;
         _Entities[listId]._pendingEntitiesAdd.push(entity);
         
-        validateEntity(entity, listId, true);
+        validateEntity(entity, listId);
     }
 
     function removeEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isEntityActivated(true, entity, listId)
-        isEntityPending(false, entity, listId, false)
+        isEntityPendingToRemove(false, entity, listId)
     {
-
         _Entities[listId]._pendingEntitiesRemove.push(entity);
 
-        validateEntity(entity, listId, false);
+        validateEntity(entity, listId);
     }
 
-    function validateEntity(address entity, uint listId, bool addedORremove) internal 
+    function validateEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwner 
-        isEntityPending(true, entity, listId, addedORremove)
-        HasNotAlreadyVoted(addedORremove, _Entities[listId]._entities[entity])
+        isEntityPending(true, entity, listId)
+        HasNotAlreadyVoted(_Entities[listId]._entities[entity])
     {
-        if(addedORremove){
-             _Entities[listId]._entities[entity]._AddValidated.push(msg.sender);
+         _Entities[listId]._entities[entity]._Validations.push(msg.sender);
 
-            if(Library.CheckValidations(_Entities[listId]._entities[entity]._AddValidated.length, _minOwners)){
-                _Entities[listId]._entities[entity]._activated = true; 
-                _Entities[listId]._activatedEntities.push(entity);
-                _Entities[listId]._pendingEntitiesAdd = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesAdd), _Entities[listId]._pendingEntitiesAdd);
-                onEntityAdded( entity, listId);
-                emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity);
+         if(Library.CheckValidations(_Entities[listId]._entities[entity]._Validations.length, _minOwners)){
+
+                if(isEntityPendingToAdded(entity, listId)){
+                    _Entities[listId]._entities[entity]._activated = true; 
+                    _Entities[listId]._activatedEntities.push(entity);
+                    _Entities[listId]._pendingEntitiesAdd = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesAdd), _Entities[listId]._pendingEntitiesAdd);
+                    onEntityValidated(entity, listId, true);
+                    deleteVoters(entity, listId);
+                    emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+                else{
+                    _Entities[listId]._activatedEntities = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._activatedEntities), _Entities[listId]._activatedEntities);
+                    _Entities[listId]._pendingEntitiesRemove = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesRemove), _Entities[listId]._pendingEntitiesRemove);
+                    onEntityValidated( entity, listId, false);
+                    delete(_Entities[listId]._entities[entity]);
+                    emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+
+                
             }
-        }
-
-        else{
-            _Entities[listId]._entities[entity]._RemoveValidated.push(msg.sender);
-
-            if(Library.CheckValidations(_Entities[listId]._entities[entity]._RemoveValidated.length, _minOwners)){
-                _Entities[listId]._activatedEntities = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._activatedEntities), _Entities[listId]._activatedEntities);
-                _Entities[listId]._pendingEntitiesRemove = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesRemove), _Entities[listId]._pendingEntitiesRemove);
-                delete(_Entities[listId]._entities[entity]);
-                onEntityRemoved( entity, listId);
-                emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity);
-            }  
-        }
         
     }
 
-    function onEntityAdded(address entity, uint listId) internal virtual{}
+    function rejectEntity(address entity, uint listId) internal 
+        isIdCorrect(listId, _Entities.length) 
+        isAnOwner 
+        isEntityPending(true, entity, listId)
+        HasNotAlreadyVoted(_Entities[listId]._entities[entity])
+    {
+         _Entities[listId]._entities[entity]._Rejections.push(msg.sender);
 
-    function onEntityRemoved(address entity, uint listId) internal virtual{}
+         if(Library.CheckValidations(_Entities[listId]._entities[entity]._Rejections.length, _minOwners)){
+
+                if(isEntityPendingToAdded(entity, listId)){
+                    _Entities[listId]._pendingEntitiesAdd = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesAdd), _Entities[listId]._pendingEntitiesAdd);
+                    onEntityRejected(entity, listId, true);
+                    delete(_Entities[listId]._entities[entity]._Info);
+                    deleteVoters(entity, listId); 
+                    emit _AddEntityRejectionIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+                else{
+                    _Entities[listId]._pendingEntitiesRemove = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesRemove), _Entities[listId]._pendingEntitiesRemove);
+                    onEntityRejected(entity, listId, false);
+                    deleteVoters(entity, listId);
+                    emit _RemoveEntityRejectionIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+
+                
+            }
+        
+    }
+
+    function deleteVoters(address entity, uint listId) internal{
+        delete(_Entities[listId]._entities[entity]._Rejections);
+        delete(_Entities[listId]._entities[entity]._Validations);
+    }
+
+    function onEntityValidated(address entity, uint listId, bool addOrRemove) internal virtual{}
+
+    function onEntityRejected(address entity, uint listId, bool addOrRemove) internal virtual{}
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)

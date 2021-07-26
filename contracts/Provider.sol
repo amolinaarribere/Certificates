@@ -31,6 +31,9 @@ pragma experimental ABIEncoderV2;
     
     struct _CertificateStruct{
         mapping(bytes32 => _entityIdentity) _cert;
+        bytes32[] _activatedCertificates;
+        bytes32[] _pendingCertificatesAdd;
+        bytes32[] _pendingCertificatesRemove;
     }
     
     struct _CertificatesPerHolderStruct{
@@ -50,6 +53,32 @@ pragma experimental ABIEncoderV2;
         _;
     }
 
+    modifier isCertificateActivated(bool YesOrNo, bytes32 cert, address pool, address holder){
+        if(false == YesOrNo) require(false == isCertificate(pool, cert, holder), "EC6");
+        else require(true == isCertificate(pool, cert, holder), "EC7");
+        _;
+    }
+
+    modifier isCertificatePending(bool YesOrNo, bytes32 cert, address pool, address holder){
+        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder) && 
+                                    false == isCertificatePendingToRemoved(pool, cert, holder), "EC27");
+        else require(true == isCertificatePendingToAdded(pool, cert, holder) || 
+                    true == isCertificatePendingToRemoved(pool, cert, holder), "EC28");
+        _;
+    }
+
+    modifier isCertificatePendingToAdd(bool YesOrNo, bytes32 cert, address pool, address holder){
+        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder), "EC27");
+        else require(true == isCertificatePendingToAdded(pool, cert, holder), "EC28");
+        _;
+    }
+
+    modifier isCertificatePendingToRemove(bool YesOrNo, bytes32 cert, address pool, address holder){
+        if(false == YesOrNo) require(false == isCertificatePendingToRemoved(pool, cert, holder), "EC27");
+        else require(true == isCertificatePendingToRemoved(pool, cert, holder), "EC28");
+        _;
+    }
+
      // Constructor
     constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
         MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdProviders)
@@ -59,7 +88,7 @@ pragma experimental ABIEncoderV2;
     }
 
     // POOL CRUD Operations
-    function subscribeToPublicPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
+    function subscribeToPublicPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
         InternaladdPool(pool, poolInfo, AddCertificatePrice, SubscriptionPrice);
         if(true == isPool(pool)){
             MultiSigCertificatesPool poolToSubscribe = PublicCertificatesPool(pool);
@@ -67,11 +96,11 @@ pragma experimental ABIEncoderV2;
         }
     }
 
-    function addPool(address pool, string memory poolInfo, uint256 AddCertificatePrice) external override{
+    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice) external override{
         InternaladdPool(pool, poolInfo, AddCertificatePrice, 0);
     }
 
-    function InternaladdPool(address pool, string memory poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) internal{
+    function InternaladdPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) internal{
         addEntity(pool, poolInfo, _poolId);
         if(false == _submited[pool]){
             _AddCertificatePricePerPool[pool] = AddCertificatePrice;
@@ -84,14 +113,15 @@ pragma experimental ABIEncoderV2;
        removeEntity(pool, _poolId); 
     }
 
-    function validatePool(address pool, bool addedORremove) external override{
-        validateEntity(pool, _poolId, addedORremove);
+    function validatePool(address pool) external override{
+        validateEntity(pool, _poolId);
     }
 
-    function onEntityAdded(address entity, uint listId) internal override
-    {}
+    function rejectPool(address pool) external override{
+        rejectEntity(pool, _poolId);
+    }
 
-    function onEntityRemoved(address entity, uint listId) internal override
+    function removePricesForPool(address entity, uint listId) internal
     {
         if(listId == _poolId){
             delete(_submited[entity]);
@@ -99,6 +129,13 @@ pragma experimental ABIEncoderV2;
             delete(_SubscriptionPricePerPool[entity]);
         }
     }
+
+    function onEntityValidated(address entity, uint listId, bool addOrRemove) internal override
+    {
+        if(false == addOrRemove)removePricesForPool(entity, listId);
+    }
+
+    function onEntityRejected(address entity, uint listId, bool addOrRemove) internal override{}
     
     function retrievePool(address pool) external override view returns (string memory, bool, uint256){
         string memory poolInfo;
@@ -122,57 +159,132 @@ pragma experimental ABIEncoderV2;
     
     // Certificates management
      function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
+        isAPool(pool)
+        isAnOwner
+        isCertificateActivated(false, CertificateHash, pool, holder) 
+        isCertificatePendingToAdd(false, CertificateHash, pool, holder)
      {
-        manipulateCertificate(pool, CertificateHash, holder, true);
+        _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd.push(CertificateHash);
+        
+        internalValidateCertificate(pool, CertificateHash, holder);
      }
      
      function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
-     {
-         manipulateCertificate(pool, CertificateHash, holder, false);
-     }
-
-    
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, bool addOrRemove) 
         isAPool(pool)
         isAnOwner
-        HasNotAlreadyVoted(addOrRemove, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
-    internal{
-        
-        uint validations;
-        
-        if(addOrRemove){
-            _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.push(msg.sender);
-            validations = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._AddValidated.length;
-        }
-        else{
-            _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._RemoveValidated.push(msg.sender);
-            validations = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._RemoveValidated.length;
-        }
+        isCertificateActivated(true, CertificateHash, pool, holder) 
+        isCertificatePendingToRemove(false, CertificateHash, pool, holder)
+     {
+         _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove.push(CertificateHash);
 
-        if(Library.CheckValidations(validations, _minOwners)){
-            MultiSigCertificatesPool poolToSend;
-            (string memory p ,) = InternalRetrievePool(pool);
-            
-            if(keccak256(abi.encodePacked("Private")) == keccak256(abi.encodePacked((p)))){
+         internalValidateCertificate(pool, CertificateHash, holder);
+     }
+
+     function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
+        isAPool(pool)
+        isAnOwner
+        isCertificatePending(true, CertificateHash, pool, holder)
+        HasNotAlreadyVoted(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+     {
+        internalValidateCertificate(pool, CertificateHash, holder);
+     }
+
+     function internalValidateCertificate(address pool, bytes32 CertificateHash, address holder) internal
+     {
+         _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Validations.push(msg.sender);
+
+         if(Library.CheckValidations(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Validations.length, _minOwners)){
+
+                if(isCertificatePendingToAdded(pool, CertificateHash, holder)){
+                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._activated = true; 
+                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates.push(CertificateHash);
+                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd);
+                    manipulateCertificate(pool, CertificateHash, holder, true);
+                    deleteVoters(pool, CertificateHash, holder);
+                    //emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+                else{
+                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates);
+                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove);
+                    manipulateCertificate(pool, CertificateHash, holder, false);
+                    delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
+                    //emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+
+                
+            }
+     }
+     
+     function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external override
+        isAPool(pool)
+        isAnOwner
+        isCertificatePending(true, CertificateHash, pool, holder)
+        HasNotAlreadyVoted(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+     {
+            if(isCertificatePendingToAdded(pool, CertificateHash, holder)){
+                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd);
+                    //onEntityRejected(entity, listId, true);
+                    delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Info);
+                    deleteVoters(pool, CertificateHash, holder);
+                    //emit _AddEntityRejectionIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+            else{
+                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove);
+                    //onEntityRejected(entity, listId, false);
+                    deleteVoters(pool, CertificateHash, holder);
+                    //emit _RemoveEntityRejectionIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
+                }
+     }
+
+    function deleteVoters(address pool, bytes32 CertificateHash, address holder) internal{
+        delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Rejections);
+        delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Validations);
+    }
+    
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, bool addOrRemove) internal
+    {
+        MultiSigCertificatesPool poolToSend;
+        (string memory p ,) = InternalRetrievePool(pool);
+
+        if(keccak256(abi.encodePacked("Private")) == keccak256(abi.encodePacked((p)))){
                 poolToSend = PrivateCertificatesPool(pool);
             }
-            else {
+        else {
                 poolToSend = PublicCertificatesPool(pool);
-            }
-            
-            
-            if(addOrRemove){
+        }
+
+        if(addOrRemove){
                 poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
             }
-            else{
+        else{
                poolToSend.removeCertificate(CertificateHash, holder);
-            }
-            
-            delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
-            
         }
+            
+        //delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
+        
     }
 
+    function isCertificate(address pool, bytes32 CertificateHash, address holder) public view returns(bool){
+        return _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._activated;
+    }
+
+    function isCertificatePendingToAdded(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
+    {
+        bytes32[] memory pendingToBeAdded = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd;
+        for(uint i=0; i < pendingToBeAdded.length; i++){
+            if(CertificateHash == pendingToBeAdded[i]) return true;
+        }
+        return false;
+    }
+
+    function isCertificatePendingToRemoved(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
+    {
+        bytes32[] memory pendingToBeRemoved = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove;
+        for(uint i=0; i < pendingToBeRemoved.length; i++){
+            if(CertificateHash == pendingToBeRemoved[i]) return true;
+        }
+        return false;
+    }
     
     receive() external override payable{}
     
