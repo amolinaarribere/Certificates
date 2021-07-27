@@ -84,7 +84,7 @@ contract("Testing Treasury",function(accounts){
     async function SendingNewProviders(){
         await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
-        await pool_common.ValidateProviderCorrect(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
+        await pool_common.ValidatingProviders(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
     }
 
     async function SplitTokenSupply(){

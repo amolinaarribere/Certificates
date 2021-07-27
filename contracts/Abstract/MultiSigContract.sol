@@ -10,8 +10,10 @@ pragma experimental ABIEncoderV2;
 
  import "../Interfaces/IMultiSigContract.sol";
  import "../Base/EntitiesBaseContract.sol";
+ import "../Libraries/AddressLibrary.sol";
 
 abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
+    using AddressLibrary for *;
 
     // modifier
      modifier isSomeoneSpecific(address someone){
@@ -44,13 +46,15 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
 
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
-            _Entities[_ownerId]._entities[owners[i]]._activated = true;
-            _Entities[_ownerId]._activatedEntities.push(owners[i]); 
+            bytes32 ownerInBytes = AddressLibrary.AddressToBytes(owners[i]);
+            _Entities[_ownerId]._items[ownerInBytes]._activated = true;
+            _Entities[_ownerId]._activatedItems.push(ownerInBytes); 
         }
     }
 
     // OWNERS CRUD Operations
-    function addOwner(address owner, string calldata ownerInfo) external override {
+    function addOwner(address owner, string calldata ownerInfo) external override 
+    {
         addEntity(owner, ownerInfo, _ownerId);
     }
     
@@ -62,6 +66,9 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
 
     function validateOwner(address owner) external override
     {
+        if(true == isEntityPendingToRemoved(owner, _ownerId)){
+            require(_minOwners <= retrieveAllEntities(_ownerId).length - 1, "EC19");
+        }
         validateEntity(owner, _ownerId);
     }
 

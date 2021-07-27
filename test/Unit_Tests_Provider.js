@@ -72,15 +72,15 @@ contract("Testing Provider",function(accounts){
 
     async function SubscribingToPublicPool(){
         await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
-        await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, 0, 0, {from: ProviderOwners[1], gas: Gas}); 
+        await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas}); 
         ValidateProvider();
     }
 
     async function AddingCertificates(){
         await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
+        await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
         await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[2], gas: Gas});
-        await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+        await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
     }
 
     async function CheckPool(){
@@ -109,7 +109,7 @@ contract("Testing Provider",function(accounts){
         // act
         try{
             await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
-            await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
+            await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
@@ -156,7 +156,7 @@ contract("Testing Provider",function(accounts){
         // act
         try{
             await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, {from: ProviderOwners[0], gas: Gas});
-            await provider.validatePool(publicCertPoolAddress, true, {from: ProviderOwners[0], gas: Gas});
+            await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
@@ -169,7 +169,7 @@ contract("Testing Provider",function(accounts){
         // act
         AddProvider();
         await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, {from: ProviderOwners[0], gas: Gas});
-        await provider.validatePool(publicCertPoolAddress, true, {from: ProviderOwners[1], gas: Gas});
+        await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas});
         // assert
         await CheckPool();
     });
@@ -200,7 +200,7 @@ contract("Testing Provider",function(accounts){
         // act
         try{
             await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
-            await provider.validatePool(publicCertPoolAddress, false, {from: ProviderOwners[0], gas: Gas});
+            await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
         // assert
@@ -213,7 +213,7 @@ contract("Testing Provider",function(accounts){
         // act
         await SubscribingToPublicPool();
         await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[2], gas: Gas});
-        await provider.validatePool(publicCertPoolAddress, false, {from: ProviderOwners[0], gas: Gas});
+        await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
         // assert
         let _All = await provider.retrieveAllPools({from: user_1});
         let _Total = _All.length;

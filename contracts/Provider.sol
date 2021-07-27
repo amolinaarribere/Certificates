@@ -12,10 +12,13 @@ pragma experimental ABIEncoderV2;
  import "./Abstract/MultiSigContract.sol";
  import "./PrivateCertificatesPool.sol";
  import "./PublicCertificatesPool.sol";
-
+ import "./Libraries/ItemsLibrary.sol";
+ import "./Libraries/AddressLibrary.sol";
 
  contract Provider is IProvider, MultiSigContract {
     using Library for *;
+    using AddressLibrary for *;
+    using ItemsLibrary for *;
 
     uint256 constant TotalEntities = 2;
 
@@ -29,15 +32,8 @@ pragma experimental ABIEncoderV2;
 
     string[] _Label = [_ownerLabel, _poolLabel];
     
-    struct _CertificateStruct{
-        mapping(bytes32 => _entityIdentity) _cert;
-        bytes32[] _activatedCertificates;
-        bytes32[] _pendingCertificatesAdd;
-        bytes32[] _pendingCertificatesRemove;
-    }
-    
     struct _CertificatesPerHolderStruct{
-        mapping(address => _CertificateStruct) _CertificatesPerHolder;
+        mapping(address => ItemsLibrary._ItemsStruct) _CertificatesPerHolder;
     }
    
     mapping(address => _CertificatesPerHolderStruct) _CertificatesPerPool;
@@ -76,6 +72,11 @@ pragma experimental ABIEncoderV2;
     modifier isCertificatePendingToRemove(bool YesOrNo, bytes32 cert, address pool, address holder){
         if(false == YesOrNo) require(false == isCertificatePendingToRemoved(pool, cert, holder), "EC27");
         else require(true == isCertificatePendingToRemoved(pool, cert, holder), "EC28");
+        _;
+    }
+
+    modifier HasNotAlreadyVotedForCertificate(bytes32 cert, address pool, address holder){
+        require(false == ItemsLibrary.hasVoted(msg.sender, cert, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]), "EC5");
         _;
     }
 
@@ -130,12 +131,15 @@ pragma experimental ABIEncoderV2;
         }
     }
 
-    function onEntityValidated(address entity, uint listId, bool addOrRemove) internal override
+    function onItemValidated(bytes32 item, uint id, bool addOrRemove) public 
     {
-        if(false == addOrRemove)removePricesForPool(entity, listId);
+        if(false == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item), id);
     }
 
-    function onEntityRejected(address entity, uint listId, bool addOrRemove) internal override{}
+    function onItemRejected(bytes32 item, uint id, bool addOrRemove) public 
+    {
+        if(true == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item), id);
+    }
     
     function retrievePool(address pool) external override view returns (string memory, bool, uint256){
         string memory poolInfo;
@@ -164,9 +168,9 @@ pragma experimental ABIEncoderV2;
         isCertificateActivated(false, CertificateHash, pool, holder) 
         isCertificatePendingToAdd(false, CertificateHash, pool, holder)
      {
-        _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd.push(CertificateHash);
-        
-        internalValidateCertificate(pool, CertificateHash, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
+        ItemsLibrary.addItem(manipulateItemStruct, "", itemsstruct);
      }
      
      function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
@@ -175,72 +179,33 @@ pragma experimental ABIEncoderV2;
         isCertificateActivated(true, CertificateHash, pool, holder) 
         isCertificatePendingToRemove(false, CertificateHash, pool, holder)
      {
-         _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove.push(CertificateHash);
-
-         internalValidateCertificate(pool, CertificateHash, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
+        ItemsLibrary.removeItem(manipulateItemStruct, itemsstruct);
      }
 
      function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
         isCertificatePending(true, CertificateHash, pool, holder)
-        HasNotAlreadyVoted(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+        HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
      {
-        internalValidateCertificate(pool, CertificateHash, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
+        ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct);
      }
 
-     function internalValidateCertificate(address pool, bytes32 CertificateHash, address holder) internal
-     {
-         _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Validations.push(msg.sender);
-
-         if(Library.CheckValidations(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Validations.length, _minOwners)){
-
-                if(isCertificatePendingToAdded(pool, CertificateHash, holder)){
-                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._activated = true; 
-                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates.push(CertificateHash);
-                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd);
-                    manipulateCertificate(pool, CertificateHash, holder, true);
-                    deleteVoters(pool, CertificateHash, holder);
-                    //emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
-                }
-                else{
-                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._activatedCertificates);
-                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove);
-                    manipulateCertificate(pool, CertificateHash, holder, false);
-                    delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
-                    //emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
-                }
-
-                
-            }
-     }
-     
      function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
         isCertificatePending(true, CertificateHash, pool, holder)
-        HasNotAlreadyVoted(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash])
+        HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
      {
-            if(isCertificatePendingToAdded(pool, CertificateHash, holder)){
-                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd);
-                    //onEntityRejected(entity, listId, true);
-                    delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Info);
-                    deleteVoters(pool, CertificateHash, holder);
-                    //emit _AddEntityRejectionIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
-                }
-            else{
-                    _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove), _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove);
-                    //onEntityRejected(entity, listId, false);
-                    deleteVoters(pool, CertificateHash, holder);
-                    //emit _RemoveEntityRejectionIdEvent(_entitiesLabel[listId], entity, _Entities[listId]._entities[entity]._Info);
-                }
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
+        ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct);
      }
-
-    function deleteVoters(address pool, bytes32 CertificateHash, address holder) internal{
-        delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Rejections);
-        delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._Validations);
-    }
-    
+ 
     function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, bool addOrRemove) internal
     {
         MultiSigCertificatesPool poolToSend;
@@ -265,25 +230,17 @@ pragma experimental ABIEncoderV2;
     }
 
     function isCertificate(address pool, bytes32 CertificateHash, address holder) public view returns(bool){
-        return _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]._activated;
+        return ItemsLibrary.isItem(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
     }
 
     function isCertificatePendingToAdded(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
     {
-        bytes32[] memory pendingToBeAdded = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesAdd;
-        for(uint i=0; i < pendingToBeAdded.length; i++){
-            if(CertificateHash == pendingToBeAdded[i]) return true;
-        }
-        return false;
+        return ItemsLibrary.isItemPendingToAdded(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
     }
 
     function isCertificatePendingToRemoved(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
     {
-        bytes32[] memory pendingToBeRemoved = _CertificatesPerPool[pool]._CertificatesPerHolder[holder]._pendingCertificatesRemove;
-        for(uint i=0; i < pendingToBeRemoved.length; i++){
-            if(CertificateHash == pendingToBeRemoved[i]) return true;
-        }
-        return false;
+        return ItemsLibrary.isItemPendingToRemoved(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
     }
     
     receive() external override payable{}

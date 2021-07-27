@@ -19,8 +19,7 @@ pragma experimental ABIEncoderV2;
         addEntity(provider, providerInfo, _providerId);
     }
 
-    function onEntityValidated(address entity, uint listId, bool addOrRemove) internal override{}
+    function onItemValidated(bytes32 item, string calldata id, bool addOrRemove) public {}
 
-    function onEntityRejected(address entity, uint listId, bool addOrRemove) internal override{}
-
+    function onItemRejected(bytes32 item, string calldata id, bool addOrRemove) public {}
  }

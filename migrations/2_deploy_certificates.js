@@ -8,6 +8,7 @@ let PrivatePoolGenerator = artifacts.require("PrivatePoolGenerator");
 let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
 let AddressLibrary = artifacts.require("./Libraries/AddressLibrary");
+let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
 
 module.exports = async function(deployer, network, accounts){
 
@@ -26,6 +27,15 @@ module.exports = async function(deployer, network, accounts){
 
     await deployer.deploy(AddressLibrary);
     console.log("AddressLibrary deployed");
+
+    await deployer.link(Library, ItemsLibrary);
+    console.log("Library linked to Items Library");
+
+    await deployer.link(AddressLibrary, ItemsLibrary);
+    console.log("Address Library linked to Items Library");
+
+    await deployer.deploy(ItemsLibrary);
+    console.log("ItemsLibrary deployed");
 
     // Certificate Pool Manager
     await deployer.link(Library, CertificatesPoolManager);
@@ -53,13 +63,25 @@ module.exports = async function(deployer, network, accounts){
     await deployer.link(Library, PublicCertificatesPool);
     console.log("Library linked to PublicCertificatesPool");
 
+    await deployer.link(AddressLibrary, PublicCertificatesPool);
+    console.log("Address Library linked to PublicCertificatesPool");
+
+    await deployer.link(ItemsLibrary, PublicCertificatesPool);
+    console.log("Items Library linked to PublicCertificatesPool");
+
     await deployer.deploy(PublicCertificatesPool, [accounts[0]],  1, CertificatesPoolManagerInstance.address);
     PublicCertificatesPoolInstance = await PublicCertificatesPool.deployed();
     console.log("PublicCertificatesPool deployed : " + PublicCertificatesPoolInstance.address);
 
     // Treasury
+    await deployer.link(Library, Treasury);
+    console.log("Library linked to Treasury");
+
     await deployer.link(UintLibrary, Treasury);
     console.log("UintLibrary linked to Treasury");
+
+    await deployer.link(AddressLibrary, Treasury);
+    console.log("AddressLibrary linked to Treasury");
 
     await deployer.deploy(Treasury, 10, 20, 5, 2, CertificatesPoolManagerInstance.address, 604800, 50, 5);
     TreasuryInstance = await Treasury.deployed();
@@ -68,6 +90,12 @@ module.exports = async function(deployer, network, accounts){
     // Private Pool Generator
     await deployer.link(Library, PrivatePoolGenerator);
     console.log("Library linked to PrivatePoolGenerator");
+
+    await deployer.link(AddressLibrary, PrivatePoolGenerator);
+    console.log("AddressLibrary linked to PrivatePoolGenerator");
+
+    await deployer.link(ItemsLibrary, PrivatePoolGenerator);
+    console.log("ItemsLibrary linked to PrivatePoolGenerator");
 
     await deployer.deploy(PrivatePoolGenerator, CertificatesPoolManagerInstance.address);
     PrivatePoolGeneratorInstance = await PrivatePoolGenerator.deployed();
@@ -81,6 +109,12 @@ module.exports = async function(deployer, network, accounts){
     // Provider
     await deployer.link(Library, Provider);
     console.log("Library linked to Provider");
+
+    await deployer.link(AddressLibrary, Provider);
+    console.log("AddressLibrary linked to Provider");
+
+    await deployer.link(ItemsLibrary, Provider);
+    console.log("ItemsLibrary linked to Provider");
 
     await deployer.deploy(Provider, [accounts[0]], 1, "Provider Info");
     console.log("Provider deployed");

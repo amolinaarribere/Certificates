@@ -12,9 +12,11 @@ pragma experimental ABIEncoderV2;
  import "./Treasury.sol";
  import "./Libraries/Library.sol";
  import "./Base/ManagedBaseContract.sol";
+ import "./Libraries/AddressLibrary.sol";
 
  contract PublicCertificatesPool is MultiSigCertificatesPool, ManagedBaseContract {
     using Library for *;
+    using AddressLibrary for *;
 
     // events
     event _SendProposalId(address indexed,  string indexed);
@@ -41,31 +43,30 @@ pragma experimental ABIEncoderV2;
     override payable
     {
         _Treasury.pay{value:msg.value}(Library.Prices.NewProvider);
-        _Entities[_providerId]._entities[provider]._Info = providerInfo;
-        _Entities[_providerId]._pendingEntitiesAdd.push(provider);
+        bytes32 providerInBytes = AddressLibrary.AddressToBytes(provider);
+        _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
+        _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
 
         emit _SendProposalId(provider, providerInfo);
     }
 
-    function onEntityValidated(address entity, uint listId, bool addOrRemove) internal override
+    function onItemValidated(bytes32 item, uint id, bool addOrRemove) public 
     {
-        if(addOrRemove)payBack( entity, listId, true);
+        if(addOrRemove)payBack(item, id, true);
     }
 
-    function onEntityRejected(address entity, uint listId, bool addOrRemove) internal override
+    function onItemRejected(bytes32 item, uint id, bool addOrRemove) public 
     {
-        if(addOrRemove)payBack( entity, listId, false);
+        if(addOrRemove)payBack(item, id, false);
     }
 
-    function payBack(address entity, uint listId, bool validatedOrRejected) internal
+    function payBack(bytes32 entityInBytes, uint listId, bool validatedOrRejected) internal
     {
         if(listId == _providerId){
-            if(true == isProvider(entity)){
-                address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._entities[entity]._Validations : _Entities[_providerId]._entities[entity]._Rejections;
+            address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._items[entityInBytes]._Validations : _Entities[_providerId]._items[entityInBytes]._Rejections;
 
-                for(uint i=0; i < Voters.length; i++){
-                    _Treasury.getRefund(Voters[i], Voters.length);
-                }
+            for(uint i=0; i < Voters.length; i++){
+                _Treasury.getRefund(Voters[i], Voters.length);
             }
         }
     }
