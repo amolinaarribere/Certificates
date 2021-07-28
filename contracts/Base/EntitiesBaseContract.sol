@@ -12,7 +12,7 @@ import "../Libraries/Library.sol";
 import "../Libraries/AddressLibrary.sol";
 import "../Libraries/ItemsLibrary.sol";
 
-contract EntitiesBaseContract{
+abstract contract EntitiesBaseContract{
     using Library for *;
     using AddressLibrary for *;
     using ItemsLibrary for *;
@@ -82,9 +82,11 @@ contract EntitiesBaseContract{
         isEntityPendingToAdd(false, entity, listId)
     { 
         bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, _minOwners, _entitiesLabel[listId], listId, true);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, entityInfo, _minOwners, _entitiesLabel[listId], listIdArray, true);
         ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
-        ItemsLibrary.addItem(manipulateItemStruct, entityInfo, itemsstruct);
+        ItemsLibrary.addItem(manipulateItemStruct, itemsstruct, address(this));
     }
 
     function removeEntity(address entity, uint listId) internal 
@@ -94,9 +96,11 @@ contract EntitiesBaseContract{
         isEntityPendingToRemove(false, entity, listId)
     {
         bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, _minOwners, _entitiesLabel[listId], listId, true);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
         ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
-        ItemsLibrary.removeItem(manipulateItemStruct, itemsstruct);
+        ItemsLibrary.removeItem(manipulateItemStruct, itemsstruct, address(this));
     }
 
     function validateEntity(address entity, uint listId) internal 
@@ -106,9 +110,11 @@ contract EntitiesBaseContract{
         HasNotAlreadyVoted(entity, listId)
     {
         bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, _minOwners, _entitiesLabel[listId], listId, true);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
         ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
-        ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct);
+        ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct, address(this));
     }
 
     function rejectEntity(address entity, uint listId) internal 
@@ -118,9 +124,11 @@ contract EntitiesBaseContract{
         HasNotAlreadyVoted(entity, listId)
     {
         bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, _minOwners, _entitiesLabel[listId], listId, true);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
         ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
-        ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct); 
+        ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct, address(this)); 
     }
 
     function retrieveEntity(address entity, uint listId) internal 
@@ -171,5 +179,11 @@ contract EntitiesBaseContract{
         (EntitiesInBytes, EntitiesInfo) = ItemsLibrary.retrievePendingItems(addORemove, _Entities[listId]);
         return(AddressLibrary.BytesArrayToAddress(EntitiesInBytes) , EntitiesInfo);
     }
+
+    // Callback functions 
+
+    function onItemValidated(bytes32 item, uint[] calldata ids, bool addOrRemove) public virtual{}
+
+    function onItemRejected(bytes32 item, uint[] calldata ids, bool addOrRemove) internal virtual{}
 
 }

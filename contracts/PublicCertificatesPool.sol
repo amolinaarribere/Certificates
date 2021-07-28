@@ -19,7 +19,8 @@ pragma experimental ABIEncoderV2;
     using AddressLibrary for *;
 
     // events
-    event _SendProposalId(address indexed,  string indexed);
+    event _SendProposalId(address, address indexed,  string indexed);
+    event test(uint);
 
     // Treasury
     Treasury _Treasury;
@@ -47,27 +48,15 @@ pragma experimental ABIEncoderV2;
         _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
         _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
 
-        emit _SendProposalId(provider, providerInfo);
+        emit _SendProposalId(address(this), provider, providerInfo);
     }
 
-    function onItemValidated(bytes32 item, uint id, bool addOrRemove) public 
+    function payBack(bytes32 entityInBytes, bool validatedOrRejected) internal
     {
-        if(addOrRemove)payBack(item, id, true);
-    }
+        address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._items[entityInBytes]._Validations : _Entities[_providerId]._items[entityInBytes]._Rejections;
 
-    function onItemRejected(bytes32 item, uint id, bool addOrRemove) public 
-    {
-        if(addOrRemove)payBack(item, id, false);
-    }
-
-    function payBack(bytes32 entityInBytes, uint listId, bool validatedOrRejected) internal
-    {
-        if(listId == _providerId){
-            address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._items[entityInBytes]._Validations : _Entities[_providerId]._items[entityInBytes]._Rejections;
-
-            for(uint i=0; i < Voters.length; i++){
-                _Treasury.getRefund(Voters[i], Voters.length);
-            }
+        for(uint i=0; i < Voters.length; i++){
+            _Treasury.getRefund(Voters[i], Voters.length);
         }
     }
 
@@ -75,6 +64,24 @@ pragma experimental ABIEncoderV2;
     {
         _Treasury.pay{value:msg.value}(Library.Prices.NewCertificate);
         addCertificateInternal(CertificateHash, holder);
+    }
+
+    // Callback functions
+
+    function onItemValidated(bytes32 item, uint[] calldata ids, bool addOrRemove) public override 
+    {
+        emit test(1);
+        if(ids[0] == _providerId){
+            if(addOrRemove)payBack(item, true);
+        }
+    }
+
+    function onItemRejected(bytes32 item, uint[] calldata ids, bool addOrRemove) internal override  
+    {
+         emit test(1);
+        if(ids[0] == _providerId){
+            if(addOrRemove)payBack(item, false);
+        }
     }
 
  }

@@ -64,4 +64,12 @@ library AddressLibrary{
         return Library.BytesToString(AddressToBytes(element));
     }
 
+    function UintToAddress(uint element) public pure returns(address){
+        return address(uint160(element));
+    }
+
+    function AddressToUint(address element) public pure returns(uint){
+        return uint256(uint160(element));
+    }
+
 }

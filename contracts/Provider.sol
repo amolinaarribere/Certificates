@@ -30,6 +30,10 @@ pragma experimental ABIEncoderV2;
     uint256 constant _poolId = 1;
     string constant _poolLabel = "Pool";
 
+    // Certificates
+    uint256 constant _certId = 2;
+    string constant _certLabel = "Certificate";
+
     string[] _Label = [_ownerLabel, _poolLabel];
     
     struct _CertificatesPerHolderStruct{
@@ -37,11 +41,15 @@ pragma experimental ABIEncoderV2;
     }
    
     mapping(address => _CertificatesPerHolderStruct) _CertificatesPerPool;
-    string _ProviderInfo;
 
     mapping(address => uint256) _AddCertificatePricePerPool;
     mapping(address => uint256) _SubscriptionPricePerPool;
     mapping(address => bool) _submited;
+
+    // Provider
+    string _ProviderInfo;
+
+    
 
     // modifiers
     modifier isAPool(address pool){
@@ -122,23 +130,11 @@ pragma experimental ABIEncoderV2;
         rejectEntity(pool, _poolId);
     }
 
-    function removePricesForPool(address entity, uint listId) internal
+    function removePricesForPool(address entity) internal
     {
-        if(listId == _poolId){
-            delete(_submited[entity]);
-            delete(_AddCertificatePricePerPool[entity]);
-            delete(_SubscriptionPricePerPool[entity]);
-        }
-    }
-
-    function onItemValidated(bytes32 item, uint id, bool addOrRemove) public 
-    {
-        if(false == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item), id);
-    }
-
-    function onItemRejected(bytes32 item, uint id, bool addOrRemove) public 
-    {
-        if(true == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item), id);
+        delete(_submited[entity]);
+        delete(_AddCertificatePricePerPool[entity]);
+        delete(_SubscriptionPricePerPool[entity]);
     }
     
     function retrievePool(address pool) external override view returns (string memory, bool, uint256){
@@ -153,24 +149,37 @@ pragma experimental ABIEncoderV2;
         return retrieveEntity(pool, _poolId);
     }
 
-    function retrieveAllPools() external override view returns (address[] memory){
+    function retrieveAllPools() external override view returns (address[] memory)
+    {
         return retrieveAllEntities(_poolId);
     }
 
-    function isPool(address pool) public view returns (bool){
+    function isPool(address pool) public view returns (bool)
+    {
         return(isEntity(pool, _poolId));
     }
     
     // Certificates management
+    function extractCertIds(address pool, address holder) internal pure returns(uint[] memory){
+        uint[] memory certIdIdArray = new uint[](3);
+        certIdIdArray[0] = _certId;
+        certIdIdArray[1] = AddressLibrary.AddressToUint(pool);
+        certIdIdArray[2] = AddressLibrary.AddressToUint(holder);
+
+        return(certIdIdArray);
+    }
+
      function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
         isCertificateActivated(false, CertificateHash, pool, holder) 
         isCertificatePendingToAdd(false, CertificateHash, pool, holder)
      {
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
-        ItemsLibrary.addItem(manipulateItemStruct, "", itemsstruct);
+        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
+        uint[] memory certIdIdArray = extractCertIds(pool, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
+        ItemsLibrary.addItem(manipulateItemStruct,itemsstruct, address(this));
      }
      
      function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
@@ -179,9 +188,11 @@ pragma experimental ABIEncoderV2;
         isCertificateActivated(true, CertificateHash, pool, holder) 
         isCertificatePendingToRemove(false, CertificateHash, pool, holder)
      {
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
-        ItemsLibrary.removeItem(manipulateItemStruct, itemsstruct);
+        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
+        uint[] memory certIdIdArray = extractCertIds(pool, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
+        ItemsLibrary.removeItem(manipulateItemStruct, itemsstruct, address(this));
      }
 
      function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
@@ -190,9 +201,11 @@ pragma experimental ABIEncoderV2;
         isCertificatePending(true, CertificateHash, pool, holder)
         HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
      {
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
-        ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct);
+        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
+        uint[] memory certIdIdArray = extractCertIds(pool, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
+        ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct, address(this));
      }
 
      function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external override
@@ -201,9 +214,11 @@ pragma experimental ABIEncoderV2;
         isCertificatePending(true, CertificateHash, pool, holder)
         HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
      {
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, _minOwners, "", 0, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
-        ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct);
+        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
+        uint[] memory certIdIdArray = extractCertIds(pool, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
+        ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct, address(this));
      }
  
     function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, bool addOrRemove) internal
@@ -225,11 +240,12 @@ pragma experimental ABIEncoderV2;
                poolToSend.removeCertificate(CertificateHash, holder);
         }
             
-        //delete(_CertificatesPerPool[pool]._CertificatesPerHolder[holder]._cert[CertificateHash]);
+        //delete(_CertificatesPerPool[getPoolId(pool)]._CertificatesPerHolder[getHolderId(holder)]._cert[CertificateHash]);
         
     }
 
-    function isCertificate(address pool, bytes32 CertificateHash, address holder) public view returns(bool){
+    function isCertificate(address pool, bytes32 CertificateHash, address holder) public view returns(bool)
+    {
         return ItemsLibrary.isItem(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
     }
 
@@ -242,7 +258,27 @@ pragma experimental ABIEncoderV2;
     {
         return ItemsLibrary.isItemPendingToRemoved(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
     }
+
     
     receive() external override payable{}
+
+    // Callback functions
+
+    function onItemValidated(bytes32 item, uint[] calldata ids, bool addOrRemove) public override  
+    {
+        if(ids[0] == _poolId){
+            if(false == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item));
+        }
+        else if(ids[0] == _certId){
+            manipulateCertificate(AddressLibrary.UintToAddress(ids[1]), item, AddressLibrary.UintToAddress(ids[2]), addOrRemove);
+        }
+    }
+
+    function onItemRejected(bytes32 item, uint[] calldata ids, bool addOrRemove) internal override  
+    {
+        if(ids[0] == _poolId){
+            if(true == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item));
+        } 
+    }
     
  }

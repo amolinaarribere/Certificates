@@ -16,8 +16,8 @@ library ItemsLibrary{
     using Library for *;
 
     //events
-    event _AddItemValidationIdEvent(string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemValidationIdEvent(string indexed,  bytes32 indexed,  string indexed);
+    event _AddItemValidationIdEvent(address, address, bool, bytes, string indexed,  bytes32 indexed,  string indexed);
+    event _RemoveItemValidationIdEvent(address, address, bool, bytes, string indexed,  bytes32 indexed,  string indexed);
     event _AddItemRejectionIdEvent(string indexed,  bytes32 indexed,  string indexed);
     event _RemoveItemRejectionIdEvent(string indexed,  bytes32 indexed,  string indexed);
     
@@ -38,9 +38,10 @@ library ItemsLibrary{
 
     struct _manipulateItemStruct{
         bytes32 item;
+        string info;
         uint256 _minSignatures;
         string label;
-        uint id;
+        uint[] ids;
         bool emitEvent;
     }
 
@@ -51,31 +52,32 @@ library ItemsLibrary{
     }
 
     // ADD and REMOVE Functionality
-    function addItem(_manipulateItemStruct memory manipulateItemstruct, string memory info, _ItemsStruct storage itemStruct) internal
+    function addItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
     {
         bytes32 item = manipulateItemstruct.item;
+        string memory info = manipulateItemstruct.info;
 
         itemStruct._items[item]._Info = info;
         itemStruct._pendingItemsAdd.push(item);
         
-        validateItem(manipulateItemstruct, itemStruct);
+        validateItem(manipulateItemstruct, itemStruct, c);
     }
      
-    function removeItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct) public
+    function removeItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
     {
         bytes32 item = manipulateItemstruct.item;
 
         itemStruct._pendingItemsRemove.push(item);
 
-        validateItem(manipulateItemstruct, itemStruct);
+        validateItem(manipulateItemstruct, itemStruct, c);
     }
 
-    function validateItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct) public
+    function validateItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
     {
         bytes32 item = manipulateItemstruct.item;
         uint _minSignatures = manipulateItemstruct._minSignatures;
         string memory label = manipulateItemstruct.label;
-        uint id = manipulateItemstruct.id;
+        uint[] memory ids = manipulateItemstruct.ids;
         bool emitEvent = manipulateItemstruct.emitEvent;
 
         itemStruct._items[item]._Validations.push(msg.sender);
@@ -86,26 +88,26 @@ library ItemsLibrary{
                 itemStruct._items[item]._activated = true; 
                 itemStruct._activatedItems.push(item);
                 itemStruct._pendingItemsAdd = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsAdd), itemStruct._pendingItemsAdd);
-                onItemValidated(item, id, true);
+                (bool success, bytes memory data) = c.delegatecall(abi.encodeWithSignature("onItemValidated(bytes32,uint[],bool)", item, ids, true));
                 deleteVoters(item, itemStruct);
-                if(emitEvent) emit _AddItemValidationIdEvent(label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _AddItemValidationIdEvent(address(this), c, success, data, label, item, itemStruct._items[item]._Info);
             }
             else{
                 itemStruct._activatedItems = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._activatedItems), itemStruct._activatedItems);
                 itemStruct._pendingItemsRemove = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsRemove), itemStruct._pendingItemsRemove);
-                onItemValidated(item, id, false);
+                (bool success, bytes memory data) = c.delegatecall(abi.encodeWithSignature("onItemValidated(bytes32,uint[],bool)", item, ids, false));
                 delete(itemStruct._items[item]);
-                if(emitEvent) emit _RemoveItemValidationIdEvent(label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _RemoveItemValidationIdEvent(address(this), c, success, data, label, item, itemStruct._items[item]._Info);
             }   
         }
     }
 
-    function rejectItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct) public
+    function rejectItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
     {
         bytes32 item = manipulateItemstruct.item;
         uint _minSignatures = manipulateItemstruct._minSignatures;
         string memory label = manipulateItemstruct.label;
-        uint id = manipulateItemstruct.id;
+        uint[] memory ids = manipulateItemstruct.ids;
         bool emitEvent = manipulateItemstruct.emitEvent;
 
         itemStruct._items[item]._Rejections.push(msg.sender);
@@ -114,14 +116,14 @@ library ItemsLibrary{
 
             if(isItemPendingToAdded(item, itemStruct)){
                 itemStruct._pendingItemsAdd = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsAdd), itemStruct._pendingItemsAdd);
-                onItemRejected(item, id, true);
+                c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, true));
                 delete(itemStruct._items[item]._Info);
                 deleteVoters(item, itemStruct); 
                 if(emitEvent) emit _AddItemRejectionIdEvent(label, item, itemStruct._items[item]._Info);
             }
             else{
                 itemStruct._pendingItemsRemove = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsRemove), itemStruct._pendingItemsRemove);
-                onItemRejected(item, id, false);
+                c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, false));
                 deleteVoters(item, itemStruct);
                 if(emitEvent) emit _RemoveItemRejectionIdEvent(label, item, itemStruct._items[item]._Info);
             }
@@ -133,10 +135,6 @@ library ItemsLibrary{
         delete(itemStruct._items[item]._Rejections);
         delete(itemStruct._items[item]._Validations);
     }
-
-    function onItemValidated(bytes32 item, uint id, bool addOrRemove) public {}
-
-    function onItemRejected(bytes32 item, uint id, bool addOrRemove) public {}
 
     // READ Data
 

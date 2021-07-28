@@ -111,7 +111,7 @@ contract("Testing Treasury",function(accounts){
     }
 
     // ****** TESTING Config ***************************************************************** //
-
+/*
     it("Update Price Configuration WRONG",async function(){
         // act
         try{
@@ -351,7 +351,7 @@ contract("Testing Treasury",function(accounts){
         catch(error){
             expect(error.message).to.match(WrongSender);
         }
-    });
+    });*/
 
     it("Owners Refunding CORRECT",async function(){
         // act
@@ -363,7 +363,7 @@ contract("Testing Treasury",function(accounts){
         }
         expect(BalanceOwners).to.be.equal(2 * OwnerRefundPriceWei);
     });
-
+/*
     // ****** TESTING Owners Refunding ***************************************************************** //
 
     it("Withdraw WRONG",async function(){
@@ -397,6 +397,6 @@ contract("Testing Treasury",function(accounts){
         }
         let FinalTreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         expect(FinalTreasuryBalance).to.be.equal(TreasuryBalance);
-    });
+    });*/
 
 });
