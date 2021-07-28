@@ -20,7 +20,6 @@ pragma experimental ABIEncoderV2;
 
     // events
     event _SendProposalId(address, address indexed,  string indexed);
-    event test(uint);
 
     // Treasury
     Treasury _Treasury;
@@ -68,17 +67,15 @@ pragma experimental ABIEncoderV2;
 
     // Callback functions
 
-    function onItemValidated(bytes32 item, uint[] calldata ids, bool addOrRemove) public override 
+    function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override 
     {
-        emit test(1);
         if(ids[0] == _providerId){
             if(addOrRemove)payBack(item, true);
         }
     }
 
-    function onItemRejected(bytes32 item, uint[] calldata ids, bool addOrRemove) internal override  
+    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override  
     {
-         emit test(1);
         if(ids[0] == _providerId){
             if(addOrRemove)payBack(item, false);
         }

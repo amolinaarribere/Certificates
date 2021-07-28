@@ -21,7 +21,7 @@ pragma experimental ABIEncoderV2;
 
     // Callback functions
 
-    function onItemValidated(bytes32 item, uint[] calldata id, bool addOrRemove) public override {}
+    function onItemValidated(bytes32 item, uint256[] calldata id, bool addOrRemove) public override {}
 
-    function onItemRejected(bytes32 item, uint[] calldata id, bool addOrRemove) internal override {}
+    function onItemRejected(bytes32 item, uint256[] calldata id, bool addOrRemove) public override {}
  }

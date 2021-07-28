@@ -182,8 +182,8 @@ abstract contract EntitiesBaseContract{
 
     // Callback functions 
 
-    function onItemValidated(bytes32 item, uint[] calldata ids, bool addOrRemove) public virtual{}
+    function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual {}
 
-    function onItemRejected(bytes32 item, uint[] calldata ids, bool addOrRemove) internal virtual{}
+    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual {}
 
 }

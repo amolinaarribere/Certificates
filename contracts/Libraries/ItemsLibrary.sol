@@ -16,10 +16,10 @@ library ItemsLibrary{
     using Library for *;
 
     //events
-    event _AddItemValidationIdEvent(address, address, bool, bytes, string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemValidationIdEvent(address, address, bool, bytes, string indexed,  bytes32 indexed,  string indexed);
-    event _AddItemRejectionIdEvent(string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemRejectionIdEvent(string indexed,  bytes32 indexed,  string indexed);
+    event _AddItemValidationIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _RemoveItemValidationIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _AddItemRejectionIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _RemoveItemRejectionIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
     
     // Data structure
     struct _itemIdentity{
@@ -88,16 +88,16 @@ library ItemsLibrary{
                 itemStruct._items[item]._activated = true; 
                 itemStruct._activatedItems.push(item);
                 itemStruct._pendingItemsAdd = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsAdd), itemStruct._pendingItemsAdd);
-                (bool success, bytes memory data) = c.delegatecall(abi.encodeWithSignature("onItemValidated(bytes32,uint[],bool)", item, ids, true));
+                (bool success, ) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, true));
                 deleteVoters(item, itemStruct);
-                if(emitEvent) emit _AddItemValidationIdEvent(address(this), c, success, data, label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _AddItemValidationIdEvent(success, label, item, itemStruct._items[item]._Info);
             }
             else{
                 itemStruct._activatedItems = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._activatedItems), itemStruct._activatedItems);
                 itemStruct._pendingItemsRemove = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsRemove), itemStruct._pendingItemsRemove);
-                (bool success, bytes memory data) = c.delegatecall(abi.encodeWithSignature("onItemValidated(bytes32,uint[],bool)", item, ids, false));
+                (bool success, ) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));
                 delete(itemStruct._items[item]);
-                if(emitEvent) emit _RemoveItemValidationIdEvent(address(this), c, success, data, label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _RemoveItemValidationIdEvent(success, label, item, itemStruct._items[item]._Info);
             }   
         }
     }
@@ -116,16 +116,16 @@ library ItemsLibrary{
 
             if(isItemPendingToAdded(item, itemStruct)){
                 itemStruct._pendingItemsAdd = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsAdd), itemStruct._pendingItemsAdd);
-                c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, true));
+                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, true));
                 delete(itemStruct._items[item]._Info);
                 deleteVoters(item, itemStruct); 
-                if(emitEvent) emit _AddItemRejectionIdEvent(label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _AddItemRejectionIdEvent(success, label, item, itemStruct._items[item]._Info);
             }
             else{
                 itemStruct._pendingItemsRemove = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsRemove), itemStruct._pendingItemsRemove);
-                c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, false));
+                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, false));
                 deleteVoters(item, itemStruct);
-                if(emitEvent) emit _RemoveItemRejectionIdEvent(label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _RemoveItemRejectionIdEvent(success, label, item, itemStruct._items[item]._Info);
             }
                 
         }

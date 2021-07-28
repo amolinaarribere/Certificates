@@ -264,7 +264,7 @@ pragma experimental ABIEncoderV2;
 
     // Callback functions
 
-    function onItemValidated(bytes32 item, uint[] calldata ids, bool addOrRemove) public override  
+    function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override  
     {
         if(ids[0] == _poolId){
             if(false == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item));
@@ -274,7 +274,7 @@ pragma experimental ABIEncoderV2;
         }
     }
 
-    function onItemRejected(bytes32 item, uint[] calldata ids, bool addOrRemove) internal override  
+    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override  
     {
         if(ids[0] == _poolId){
             if(true == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item));
