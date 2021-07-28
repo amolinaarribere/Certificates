@@ -287,6 +287,16 @@ contract("Testing Provider",function(accounts){
         await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
         await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
     });
+
+    // ****** TESTING callbacks ***************************************************************** //
+
+    it("on Item Validated WRONG",async function(){
+        await pool_common.onItemValidatedWrong(provider.address,  user_1);
+    });
+
+    it("on Item Rejected WRONG",async function(){
+        await pool_common.onItemRejectedWrong(provider.address, user_1);
+    });
  
 
 });

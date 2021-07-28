@@ -134,4 +134,14 @@ contract("Testing Public Pool",function(accounts){
         await pool_common.RemoveCertificateCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
     });
 
+    // ****** TESTING callbacks ***************************************************************** //
+
+    it("on Item Validated WRONG",async function(){
+        await pool_common.onItemValidatedWrong(publicCertPool, user_1);
+    });
+
+    it("on Item Rejected WRONG",async function(){
+        await pool_common.onItemRejectedWrong(publicCertPool, user_1);
+    });
+
 });

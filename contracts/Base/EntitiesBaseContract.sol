@@ -32,6 +32,11 @@ abstract contract EntitiesBaseContract{
     string[] _entitiesLabel;
 
     // modifiers
+    modifier isSomeoneSpecific(address someone){
+        require(true == Library.ItIsSomeone(someone), "EC8");
+        _;
+    }
+    
     modifier isIdCorrect(uint Id, uint length){
         require(true == Library.IdCorrect(Id, length), "EC1");
         _;
@@ -182,8 +187,12 @@ abstract contract EntitiesBaseContract{
 
     // Callback functions 
 
-    function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual {}
+    function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
+        isSomeoneSpecific(address(this))
+    {}
 
-    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual {}
+    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
+        isSomeoneSpecific(address(this))
+    {}
 
 }
