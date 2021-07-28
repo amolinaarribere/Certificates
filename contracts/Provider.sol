@@ -97,19 +97,7 @@ pragma experimental ABIEncoderV2;
     }
 
     // POOL CRUD Operations
-    function subscribeToPublicPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
-        InternaladdPool(pool, poolInfo, AddCertificatePrice, SubscriptionPrice);
-        if(true == isPool(pool)){
-            MultiSigCertificatesPool poolToSubscribe = PublicCertificatesPool(pool);
-            poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
-        }
-    }
-
-    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice) external override{
-        InternaladdPool(pool, poolInfo, AddCertificatePrice, 0);
-    }
-
-    function InternaladdPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) internal{
+    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
         addEntity(pool, poolInfo, _poolId);
         if(false == _submited[pool]){
             _AddCertificatePricePerPool[pool] = AddCertificatePrice;
@@ -267,7 +255,13 @@ pragma experimental ABIEncoderV2;
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override  
     {
         if(ids[0] == _poolId){
-            if(false == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item));
+            address pool = AddressLibrary.BytesToAddress(item);
+
+            if(false == addOrRemove)removePricesForPool(pool);
+            else{
+                MultiSigCertificatesPool poolToSubscribe = PublicCertificatesPool(pool);
+                poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
+            }
         }
         else if(ids[0] == _certId){
             manipulateCertificate(AddressLibrary.UintToAddress(ids[1]), item, AddressLibrary.UintToAddress(ids[2]), addOrRemove);

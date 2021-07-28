@@ -43,7 +43,6 @@ contract("Testing Provider",function(accounts){
     // test constants
     const NotAnOwner = new RegExp("EC9");
     const OwnerAlreadyvoted = new RegExp("EC5");
-    const NotAllowedRemoveEntity = new RegExp("EC10");
     const MustBeActivated = new RegExp("EC7");
     const NotAllowedToRemoveCertificate = new RegExp("EC14");
     const NotEnoughFunds = new RegExp("EC2");
@@ -71,7 +70,7 @@ contract("Testing Provider",function(accounts){
     }
 
     async function SubscribingToPublicPool(){
-        await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
+        await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
         await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas}); 
         ValidateProvider();
     }
@@ -99,7 +98,7 @@ contract("Testing Provider",function(accounts){
     it("Subscribe Pool WRONG 1",async function(){
         // act
         try{
-            await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: user_1, gas: Gas});
+            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: user_1, gas: Gas});
             expect.fail();
         }
         // assert
@@ -108,7 +107,7 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
+            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
             await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
@@ -121,8 +120,8 @@ contract("Testing Provider",function(accounts){
     it("Subscribe Pool WRONG 2",async function(){
         // act
         try{
-            await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1, {from: ProviderOwners[1], gas: Gas});
-            await provider.subscribeToPublicPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[2], gas: Gas});
+            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1, {from: ProviderOwners[1], gas: Gas});
+            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[2], gas: Gas});
             expect.fail();
         }
         // assert
@@ -146,7 +145,7 @@ contract("Testing Provider",function(accounts){
     it("Add Pool WRONG",async function(){
         // act
         try{
-            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, {from: user_1});
+            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0, {from: user_1});
             expect.fail();
         }
         // assert
@@ -155,7 +154,7 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, {from: ProviderOwners[0], gas: Gas});
+            await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0, {from: ProviderOwners[0], gas: Gas});
             await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
             expect.fail();
         }
@@ -168,7 +167,7 @@ contract("Testing Provider",function(accounts){
     it("Add Pool CORRECT",async function(){
         // act
         AddProvider();
-        await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, {from: ProviderOwners[0], gas: Gas});
+        await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0, {from: ProviderOwners[0], gas: Gas});
         await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas});
         // assert
         await CheckPool();
@@ -186,7 +185,7 @@ contract("Testing Provider",function(accounts){
         }
         // assert
         catch(error){
-            expect(error.message).to.match(NotAllowedRemoveEntity);
+            expect(error.message).to.match(NotAnOwner);
         }
         // act
         try{
@@ -238,7 +237,7 @@ contract("Testing Provider",function(accounts){
         // act
         try{
             await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
-            await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+            await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
             expect.fail();
         }
         // assert
@@ -271,7 +270,7 @@ contract("Testing Provider",function(accounts){
         // act
         try{
             await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
-            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
+            await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
             expect.fail();
         }
         // assert
@@ -286,7 +285,7 @@ contract("Testing Provider",function(accounts){
         await SubscribingToPublicPool();
         await AddingCertificates();
         await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
-        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
+        await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
     });
  
 
