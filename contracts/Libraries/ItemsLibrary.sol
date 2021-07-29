@@ -116,14 +116,14 @@ library ItemsLibrary{
 
             if(isItemPendingToAdded(item, itemStruct)){
                 itemStruct._pendingItemsAdd = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsAdd), itemStruct._pendingItemsAdd);
-                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, true));
+                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true));
                 delete(itemStruct._items[item]._Info);
                 deleteVoters(item, itemStruct); 
                 if(emitEvent) emit _AddItemRejectionIdEvent(success, label, item, itemStruct._items[item]._Info);
             }
             else{
                 itemStruct._pendingItemsRemove = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsRemove), itemStruct._pendingItemsRemove);
-                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint[],bool)", item, ids, false));
+                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, false));
                 deleteVoters(item, itemStruct);
                 if(emitEvent) emit _RemoveItemRejectionIdEvent(success, label, item, itemStruct._items[item]._Info);
             }

@@ -120,20 +120,20 @@ pragma experimental ABIEncoderV2;
         rejectEntity(pool, _poolId);
     }
 
-    function removePricesForPool(address entity) internal
+    function removePricesForPool(address pool) internal
     {
-        delete(_submited[entity]);
-        delete(_AddCertificatePricePerPool[entity]);
-        delete(_SubscriptionPricePerPool[entity]);
+        delete(_submited[pool]);
+        delete(_AddCertificatePricePerPool[pool]);
+        delete(_SubscriptionPricePerPool[pool]);
     }
     
-    function retrievePool(address pool) external override view returns (string memory, bool, uint256)
+    function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256)
     {
         string memory poolInfo;
         bool isActivated;
 
         (poolInfo, isActivated) = InternalRetrievePool(pool);
-        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool]);
+        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool], _SubscriptionPricePerPool[pool]);
     }
     
     function InternalRetrievePool(address pool) internal view returns (string memory, bool)
@@ -261,7 +261,9 @@ pragma experimental ABIEncoderV2;
         super.onItemRejected(item, ids, addOrRemove);
 
         if(ids[0] == _poolId){
-            if(true == addOrRemove)removePricesForPool(AddressLibrary.BytesToAddress(item));
+            address pool = AddressLibrary.BytesToAddress(item);
+
+            if(true == addOrRemove)removePricesForPool(pool);
         } 
     }
     

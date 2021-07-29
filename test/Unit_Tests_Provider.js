@@ -73,28 +73,55 @@ contract("Testing Provider",function(accounts){
         await publicCertPool.validateProvider(provider.address, {from: PublicOwners[1], gas: Gas});
     }
 
-    async function SubscribingToPublicPool(){
+    async function SubscribingToPublicPool(validateOrreject){
         await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, {from: ProviderOwners[0], gas: Gas});
-        await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas}); 
-        ValidateProvider();
+        if(validateOrreject){
+            await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas}); 
+            await ValidateProvider();
+        }
+        else{
+            await provider.rejectPool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas}); 
+            await provider.rejectPool(publicCertPoolAddress, {from: ProviderOwners[2], gas: Gas}); 
+        }
+        
     }
 
-    async function AddingCertificates(){
+    async function AddingCertificates(validateOrreject){
         await provider.addCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
-        await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
         await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[2], gas: Gas});
-        await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+        if(validateOrreject){
+            await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
+            await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+        }
+        else{
+            await provider.rejectCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[1], gas: Gas});
+            await provider.rejectCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
+            await provider.rejectCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[1], gas: Gas});
+            await provider.rejectCertificate(publicCertPoolAddress, hash_1, holder_2, {from: ProviderOwners[0], gas: Gas});
+        }
+        
     }
 
-    async function CheckPool(){
-        let {0:_PoolInfo,1:_isPool,2:_AddCertificatePrice} = await provider.retrievePool(publicCertPoolAddress, {from: user_1});
+    async function CheckPool(validateOrreject, subscriptionPriceForPool){
+        let {0:_PoolInfo,1:_isPool,2:_AddCertificatePrice,3:_SubscriptionPrice} = await provider.retrievePool(publicCertPoolAddress, {from: user_1});
         let _Pools = await provider.retrieveAllPools({from: user_1});
         let _Total = _Pools.length;
-        expect(_PoolInfo).to.equal(pool_Info);
-        expect(_isPool).to.be.true;
-        expect(_AddCertificatePrice.toString()).to.be.equal(CertificatePriceWei.toString());
-        expect(_Total).to.equal(1);
-        expect(_Pools[0]).to.equal(publicCertPoolAddress);
+        if(validateOrreject){
+            expect(_PoolInfo).to.equal(pool_Info);
+            expect(_isPool).to.be.true;
+            expect(_AddCertificatePrice.toString()).to.be.equal(CertificatePriceWei.toString());
+            expect(_SubscriptionPrice.toString()).to.be.equal(subscriptionPriceForPool.toString());
+            expect(_Total).to.equal(1);
+            expect(_Pools[0]).to.equal(publicCertPoolAddress);
+        }
+        else{
+            expect(_PoolInfo).to.equal("");
+            expect(_isPool).to.be.false;
+            expect(_AddCertificatePrice.toString()).to.be.equal("0");
+            expect(_SubscriptionPrice.toString()).to.be.equal("0");
+            expect(_Total).to.equal(0);
+        }
+        
     }
 
     // ****** TESTING Subscribing Pool ***************************************************************** //
@@ -134,14 +161,24 @@ contract("Testing Provider",function(accounts){
         }
     });
 
-    it("Subscribe Pool CORRECT",async function(){
+    it("Subscribe Pool CORRECT 1",async function(){
         // act
         let InitBalance = parseInt(await web3.eth.getBalance(provider.address));
-        await SubscribingToPublicPool();
+        await SubscribingToPublicPool(true);
         let FinalBalance = parseInt(await web3.eth.getBalance(provider.address));
         // assert
-        await CheckPool();
+        await CheckPool(true, PublicPriceWei);
         expect(InitBalance - PublicPriceWei).to.equal(FinalBalance);
+    });
+
+    it("Subscribe Pool CORRECT 2",async function(){
+        // act
+        let InitBalance = parseInt(await web3.eth.getBalance(provider.address));
+        await SubscribingToPublicPool(false);
+        let FinalBalance = parseInt(await web3.eth.getBalance(provider.address));
+        // assert
+        await CheckPool(false, 0);
+        expect(InitBalance - FinalBalance).to.equal(0);
     });
 
     // ****** TESTING Adding Pool ***************************************************************** //
@@ -174,14 +211,14 @@ contract("Testing Provider",function(accounts){
         await provider.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0, {from: ProviderOwners[0], gas: Gas});
         await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas});
         // assert
-        await CheckPool();
+        await CheckPool(true, 0);
     });
 
     // ****** TESTING Removing Pool ***************************************************************** //
 
     it("Removing Pool WRONG",async function(){
         // act
-        await SubscribingToPublicPool();
+        await SubscribingToPublicPool(true);
 
         try{
             await provider.removePool(publicCertPoolAddress, {from: user_1});
@@ -212,9 +249,9 @@ contract("Testing Provider",function(accounts){
         }
     });
 
-    it("Removing Pool CORRECT",async function(){
+    it("Removing Pool CORRECT 1",async function(){
         // act
-        await SubscribingToPublicPool();
+        await SubscribingToPublicPool(true);
         await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[2], gas: Gas});
         await provider.validatePool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
         // assert
@@ -223,12 +260,24 @@ contract("Testing Provider",function(accounts){
         expect(_Total).to.equal(0);
     });
 
+    it("Removing Pool CORRECT 2",async function(){
+        // act
+        await SubscribingToPublicPool(true);
+        await provider.removePool(publicCertPoolAddress, {from: ProviderOwners[2], gas: Gas});
+        await provider.rejectPool(publicCertPoolAddress, {from: ProviderOwners[0], gas: Gas});
+        await provider.rejectPool(publicCertPoolAddress, {from: ProviderOwners[1], gas: Gas});
+        // assert
+        let _All = await provider.retrieveAllPools({from: user_1});
+        let _Total = _All.length;
+        expect(_Total).to.equal(1);
+    });
+
     
     // ****** TESTING Adding Certificate ***************************************************************** //
 
     it("Adding Certificate WRONG",async function(){
         // act
-        await SubscribingToPublicPool();
+        await SubscribingToPublicPool(true);
 
         try{
             await provider.addCertificate(publicCertPoolAddress, hash_1, holder_2, {from: user_1, gas: Gas});
@@ -250,48 +299,18 @@ contract("Testing Provider",function(accounts){
         }
     });
 
-    it("Adding Certificate CORRECT",async function(){
+    it("Adding Certificate CORRECT 1",async function(){
         // act
-        await SubscribingToPublicPool();
-        await AddingCertificates();
+        await SubscribingToPublicPool(true);
+        await AddingCertificates(true);
     });
 
-    // ****** TESTING Removing Certificate ***************************************************************** //
-/*
-    it("Removing Certificate WRONG",async function(){
+    it("Adding Certificate CORRECT 2",async function(){
         // act
-        await SubscribingToPublicPool();
-        await AddingCertificates();
-
-        try{
-            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: user_1});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotAnOwner);
-        }
-        // act
-        try{
-            await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
-            await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(OwnerAlreadyvoted);
-        }
-        
+        await SubscribingToPublicPool(true);
+        await AddingCertificates(false);
     });
 
-    it("Removing Certificate CORRECT",async function(){
-        // act
-        await SubscribingToPublicPool();
-        await AddingCertificates();
-        await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
-        await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
-    });
-*/
     // ****** TESTING callbacks ***************************************************************** //
 
     it("on Item Validated WRONG",async function(){
