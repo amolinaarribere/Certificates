@@ -17,12 +17,7 @@ import "./Libraries/AddressLibrary.sol";
 contract CertificatesPoolManager is TokenGovernanceBaseContract{
     using AddressLibrary for *;
 
-    //modifier
-    modifier isNotInitialized(){
-        require(false == _init, "EC26");
-        _;
-    }
-
+    // DATA
     // proposition to change
     struct ProposedContractsStruct{
         address NewPublicPoolAddress;
@@ -45,7 +40,14 @@ contract CertificatesPoolManager is TokenGovernanceBaseContract{
     // init
     bool _init;
 
-    // constructor and Initialization
+    // MODIFIERS
+    modifier isNotInitialized(){
+        require(false == _init, "EC26");
+        _;
+    }
+
+
+    // CONSTRUCTOR and INITIALIZATION
     constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
     TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
     {

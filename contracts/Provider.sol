@@ -105,15 +105,18 @@ pragma experimental ABIEncoderV2;
         }
     }
 
-    function removePool(address pool) external override{
+    function removePool(address pool) external override
+    {
        removeEntity(pool, _poolId); 
     }
 
-    function validatePool(address pool) external override{
+    function validatePool(address pool) external override
+    {
         validateEntity(pool, _poolId);
     }
 
-    function rejectPool(address pool) external override{
+    function rejectPool(address pool) external override
+    {
         rejectEntity(pool, _poolId);
     }
 
@@ -124,7 +127,8 @@ pragma experimental ABIEncoderV2;
         delete(_SubscriptionPricePerPool[entity]);
     }
     
-    function retrievePool(address pool) external override view returns (string memory, bool, uint256){
+    function retrievePool(address pool) external override view returns (string memory, bool, uint256)
+    {
         string memory poolInfo;
         bool isActivated;
 
@@ -132,7 +136,8 @@ pragma experimental ABIEncoderV2;
         return (poolInfo, isActivated, _AddCertificatePricePerPool[pool]);
     }
     
-    function InternalRetrievePool(address pool) internal view returns (string memory, bool){
+    function InternalRetrievePool(address pool) internal view returns (string memory, bool)
+    {
         return retrieveEntity(pool, _poolId);
     }
 
@@ -147,7 +152,8 @@ pragma experimental ABIEncoderV2;
     }
     
     // Certificates management
-    function extractCertIds(address pool, address holder) internal pure returns(uint[] memory){
+    function extractCertIds(address pool, address holder) internal pure returns(uint[] memory)
+    {
         uint[] memory certIdIdArray = new uint[](3);
         certIdIdArray[0] = _certId;
         certIdIdArray[1] = AddressLibrary.AddressToUint(pool);

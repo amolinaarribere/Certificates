@@ -12,17 +12,20 @@ import "./Libraries/AddressLibrary.sol";
 
  contract CertisToken is ERC20 {
 
-     using AddressLibrary for *;
+    using AddressLibrary for *;
 
-     uint8 _decimals;
-     address[] _tokenOwners;
+    // DATA
+    uint8 _decimals;
+    address[] _tokenOwners;
 
+    // CONSTRUCTOR
     constructor(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) ERC20(name, symbol){
         _tokenOwners = new address[](0);
         _decimals = decimalsValue;
         _mint(msg.sender, MaxSupply);
     }
 
+    // FUNCTIONALITY
     function decimals() public view override returns (uint8) {
         return _decimals;
     }

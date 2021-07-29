@@ -15,8 +15,4 @@ pragma experimental ABIEncoderV2;
     // CONSTRUCTOR
     constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {}
 
-    // CALLBACKS
-   /* function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override { super.onItemValidated(item, ids, addOrRemove); }
-
-    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override { super.onItemRejected(item, ids, addOrRemove); }*/
- }
+  }
