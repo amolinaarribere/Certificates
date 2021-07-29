@@ -36,21 +36,31 @@ const NotEnoughFunds = new RegExp("EC2");
 const AlreadySent = new RegExp("EC27");
 
 
-async function AddingOwners(CertPool, Owners, extra_owner){
+async function AddingOwners(CertPool, Owners, extra_owner, validateOrreject){
     await CertPool.methods.addOwner(extra_owner, extra_owner_Info).send({from: Owners[0], gas: Gas}, function(error, result){});
-    await CertPool.methods.validateOwner(extra_owner).send({from: Owners[1], gas: Gas}, function(error, result){});
+    if(validateOrreject) await CertPool.methods.validateOwner(extra_owner).send({from: Owners[1], gas: Gas}, function(error, result){});
+    else await CertPool.methods.rejectOwner(extra_owner).send({from: Owners[1], gas: Gas}, function(error, result){});
 }
 
 async function AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate){
-    if(isPrivate) await AddingProviders(CertPool, Owners, provider_1, provider_2);
+    if(isPrivate) await AddingProviders(CertPool, Owners, provider_1, provider_2, true);
     else await ValidatingProviders(CertPool, Owners, provider_1, provider_2);
 }
 
-async function AddingProviders(CertPool, Owners, provider_1, provider_2){
+async function AddingProviders(CertPool, Owners, provider_1, provider_2, validateOrreject){
     await CertPool.methods.addProvider(provider_1, provider_1_Info).send({from: Owners[0], gas: Gas}, function(error, result){});
-    await CertPool.methods.validateProvider(provider_1).send({from: Owners[1], gas: Gas}, function(error, result){});
     await CertPool.methods.addProvider(provider_2, provider_2_Info).send({from: Owners[1], gas: Gas}, function(error, result){});
-    await CertPool.methods.validateProvider(provider_2).send({from: Owners[2], gas: Gas}, function(error, result){});
+    if(validateOrreject){
+        await CertPool.methods.validateProvider(provider_1).send({from: Owners[1], gas: Gas}, function(error, result){});
+        await CertPool.methods.validateProvider(provider_2).send({from: Owners[2], gas: Gas}, function(error, result){});
+    }
+    else{
+        await CertPool.methods.rejectProvider(provider_1).send({from: Owners[1], gas: Gas}, function(error, result){});
+        await CertPool.methods.rejectProvider(provider_1).send({from: Owners[2], gas: Gas}, function(error, result){});
+        await CertPool.methods.rejectProvider(provider_2).send({from: Owners[2], gas: Gas}, function(error, result){});
+        await CertPool.methods.rejectProvider(provider_2).send({from: Owners[0], gas: Gas}, function(error, result){});
+    }
+    
 }
 
 async function ValidatingProviders(CertPool, Owners, provider_1, provider_2){
@@ -102,7 +112,7 @@ async function AddOwnerWrong(CertPool, Owners, extra_owner, user_1){
 
 async function AddOwnerCorrect(CertPool, Owners, extra_owner, user_1){
     // act
-    await AddingOwners(CertPool, Owners, extra_owner);
+    await AddingOwners(CertPool, Owners, extra_owner, true);
     // assert
     let {0:Owner_Extra,1:isOwner} = await CertPool.methods.retrieveOwner(extra_owner).call({from: user_1}, function(error, result){});
     let AllOwners = await CertPool.methods.retrieveAllOwners().call({from: user_1}, function(error, result){});
@@ -120,19 +130,18 @@ async function AddOwnerCorrect(CertPool, Owners, extra_owner, user_1){
 
 async function AddOwnerCorrect2(CertPool, Owners, extra_owner, user_1){
     // act
-    await AddingOwners2(CertPool, Owners, extra_owner);
+    await AddingOwners(CertPool, Owners, extra_owner, false);
     // assert
     let {0:Owner_Extra,1:isOwner} = await CertPool.methods.retrieveOwner(extra_owner).call({from: user_1}, function(error, result){});
     let AllOwners = await CertPool.methods.retrieveAllOwners().call({from: user_1}, function(error, result){});
     Total = AllOwners.length;
     let MinOwners = await CertPool.methods.retrieveMinOwners().call({from: user_1}, function(error, result){});
     expect(Owner_Extra).to.equal(extra_owner_Info);
-    expect(isOwner).to.be.true;
-    expect(Total).to.equal(4);
+    expect(isOwner).to.be.false;
+    expect(Total).to.equal(3);
     expect(AllOwners[0]).to.equal(Owners[0]);
     expect(AllOwners[1]).to.equal(Owners[1]);
     expect(AllOwners[2]).to.equal(Owners[2]);
-    expect(AllOwners[3]).to.equal(extra_owner);
     expect(MinOwners).to.equal(minOwners.toString());
 };
 
@@ -339,7 +348,7 @@ async function ValidateProviderCorrect(CertPool, Owners, provider_1, provider_2,
 
 async function AddProviderCorrect(CertPool, Owners, provider_1, provider_2, user_1){
     // act
-    await AddingProviders(CertPool, Owners, provider_1, provider_2);
+    await AddingProviders(CertPool, Owners, provider_1, provider_2, true);
     // assert
     let {0:Provider_1,1:isProvider_1} = await CertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
     let {0:Provider_2,1:isProvider_2} = await CertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
@@ -356,19 +365,17 @@ async function AddProviderCorrect(CertPool, Owners, provider_1, provider_2, user
 
 async function AddProviderCorrect2(CertPool, Owners, provider_1, provider_2, user_1){
     // act
-    await AddingProviders2(CertPool, Owners, provider_1, provider_2);
+    await AddingProviders(CertPool, Owners, provider_1, provider_2, false);
     // assert
     let {0:Provider_1,1:isProvider_1} = await CertPool.methods.retrieveProvider(provider_1).call({from: user_1}, function(error, result){});
     let {0:Provider_2,1:isProvider_2} = await CertPool.methods.retrieveProvider(provider_2).call({from: user_1}, function(error, result){});
     let AllProviders = await CertPool.methods.retrieveAllProviders().call({from: user_1}, function(error, result){});
     let Total = AllProviders.length;
-    expect(Provider_1).to.equal(provider_1_Info);
-    expect(isProvider_1).to.be.true;
-    expect(Provider_2).to.equal(provider_2_Info);
-    expect(isProvider_2).to.be.true;
-    expect(Total).to.equal(2);
-    expect(AllProviders[0]).to.equal(provider_1);
-    expect(AllProviders[1]).to.equal(provider_2);
+    expect(Provider_1).to.equal("");
+    expect(isProvider_1).to.be.false;
+    expect(Provider_2).to.equal("");
+    expect(isProvider_2).to.be.false;
+    expect(Total).to.equal(0);
 }
 
 async function RemoveProviderWrong(CertPool, Owners, provider_1, provider_2, provider_3, user_1, isPrivate){
@@ -568,14 +575,18 @@ async function onItemRejectedWrong(Contract, user_1){
 
 exports.AddOwnerWrong = AddOwnerWrong;
 exports.AddOwnerCorrect = AddOwnerCorrect;
+exports.AddOwnerCorrect2 = AddOwnerCorrect2;
 exports.RemoveOwnerWrong = RemoveOwnerWrong;
 exports.RemoveOwnerCorrect = RemoveOwnerCorrect;
+exports.RemoveOwnerCorrect2 = RemoveOwnerCorrect2;
 exports.AddProviderWrong = AddProviderWrong;
 exports.ValidateProviderWrong = ValidateProviderWrong;
 exports.ValidateProviderCorrect = ValidateProviderCorrect;
 exports.AddProviderCorrect = AddProviderCorrect;
+exports.AddProviderCorrect2 = AddProviderCorrect2;
 exports.RemoveProviderWrong = RemoveProviderWrong;
 exports.RemoveProviderCorrect = RemoveProviderCorrect;
+exports.RemoveProviderCorrect2 = RemoveProviderCorrect2;
 exports.AddCertificateWrong = AddCertificateWrong;
 exports.AddCertificateCorrect = AddCertificateCorrect;
 exports.RemoveCertificateWrong = RemoveCertificateWrong;
