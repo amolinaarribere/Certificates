@@ -17,15 +17,10 @@ pragma solidity >=0.7.0 <0.9.0;
 contract PrivatePoolGenerator is IPoolGenerator, ManagedBaseContract {
     using Library for *;
 
-     // events
+     // EVENTS
     event _NewCertificatesPool(uint256, address, MultiSigCertificatesPool);
 
-    // modfiers
-    modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "EC1");
-        _;
-    }
-
+    // DATA
     // Private Certificates Pool structure
     struct _privateCertificatesPoolStruct{
         address _creator;
@@ -37,12 +32,19 @@ contract PrivatePoolGenerator is IPoolGenerator, ManagedBaseContract {
     // Treasury
     Treasury _Treasury;
 
-    // Constructor
+    // MODIFIERS
+    modifier isIdCorrect(uint Id, uint length){
+        require(true == Library.IdCorrect(Id, length), "EC1");
+        _;
+    }
+
+    
+    // CONSTRUCTOR
     constructor(address managerContractAddress)
     ManagedBaseContract(managerContractAddress) 
     {}
 
-    // functionality
+    // FUNCTIONALITY
     function updateContracts(address TreasuryAddress) external
         isFromManagerContract()
     {

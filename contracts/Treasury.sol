@@ -20,7 +20,33 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
     using Library for *;
     using UintLibrary for *;
 
-    // modifiers
+    // DATA
+    // proposition to change prices
+    struct ProposedPricesStruct{
+        uint NewPublicPriceWei;
+        uint NewCertificatePriceWei;
+        uint NewPrivatePriceWei;
+        uint NewOwnerRefundPriceWei;
+    }
+
+    ProposedPricesStruct _ProposedPrices;
+
+    // parameters
+    PublicCertificatesPool  _PublicCertificatesPool;
+    uint _PublicPriceWei;
+    uint _CertificatePriceWei;
+    uint _PrivatePriceWei;
+    uint _OwnerRefundPriceWei;
+
+    // dividends per token owner
+    struct _BalanceStruct{
+        mapping(uint => uint) _balance;
+        uint[] _factors;
+    }
+    
+    mapping(address => _BalanceStruct) _balances;
+
+    // MODIFIERS
     modifier areFundsEnough(Library.Prices price){
         uint256 minPrice = 2**256 - 1;
 
@@ -47,31 +73,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
         _;
     }
 
-    // proposition to change
-    struct ProposedPricesStruct{
-        uint NewPublicPriceWei;
-        uint NewCertificatePriceWei;
-        uint NewPrivatePriceWei;
-        uint NewOwnerRefundPriceWei;
-    }
-
-    ProposedPricesStruct _ProposedPrices;
-
-    // constants
-    PublicCertificatesPool  _PublicCertificatesPool;
-    uint _PublicPriceWei;
-    uint _CertificatePriceWei;
-    uint _PrivatePriceWei;
-    uint _OwnerRefundPriceWei;
-
-    // data
-    struct _BalanceStruct{
-        mapping(uint => uint) _balance;
-        uint[] _factors;
-    }
     
-    mapping(address => _BalanceStruct) _balances;
-
+    // CONSTRUCTOR
     constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
     TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
     ManagedBaseContract(managerContractAddress)
@@ -80,7 +83,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
     }
 
 
-    // governance 
+    // GOVERNANCE 
     function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
     {
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
@@ -140,7 +143,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
         return proposition;
     }
 
-    // functionality
+    // FUNCTIONALITY
     function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
         isFromManagerContract()
     override
@@ -158,7 +161,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
         AssignDividends(amount);
     }
 
-    function AssignDividends(uint256 amount) internal{
+    function AssignDividends(uint256 amount) internal
+    {
         (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = _CertisToken.TokenOwners();
         uint256 TotalTokenSupply = _CertisToken.totalSupply();
 
@@ -167,7 +171,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
         }
 
     }
-
 
     function getRefund(address addr, uint numberOfOwners) external 
         isFromPublicPool()
@@ -226,7 +229,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
         return _balances[addr]._balance[factor];
     }
 
-    function addBalance(address addr, uint amount, uint factor) private{
+    function addBalance(address addr, uint amount, uint factor) private
+    {
         if(0 == _balances[addr]._balance[factor]){
              _balances[addr]._factors.push(factor);
         }
@@ -234,7 +238,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
        _balances[addr]._balance[factor] += amount;
     }
 
-    function substractBalance(address addr, uint amount, uint factor) private{
+    function substractBalance(address addr, uint amount, uint factor) private
+    {
         require(_balances[addr]._balance[factor] >= amount, "Not enough balance for this factor");
 
         _balances[addr]._balance[factor] -= amount;

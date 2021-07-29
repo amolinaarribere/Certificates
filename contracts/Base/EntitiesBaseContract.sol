@@ -17,12 +17,13 @@ abstract contract EntitiesBaseContract{
     using AddressLibrary for *;
     using ItemsLibrary for *;
 
-    //events
+    //EVENTS 
     event _AddEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
     event _RemoveEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
     event _AddEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
     event _RemoveEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
 
+    // DATA
     // owners
     uint _ownerId;
     uint256 _minOwners;
@@ -31,7 +32,7 @@ abstract contract EntitiesBaseContract{
     ItemsLibrary._ItemsStruct[] _Entities;
     string[] _entitiesLabel;
 
-    // modifiers
+    // MODIFIERS
     modifier isSomeoneSpecific(address someone){
         require(true == Library.ItIsSomeone(someone), "EC8");
         _;
@@ -79,7 +80,7 @@ abstract contract EntitiesBaseContract{
         _;
     }
 
-    // Entities functions
+    // FUNCTIONALITY
     function addEntity(address entity, string calldata entityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwner
@@ -185,7 +186,7 @@ abstract contract EntitiesBaseContract{
         return(AddressLibrary.BytesArrayToAddress(EntitiesInBytes) , EntitiesInfo);
     }
 
-    // Callback functions 
+    // CALLBACKS
 
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
         isSomeoneSpecific(address(this))

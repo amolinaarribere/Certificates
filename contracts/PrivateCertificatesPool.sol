@@ -12,16 +12,11 @@ pragma experimental ABIEncoderV2;
 
  contract PrivateCertificatesPool is MultiSigCertificatesPool {
 
-     constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {
-    }
+    // CONSTRUCTOR
+    constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {}
 
-    function addProvider(address provider, string calldata providerInfo) external override payable{
-        addEntity(provider, providerInfo, _providerId);
-    }
+    // CALLBACKS
+   /* function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override { super.onItemValidated(item, ids, addOrRemove); }
 
-    // Callback functions
-
-    function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override { super.onItemValidated(item, ids, addOrRemove); }
-
-    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override { super.onItemRejected(item, ids, addOrRemove); }
+    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override { super.onItemRejected(item, ids, addOrRemove); }*/
  }

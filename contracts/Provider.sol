@@ -20,6 +20,7 @@ pragma experimental ABIEncoderV2;
     using AddressLibrary for *;
     using ItemsLibrary for *;
 
+    // DATA
     uint256 constant TotalEntities = 2;
 
     // Owners
@@ -49,9 +50,7 @@ pragma experimental ABIEncoderV2;
     // Provider
     string _ProviderInfo;
 
-    
-
-    // modifiers
+    // MODIFIERS
     modifier isAPool(address pool){
         require(true == isPool(pool));
         _;
@@ -88,7 +87,7 @@ pragma experimental ABIEncoderV2;
         _;
     }
 
-     // Constructor
+     // CONSTRUCTOR
     constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
         MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdProviders)
     payable
@@ -96,7 +95,7 @@ pragma experimental ABIEncoderV2;
         _ProviderInfo = ProviderInfo;
     }
 
-    // POOL CRUD Operations
+    // FUNCTIONALITY
     function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
         addEntity(pool, poolInfo, _poolId);
         if(false == _submited[pool]){
@@ -169,19 +168,6 @@ pragma experimental ABIEncoderV2;
         ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
         ItemsLibrary.addItem(manipulateItemStruct,itemsstruct, address(this));
      }
-     
-     function removeCertificate(address pool, bytes32 CertificateHash, address holder) external override
-        isAPool(pool)
-        isAnOwner
-        isCertificateActivated(true, CertificateHash, pool, holder) 
-        isCertificatePendingToRemove(false, CertificateHash, pool, holder)
-     {
-        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
-        uint[] memory certIdIdArray = extractCertIds(pool, holder);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
-        ItemsLibrary.removeItem(manipulateItemStruct, itemsstruct, address(this));
-     }
 
      function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
@@ -209,7 +195,7 @@ pragma experimental ABIEncoderV2;
         ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct, address(this));
      }
  
-    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder, bool addOrRemove) internal
+    function manipulateCertificate(address pool, bytes32 CertificateHash, address holder) internal
     {
         MultiSigCertificatesPool poolToSend;
         (string memory p ,) = InternalRetrievePool(pool);
@@ -221,12 +207,7 @@ pragma experimental ABIEncoderV2;
                 poolToSend = PublicCertificatesPool(pool);
         }
 
-        if(addOrRemove){
-                poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
-            }
-        else{
-               poolToSend.removeCertificate(CertificateHash, holder);
-        }
+        poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
             
         //delete(_CertificatesPerPool[getPoolId(pool)]._CertificatesPerHolder[getHolderId(holder)]._cert[CertificateHash]);
         
@@ -250,8 +231,7 @@ pragma experimental ABIEncoderV2;
     
     receive() external override payable{}
 
-    // Callback functions
-
+    // CALLBACKS
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override  
     {
         super.onItemValidated(item, ids, addOrRemove);
@@ -266,7 +246,7 @@ pragma experimental ABIEncoderV2;
             }
         }
         else if(ids[0] == _certId){
-            manipulateCertificate(AddressLibrary.UintToAddress(ids[1]), item, AddressLibrary.UintToAddress(ids[2]), addOrRemove);
+            manipulateCertificate(AddressLibrary.UintToAddress(ids[1]), item, AddressLibrary.UintToAddress(ids[2]));
         }
     }
 

@@ -257,7 +257,7 @@ contract("Testing Provider",function(accounts){
     });
 
     // ****** TESTING Removing Certificate ***************************************************************** //
-
+/*
     it("Removing Certificate WRONG",async function(){
         // act
         await SubscribingToPublicPool();
@@ -291,7 +291,7 @@ contract("Testing Provider",function(accounts){
         await provider.removeCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[2], gas: Gas});
         await provider.validateCertificate(publicCertPoolAddress, hash_1, holder_1, {from: ProviderOwners[0], gas: Gas});
     });
-
+*/
     // ****** TESTING callbacks ***************************************************************** //
 
     it("on Item Validated WRONG",async function(){

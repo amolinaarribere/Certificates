@@ -13,16 +13,16 @@ pragma experimental ABIEncoderV2;
 contract ManagedBaseContract{
     using Library for *;
 
-    // manager contract
+    // DATA
     address _managerContract;
 
-    // modifiers
+    // MODIFIERS
      modifier isFromManagerContract(){
         require(true == Library.ItIsSomeone(_managerContract), "EC8");
         _;
     }
 
-    // constructor
+    // CONSTRUCTOR
     constructor(address managerContractAddress) {
         _managerContract = managerContractAddress;
     }

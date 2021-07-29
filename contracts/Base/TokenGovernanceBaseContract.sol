@@ -15,10 +15,14 @@ contract TokenGovernanceBaseContract {
     using Library for *;
     using AddressLibrary for *; 
 
+    // DATA
+    // chair person
     address _chairperson;
 
+    // Token contract
     CertisToken _CertisToken;
 
+    // Proposition Structure
     struct PropositionStruct{
         address Proposer;
         uint256 DeadLine;
@@ -36,6 +40,7 @@ contract TokenGovernanceBaseContract {
     uint8 _PropositionThresholdPercentage;
     uint8 _minWeightToProposePercentage;
 
+    // Proposition to change Prop parameters
     struct ProposedPropositionStruct{
         uint256 NewPropositionLifeTime;
         uint8 NewPropositionThresholdPercentage;
@@ -46,8 +51,7 @@ contract TokenGovernanceBaseContract {
 
     bool _currentPropisProp;
     
-    // modifiers
-
+    // MODIFIERS
     modifier isFromChairPerson(){
         require(true == Library.ItIsSomeone(_chairperson), "EC8");
         _;
@@ -86,7 +90,6 @@ contract TokenGovernanceBaseContract {
     }
 
     // auxiliairy function
-
     function AuthorizedToPropose(address add) internal view returns(bool) {
         if(msg.sender == _chairperson) return true;
         else 
@@ -139,14 +142,13 @@ contract TokenGovernanceBaseContract {
         }
     }
 
-    // constructor
+    // CONSTRUCTOR
     constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
         _chairperson = msg.sender; 
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
     
-    // updates prop values
-
+    // Manage Prop Parameters
     function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external
     {
         InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);
@@ -174,8 +176,7 @@ contract TokenGovernanceBaseContract {
         return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
-    // functions
-
+    // FUNCTIONALITY
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
         isAuthorizedToPropose()

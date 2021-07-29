@@ -18,19 +18,20 @@ pragma experimental ABIEncoderV2;
     using Library for *;
     using AddressLibrary for *;
 
-    // events
+    // EVENTS
     event _SendProposalId(address, address indexed,  string indexed);
 
+    // DATA
     // Treasury
     Treasury _Treasury;
 
-    // Constructor
+    // CONSTRUCTOR
     constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress)
     MultiSigCertificatesPool(owners, minOwners) 
     ManagedBaseContract(managerContractAddress) 
     {}
 
-    // functionality
+    // FUNCTIONALITY
     function updateContracts(address TreasuryAddress) external
         isFromManagerContract()
     {

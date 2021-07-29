@@ -13,10 +13,11 @@ import "../Interfaces/IPool.sol";
 
 abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     
-    // events logs
+    // EVENTS
     event _AddCertificateIdEvent(address, address);
     event _RemoveCertificateIdEvent(address, address);
 
+    // DATA
     uint256 constant TotalEntities = 2;
 
     // Owners
@@ -37,7 +38,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     
     mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;
 
-    // modifiers
+    // MODIFIERS
     modifier isAProvider(){
         require(true == isProvider(msg.sender), "EC12");
         _;
@@ -58,37 +59,52 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         _;
     }
     
-    // Constructor
+    // CONSTRUCTOR
     constructor(address[] memory owners,  uint256 minOwners) 
         MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdCertificates)
     payable
     {}
 
-    // PROVIDERS CRUD Operations
-    function addProvider(address provider, string calldata providerInfo) external override payable virtual;
+    // FUNCTIONALITY
+    // Providers CRUD Operations
+    function addProvider(address provider, string calldata providerInfo) external override payable virtual
+    {
+        addEntity(provider, providerInfo, _providerId);
+    }
 
-    function validateProvider(address provider) external override{
+    function removeProvider(address provider) external override
+    {
+       removeEntity(provider, _providerId); 
+    }   
+
+    function validateProvider(address provider) external override
+    {
         validateEntity(provider, _providerId);
     }
 
-    function rejectProvider(address provider) external override{
+    function rejectProvider(address provider) external override
+    {
         rejectEntity(provider, _providerId);
     }
-
-    function removeProvider(address provider) external override{
-       removeEntity(provider, _providerId); 
-    }   
     
-    function retrieveProvider(address provider) external override view returns (string memory, bool){
+    function retrieveProvider(address provider) external override view returns (string memory, bool)
+    {
         return (retrieveEntity(provider, _providerId));
     }
 
-    function retrieveAllProviders() external override view returns (address[] memory){
+    function retrieveAllProviders() external override view returns (address[] memory)
+    {
         return(retrieveAllEntities(_providerId));
     }
 
-    function isProvider(address provider) public view returns (bool){
+    function isProvider(address provider) public view returns (bool)
+    {
         return(isEntity(provider, _providerId));
+    }
+
+    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory, string[] memory)
+    {
+        return(retrievePendingEntities(addedORremove, _providerId));
     }
     
     // Certificates CRUD Operations
@@ -107,27 +123,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
 
         emit _AddCertificateIdEvent(msg.sender, holder);
     }
-    
-    function removeCertificate(bytes32 CertificateHash, address holder) external override
-        isAProvider 
-        isTheProviderOrHimself(holder, CertificateHash) 
-    {
-        address provider = _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
-        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;
-        
-        for(uint i=0; i < listOfCert.length; i++){
-            if(CertificateHash == listOfCert[i]){
-                _CertificatesPerHolder[holder]._ListOfCertificates = Library.ArrayRemoveResize(i, _CertificatesPerHolder[holder]._ListOfCertificates);
-                break;
-            }
-        }
-        
-        delete _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash];
-        
-        emit _RemoveCertificateIdEvent(provider, holder);
-
-    }
-    
 
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override
     view returns (address)
@@ -171,9 +166,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         return (ListOfCertificatesByHolder);
     }
 
-    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory, string[] memory){
-        return(retrievePendingEntities(addedORremove, _providerId));
-    }
 
 
 }

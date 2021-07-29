@@ -125,7 +125,7 @@ contract("Testing Public Pool",function(accounts){
     });
 
     // ****** TESTING Removing Certificate ***************************************************************** //
-
+/*
     it("Removing Certificate WRONG",async function(){
         await pool_common.RemoveCertificateWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
     });
@@ -133,7 +133,7 @@ contract("Testing Public Pool",function(accounts){
     it("Removing Certificate CORRECT",async function(){
         await pool_common.RemoveCertificateCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
     });
-
+*/
     // ****** TESTING callbacks ***************************************************************** //
 
     it("on Item Validated WRONG",async function(){

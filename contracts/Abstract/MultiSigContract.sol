@@ -15,7 +15,7 @@ pragma experimental ABIEncoderV2;
 abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
     using AddressLibrary for *;
 
-    // modifier
+    // MODIFIERS
     modifier NotEmpty(bytes32 document){
         require(0 < document.length, "EC11");
         _;
@@ -26,7 +26,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
         _;
     }
 
-    // Constructor
+    // CONSTRUCTOR
     constructor(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) payable{
         require(minOwners <= owners.length, "EC16");
         require(minOwners > 0, "EC17");
@@ -47,7 +47,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
         }
     }
 
-    // OWNERS CRUD Operations
+    // FUNCTIONALITY
     function addOwner(address owner, string calldata ownerInfo) external override 
     {
         addEntity(owner, ownerInfo, _ownerId);
