@@ -21,7 +21,7 @@ pragma experimental ABIEncoderV2;
     using ItemsLibrary for *;
 
     // DATA
-    uint256 constant TotalEntities = 2;
+    uint256 constant _TotalEntities = 2;
 
     // Owners
     uint256 constant _ownerIdProviders = 0;
@@ -89,7 +89,7 @@ pragma experimental ABIEncoderV2;
 
      // CONSTRUCTOR
     constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
-        MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdProviders)
+        MultiSigContract(owners, minOwners, _TotalEntities, _Label, _ownerIdProviders)
     payable
     {
         _ProviderInfo = ProviderInfo;

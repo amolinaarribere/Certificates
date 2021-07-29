@@ -18,7 +18,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     event _RemoveCertificateIdEvent(address, address);
 
     // DATA
-    uint256 constant TotalEntities = 2;
+    uint256 constant _TotalEntities = 2;
 
     // Owners
     uint256 constant _ownerIdCertificates = 0;
@@ -61,7 +61,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     
     // CONSTRUCTOR
     constructor(address[] memory owners,  uint256 minOwners) 
-        MultiSigContract(owners, minOwners, TotalEntities, _Label, _ownerIdCertificates)
+        MultiSigContract(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates)
     payable
     {}
 
