@@ -1,11 +1,13 @@
 // Chai library for testing
 // ERROR tests = First we test the error message then we test the action was not carried out
+const pool_common = require("../test_libraries/Pools.js");
 const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
 
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PublicCertificates = artifacts.require("PublicCertificatesPool");
 const Provider = artifacts.require("Provider");
+const ProviderAbi = Provider.abi;
 var PublicCertificatesAbi = PublicCertificates.abi;
 const CertisToken = artifacts.require("CertisToken");
 var CertisTokenAbi = CertisToken.abi;
@@ -27,6 +29,7 @@ contract("Testing Provider",function(accounts){
     var publicCertPoolAddress;
     const randomPoolAddress = accounts[0];
     var provider;
+    var providerContract;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -57,6 +60,7 @@ contract("Testing Provider",function(accounts){
         let result = await certPoolManager.retrieveConfiguration({from: user_1});
         const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
         publicCertPoolAddress = _publicCertPoolAddress;
+        providerContract = new web3.eth.Contract(ProviderAbi, provider.address);
     });
 
     async function AddProvider(){
@@ -291,11 +295,11 @@ contract("Testing Provider",function(accounts){
     // ****** TESTING callbacks ***************************************************************** //
 
     it("on Item Validated WRONG",async function(){
-        await pool_common.onItemValidatedWrong(provider.address,  user_1);
+        await pool_common.onItemValidatedWrong(providerContract,  user_1);
     });
 
     it("on Item Rejected WRONG",async function(){
-        await pool_common.onItemRejectedWrong(provider.address, user_1);
+        await pool_common.onItemRejectedWrong(providerContract, user_1);
     });
  
 

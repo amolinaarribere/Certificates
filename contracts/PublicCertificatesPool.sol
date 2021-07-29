@@ -69,6 +69,8 @@ pragma experimental ABIEncoderV2;
 
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override 
     {
+        super.onItemValidated(item, ids, addOrRemove);
+
         if(ids[0] == _providerId){
             if(addOrRemove)payBack(item, true);
         }
@@ -76,6 +78,8 @@ pragma experimental ABIEncoderV2;
 
     function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override  
     {
+        super.onItemRejected(item, ids, addOrRemove);
+
         if(ids[0] == _providerId){
             if(addOrRemove)payBack(item, false);
         }
