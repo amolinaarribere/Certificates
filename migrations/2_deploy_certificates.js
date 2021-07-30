@@ -1,9 +1,14 @@
-let CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
-let Provider = artifacts.require("Provider");
-let Treasury = artifacts.require("Treasury");
-let PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
-let CertisToken = artifacts.require("CertisToken");
-let PrivatePoolGenerator = artifacts.require("PrivatePoolGenerator");
+let CertificatesPoolManager = artifacts.require("./DeployedContracts/CertificatesPoolManager");
+let Provider = artifacts.require("./DeployedContracts/Provider");
+let Treasury = artifacts.require("./DeployedContracts/Treasury");
+let PublicCertificatesPool = artifacts.require("./DeployedContracts/PublicCertificatesPool");
+let CertisToken = artifacts.require("./DeployedContracts/CertisToken");
+let PrivatePoolGenerator = artifacts.require("./DeployedContracts/PrivatePoolGenerator");
+
+let TreasuryProxy = artifacts.require("./DeployedContracts/Proxies/TreasuryProxy");
+let PublicCertificatesPoolProxy = artifacts.require("./DeployedContracts/Proxies/PublicCertificatesPoolProxy");
+let CertisTokenProxy = artifacts.require("./DeployedContracts/Proxies/CertisTokenProxy");
+let PrivatePoolGeneratorProxy = artifacts.require("./DeployedContracts/Proxies/PrivatePoolGeneratorProxy");
 
 let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
@@ -58,6 +63,10 @@ module.exports = async function(deployer, network, accounts){
     await deployer.deploy(CertisToken, "CertisToken", "CERT", 0, 1000000);
     CertisTokenInstance = await CertisToken.deployed();
     console.log("CertisToken deployed : " + CertisTokenInstance.address);
+
+    await deployer.deploy(CertisTokenProxy, CertisTokenInstance.address, CertificatesPoolManagerInstance.address, web3.utils.asciiToHex("random"));
+    CertisTokenProxyInstance = await CertisTokenProxy.deployed();
+    console.log("CertisTokenProxy deployed : " + CertisTokenProxyInstance.address);
 
     // Public Pool
     await deployer.link(Library, PublicCertificatesPool);

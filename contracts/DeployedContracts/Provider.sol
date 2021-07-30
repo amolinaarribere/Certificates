@@ -7,13 +7,13 @@ pragma experimental ABIEncoderV2;
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
- import "./Libraries/Library.sol";
- import "./Interfaces/IProvider.sol";
- import "./Abstract/MultiSigContract.sol";
+ import "../Libraries/Library.sol";
+ import "../Interfaces/IProvider.sol";
+ import "../Abstract/MultiSigContract.sol";
  import "./PrivateCertificatesPool.sol";
  import "./PublicCertificatesPool.sol";
- import "./Libraries/ItemsLibrary.sol";
- import "./Libraries/AddressLibrary.sol";
+ import "../Libraries/ItemsLibrary.sol";
+ import "../Libraries/AddressLibrary.sol";
 
  contract Provider is IProvider, MultiSigContract {
     using Library for *;

@@ -7,11 +7,11 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import './Interfaces/IPoolGenerator.sol';
+ import '../Interfaces/IPoolGenerator.sol';
  import "./PrivateCertificatesPool.sol";
  import "./Treasury.sol";
- import "./Libraries/Library.sol";
- import "./Base/ManagedBaseContract.sol";
+ import "../Libraries/Library.sol";
+ import "../Base/ManagedBaseContract.sol";
 
 
 contract PrivatePoolGenerator is IPoolGenerator, ManagedBaseContract {

@@ -7,13 +7,13 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
-import "./Interfaces/ITreasury.sol";
+import "../Interfaces/ITreasury.sol";
 import "./PublicCertificatesPool.sol";
-import "./Libraries/UintLibrary.sol";
-import "./Libraries/Library.sol";
+import "../Libraries/UintLibrary.sol";
+import "../Libraries/Library.sol";
 import "./CertisToken.sol";
-import "./Base/TokenGovernanceBaseContract.sol";
-import "./Base/ManagedBaseContract.sol";
+import "../Base/TokenGovernanceBaseContract.sol";
+import "../Base/ManagedBaseContract.sol";
 
 
 contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract{

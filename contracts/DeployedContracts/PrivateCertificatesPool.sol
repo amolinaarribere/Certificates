@@ -8,7 +8,7 @@ pragma experimental ABIEncoderV2;
  * @dev Store & retrieve value in a variable
  */
 
- import "./Abstract/MultiSigCertificatesPool.sol";
+ import "../Abstract/MultiSigCertificatesPool.sol";
 
  contract PrivateCertificatesPool is MultiSigCertificatesPool {
 

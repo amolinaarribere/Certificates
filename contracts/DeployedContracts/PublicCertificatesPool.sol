@@ -8,11 +8,11 @@ pragma experimental ABIEncoderV2;
  * @dev Store & retrieve value in a variable
  */
 
- import "./Abstract/MultiSigCertificatesPool.sol";
+ import "../Abstract/MultiSigCertificatesPool.sol";
  import "./Treasury.sol";
- import "./Libraries/Library.sol";
- import "./Base/ManagedBaseContract.sol";
- import "./Libraries/AddressLibrary.sol";
+ import "../Libraries/Library.sol";
+ import "../Base/ManagedBaseContract.sol";
+ import "../Libraries/AddressLibrary.sol";
 
  contract PublicCertificatesPool is MultiSigCertificatesPool, ManagedBaseContract {
     using Library for *;
