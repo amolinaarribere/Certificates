@@ -7,10 +7,11 @@ pragma solidity ^0.8.0;
  * @dev Store & retrieve value in a variable
  */
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+//import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "../Libraries/AddressLibrary.sol";
 
- contract CertisToken is ERC20 {
+ contract CertisToken is ERC20Upgradeable {
 
     using AddressLibrary for *;
 
@@ -19,7 +20,14 @@ import "../Libraries/AddressLibrary.sol";
     address[] _tokenOwners;
 
     // CONSTRUCTOR
-    constructor(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) ERC20(name, symbol){
+   /* constructor(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) ERC20(name, symbol){
+        _tokenOwners = new address[](0);
+        _decimals = decimalsValue;
+        _mint(msg.sender, MaxSupply);
+    }*/
+
+    function initialize(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) public initializer {
+        super.__ERC20_init_unchained(name, symbol);
         _tokenOwners = new address[](0);
         _decimals = decimalsValue;
         _mint(msg.sender, MaxSupply);
