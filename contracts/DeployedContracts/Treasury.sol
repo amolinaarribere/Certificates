@@ -13,10 +13,9 @@ import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
 import "./CertisToken.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
-import "../Base/ManagedBaseContract.sol";
 
 
-contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract{
+contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using Library for *;
     using UintLibrary for *;
 
@@ -32,7 +31,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
     ProposedPricesStruct _ProposedPrices;
 
     // parameters
-    PublicCertificatesPool  _PublicCertificatesPool;
+    //PublicCertificatesPool  _PublicCertificatesPool;
     uint _PublicPriceWei;
     uint _CertificatePriceWei;
     uint _PrivatePriceWei;
@@ -64,7 +63,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
     }
 
     modifier isFromPublicPool(){
-        require(true == Library.ItIsSomeone(address(_PublicCertificatesPool)), "EC8");
+        require(true == Library.ItIsSomeone(_managerContract.retrievePublicCertificatePoolProxy()), "EC8");
         _;
     }
 
@@ -84,8 +83,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
 
     function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender);
-        super.ManagedBaseContract_init(managerContractAddress);
+        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, managerContractAddress);
+        //super.ManagedBaseContract_init(managerContractAddress);
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
     }
 
@@ -151,13 +150,13 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
     }
 
     // FUNCTIONALITY
-    function updateContracts(address PublicPoolAddressProxy, address CertisTokenAddressProxy) external 
+    /*function updateContracts(address PublicPoolAddressProxy, address CertisTokenAddressProxy) external 
         isFromManagerContract()
     override
     {
         _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddressProxy);
         _CertisToken = CertisToken(CertisTokenAddressProxy); 
-    }
+    }*/
 
     function pay(Library.Prices price) external 
         areFundsEnough(price)
@@ -170,8 +169,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
 
     function AssignDividends(uint256 amount) internal
     {
-        (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = _CertisToken.TokenOwners();
-        uint256 TotalTokenSupply = _CertisToken.totalSupply();
+        (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = GetTokenOwners();
+        uint256 TotalTokenSupply = totalSupply();
 
         for(uint i=0; i < DividendsRecipients.length; i++){
             addBalance(DividendsRecipients[i], DividendsRecipientsTokens[i] * amount, TotalTokenSupply);

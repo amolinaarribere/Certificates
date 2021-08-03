@@ -7,6 +7,7 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
+import "../Interfaces/IProxyManager.sol";
 import "./PublicCertificatesPool.sol";
 import "./PrivateCertificatesPool.sol";
 import "./PrivatePoolGenerator.sol";
@@ -16,7 +17,7 @@ import "./CertisToken.sol";
 import "../Libraries/AddressLibrary.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract CertificatesPoolManager is TokenGovernanceBaseContract{
+contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     using AddressLibrary for *;
 
     // DATA
@@ -40,6 +41,9 @@ contract CertificatesPoolManager is TokenGovernanceBaseContract{
     // Treasury
     Treasury _Treasury;
 
+    // Certis Token
+    CertisToken _CertisToken;
+
     // init
     bool _init;
 
@@ -59,7 +63,7 @@ contract CertificatesPoolManager is TokenGovernanceBaseContract{
 
     constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender);
+        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, address(this));
         _init = false;
     }
 
@@ -143,8 +147,6 @@ contract CertificatesPoolManager is TokenGovernanceBaseContract{
         _Treasury = Treasury(TreasuryProxyAddress);
         _CertisToken = CertisToken(CertisTokenProxyAddress);
         _PrivatePoolGenerator = PrivatePoolGenerator(PrivatePoolGeneratorProxyAddress);
-
-        initContracts();
     }
 
     function upgradeContractsImplementations(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress, address PrivatePoolImplAddress) internal
@@ -164,13 +166,6 @@ contract CertificatesPoolManager is TokenGovernanceBaseContract{
         require(success);
     }
 
-    function initContracts() internal
-    {
-        _PrivatePoolGenerator.updateContracts(address(_Treasury));
-        _PublicCertificatesPool.updateContracts(address(_Treasury));
-        _Treasury.updateContracts(address(_PublicCertificatesPool), address(_CertisToken));
-    }
-
 /*
     function assignContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress) internal {
         _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
@@ -184,8 +179,24 @@ contract CertificatesPoolManager is TokenGovernanceBaseContract{
     }
 */ 
     // configuration
-    function retrieveConfiguration() external view returns (address, address, address, address, address, uint) {
+    /*function retrieveConfiguration() external view returns (address, address, address, address, address, uint) {
         return (address(_PublicCertificatesPool), address(_Treasury), address(_CertisToken), address(_PrivatePoolGenerator), _chairperson, address(this).balance);
+    }*/
+
+    function retrievePublicCertificatePoolProxy() external override view returns (address) {
+        return (address(_PublicCertificatesPool));
+    }
+
+    function retrieveTreasuryProxy() external override view returns (address) {
+        return (address(_Treasury));
+    }
+
+    function retrieveCertisTokenProxy() external override view returns (address) {
+        return (address(_CertisToken));
+    }
+
+    function retrievePrivatePoolGeneratorProxy() external override view returns (address) {
+        return (address(_PrivatePoolGenerator));
     }
     
 }

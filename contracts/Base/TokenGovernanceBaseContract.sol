@@ -10,9 +10,10 @@ pragma solidity >=0.7.0 <0.9.0;
  import "../DeployedContracts/CertisToken.sol";
  import "../Libraries/AddressLibrary.sol";
  import "../Libraries/Library.sol";
+ import "./ManagedBaseContract.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract TokenGovernanceBaseContract is Initializable {
+abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContract {
     using Library for *;
     using AddressLibrary for *; 
 
@@ -21,7 +22,7 @@ contract TokenGovernanceBaseContract is Initializable {
     address _chairperson;
 
     // Token contract
-    CertisToken _CertisToken;
+    //CertisToken _CertisToken;
 
     // Proposition Structure
     struct PropositionStruct{
@@ -115,17 +116,21 @@ contract TokenGovernanceBaseContract is Initializable {
     }
 
     function GetAdminList() internal view returns(address[] memory){
-        (address[] memory list, ) = _CertisToken.TokenOwners();
+        (address[] memory list, ) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return list;
     }
 
     function GetAdminWeights() internal view returns(uint256[] memory){
-        (, uint256[] memory weights) = _CertisToken.TokenOwners();
+        (, uint256[] memory weights) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return weights;
     }
 
+    function GetTokenOwners() internal view returns(address[] memory, uint256[] memory){
+        return CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+    }
+
     function totalSupply() internal view returns(uint256){
-        return _CertisToken.totalSupply();
+        return CertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
     }
 
     function CheckIfPropostiionActive() internal returns(bool){
@@ -149,7 +154,8 @@ contract TokenGovernanceBaseContract is Initializable {
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }*/
 
-    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson) internal initializer {
+    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {
+        super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson; 
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }

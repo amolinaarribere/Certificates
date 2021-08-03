@@ -15,7 +15,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
     
     function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external;
-    function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external;
+    //function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external;
     
     function getRefund(address addr, uint numberOfOwners) external;
     function withdraw(uint amount) external;

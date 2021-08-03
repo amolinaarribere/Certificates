@@ -29,7 +29,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
     uint256 constant _providerId = 1;
     string constant _providerLabel = "Provider";
 
-    string[] _Label = [_ownerLabel, _providerLabel];
+    string[] _Label;
 
     // Holders
     struct _CertificatePerHolder{
@@ -66,7 +66,12 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
     payable
     {}*/
 
-    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer {
+    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 
+    {
+        _Label = new string[](2);
+        _Label[0] = _ownerLabel;
+        _Label[1] = _providerLabel;
+
         super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); 
     }
 

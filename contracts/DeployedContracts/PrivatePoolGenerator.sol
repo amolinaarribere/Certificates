@@ -36,7 +36,7 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
     _privateCertificatesPoolStruct[] _PrivateCertificatesPools;
 
     // Treasury
-    Treasury _Treasury;
+    //Treasury _Treasury;
 
     // MODIFIERS
     modifier isIdCorrect(uint Id, uint length){
@@ -56,11 +56,11 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
     }
 
     // FUNCTIONALITY
-    function updateContracts(address TreasuryAddressProxy) external
+    /*function updateContracts(address TreasuryAddressProxy) external
         isFromManagerContract()
     {
         _Treasury = Treasury(TreasuryAddressProxy);
-    }
+    }*/
 
     function updatePrivateCertificatePoolImpl(address PrivateCertificatePoolImplAddress) external
         isFromManagerContract()
@@ -70,7 +70,7 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
 
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external override payable
     {
-        _Treasury.pay{value:msg.value}(Library.Prices.NewPool);
+        Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewPool);
         bytes memory data = abi.encodeWithSignature("PrivateCertPool_init(address[],uint256)", owners, minOwners);
         PrivateCertificatesPoolProxy certificatePoolProxy = new PrivateCertificatesPoolProxy(address(_PrivateCertificatePoolBeacon), data);
         _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, address(certificatePoolProxy));

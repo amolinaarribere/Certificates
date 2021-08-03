@@ -36,7 +36,7 @@ pragma experimental ABIEncoderV2;
     uint256 constant _certId = 2;
     string constant _certLabel = "Certificate";
 
-    string[] _Label = [_ownerLabel, _poolLabel];
+    string[] _Label;
     
     struct _CertificatesPerHolderStruct{
         mapping(address => ItemsLibrary._ItemsStruct) _CertificatesPerHolder;
@@ -98,6 +98,10 @@ pragma experimental ABIEncoderV2;
 
     function Provider_init(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) public initializer 
     {
+        _Label = new string[](2);
+        _Label[0] = _ownerLabel;
+        _Label[1] = _poolLabel;
+
         super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdProviders); 
         _ProviderInfo = ProviderInfo;
     }

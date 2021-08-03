@@ -24,7 +24,7 @@ pragma experimental ABIEncoderV2;
 
     // DATA
     // Treasury
-    Treasury _Treasury;
+    //Treasury _Treasury;
 
     // CONSTRUCTOR
     /*constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress)
@@ -38,18 +38,18 @@ pragma experimental ABIEncoderV2;
     }
 
     // FUNCTIONALITY
-    function updateContracts(address TreasuryAddressProxy) external
+    /*function updateContracts(address TreasuryAddressProxy) external
         isFromManagerContract()
     {
         _Treasury = Treasury(TreasuryAddressProxy);
-    }
+    }*/
 
     function addProvider(address provider, string memory providerInfo) external 
         isEntityActivated(false, provider, _providerId) 
         isEntityPendingToAdd(false, provider, _providerId)
     override payable
     {
-        _Treasury.pay{value:msg.value}(Library.Prices.NewProvider);
+        Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProvider);
         bytes32 providerInBytes = AddressLibrary.AddressToBytes(provider);
         _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
         _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
@@ -62,13 +62,13 @@ pragma experimental ABIEncoderV2;
         address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._items[entityInBytes]._Validations : _Entities[_providerId]._items[entityInBytes]._Rejections;
 
         for(uint i=0; i < Voters.length; i++){
-            _Treasury.getRefund(Voters[i], Voters.length);
+            Treasury(_managerContract.retrieveTreasuryProxy()).getRefund(Voters[i], Voters.length);
         }
     }
 
     function addCertificate(bytes32 CertificateHash, address holder) external override payable
     {
-        _Treasury.pay{value:msg.value}(Library.Prices.NewCertificate);
+        Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewCertificate);
         addCertificateInternal(CertificateHash, holder);
     }
 
