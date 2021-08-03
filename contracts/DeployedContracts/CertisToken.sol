@@ -26,8 +26,8 @@ import "../Libraries/AddressLibrary.sol";
         _mint(msg.sender, MaxSupply);
     }*/
 
-    function initialize(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) public initializer {
-        super.__ERC20_init_unchained(name, symbol);
+    function CertisToken_init(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) public initializer {
+        super.__ERC20_init(name, symbol);
         _tokenOwners = new address[](0);
         _decimals = decimalsValue;
         _mint(msg.sender, MaxSupply);

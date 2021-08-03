@@ -75,10 +75,17 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
 
     
     // CONSTRUCTOR
-    constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
+    /*constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
     TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
     ManagedBaseContract(managerContractAddress)
     {
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
+    }*/
+
+    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
+    {
+        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender);
+        super.ManagedBaseContract_init(managerContractAddress);
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
     }
 
@@ -144,12 +151,12 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract, ManagedBaseContract
     }
 
     // FUNCTIONALITY
-    function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external 
+    function updateContracts(address PublicPoolAddressProxy, address CertisTokenAddressProxy) external 
         isFromManagerContract()
     override
     {
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddress);
-        _CertisToken = CertisToken(CertisTokenAddress); 
+        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddressProxy);
+        _CertisToken = CertisToken(CertisTokenAddressProxy); 
     }
 
     function pay(Library.Prices price) external 

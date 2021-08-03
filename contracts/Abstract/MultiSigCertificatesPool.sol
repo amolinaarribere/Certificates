@@ -10,8 +10,9 @@ pragma experimental ABIEncoderV2;
 
 import "./MultiSigContract.sol";
 import "../Interfaces/IPool.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
+abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigContract {
     
     // EVENTS
     event _AddCertificateIdEvent(address, address);
@@ -60,10 +61,14 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     }
     
     // CONSTRUCTOR
-    constructor(address[] memory owners,  uint256 minOwners) 
+    /*constructor(address[] memory owners,  uint256 minOwners) 
         MultiSigContract(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates)
     payable
-    {}
+    {}*/
+
+    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer {
+        super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); 
+    }
 
     // FUNCTIONALITY
     // Providers CRUD Operations

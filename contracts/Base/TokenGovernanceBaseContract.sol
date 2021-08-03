@@ -10,8 +10,9 @@ pragma solidity >=0.7.0 <0.9.0;
  import "../DeployedContracts/CertisToken.sol";
  import "../Libraries/AddressLibrary.sol";
  import "../Libraries/Library.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract TokenGovernanceBaseContract {
+contract TokenGovernanceBaseContract is Initializable {
     using Library for *;
     using AddressLibrary for *; 
 
@@ -143,8 +144,13 @@ contract TokenGovernanceBaseContract {
     }
 
     // CONSTRUCTOR
-    constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
+    /*constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
         _chairperson = msg.sender; 
+        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
+    }*/
+
+    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson) internal initializer {
+        _chairperson = chairperson; 
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
     

@@ -9,8 +9,9 @@ pragma experimental ABIEncoderV2;
  */
 
  import "../Libraries/Library.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ManagedBaseContract{
+contract ManagedBaseContract is Initializable{
     using Library for *;
 
     // DATA
@@ -23,7 +24,11 @@ contract ManagedBaseContract{
     }
 
     // CONSTRUCTOR
-    constructor(address managerContractAddress) {
+    /*constructor(address managerContractAddress) {
+        _managerContract = managerContractAddress;
+    }*/
+
+    function ManagedBaseContract_init(address managerContractAddress) internal initializer {
         _managerContract = managerContractAddress;
     }
 

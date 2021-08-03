@@ -13,8 +13,9 @@ pragma experimental ABIEncoderV2;
  import "../Libraries/Library.sol";
  import "../Base/ManagedBaseContract.sol";
  import "../Libraries/AddressLibrary.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
- contract PublicCertificatesPool is MultiSigCertificatesPool, ManagedBaseContract {
+ contract PublicCertificatesPool is Initializable, MultiSigCertificatesPool, ManagedBaseContract {
     using Library for *;
     using AddressLibrary for *;
 
@@ -26,16 +27,21 @@ pragma experimental ABIEncoderV2;
     Treasury _Treasury;
 
     // CONSTRUCTOR
-    constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress)
+    /*constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress)
     MultiSigCertificatesPool(owners, minOwners) 
     ManagedBaseContract(managerContractAddress) 
-    {}
+    {}*/
+
+    function PublicCertPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
+        super.MultiSigCertPool_init(owners, minOwners); 
+        super.ManagedBaseContract_init(managerContractAddress); 
+    }
 
     // FUNCTIONALITY
-    function updateContracts(address TreasuryAddress) external
+    function updateContracts(address TreasuryAddressProxy) external
         isFromManagerContract()
     {
-        _Treasury = Treasury(TreasuryAddress);
+        _Treasury = Treasury(TreasuryAddressProxy);
     }
 
     function addProvider(address provider, string memory providerInfo) external 

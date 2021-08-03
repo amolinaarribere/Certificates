@@ -9,22 +9,28 @@ pragma solidity >=0.7.0 <0.9.0;
 
  import '../Interfaces/IPoolGenerator.sol';
  import "./PrivateCertificatesPool.sol";
+ import "./Proxies/PrivateCertificatesPoolProxy.sol";
  import "./Treasury.sol";
  import "../Libraries/Library.sol";
  import "../Base/ManagedBaseContract.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+ import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 
 
-contract PrivatePoolGenerator is IPoolGenerator, ManagedBaseContract {
+contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContract{
     using Library for *;
 
      // EVENTS
-    event _NewCertificatesPool(uint256, address, MultiSigCertificatesPool);
+    event _NewCertificatesPool(uint256, address, address);
 
     // DATA
+    // Private Certificate Pool implementation
+    UpgradeableBeacon _PrivateCertificatePoolBeacon;
+
     // Private Certificates Pool structure
     struct _privateCertificatesPoolStruct{
         address _creator;
-        PrivateCertificatesPool _PrivateCertificatesPool;
+        address _PrivateCertificatesPoolProxyAddress;
     } 
 
     _privateCertificatesPoolStruct[] _PrivateCertificatesPools;
@@ -40,33 +46,44 @@ contract PrivatePoolGenerator is IPoolGenerator, ManagedBaseContract {
 
     
     // CONSTRUCTOR
-    constructor(address managerContractAddress)
+    /*constructor(address managerContractAddress)
     ManagedBaseContract(managerContractAddress) 
-    {}
+    {}*/
 
-    // FUNCTIONALITY
-    function updateContracts(address TreasuryAddress) external
-        isFromManagerContract()
-    {
-        _Treasury = Treasury(TreasuryAddress);
+    function PrivatePoolGenerator_init(address managerContractAddress, address PrivateCertificatePoolImplAddress) public initializer {
+        super.ManagedBaseContract_init(managerContractAddress);
+        _PrivateCertificatePoolBeacon = new UpgradeableBeacon(PrivateCertificatePoolImplAddress);
     }
 
+    // FUNCTIONALITY
+    function updateContracts(address TreasuryAddressProxy) external
+        isFromManagerContract()
+    {
+        _Treasury = Treasury(TreasuryAddressProxy);
+    }
+
+    function updatePrivateCertificatePoolImpl(address PrivateCertificatePoolImplAddress) external
+        isFromManagerContract()
+    {
+        _PrivateCertificatePoolBeacon.upgradeTo(PrivateCertificatePoolImplAddress);
+    }
 
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external override payable
     {
         _Treasury.pay{value:msg.value}(Library.Prices.NewPool);
-        PrivateCertificatesPool certificatePool = new PrivateCertificatesPool(owners, minOwners);
-        _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, certificatePool);
+        bytes memory data = abi.encodeWithSignature("PrivateCertPool_init(address[],uint256)", owners, minOwners);
+        PrivateCertificatesPoolProxy certificatePoolProxy = new PrivateCertificatesPoolProxy(address(_PrivateCertificatePoolBeacon), data);
+        _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, address(certificatePoolProxy));
         _PrivateCertificatesPools.push(privateCertificatesPool);
 
-        emit _NewCertificatesPool(_PrivateCertificatesPools.length - 1, privateCertificatesPool._creator, privateCertificatesPool._PrivateCertificatesPool);
+        emit _NewCertificatesPool(_PrivateCertificatesPools.length - 1, privateCertificatesPool._creator, privateCertificatesPool._PrivateCertificatesPoolProxyAddress);
     }
 
     function retrievePrivateCertificatesPool(uint certificatePoolId) external override
         isIdCorrect(certificatePoolId, _PrivateCertificatesPools.length)
     view returns (address, address)
     {
-        return(_PrivateCertificatesPools[certificatePoolId]._creator, address(_PrivateCertificatesPools[certificatePoolId]._PrivateCertificatesPool));
+        return(_PrivateCertificatesPools[certificatePoolId]._creator, _PrivateCertificatesPools[certificatePoolId]._PrivateCertificatesPoolProxyAddress);
     }
 
     function retrieveTotalPrivateCertificatesPool() external override view returns (uint)

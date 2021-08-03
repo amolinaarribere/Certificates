@@ -9,10 +9,16 @@ pragma experimental ABIEncoderV2;
  */
 
  import "../Abstract/MultiSigCertificatesPool.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
- contract PrivateCertificatesPool is MultiSigCertificatesPool {
+ contract PrivateCertificatesPool is Initializable, MultiSigCertificatesPool {
 
     // CONSTRUCTOR
-    constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {}
+    //constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {}
+
+    function PrivateCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 
+    {
+      super.MultiSigCertPool_init(owners, minOwners);
+    }
 
   }

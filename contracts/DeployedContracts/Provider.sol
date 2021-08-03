@@ -14,8 +14,9 @@ pragma experimental ABIEncoderV2;
  import "./PublicCertificatesPool.sol";
  import "../Libraries/ItemsLibrary.sol";
  import "../Libraries/AddressLibrary.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
- contract Provider is IProvider, MultiSigContract {
+ contract Provider is IProvider, Initializable, MultiSigContract {
     using Library for *;
     using AddressLibrary for *;
     using ItemsLibrary for *;
@@ -88,10 +89,16 @@ pragma experimental ABIEncoderV2;
     }
 
      // CONSTRUCTOR
-    constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
+    /*constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
         MultiSigContract(owners, minOwners, _TotalEntities, _Label, _ownerIdProviders)
     payable
     {
+        _ProviderInfo = ProviderInfo;
+    }*/
+
+    function Provider_init(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) public initializer 
+    {
+        super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdProviders); 
         _ProviderInfo = ProviderInfo;
     }
 

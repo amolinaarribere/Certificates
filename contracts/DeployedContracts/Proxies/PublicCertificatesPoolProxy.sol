@@ -13,8 +13,8 @@ import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.so
 contract PublicCertificatesPoolProxy is TransparentUpgradeableProxy{
 
     // CONSTRUCTOR
-    constructor(address PublicCertificatesPoolCodeContractAddress, address managerContractAddress)
-        TransparentUpgradeableProxy(PublicCertificatesPoolCodeContractAddress, managerContractAddress, "0x0") 
+    constructor(address PublicCertificatesPoolCodeContractAddress, address managerContractAddress, bytes memory data)
+        TransparentUpgradeableProxy(PublicCertificatesPoolCodeContractAddress, managerContractAddress, data) 
     {}
     
 

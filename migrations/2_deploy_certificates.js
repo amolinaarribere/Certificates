@@ -60,11 +60,43 @@ module.exports = async function(deployer, network, accounts){
     await deployer.link(AddressLibrary, CertisToken);
     console.log("AddressLibrary linked to CertisToken");
  
-    await deployer.deploy(CertisToken, "CertisToken", "CERT", 0, 1000000);
+    //await deployer.deploy(CertisToken, "CertisToken", "CERT", 0, 1000000);
+    await deployer.deploy(CertisToken);
     CertisTokenInstance = await CertisToken.deployed();
     console.log("CertisToken deployed : " + CertisTokenInstance.address);
 
-    await deployer.deploy(CertisTokenProxy, CertisTokenInstance.address, CertificatesPoolManagerInstance.address, web3.utils.asciiToHex("random"));
+    var CertisTokenProxyInitializerMethod = {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "uint8",
+            "name": "decimalsValue",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "MaxSupply",
+            "type": "uint256"
+          }
+        ],
+        "name": "CertisToken_init",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      };
+    var CertisTokenProxyInitializerParameters = ["CertisToken", "CERT", 0, 1000000];
+    var CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
+
+    await deployer.deploy(CertisTokenProxy, CertisTokenInstance.address, CertificatesPoolManagerInstance.address, CertisProxyData);
     CertisTokenProxyInstance = await CertisTokenProxy.deployed();
     console.log("CertisTokenProxy deployed : " + CertisTokenProxyInstance.address);
 
