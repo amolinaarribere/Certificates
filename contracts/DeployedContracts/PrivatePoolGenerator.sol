@@ -25,7 +25,7 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
 
     // DATA
     // Private Certificate Pool implementation
-    UpgradeableBeacon _PrivateCertificatePoolBeacon;
+    //UpgradeableBeacon _PrivateCertificatePoolBeacon;
 
     // Private Certificates Pool structure
     struct _privateCertificatesPoolStruct{
@@ -50,9 +50,9 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
     ManagedBaseContract(managerContractAddress) 
     {}*/
 
-    function PrivatePoolGenerator_init(address managerContractAddress, address PrivateCertificatePoolImplAddress) public initializer {
+    function PrivatePoolGenerator_init(address managerContractAddress) public initializer {
         super.ManagedBaseContract_init(managerContractAddress);
-        _PrivateCertificatePoolBeacon = new UpgradeableBeacon(PrivateCertificatePoolImplAddress);
+        //_PrivateCertificatePoolBeacon = new UpgradeableBeacon(PrivateCertificatePoolImplAddress);
     }
 
     // FUNCTIONALITY
@@ -62,17 +62,17 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
         _Treasury = Treasury(TreasuryAddressProxy);
     }*/
 
-    function updatePrivateCertificatePoolImpl(address PrivateCertificatePoolImplAddress) external
+   /* function updatePrivateCertificatePoolImpl(address PrivateCertificatePoolImplAddress) external
         isFromManagerContract()
     {
         _PrivateCertificatePoolBeacon.upgradeTo(PrivateCertificatePoolImplAddress);
-    }
+    }*/
 
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external override payable
     {
         Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewPool);
         bytes memory data = abi.encodeWithSignature("PrivateCertPool_init(address[],uint256)", owners, minOwners);
-        PrivateCertificatesPoolProxy certificatePoolProxy = new PrivateCertificatesPoolProxy(address(_PrivateCertificatePoolBeacon), data);
+        PrivateCertificatesPoolProxy certificatePoolProxy = new PrivateCertificatesPoolProxy(_managerContract.retrievePrivatePoolBeacon(), data);
         _privateCertificatesPoolStruct memory privateCertificatesPool = _privateCertificatesPoolStruct(msg.sender, address(certificatePoolProxy));
         _PrivateCertificatesPools.push(privateCertificatesPool);
 

@@ -16,8 +16,8 @@ import "../Libraries/AddressLibrary.sol";
     using AddressLibrary for *;
 
     // DATA
-    uint8 _decimals;
     address[] _tokenOwners;
+    uint8 _decimals;
 
     // CONSTRUCTOR
    /* constructor(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) ERC20(name, symbol){
@@ -50,12 +50,11 @@ import "../Libraries/AddressLibrary.sol";
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
-        if(amount > 0){
-            if(address(0) != to && 0 == balanceOf(to))_tokenOwners.push(to);
-            if(address(0) != from && amount == balanceOf(from)){
-                _tokenOwners = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(from, _tokenOwners),_tokenOwners);
-            }
-        }
+        if(amount > 0 && address(0) != to && 0 == balanceOf(to))_tokenOwners.push(to);
+    }
+
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal override {
+        if(amount > 0 && address(0) != from && 0 == balanceOf(from)) _tokenOwners = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(from, _tokenOwners),_tokenOwners);
     }
     
 

@@ -291,7 +291,6 @@ contract("Testing Treasury",function(accounts){
          await SplitTokenSupply();
 
         // Rejected
-
          await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
          await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
@@ -303,7 +302,6 @@ contract("Testing Treasury",function(accounts){
          await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
  
          // Cancelled
-
          await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
          await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
@@ -314,7 +312,6 @@ contract("Testing Treasury",function(accounts){
  
 
          // Validated
- 
          await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
          await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
@@ -324,7 +321,6 @@ contract("Testing Treasury",function(accounts){
          await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);
  
         // Validated again
-
          await Treasury.methods.updateProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
          await Treasury.methods.voteProposition(true).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
          await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1);

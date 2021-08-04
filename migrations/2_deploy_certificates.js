@@ -203,11 +203,6 @@ module.exports = async function(deployer, network, accounts){
         "internalType": "address",
         "name": "managerContractAddress",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "PrivateCertificatePoolImplAddress",
-        "type": "address"
       }
     ],
     "name": "PrivatePoolGenerator_init",
@@ -215,7 +210,7 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var PrivatePoolGeneratorProxyInitializerParameters = [CertificatesPoolManagerInstance.address, PrivateCertificatesPoolInstance.address];
+  var PrivatePoolGeneratorProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
   var PrivatePoolGeneratorProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolGeneratorProxyInitializerMethod, PrivatePoolGeneratorProxyInitializerParameters);
 
   await deployer.deploy(PrivatePoolGeneratorProxy, PrivatePoolGeneratorInstance.address, CertificatesPoolManagerInstance.address, PrivatePoolGeneratorProxyData);
@@ -267,7 +262,7 @@ module.exports = async function(deployer, network, accounts){
   console.log("PublicCertificatesPoolProxy deployed : " + PublicCertificatesPoolProxyInstance.address);
 
   // Initialized Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await CertificatesPoolManagerInstance.InitializeContracts(PublicCertificatesPoolProxyInstance.address, TreasuryProxyInstance.address, CertisTokenProxyInstance.address, PrivatePoolGeneratorProxyInstance.address);
+  await CertificatesPoolManagerInstance.InitializeContracts(PublicCertificatesPoolProxyInstance.address, TreasuryProxyInstance.address, CertisTokenProxyInstance.address, PrivatePoolGeneratorProxyInstance.address, PrivateCertificatesPoolInstance.address);
   console.log("CertificatesPoolManager initialized");
 
   // Provider -----------------------------------------------------------------------------------------------------------------------------------------------------------------

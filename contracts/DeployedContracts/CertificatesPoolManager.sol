@@ -8,19 +8,25 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
 import "../Interfaces/IProxyManager.sol";
-import "./PublicCertificatesPool.sol";
+//import "./PublicCertificatesPool.sol";
+import "./Proxies/PublicCertificatesPoolProxy.sol";
 import "./PrivateCertificatesPool.sol";
-import "./PrivatePoolGenerator.sol";
-import "./Treasury.sol";
+//import "./PrivatePoolGenerator.sol";
+import "./Proxies/PrivatePoolGeneratorProxy.sol";
+//import "./Treasury.sol";
+import "./Proxies/TreasuryProxy.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
-import "./CertisToken.sol";
+//import "./CertisToken.sol";
+import "./Proxies/CertisTokenProxy.sol";
 import "../Libraries/AddressLibrary.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     using AddressLibrary for *;
 
-    // DATA
+    // DATA /////////////////////////////////////////
     // proposition to change
     struct ProposedContractsStruct{
         address NewPublicPoolAddress;
@@ -33,28 +39,30 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     ProposedContractsStruct _ProposedContracts;
     
     // Private Certificate Pools Generator
-    PrivatePoolGenerator _PrivatePoolGenerator;
+    PrivatePoolGeneratorProxy _PrivatePoolGenerator;
+
+    // Private Certificates Pool
+    UpgradeableBeacon _PrivateCertificatePoolBeacon;
 
     // Public Certificates Pool
-    PublicCertificatesPool  _PublicCertificatesPool;
+    PublicCertificatesPoolProxy  _PublicCertificatesPool;
 
     // Treasury
-    Treasury _Treasury;
+    TreasuryProxy _Treasury;
 
     // Certis Token
-    CertisToken _CertisToken;
+    CertisTokenProxy _CertisToken;
 
     // init
     bool _init;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isNotInitialized(){
         require(false == _init, "EC26");
         _;
     }
 
-
-    // CONSTRUCTOR and INITIALIZATION
+    // CONSTRUCTOR and INITIALIZATION /////////////////////////////////////////
     constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
     {
         super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, address(this));
@@ -62,15 +70,16 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     }
 
 
-    function InitializeContracts(address payable PublicPoolProxyAddress, address payable TreasuryProxyAddress, address payable CertisTokenProxyAddress, address payable PrivatePoolGeneratorProxyAddress) 
+    function InitializeContracts(address payable PublicPoolProxyAddress, address payable TreasuryProxyAddress, address payable CertisTokenProxyAddress, address payable PrivatePoolGeneratorProxyAddress, address PrivateCertificatePoolImplAddress) 
         isFromChairPerson()
         isNotInitialized()
     external
     {
         _init = true;
-        initProxies(PublicPoolProxyAddress, TreasuryProxyAddress, CertisTokenProxyAddress, PrivatePoolGeneratorProxyAddress);
+        initProxies(PublicPoolProxyAddress, TreasuryProxyAddress, CertisTokenProxyAddress, PrivatePoolGeneratorProxyAddress, PrivateCertificatePoolImplAddress);
     }
 
+    // FUNCTIONALITY /////////////////////////////////////////
     // governance : contracts assignment and management
     function updateContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress, address PrivatePoolImplAddress) external
     {
@@ -80,13 +89,10 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         _ProposedContracts.NewPrivatePoolGeneratorAddress = PrivatePoolGeneratorAddress;
         _ProposedContracts.NewPrivatePoolAddress = PrivatePoolImplAddress;
         addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
-
-        //InternalUpdateContractsVersions(PublicPoolAddress, TreasuryAddress, CertisTokenAddress, PrivatePoolGeneratorAddress, false);
     }
 
     function propositionApproved() internal override
     {
-        //assignContracts(_ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewTreasuryAddress, _ProposedContracts.NewCertisTokenAddress, _ProposedContracts.NewPrivatePoolGeneratorAddress);
         upgradeContractsImplementations(_ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewTreasuryAddress, _ProposedContracts.NewCertisTokenAddress, _ProposedContracts.NewPrivatePoolGeneratorAddress, _ProposedContracts.NewPrivatePoolAddress);
         removeProposition();
     }
@@ -108,40 +114,34 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     function retrieveProposition() external override view returns(string[] memory)
     {
-        string[] memory proposition = new string[](4);
+        string[] memory proposition = new string[](5);
         proposition[0] = AddressLibrary.AddressToString(_ProposedContracts.NewPublicPoolAddress);
         proposition[1] = AddressLibrary.AddressToString(_ProposedContracts.NewTreasuryAddress);
         proposition[2] = AddressLibrary.AddressToString(_ProposedContracts.NewCertisTokenAddress);
         proposition[3] = AddressLibrary.AddressToString(_ProposedContracts.NewPrivatePoolGeneratorAddress);
+        proposition[4] = AddressLibrary.AddressToString(_ProposedContracts.NewPrivatePoolAddress);
         return proposition;
     }
 
-    function initProxies(address PublicPoolProxyAddress, address payable TreasuryProxyAddress, address CertisTokenProxyAddress, address PrivatePoolGeneratorProxyAddress) internal
+    function initProxies(address payable PublicPoolProxyAddress, address payable TreasuryProxyAddress, address payable CertisTokenProxyAddress, address payable PrivatePoolGeneratorProxyAddress, address PrivateCertificatePoolImplAddress) internal
     {
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolProxyAddress);
-        _Treasury = Treasury(TreasuryProxyAddress);
-        _CertisToken = CertisToken(CertisTokenProxyAddress);
-        _PrivatePoolGenerator = PrivatePoolGenerator(PrivatePoolGeneratorProxyAddress);
+        _PublicCertificatesPool = PublicCertificatesPoolProxy(PublicPoolProxyAddress);
+        _Treasury = TreasuryProxy(TreasuryProxyAddress);
+        _CertisToken = CertisTokenProxy(CertisTokenProxyAddress);
+        _PrivatePoolGenerator = PrivatePoolGeneratorProxy(PrivatePoolGeneratorProxyAddress);
+        _PrivateCertificatePoolBeacon = new UpgradeableBeacon(PrivateCertificatePoolImplAddress);
     }
 
     function upgradeContractsImplementations(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress, address PrivatePoolImplAddress) internal
     {
-        upgradeContractsImplementations(address(_PublicCertificatesPool), PublicPoolAddress);
-        upgradeContractsImplementations(address(_Treasury), TreasuryAddress);
-        upgradeContractsImplementations(address(_CertisToken), CertisTokenAddress);
-        upgradeContractsImplementations(address(_PrivatePoolGenerator), PrivatePoolGeneratorAddress);
-
-        _PrivatePoolGenerator.updatePrivateCertificatePoolImpl(PrivatePoolImplAddress);
+        _PublicCertificatesPool.upgradeTo(PublicPoolAddress);
+        _Treasury.upgradeTo(TreasuryAddress);
+        _CertisToken.upgradeTo(CertisTokenAddress);
+        _PrivatePoolGenerator.upgradeTo(PrivatePoolGeneratorAddress);
+        _PrivateCertificatePoolBeacon.upgradeTo(PrivatePoolImplAddress);
     }
 
-    function upgradeContractsImplementations(address AddressProxy, address AddressNewImpl) internal
-    {
-        bool success;
-        (success, ) = AddressProxy.call(abi.encodeWithSignature("upgradeTo(address)", AddressNewImpl));
-        require(success);
-    }
-
-    // configuration
+    // configuration Proxies
     function retrievePublicCertificatePoolProxy() external override view returns (address) {
         return (address(_PublicCertificatesPool));
     }
@@ -156,6 +156,31 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     function retrievePrivatePoolGeneratorProxy() external override view returns (address) {
         return (address(_PrivatePoolGenerator));
+    }
+
+    function retrievePrivatePoolBeacon() external override view returns (address) {
+        return (address(_PrivateCertificatePoolBeacon));
+    }
+
+    // configuration implementations
+    function retrievePublicCertificatePool() external override view returns (address) {
+        return _PublicCertificatesPool.implementation();
+    }
+
+    function retrieveTreasury() external override view returns (address) {
+        return _Treasury.implementation();
+    }
+
+    function retrieveCertisToken() external override view returns (address) {
+        return _CertisToken.implementation();
+    }
+
+    function retrievePrivatePoolGenerator() external override view returns (address) {
+        return _PrivatePoolGenerator.implementation();
+    }
+
+    function retrievePrivatePool() external override view returns (address) {
+        return _PrivateCertificatePoolBeacon.implementation();
     }
     
 }

@@ -1,9 +1,14 @@
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const Treasury = artifacts.require("Treasury");
+const TreasuryAbi = Treasury.abi;
 const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
+const PublicCertificatesPoolAbi = PublicCertificatesPool.abi;
 const PrivateCertificatesPool = artifacts.require("PrivateCertificatesPool");
+const PrivateCertificatesPoolAbi = PrivateCertificatesPool.abi;
 const CertisToken = artifacts.require("CertisToken");
+const CertisTokenAbi = CertisToken.abi;
 const PrivatePoolGenerator = artifacts.require("PrivatePoolGenerator");
+const PrivatePoolGeneratorAbi = PrivatePoolGenerator.abi;
 
 const TreasuryProxy = artifacts.require("TreasuryProxy");
 const PublicCertificatesPoolProxy = artifacts.require("PublicCertificatesPoolProxy");
@@ -105,11 +110,6 @@ var PrivatePoolGeneratorProxyInitializerMethod = {
         "internalType": "address",
         "name": "managerContractAddress",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "PrivateCertificatePoolImplAddress",
-        "type": "address"
       }
     ],
     "name": "PrivatePoolGenerator_init",
@@ -144,11 +144,11 @@ var PublicCertificatesPoolProxyInitializerMethod = {
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
   let certPoolManager = await CertificatesPoolManager.new(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, {from: chairPerson});
   let implementations = await deployImplementations(user_1);
-  let proxies = await deployProxies(chairPerson, PublicOwners, minOwners, user_1, implementations[0], implementations[1], implementations[2], implementations[3], certPoolManager.address, implementations[4])
+  let proxies = await deployProxies(chairPerson, PublicOwners, minOwners, user_1, implementations[0], implementations[1], implementations[2], implementations[3], certPoolManager.address)
 
-  await certPoolManager.InitializeContracts(proxies[1].address, proxies[2].address, proxies[0].address, proxies[3].address);
+  await certPoolManager.InitializeContracts(proxies[1], proxies[2], proxies[0], proxies[3], implementations[4], {from: chairPerson});
 
-  return [certPoolManager, proxies[0], proxies[1], proxies[2], proxies[3]];
+  return [certPoolManager, proxies, implementations];
 }
 
 async function deployImplementations(user_1){
@@ -161,7 +161,7 @@ async function deployImplementations(user_1){
     return [certisToken.address, publicPool.address, treasury.address, privatePoolGenerator.address, privatePool.address];
 }
 
-async function deployProxies(chairPerson, PublicOwners, minOwners, user_1, certisToken, publicPool, treasury, privatePoolGenerator, certPoolManager, privatePool){
+async function deployProxies(chairPerson, PublicOwners, minOwners, user_1, certisToken, publicPool, treasury, privatePoolGenerator, certPoolManager){
   let CertisTokenProxyInitializerParameters = ["Certis Token for Test", "CERT", 0, TotalTokenSupply];
   let CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
   let certisTokenProxy = await CertisTokenProxy.new(certisToken, certPoolManager, CertisProxyData, {from: chairPerson});
@@ -174,22 +174,29 @@ async function deployProxies(chairPerson, PublicOwners, minOwners, user_1, certi
   let TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
   let treasuryProxy = await TreasuryProxy.new(treasury, certPoolManager, TreasuryProxyData, {from: chairPerson});
 
-  let PrivatePoolGeneratorProxyInitializerParameters = [certPoolManager, privatePool];
+  let PrivatePoolGeneratorProxyInitializerParameters = [certPoolManager];
   let PrivatePoolGeneratorProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolGeneratorProxyInitializerMethod, PrivatePoolGeneratorProxyInitializerParameters);  
   let privatePoolGeneratorProxy = await PrivatePoolGeneratorProxy.new(privatePoolGenerator, certPoolManager, PrivatePoolGeneratorProxyData, {from: user_1});
 
-  return [certisTokenProxy, publicPoolProxy, treasuryProxy, privatePoolGeneratorProxy];
+  return [certisTokenProxy.address, publicPoolProxy.address, treasuryProxy.address, privatePoolGeneratorProxy.address];
 }
 
-
-
 async function InitializeManagedBaseContracts(chairPerson, PublicOwners, minOwners, user_1, certPoolManagerAddress){
-    let certisToken = await CertisToken.new("Certis Token for Test", "CERT", 0, TotalTokenSupply, {from: chairPerson});
-    let publicPool = await PublicCertificatesPool.new(PublicOwners, minOwners, certPoolManagerAddress, {from: user_1});
-    let treasury = await Treasury.new(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManagerAddress, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, {from: chairPerson});
-    let privatePoolGenerator = await PrivatePoolGenerator.new(certPoolManagerAddress, {from: user_1});
+  let implementations = await deployImplementations(user_1);
 
-    return [certisToken, publicPool, treasury, privatePoolGenerator];
+  let certisToken = new web3.eth.Contract(CertisTokenAbi, implementations[0]);
+  await certisToken.methods.CertisToken_init("Certis Token for Test", "CERT", 0, TotalTokenSupply).send({from: chairPerson, gas: Gas});
+
+  let publicPool = new web3.eth.Contract(PublicCertificatesPoolAbi, implementations[1]);
+  await publicPool.methods.PublicCertPool_init(PublicOwners, minOwners, certPoolManagerAddress).send({from: user_1, gas: Gas});
+
+  let treasury = new web3.eth.Contract(TreasuryAbi, implementations[2]);
+  await treasury.methods.Treasury_init(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManagerAddress, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas});
+
+  let privatePoolGenerator = new web3.eth.Contract(PrivatePoolGeneratorAbi, implementations[3]);
+  await privatePoolGenerator.methods.PrivatePoolGenerator_init(certPoolManagerAddress).send({from: user_1, gas: Gas});
+
+  return implementations;
 }
 
 exports.InitializeContracts = InitializeContracts;
