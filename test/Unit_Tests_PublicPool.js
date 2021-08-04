@@ -23,7 +23,6 @@ const Gas = constants.Gas;
 
 contract("Testing Public Pool",function(accounts){
     var certPoolManager;
-    var certisToken;
     var publicCertPool;
     // used addresses
     const chairPerson = accounts[0];
@@ -60,10 +59,7 @@ contract("Testing Public Pool",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        certisToken = contracts[1];
-        let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);  
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);  
         await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
     });

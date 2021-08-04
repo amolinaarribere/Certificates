@@ -13,9 +13,7 @@ pragma experimental ABIEncoderV2;
 
  contract PrivateCertificatesPool is Initializable, MultiSigCertificatesPool {
 
-    // CONSTRUCTOR
-    //constructor(address[] memory owners,  uint256 minOwners) MultiSigCertificatesPool(owners, minOwners) payable {}
-
+    // CONSTRUCTOR & INIT /////////////////////////////////////////
     function PrivateCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 
     {
       super.MultiSigCertPool_init(owners, minOwners);

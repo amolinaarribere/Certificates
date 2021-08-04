@@ -19,31 +19,18 @@ pragma experimental ABIEncoderV2;
     using Library for *;
     using AddressLibrary for *;
 
-    // EVENTS
+    // EVENTS /////////////////////////////////////////
     event _SendProposalId(address, address indexed,  string indexed);
 
-    // DATA
-    // Treasury
-    //Treasury _Treasury;
+    // DATA /////////////////////////////////////////
 
-    // CONSTRUCTOR
-    /*constructor(address[] memory owners,  uint256 minOwners, address managerContractAddress)
-    MultiSigCertificatesPool(owners, minOwners) 
-    ManagedBaseContract(managerContractAddress) 
-    {}*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function PublicCertPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
         super.MultiSigCertPool_init(owners, minOwners); 
         super.ManagedBaseContract_init(managerContractAddress); 
     }
 
-    // FUNCTIONALITY
-    /*function updateContracts(address TreasuryAddressProxy) external
-        isFromManagerContract()
-    {
-        _Treasury = Treasury(TreasuryAddressProxy);
-    }*/
-
+    // FUNCTIONALITY /////////////////////////////////////////
     function addProvider(address provider, string memory providerInfo) external 
         isEntityActivated(false, provider, _providerId) 
         isEntityPendingToAdd(false, provider, _providerId)
@@ -73,7 +60,6 @@ pragma experimental ABIEncoderV2;
     }
 
     // Callback functions
-
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override 
     {
         super.onItemValidated(item, ids, addOrRemove);

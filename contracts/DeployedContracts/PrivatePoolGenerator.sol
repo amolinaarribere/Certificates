@@ -20,13 +20,10 @@ pragma solidity >=0.7.0 <0.9.0;
 contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContract{
     using Library for *;
 
-     // EVENTS
+     // EVENTS /////////////////////////////////////////
     event _NewCertificatesPool(uint256, address, address);
 
-    // DATA
-    // Private Certificate Pool implementation
-    //UpgradeableBeacon _PrivateCertificatePoolBeacon;
-
+    // DATA /////////////////////////////////////////
     // Private Certificates Pool structure
     struct _privateCertificatesPoolStruct{
         address _creator;
@@ -35,39 +32,19 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
 
     _privateCertificatesPoolStruct[] _PrivateCertificatesPools;
 
-    // Treasury
-    //Treasury _Treasury;
-
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isIdCorrect(uint Id, uint length){
         require(true == Library.IdCorrect(Id, length), "EC1");
         _;
     }
 
     
-    // CONSTRUCTOR
-    /*constructor(address managerContractAddress)
-    ManagedBaseContract(managerContractAddress) 
-    {}*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function PrivatePoolGenerator_init(address managerContractAddress) public initializer {
         super.ManagedBaseContract_init(managerContractAddress);
-        //_PrivateCertificatePoolBeacon = new UpgradeableBeacon(PrivateCertificatePoolImplAddress);
     }
 
-    // FUNCTIONALITY
-    /*function updateContracts(address TreasuryAddressProxy) external
-        isFromManagerContract()
-    {
-        _Treasury = Treasury(TreasuryAddressProxy);
-    }*/
-
-   /* function updatePrivateCertificatePoolImpl(address PrivateCertificatePoolImplAddress) external
-        isFromManagerContract()
-    {
-        _PrivateCertificatePoolBeacon.upgradeTo(PrivateCertificatePoolImplAddress);
-    }*/
-
+    // FUNCTIONALITY /////////////////////////////////////////
     function createPrivateCertificatesPool(address[] memory owners,  uint256 minOwners) external override payable
     {
         Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewPool);

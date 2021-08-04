@@ -30,7 +30,7 @@ const Gas = constants.Gas;
 
 contract("Testing Treasury",function(accounts){
     var certPoolManager;
-    var certisToken;
+    var certisTokenProxy;
     var publicCertPool;
     var Treasury;
     // used addresses
@@ -74,11 +74,9 @@ contract("Testing Treasury",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        certisToken = contracts[1];
-        let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, _publicCertPoolAddress);  
-        Treasury = new web3.eth.Contract(TreasuryAbi, _treasuryAddress);
+        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][0]);
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);   
+        Treasury = new web3.eth.Contract(TreasuryAbi, contracts[1][2]);
     });
 
     async function SendingNewProviders(){
@@ -87,12 +85,12 @@ contract("Testing Treasury",function(accounts){
         await pool_common.ValidatingProviders(publicCertPool, PublicOwners, provider_1, provider_2, user_1);
     }
 
-    async function SplitTokenSupply(){
-        await certisToken.transfer(tokenOwner_1, (TotalTokenSupply / 5), {from: chairPerson});
-        await certisToken.transfer(tokenOwner_2, (TotalTokenSupply / 5), {from: chairPerson});
-        await certisToken.transfer(tokenOwner_3, (TotalTokenSupply / 5), {from: chairPerson});
-        await certisToken.transfer(tokenOwner_4, (TotalTokenSupply / 5), {from: chairPerson});
-        await certisToken.transfer(tokenOwner_5, (TotalTokenSupply / 5), {from: chairPerson});
+    async function SplitTokenSupply(CT){
+        await CT.methods.transfer(tokenOwner_1, (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await CT.methods.transfer(tokenOwner_2, (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await CT.methods.transfer(tokenOwner_3, (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await CT.methods.transfer(tokenOwner_4, (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await CT.methods.transfer(tokenOwner_5, (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
     }
 
     async function checkPrices(_pp, _prp, _cp, _orp){
@@ -163,7 +161,7 @@ contract("Testing Treasury",function(accounts){
 
     it("Vote/Propose/cancel Configuration WRONG",async function(){
         // act
-        await SplitTokenSupply();
+        await SplitTokenSupply(certisTokenProxy);
         try{
             await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
             expect.fail();
@@ -235,7 +233,7 @@ contract("Testing Treasury",function(accounts){
 
     it("Update Price Configuration CORRECT",async function(){
         // act
-        await SplitTokenSupply();
+        await SplitTokenSupply(certisTokenProxy);
 
         // Rejected 
 
@@ -288,7 +286,7 @@ contract("Testing Treasury",function(accounts){
 
     it("Update Prop Configuration CORRECT",async function(){
          // act
-         await SplitTokenSupply();
+         await SplitTokenSupply(certisTokenProxy);
 
         // Rejected
          await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
@@ -368,8 +366,8 @@ contract("Testing Treasury",function(accounts){
 
     it("Pay New Proposal & New Pool & New Certificate CORRECT",async function(){
         // act
-        var CertisTokenBalance = (new BigNumber(await certisToken.balanceOf(chairPerson))).dividedBy(2);
-        await certisToken.transfer(user_1, CertisTokenBalance.toNumber());
+        var CertisTokenBalance = (new BigNumber(await certisTokenProxy.methods.balanceOf(chairPerson).call({from: chairPerson, gas: Gas}))).dividedBy(2);
+        await certisTokenProxy.methods.transfer(user_1, CertisTokenBalance.toNumber()).send({from: chairPerson, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei + 1, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(1).send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
