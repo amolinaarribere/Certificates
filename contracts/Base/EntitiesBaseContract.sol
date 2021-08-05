@@ -8,47 +8,36 @@ pragma experimental ABIEncoderV2;
  * @dev Store & retrieve value in a variable
  */
 
- import "../Libraries/Library.sol";
- import "../Libraries/AddressLibrary.sol";
+import "../Libraries/Library.sol";
+import "../Libraries/AddressLibrary.sol";
+import "../Libraries/ItemsLibrary.sol";
 
-contract EntitiesBaseContract{
+abstract contract EntitiesBaseContract{
     using Library for *;
     using AddressLibrary for *;
+    using ItemsLibrary for *;
 
-    //Actions that can be performed on entities
-    enum Actions{
-        Add,
-        Remove
-    }
+    //EVENTS 
+    event _AddEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
+    event _RemoveEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
+    event _AddEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
+    event _RemoveEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
 
-    //Structures
-    struct _entityIdentity{
-        bool _activated;
-        string _Info;
-        address[] _AddValidated;
-        address[] _RemoveValidated;
-    }
-
-    struct _entityStruct{
-        mapping(address => _entityIdentity) _entities;
-        address[] _activatedEntities;
-        address[] _pendingEntitiesAdd;
-        address[] _pendingEntitiesRemove;
-    }
-
-    //events
-    event _AddEntityValidationIdEvent(string, address);
-    event _RemoveEntityValidationIdEvent(string, address);
-
+    // DATA
     // owners
     uint _ownerId;
     uint256 _minOwners;
 
     // Total Owners and other Entities
-    _entityStruct[] _Entities;
+    ItemsLibrary._ItemsStruct[] _Entities;
     string[] _entitiesLabel;
 
-    // modifiers
+    // MODIFIERS
+    modifier isSomeoneSpecific(address someone){
+        require(true == Library.ItIsSomeone(someone), "EC8");
+        _;
+    }
+    
     modifier isIdCorrect(uint Id, uint length){
         require(true == Library.IdCorrect(Id, length), "EC1");
         _;
@@ -58,15 +47,10 @@ contract EntitiesBaseContract{
         require(true == isEntity(msg.sender, _ownerId), "EC9");
         _;
     }
-
-    modifier isAnOwnerOrHimself(address entity){
-        require(true == isEntity(msg.sender, _ownerId) || msg.sender == entity, "EC10");
-        _;
-    }
-
-    modifier HasNotAlreadyVoted(Actions action, _entityIdentity memory Entity){
-        if(Actions.Add == action) require(false == AddressLibrary.FindAddress(msg.sender, Entity._AddValidated), "EC5");
-        else require(false == AddressLibrary.FindAddress(msg.sender, Entity._RemoveValidated), "EC5");
+    
+    modifier HasNotAlreadyVoted(address entity, uint listId){
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        require(false == ItemsLibrary.hasVoted(msg.sender, entityInBytes, _Entities[listId]), "EC5");
         _;
     }
     
@@ -76,86 +60,140 @@ contract EntitiesBaseContract{
         _;
     }
 
-    // Entities functions
-    function addEntity(address entity, string memory entityInfo, uint listId) internal 
+    modifier isEntityPending(bool YesOrNo, address entity, uint listId){
+        if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId) && 
+                                    false == isEntityPendingToRemoved(entity, listId), "EC27");
+        else require(true == isEntityPendingToAdded(entity, listId) || 
+                    true == isEntityPendingToRemoved(entity, listId), "EC28");
+        _;
+    }
+
+    modifier isEntityPendingToAdd(bool YesOrNo, address entity, uint listId){
+        if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId), "EC27");
+        else require(true == isEntityPendingToAdded(entity, listId), "EC28");
+        _;
+    }
+
+    modifier isEntityPendingToRemove(bool YesOrNo, address entity, uint listId){
+        if(false == YesOrNo) require(false == isEntityPendingToRemoved(entity, listId), "EC27");
+        else require(true == isEntityPendingToRemoved(entity, listId), "EC28");
+        _;
+    }
+
+    // FUNCTIONALITY
+    function addEntity(address entity, string calldata entityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
-        isAnOwner 
+        isAnOwner
         isEntityActivated(false, entity, listId) 
-        HasNotAlreadyVoted(Actions.Add, _Entities[listId]._entities[entity])
-    {
-        if(0 == _Entities[listId]._entities[entity]._AddValidated.length){
-            _Entities[listId]._entities[entity]._Info = entityInfo;
-            _Entities[listId]._pendingEntitiesAdd.push(entity);
-        } 
-
-        _Entities[listId]._entities[entity]._AddValidated.push(msg.sender);
-
-        if(Library.CheckValidations(_Entities[listId]._entities[entity]._AddValidated.length, _minOwners)){
-            _Entities[listId]._entities[entity]._activated = true; 
-            _Entities[listId]._activatedEntities.push(entity);
-            _Entities[listId]._pendingEntitiesAdd = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesAdd), _Entities[listId]._pendingEntitiesAdd);
-
-            emit _AddEntityValidationIdEvent(_entitiesLabel[listId], entity);
-        }
+        isEntityPendingToAdd(false, entity, listId)
+    { 
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, entityInfo, _minOwners, _entitiesLabel[listId], listIdArray, true);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
+        ItemsLibrary.addItem(manipulateItemStruct, itemsstruct, address(this));
     }
 
     function removeEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
-        isAnOwnerOrHimself(entity) 
+        isAnOwner
         isEntityActivated(true, entity, listId)
-        HasNotAlreadyVoted(Actions.Remove, _Entities[listId]._entities[entity])
+        isEntityPendingToRemove(false, entity, listId)
     {
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
+        ItemsLibrary.removeItem(manipulateItemStruct, itemsstruct, address(this));
+    }
 
-        if(0 == _Entities[listId]._entities[entity]._RemoveValidated.length){
-            _Entities[listId]._pendingEntitiesRemove.push(entity);
-        } 
+    function validateEntity(address entity, uint listId) internal 
+        isIdCorrect(listId, _Entities.length) 
+        isAnOwner 
+        isEntityPending(true, entity, listId)
+        HasNotAlreadyVoted(entity, listId)
+    {
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
+        ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct, address(this));
+    }
 
-        _Entities[listId]._entities[entity]._RemoveValidated.push(msg.sender);
-
-        if(msg.sender == entity || Library.CheckValidations(_Entities[listId]._entities[entity]._RemoveValidated.length, _minOwners)){
-            _Entities[listId]._activatedEntities = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._activatedEntities), _Entities[listId]._activatedEntities);
-            _Entities[listId]._pendingEntitiesRemove = AddressLibrary.AddressArrayRemoveResize(AddressLibrary.FindAddressPosition(entity, _Entities[listId]._pendingEntitiesRemove), _Entities[listId]._pendingEntitiesRemove);
-            delete(_Entities[listId]._entities[entity]);
-            emit _RemoveEntityValidationIdEvent(_entitiesLabel[listId], entity);
-        }  
-       
+    function rejectEntity(address entity, uint listId) internal 
+        isIdCorrect(listId, _Entities.length) 
+        isAnOwner 
+        isEntityPending(true, entity, listId)
+        HasNotAlreadyVoted(entity, listId)
+    {
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        uint[] memory listIdArray = new uint[](1);
+        listIdArray[0] = listId;
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _Entities[listId];
+        ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct, address(this)); 
     }
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
     view returns (string memory, bool) 
     {
-        return (_Entities[listId]._entities[entity]._Info, isEntity(entity, listId));
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        return ItemsLibrary.retrieveItem(entityInBytes, _Entities[listId]);
     }
 
     function retrieveAllEntities(uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
     view returns (address[] memory) 
     {
-        return _Entities[listId]._activatedEntities;
+        return AddressLibrary.BytesArrayToAddress(ItemsLibrary.retrieveAllItems(_Entities[listId]));
     }
 
     function isEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
-    view returns (bool){
-        return _Entities[listId]._entities[entity]._activated;
+    view returns (bool)
+    {
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        return ItemsLibrary.isItem(entityInBytes, _Entities[listId]);
+    }
+
+    function isEntityPendingToAdded(address entity, uint listId) internal 
+        isIdCorrect(listId, _Entities.length)
+    view returns (bool)
+    {
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        return ItemsLibrary.isItemPendingToAdded(entityInBytes,_Entities[listId]);
+    }
+
+    function isEntityPendingToRemoved(address entity, uint listId) internal 
+        isIdCorrect(listId, _Entities.length)
+    view returns (bool)
+    {
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        return ItemsLibrary.isItemPendingToRemoved(entityInBytes, _Entities[listId]);
     }
 
     function retrievePendingEntities(bool addORemove, uint listId) internal 
          isIdCorrect(listId, _Entities.length)
-    view returns (address[] memory, string[] memory){
-        address[] memory Entities;
-
-        if(addORemove) Entities = _Entities[listId]._pendingEntitiesAdd;
-        else Entities = _Entities[listId]._pendingEntitiesRemove;
-
-        string[] memory Entities_Info = new string[](_Entities.length);
-
-        for(uint i=0; i < Entities.length; i++){
-            (Entities_Info[i],) = retrieveEntity(Entities[i], listId);
-        }
-        
-        return(Entities, Entities_Info);
+    view returns (address[] memory, string[] memory)
+    {
+        bytes32[] memory EntitiesInBytes;
+        string[] memory EntitiesInfo;
+        (EntitiesInBytes, EntitiesInfo) = ItemsLibrary.retrievePendingItems(addORemove, _Entities[listId]);
+        return(AddressLibrary.BytesArrayToAddress(EntitiesInBytes) , EntitiesInfo);
     }
+
+    // CALLBACKS
+
+    function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
+        isSomeoneSpecific(address(this))
+    {}
+
+    function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
+        isSomeoneSpecific(address(this))
+    {}
 
 }

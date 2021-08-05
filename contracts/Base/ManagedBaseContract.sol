@@ -8,23 +8,29 @@ pragma experimental ABIEncoderV2;
  * @dev Store & retrieve value in a variable
  */
 
- import "../Libraries/Library.sol";
+import "../Libraries/Library.sol";
+import "../Interfaces/IProxyManager.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ManagedBaseContract{
+contract ManagedBaseContract is Initializable{
     using Library for *;
 
-    // manager contract
-    address _managerContract;
+    // DATA
+    IProxyManager _managerContract;
 
-    // modifiers
+    // MODIFIERS
      modifier isFromManagerContract(){
-        require(true == Library.ItIsSomeone(_managerContract), "EC8");
+        require(true == Library.ItIsSomeone(address(_managerContract)), "EC8");
         _;
     }
 
-    // constructor
-    constructor(address managerContractAddress) {
+    // CONSTRUCTOR
+    /*constructor(address managerContractAddress) {
         _managerContract = managerContractAddress;
+    }*/
+
+    function ManagedBaseContract_init(address managerContractAddress) internal initializer {
+        _managerContract = IProxyManager(managerContractAddress);
     }
 
 }

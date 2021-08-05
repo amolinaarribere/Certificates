@@ -11,6 +11,8 @@ var PrivateCertificatesAbi = PrivateCertificates.abi;
 const CertisToken = artifacts.require("CertisToken");
 var CertisTokenAbi = CertisToken.abi;
 const Library = artifacts.require("./Libraries/Library");
+const PrivatePoolGenerator = artifacts.require("PrivatePoolGenerator");
+const PrivatePoolGeneratorAbi = PrivatePoolGenerator.abi;
 
 
 const PublicPriceWei = constants.PublicPriceWei;
@@ -24,10 +26,8 @@ const Gas = constants.Gas;
 
 contract("Testing Private Pool",function(accounts){
     var certPoolManager;
-    var certisToken;
     var privateCertPool;
     var publicPool;
-    var treasury;
     var privatePoolGenerator;
     // used addresses
     const chairPerson = accounts[0];
@@ -45,13 +45,11 @@ contract("Testing Private Pool",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        certisToken = contracts[1];
-        treasury = contracts[3];
-        privatePoolGenerator = contracts[4];
-        await privatePoolGenerator.createPrivateCertificatesPool(PrivateOwners, minOwners, {from: user_1, value: PrivatePriceWei});
-        let response = await privatePoolGenerator.retrievePrivateCertificatesPool(0, {from: user_1});
+        privatePoolGeneratorProxy = new web3.eth.Contract(PrivatePoolGeneratorAbi, contracts[1][3]);
+        await privatePoolGeneratorProxy.methods.createPrivateCertificatesPool(PrivateOwners, minOwners).send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
+        let response = await privatePoolGeneratorProxy.methods.retrievePrivateCertificatesPool(0).call({from: user_1}, function(error, result){});
         const {0: creator, 1: privateCertPoolAddress} = response;
-        privateCertPool = new web3.eth.Contract(PrivateCertificatesAbi, privateCertPoolAddress);  
+        privateCertPool = new web3.eth.Contract(PrivateCertificatesAbi, privateCertPoolAddress); 
     });
 
     // ****** TESTING Adding Owners ***************************************************************** //
@@ -60,8 +58,12 @@ contract("Testing Private Pool",function(accounts){
         await pool_common.AddOwnerWrong(privateCertPool, PrivateOwners, extra_owner, user_1);
     });
 
-    it("Add Owner CORRECT",async function(){
+    it("Add Owner CORRECT 1",async function(){
         await pool_common.AddOwnerCorrect(privateCertPool, PrivateOwners, extra_owner, user_1);
+    });
+
+    it("Add Owner CORRECT 2",async function(){
+        await pool_common.AddOwnerCorrect2(privateCertPool, PrivateOwners, extra_owner, user_1);
     });
 
     // ****** TESTING Removing Owner ***************************************************************** //
@@ -70,8 +72,12 @@ contract("Testing Private Pool",function(accounts){
         await pool_common.RemoveOwnerWrong(privateCertPool, PrivateOwners, provider_3, user_1);
     });
 
-    it("Removing Owner CORRECT",async function(){
+    it("Removing Owner CORRECT 1",async function(){
         await pool_common.RemoveOwnerCorrect(privateCertPool, PrivateOwners, user_1);
+    });
+
+    it("Removing Owner CORRECT 2",async function(){
+        await pool_common.RemoveOwnerCorrect2(privateCertPool, PrivateOwners, user_1);
     });
 
     // ****** TESTING Adding Provider ***************************************************************** //
@@ -80,8 +86,12 @@ contract("Testing Private Pool",function(accounts){
         await pool_common.AddProviderWrong(privateCertPool, PrivateOwners, provider_1, user_1, true);
     });
 
-    it("Add Provider CORRECT",async function(){
+    it("Add Provider CORRECT 1",async function(){
         await pool_common.AddProviderCorrect(privateCertPool, PrivateOwners, provider_1, provider_2, user_1);
+    });
+
+    it("Add Provider CORRECT 2",async function(){
+        await pool_common.AddProviderCorrect2(privateCertPool, PrivateOwners, provider_1, provider_2, user_1);
     });
 
     // ****** TESTING Removing Provider ***************************************************************** //
@@ -90,8 +100,12 @@ contract("Testing Private Pool",function(accounts){
         await pool_common.RemoveProviderWrong(privateCertPool, PrivateOwners, provider_1, provider_2, provider_3, user_1, true);
     });
 
-    it("Removing Provider CORRECT",async function(){
+    it("Removing Provider CORRECT 1",async function(){
         await pool_common.RemoveProviderCorrect(privateCertPool, PrivateOwners, provider_1, provider_2, user_1, true);
+    });
+
+    it("Removing Provider CORRECT 2",async function(){
+        await pool_common.RemoveProviderCorrect2(privateCertPool, PrivateOwners, provider_1, provider_2, user_1, true);
     });
 
     // ****** TESTING Adding Certificate ***************************************************************** //
@@ -104,15 +118,14 @@ contract("Testing Private Pool",function(accounts){
         await pool_common.AddCertificateCorrect(privateCertPool, PrivateOwners, provider_1, provider_2, holder_1, holder_2, user_1, true);
     });
 
-    // ****** TESTING Removing Certificate ***************************************************************** //
+    // ****** TESTING callbacks ***************************************************************** //
 
-    it("Removing Certificate WRONG",async function(){
-        await pool_common.RemoveCertificateWrong(privateCertPool, PrivateOwners, provider_1, provider_2, holder_1, holder_2, user_1, true);
+    it("on Item Validated WRONG",async function(){
+        await pool_common.onItemValidatedWrong(privateCertPool, user_1);
     });
 
-    it("Removing Certificate CORRECT",async function(){
-        await pool_common.RemoveCertificateCorrect(privateCertPool, PrivateOwners, provider_1, provider_2, holder_1, holder_2, user_1, true);
+    it("on Item Rejected WRONG",async function(){
+        await pool_common.onItemRejectedWrong(privateCertPool,  user_1);
     });
- 
 
 });

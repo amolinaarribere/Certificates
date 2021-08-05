@@ -25,7 +25,7 @@ library UintLibrary{
         return BytesArrayToUint(Library.ArrayRemoveResize(index, UintArrayToBytes(array)));
     }
 
-    function UintArrayToBytes(uint[] memory array) internal pure returns(bytes32[] memory){
+    function UintArrayToBytes(uint[] memory array) public pure returns(bytes32[] memory){
         bytes32[] memory arrayInBytes = new bytes32[](array.length);
 
         for(uint i=0; i < arrayInBytes.length; i++){
@@ -35,11 +35,11 @@ library UintLibrary{
         return arrayInBytes;
     }
 
-    function UintToBytes(uint element) internal pure returns(bytes32){
+    function UintToBytes(uint element) public pure returns(bytes32){
         return bytes32(element);
     }
 
-    function BytesArrayToUint(bytes32[] memory array) internal pure returns(uint[] memory){
+    function BytesArrayToUint(bytes32[] memory array) public pure returns(uint[] memory){
         uint[] memory arrayInUint = new uint[](array.length);
 
         for(uint i=0; i < arrayInUint.length; i++){
@@ -49,11 +49,11 @@ library UintLibrary{
         return arrayInUint;
     }
 
-    function BytesToUint(bytes32 element) internal pure returns(uint){
+    function BytesToUint(bytes32 element) public pure returns(uint){
         return uint256(element);
     }
 
-    function UintToString(uint element) internal pure returns(string memory){
+    function UintToString(uint element) public pure returns(string memory){
         return Library.BytesToString(UintToBytes(element));
     }
 

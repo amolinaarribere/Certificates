@@ -7,18 +7,24 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import "../CertisToken.sol";
+ import "../DeployedContracts/CertisToken.sol";
  import "../Libraries/AddressLibrary.sol";
  import "../Libraries/Library.sol";
+ import "./ManagedBaseContract.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract TokenGovernanceBaseContract {
+abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContract {
     using Library for *;
     using AddressLibrary for *; 
 
+    // DATA
+    // chair person
     address _chairperson;
 
-    CertisToken _CertisToken;
+    // Token contract
+    //CertisToken _CertisToken;
 
+    // Proposition Structure
     struct PropositionStruct{
         address Proposer;
         uint256 DeadLine;
@@ -30,12 +36,13 @@ contract TokenGovernanceBaseContract {
         address[] AlreadyVoted;
     }
 
-    PropositionStruct Proposition;
+    PropositionStruct _Proposition;
 
     uint _PropositionLifeTime;
     uint8 _PropositionThresholdPercentage;
     uint8 _minWeightToProposePercentage;
 
+    // Proposition to change Prop parameters
     struct ProposedPropositionStruct{
         uint256 NewPropositionLifeTime;
         uint8 NewPropositionThresholdPercentage;
@@ -46,8 +53,7 @@ contract TokenGovernanceBaseContract {
 
     bool _currentPropisProp;
     
-    // modifiers
-
+    // MODIFIERS
     modifier isFromChairPerson(){
         require(true == Library.ItIsSomeone(_chairperson), "EC8");
         _;
@@ -59,12 +65,12 @@ contract TokenGovernanceBaseContract {
     }
 
     modifier isAuthorizedToCancel(){
-        require(msg.sender == Proposition.Proposer, "EC22");
+        require(msg.sender == _Proposition.Proposer, "EC22");
         _;
     }
 
     modifier canVote(){
-        require(true == AuthorizedToVote(msg.sender, Proposition.listOfAdmins), "EC23");
+        require(true == AuthorizedToVote(msg.sender, _Proposition.listOfAdmins), "EC23");
          _;
     }
 
@@ -75,7 +81,7 @@ contract TokenGovernanceBaseContract {
     }
 
     modifier HasNotAlreadyVoted(){
-        require(false == AddressLibrary.FindAddress(msg.sender, Proposition.AlreadyVoted), "EC5");
+        require(false == AddressLibrary.FindAddress(msg.sender, _Proposition.AlreadyVoted), "EC5");
         _;
     }
 
@@ -86,7 +92,6 @@ contract TokenGovernanceBaseContract {
     }
 
     // auxiliairy function
-
     function AuthorizedToPropose(address add) internal view returns(bool) {
         if(msg.sender == _chairperson) return true;
         else 
@@ -111,27 +116,31 @@ contract TokenGovernanceBaseContract {
     }
 
     function GetAdminList() internal view returns(address[] memory){
-        (address[] memory list, ) = _CertisToken.TokenOwners();
+        (address[] memory list, ) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return list;
     }
 
     function GetAdminWeights() internal view returns(uint256[] memory){
-        (, uint256[] memory weights) = _CertisToken.TokenOwners();
+        (, uint256[] memory weights) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return weights;
     }
 
+    function GetTokenOwners() internal view returns(address[] memory, uint256[] memory){
+        return CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+    }
+
     function totalSupply() internal view returns(uint256){
-        return _CertisToken.totalSupply();
+        return CertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
     }
 
     function CheckIfPropostiionActive() internal returns(bool){
-        if(block.timestamp < Proposition.DeadLine)
+        if(block.timestamp < _Proposition.DeadLine)
         {
             return true;
         }
         else 
         {
-            if(address(0) != Proposition.Proposer){
+            if(address(0) != _Proposition.Proposer){
                 propositionExpired();
                 InternalCancelProposition();
             } 
@@ -139,14 +148,19 @@ contract TokenGovernanceBaseContract {
         }
     }
 
-    // constructor
-    constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
+    // CONSTRUCTOR
+    /*constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
         _chairperson = msg.sender; 
+        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
+    }*/
+
+    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {
+        super.ManagedBaseContract_init(managerContractAddress);
+        _chairperson = chairperson; 
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
     
-    // updates prop values
-
+    // Manage Prop Parameters
     function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external
     {
         InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);
@@ -174,19 +188,18 @@ contract TokenGovernanceBaseContract {
         return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
-    // functions
-
+    // FUNCTIONALITY
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
         isAuthorizedToPropose()
     {
-        Proposition.listOfAdmins = GetAdminList();
-        require(0 < Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
+        _Proposition.listOfAdmins = GetAdminList();
+        require(0 < _Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
 
-        Proposition.Proposer = msg.sender;
-        Proposition.DeadLine = _DeadLine;
-        Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
-        Proposition.AdminsWeight = GetAdminWeights();
+        _Proposition.Proposer = msg.sender;
+        _Proposition.DeadLine = _DeadLine;
+        _Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
+        _Proposition.AdminsWeight = GetAdminWeights();
     }
 
     function cancelProposition() external
@@ -201,15 +214,15 @@ contract TokenGovernanceBaseContract {
         canVote()
         HasNotAlreadyVoted()
     {
-        if(block.timestamp < Proposition.DeadLine)
+        if(block.timestamp < _Proposition.DeadLine)
         {
-            Proposition.AlreadyVoted.push(msg.sender);
+            _Proposition.AlreadyVoted.push(msg.sender);
 
             if(vote){
-                Proposition.VotesFor += Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
+                _Proposition.VotesFor += _Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
             }
             else{
-                Proposition.VotesAgainst += Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
+                _Proposition.VotesAgainst += _Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
             }
 
             checkProposition();
@@ -229,7 +242,7 @@ contract TokenGovernanceBaseContract {
 
     function checkProposition() internal
     {
-        if(Proposition.VotesFor > Proposition.validationThreshold) 
+        if(_Proposition.VotesFor > _Proposition.validationThreshold) 
         {
             if(_currentPropisProp){
                 _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;
@@ -242,7 +255,7 @@ contract TokenGovernanceBaseContract {
             }
             InternalCancelProposition();
         }
-        else if(Proposition.VotesAgainst > Proposition.validationThreshold)
+        else if(_Proposition.VotesAgainst > _Proposition.validationThreshold)
         {
             if(_currentPropisProp){
                 removePropositionProp();
@@ -262,18 +275,18 @@ contract TokenGovernanceBaseContract {
 
     function InternalCancelProposition() internal
     {
-        delete(Proposition);
+        delete(_Proposition);
     }
 
     function retrievePropositionStatus() external view returns(address, uint256, uint256, uint256, uint256, address[] memory, uint256[] memory, address[] memory){
-        return (Proposition.Proposer,
-            Proposition.DeadLine,
-            Proposition.validationThreshold,
-            Proposition.VotesFor,
-            Proposition.VotesAgainst,
-            Proposition.listOfAdmins,
-            Proposition.AdminsWeight,
-            Proposition.AlreadyVoted
+        return (_Proposition.Proposer,
+            _Proposition.DeadLine,
+            _Proposition.validationThreshold,
+            _Proposition.VotesFor,
+            _Proposition.VotesAgainst,
+            _Proposition.listOfAdmins,
+            _Proposition.AdminsWeight,
+            _Proposition.AlreadyVoted
         );
     }
 

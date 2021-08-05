@@ -24,17 +24,12 @@ library Library{
         return (length > Id);
     }
 
-    function CheckValidations(uint256 signatures, uint256 minSignatures) internal pure returns(bool){
-        if(signatures < minSignatures) return false;
-        return true;
-    }
-
-    function ItIsSomeone(address someone) internal view returns(bool){
+    function ItIsSomeone(address someone) public view returns(bool){
         if(msg.sender == someone) return true;
         return false;
     }
 
-    function FindPosition(bytes32 data, bytes32[] memory list) internal pure returns (uint){
+    function FindPosition(bytes32 data, bytes32[] memory list) public pure returns (uint){
         for(uint i=0; i < list.length; i++){
             if(data == list[i]) return i;
         }
@@ -56,7 +51,7 @@ library Library{
         return newArray;
     }
 
-    function BytesToString(bytes32 element) internal pure returns(string memory){
+    function BytesToString(bytes32 element) public pure returns(string memory){
         return string(abi.encodePacked(element));
     }
     
