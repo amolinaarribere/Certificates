@@ -21,7 +21,7 @@ pragma experimental ABIEncoderV2;
     using AddressLibrary for *;
     using ItemsLibrary for *;
 
-    // DATA
+    // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;
 
     // Owners
@@ -51,7 +51,7 @@ pragma experimental ABIEncoderV2;
     // Provider
     string _ProviderInfo;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isAPool(address pool){
         require(true == isPool(pool));
         _;
@@ -88,7 +88,7 @@ pragma experimental ABIEncoderV2;
         _;
     }
 
-     // CONSTRUCTOR
+     // CONSTRUCTOR /////////////////////////////////////////
     function Provider_init(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) public initializer 
     {
         _Label = new string[](2);
@@ -99,7 +99,7 @@ pragma experimental ABIEncoderV2;
         _ProviderInfo = ProviderInfo;
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
         addEntity(pool, poolInfo, _poolId);
         if(false == _submited[pool]){
@@ -238,10 +238,9 @@ pragma experimental ABIEncoderV2;
         return ItemsLibrary.isItemPendingToRemoved(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
     }
 
-    
     receive() external override payable{}
 
-    // CALLBACKS
+    // CALLBACKS /////////////////////////////////////////
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public override  
     {
         super.onItemValidated(item, ids, addOrRemove);

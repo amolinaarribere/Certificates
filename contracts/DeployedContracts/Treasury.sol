@@ -54,7 +54,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         if(Library.Prices.NewProvider == price) minPrice = _PublicPriceWei;
         else if(Library.Prices.NewPool == price) minPrice = _PrivatePriceWei;
         else if(Library.Prices.NewCertificate == price) minPrice = _CertificatePriceWei;
-        else if(Library.Prices.NewProviderContract == price) minPrice = _ProviderPriceWei;
+        else minPrice = _ProviderPriceWei;
 
         require(msg.value >= minPrice, "EC2");
         _;
