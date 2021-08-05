@@ -24,8 +24,9 @@ const Gas = constants.Gas;
 
 contract("Testing Provider",function(accounts){
     var certPoolManager;
-    var certisToken;
-    var publicCertPool;
+    //var certisToken;
+    //var publicCertPool;
+    var publicPoolProxy;
     var publicCertPoolAddress;
     const randomPoolAddress = accounts[0];
     var provider;
@@ -54,23 +55,24 @@ contract("Testing Provider",function(accounts){
         // Public Pool creation and provider subscription
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        certisToken = contracts[1];
-        publicCertPool = contracts[2];
+        //certisToken = contracts[1];
+        //publicCertPool = contracts[2];
+        publicPoolProxy = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);
         provider = await Provider.new(ProviderOwners, minOwners, provider_1_Info, {from: user_1, value: (2 * CertificatePriceWei) + PublicPriceWei});
-        let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
-        publicCertPoolAddress = _publicCertPoolAddress;
+        //let result = await certPoolManager.retrieveConfiguration({from: user_1});
+        //const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
+        publicCertPoolAddress = publicPoolProxy._address;
         providerContract = new web3.eth.Contract(ProviderAbi, provider.address);
     });
 
     async function AddProvider(){
-        await publicCertPool.addProvider(provider.address, provider_1_Info, {from: user_1, value: PublicPriceWei, gas: Gas});
+        await publicPoolProxy.methods.addProvider(provider.address, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await ValidateProvider();
     }
 
     async function ValidateProvider(){
-        await publicCertPool.validateProvider(provider.address, {from: PublicOwners[0], gas: Gas});
-        await publicCertPool.validateProvider(provider.address, {from: PublicOwners[1], gas: Gas});
+        await publicPoolProxy.methods.validateProvider(provider.address).send({from: PublicOwners[0], gas: Gas}, function(error, result){});
+        await publicPoolProxy.methods.validateProvider(provider.address).send({from: PublicOwners[1], gas: Gas}, function(error, result){});
     }
 
     async function SubscribingToPublicPool(validateOrreject){
