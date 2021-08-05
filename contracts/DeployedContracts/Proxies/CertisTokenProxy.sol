@@ -12,17 +12,13 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract CertisTokenProxy is ERC1967Proxy{
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier ifAdmin() {
         require(msg.sender == _getAdmin(), "EC8"); 
         _;
     }
 
-    // CONSTRUCTOR
-    /*constructor(address CertisCodeContractAddress, address managerContractAddress, bytes memory data)
-        TransparentUpgradeableProxy(CertisCodeContractAddress, managerContractAddress, data) 
-    {}*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     constructor(address CertisCodeContractAddress, address managerContractAddress, bytes memory data)
         ERC1967Proxy(CertisCodeContractAddress, data)
     {

@@ -15,20 +15,16 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract ManagedBaseContract is Initializable{
     using Library for *;
 
-    // DATA
+    // DATA /////////////////////////////////////////
     IProxyManager _managerContract;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
      modifier isFromManagerContract(){
         require(true == Library.ItIsSomeone(address(_managerContract)), "EC8");
         _;
     }
 
-    // CONSTRUCTOR
-    /*constructor(address managerContractAddress) {
-        _managerContract = managerContractAddress;
-    }*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function ManagedBaseContract_init(address managerContractAddress) internal initializer {
         _managerContract = IProxyManager(managerContractAddress);
     }

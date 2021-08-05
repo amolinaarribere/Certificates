@@ -19,7 +19,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using Library for *;
     using UintLibrary for *;
 
-    // DATA
+    // DATA /////////////////////////////////////////
     // proposition to change prices
     struct ProposedPricesStruct{
         uint NewPublicPriceWei;
@@ -45,7 +45,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     
     mapping(address => _BalanceStruct) _balances;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier areFundsEnough(Library.Prices price){
         uint256 minPrice = 2**256 - 1;
 
@@ -73,14 +73,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
     
-    // CONSTRUCTOR
-    /*constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
-    TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
-    ManagedBaseContract(managerContractAddress)
-    {
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
-    }*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
     {
         super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, managerContractAddress);
@@ -89,7 +82,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
 
-    // GOVERNANCE 
+    // GOVERNANCE /////////////////////////////////////////
     function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
     {
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
@@ -149,15 +142,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return proposition;
     }
 
-    // FUNCTIONALITY
-    /*function updateContracts(address PublicPoolAddressProxy, address CertisTokenAddressProxy) external 
-        isFromManagerContract()
-    override
-    {
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddressProxy);
-        _CertisToken = CertisToken(CertisTokenAddressProxy); 
-    }*/
-
+    // FUNCTIONALITY /////////////////////////////////////////
     function pay(Library.Prices price) external 
         areFundsEnough(price)
     override payable

@@ -15,17 +15,11 @@ import "../Libraries/AddressLibrary.sol";
 
     using AddressLibrary for *;
 
-    // DATA
+    // DATA /////////////////////////////////////////
     address[] _tokenOwners;
     uint8 _decimals;
 
-    // CONSTRUCTOR
-   /* constructor(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) ERC20(name, symbol){
-        _tokenOwners = new address[](0);
-        _decimals = decimalsValue;
-        _mint(msg.sender, MaxSupply);
-    }*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function CertisToken_init(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) public initializer {
         super.__ERC20_init(name, symbol);
         _tokenOwners = new address[](0);
@@ -33,7 +27,7 @@ import "../Libraries/AddressLibrary.sol";
         _mint(msg.sender, MaxSupply);
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     function decimals() public view override returns (uint8) {
         return _decimals;
     }

@@ -17,12 +17,9 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     using Library for *;
     using AddressLibrary for *; 
 
-    // DATA
+    // DATA /////////////////////////////////////////
     // chair person
     address _chairperson;
-
-    // Token contract
-    //CertisToken _CertisToken;
 
     // Proposition Structure
     struct PropositionStruct{
@@ -53,7 +50,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
 
     bool _currentPropisProp;
     
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isFromChairPerson(){
         require(true == Library.ItIsSomeone(_chairperson), "EC8");
         _;
@@ -148,12 +145,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         }
     }
 
-    // CONSTRUCTOR
-    /*constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
-        _chairperson = msg.sender; 
-        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
-    }*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {
         super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson; 
@@ -188,7 +180,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
         isAuthorizedToPropose()

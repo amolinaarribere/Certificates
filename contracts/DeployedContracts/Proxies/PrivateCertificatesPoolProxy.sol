@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 contract PrivateCertificatesPoolProxy is BeaconProxy{
 
-    // CONSTRUCTOR
+    // CONSTRUCTOR /////////////////////////////////////////
     constructor(address BeaconAddress, bytes memory data)
         BeaconProxy(BeaconAddress, data) 
     {}

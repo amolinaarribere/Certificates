@@ -14,11 +14,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigContract {
     
-    // EVENTS
+    // EVENTS /////////////////////////////////////////
     event _AddCertificateIdEvent(address, address);
     event _RemoveCertificateIdEvent(address, address);
 
-    // DATA
+    // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;
 
     // Owners
@@ -39,7 +39,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
     
     mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isAProvider(){
         require(true == isProvider(msg.sender), "EC12");
         _;
@@ -60,12 +60,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         _;
     }
     
-    // CONSTRUCTOR
-    /*constructor(address[] memory owners,  uint256 minOwners) 
-        MultiSigContract(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates)
-    payable
-    {}*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 
     {
         _Label = new string[](2);
@@ -75,7 +70,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); 
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     // Providers CRUD Operations
     function addProvider(address provider, string calldata providerInfo) external override payable virtual
     {
