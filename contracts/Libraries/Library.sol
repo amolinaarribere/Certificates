@@ -11,7 +11,7 @@ pragma experimental ABIEncoderV2;
 library Library{
 
     // enum
-    enum Prices{NewProvider, NewPool, NewCertificate}
+    enum Prices{NewProvider, NewPool, NewCertificate, NewProviderContract}
 
     // modifier
     modifier isIdCorrect(uint Id, uint length){

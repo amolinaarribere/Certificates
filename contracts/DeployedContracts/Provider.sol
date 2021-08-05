@@ -89,13 +89,6 @@ pragma experimental ABIEncoderV2;
     }
 
      // CONSTRUCTOR
-    /*constructor(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) 
-        MultiSigContract(owners, minOwners, _TotalEntities, _Label, _ownerIdProviders)
-    payable
-    {
-        _ProviderInfo = ProviderInfo;
-    }*/
-
     function Provider_init(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) public initializer 
     {
         _Label = new string[](2);

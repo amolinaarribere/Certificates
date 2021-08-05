@@ -25,6 +25,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint NewPublicPriceWei;
         uint NewCertificatePriceWei;
         uint NewPrivatePriceWei;
+        uint NewProviderPriceWei;
         uint NewOwnerRefundPriceWei;
     }
 
@@ -35,6 +36,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     uint _PublicPriceWei;
     uint _CertificatePriceWei;
     uint _PrivatePriceWei;
+    uint _ProviderPriceWei;
     uint _OwnerRefundPriceWei;
 
     // dividends per token owner
@@ -52,6 +54,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         if(Library.Prices.NewProvider == price) minPrice = _PublicPriceWei;
         else if(Library.Prices.NewPool == price) minPrice = _PrivatePriceWei;
         else if(Library.Prices.NewCertificate == price) minPrice = _CertificatePriceWei;
+        else if(Library.Prices.NewProviderContract == price) minPrice = _ProviderPriceWei;
 
         require(msg.value >= minPrice, "EC2");
         _;
@@ -74,26 +77,26 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
+    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
     {
         super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, managerContractAddress);
-        //super.ManagedBaseContract_init(managerContractAddress);
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
     }
 
 
     // GOVERNANCE /////////////////////////////////////////
-    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
+    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
     {
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
     }
 
-    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
+    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
         isPriceOK(PublicPriceWei, OwnerRefundPriceWei)
     {
         if(fromConstructor){
             _PublicPriceWei = PublicPriceWei;
             _PrivatePriceWei = PrivatePriceWei;
+             _ProviderPriceWei = ProviderPriceWei;
             _CertificatePriceWei = CertificatePriceWei;
             _OwnerRefundPriceWei = OwnerRefundPriceWei;
         }
@@ -102,6 +105,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _ProposedPrices.NewPublicPriceWei = PublicPriceWei;
             _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
             _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
+             _ProposedPrices.NewProviderPriceWei = ProviderPriceWei;
             _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
         }
         
@@ -111,6 +115,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     {
         _PublicPriceWei = _ProposedPrices.NewPublicPriceWei;
         _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
+        _ProviderPriceWei = _ProposedPrices.NewProviderPriceWei;
         _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
         _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
         
@@ -134,11 +139,12 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     function retrieveProposition() external override view returns(string[] memory)
     {
-        string[] memory proposition = new string[](4);
+        string[] memory proposition = new string[](5);
         proposition[0] = UintLibrary.UintToString(_ProposedPrices.NewPublicPriceWei);
         proposition[1] = UintLibrary.UintToString(_ProposedPrices.NewPrivatePriceWei);
-        proposition[2] = UintLibrary.UintToString(_ProposedPrices.NewCertificatePriceWei);
-        proposition[3] = UintLibrary.UintToString(_ProposedPrices.NewOwnerRefundPriceWei);
+        proposition[2] = UintLibrary.UintToString(_ProposedPrices.NewProviderPriceWei);
+        proposition[3] = UintLibrary.UintToString(_ProposedPrices.NewCertificatePriceWei);
+        proposition[4] = UintLibrary.UintToString(_ProposedPrices.NewOwnerRefundPriceWei);
         return proposition;
     }
 
@@ -196,9 +202,9 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return checkBalance(addr);
     }
 
-    function retrievePrices() external override view returns(uint, uint, uint, uint)
+    function retrievePrices() external override view returns(uint, uint, uint, uint, uint)
     {
-        return(_PublicPriceWei, _PrivatePriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
+        return(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
     }
 
     function checkBalance(address addr) internal view returns(uint){
