@@ -17,7 +17,7 @@ pragma solidity >=0.7.0 <0.9.0;
  import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 
 
-contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContract{
+contract PrivatePoolFactory is IPoolGenerator, Initializable, ManagedBaseContract{
     using Library for *;
 
      // EVENTS /////////////////////////////////////////
@@ -40,7 +40,7 @@ contract PrivatePoolGenerator is IPoolGenerator, Initializable, ManagedBaseContr
 
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function PrivatePoolGenerator_init(address managerContractAddress) public initializer {
+    function PrivatePoolFactory_init(address managerContractAddress) public initializer {
         super.ManagedBaseContract_init(managerContractAddress);
     }
 

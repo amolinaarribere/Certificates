@@ -10,8 +10,8 @@ const PrivateCertificatesPool = artifacts.require("PrivateCertificatesPool");
 const PrivateCertificatesPoolAbi = PrivateCertificatesPool.abi;
 const CertisToken = artifacts.require("CertisToken");
 const CertisTokenAbi = CertisToken.abi;
-const PrivatePoolGenerator = artifacts.require("PrivatePoolGenerator");
-const PrivatePoolGeneratorAbi = PrivatePoolGenerator.abi;
+const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
+const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 const Library = artifacts.require("./Libraries/Library");
 
 const init = require("../test_libraries/InitializeContracts.js");
@@ -35,11 +35,11 @@ contract("Testing Certificate Pool Manager",function(accounts){
     var certisTokenProxy;
     var publicPoolProxy;
     var treasuryProxy;
-    var privatePoolGeneratorProxy;
+    var privatePoolFactoryProxy;
     var certisToken;
     var publicPool;
     var treasury;
-    var privatePoolGenerator;
+    var privatePoolFactory;
     var privatePool;
     // used addresses
     const chairPerson = accounts[0];
@@ -74,11 +74,11 @@ contract("Testing Certificate Pool Manager",function(accounts){
         certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][0]);
         publicPoolProxy = new web3.eth.Contract(PublicCertificatesPoolAbi, contracts[1][1]);
         treasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][2]);
-        privatePoolGeneratorProxy = new web3.eth.Contract(PrivatePoolGeneratorAbi, contracts[1][3]);
+        privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, contracts[1][3]);
         certisToken = contracts[2][0];
         publicPool = contracts[2][1];
         treasury = contracts[2][2];
-        privatePoolGenerator = contracts[2][3];
+        privatePoolFactory = contracts[2][3];
         privatePool = contracts[2][4];
     });
 
@@ -94,30 +94,30 @@ contract("Testing Certificate Pool Manager",function(accounts){
         let _publicCertPoolAddressProxy = await certPoolManager.retrievePublicCertificatePoolProxy({from: user_1});
         let _treasuryAddressProxy = await certPoolManager.retrieveTreasuryProxy({from: user_1});
         let _certisAddressProxy = await certPoolManager.retrieveCertisTokenProxy({from: user_1});
-        let _privatePoolGeneratorAddressProxy = await certPoolManager.retrievePrivatePoolGeneratorProxy({from: user_1});
+        let _privatePoolFactoryAddressProxy = await certPoolManager.retrievePrivatePoolFactoryProxy({from: user_1});
         
         expect(_ppa).to.equal(_publicCertPoolAddressProxy);
         expect(_ta).to.equal(_treasuryAddressProxy);
         expect(_ca).to.equal(_certisAddressProxy);
-        expect(_ppga).to.equal(_privatePoolGeneratorAddressProxy);
+        expect(_ppga).to.equal(_privatePoolFactoryAddressProxy);
     }
 
     async function checkImplAddresses( _ppa, _ta, _ca, _ppga, _prpa){
         let _publicCertPoolAddress = await certPoolManager.retrievePublicCertificatePool({from: user_1});
         let _treasuryAddress = await certPoolManager.retrieveTreasury({from: user_1});
         let _certisAddress = await certPoolManager.retrieveCertisToken({from: user_1});
-        let _privatePoolGeneratorAddress = await certPoolManager.retrievePrivatePoolGenerator({from: user_1});
+        let _privatePoolFactoryAddress = await certPoolManager.retrievePrivatePoolFactory({from: user_1});
         let _privatePool = await certPoolManager.retrievePrivatePool({from: user_1});
         expect(_ppa).to.equal(_publicCertPoolAddress);
         expect(_ta).to.equal(_treasuryAddress);
         expect(_ca).to.equal(_certisAddress);
-        expect(_ppga).to.equal(_privatePoolGeneratorAddress);
+        expect(_ppga).to.equal(_privatePoolFactoryAddress);
         expect(_prpa).to.equal(_privatePool);
     }
 
     async function checkProposition( _ppa, _ta, _ca, _ppga, _prpa){
         var proposition = await certPoolManager.retrieveProposition({from: user_1});
-        //let {0: ppa, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 3: _privatePoolAddress} = proposition;
+        //let {0: ppa, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolFactoryAddress, 3: _privatePoolAddress} = proposition;
         //console.log(proposition);
         //console.log(_ppa);
         //console.log(ppa);
@@ -137,8 +137,8 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
     it("Retrieve Configuration",async function(){
         // assert
-        await checkProxyAddresses(publicPoolProxy._address, treasuryProxy._address, certisTokenProxy._address, privatePoolGeneratorProxy._address);
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkProxyAddresses(publicPoolProxy._address, treasuryProxy._address, certisTokenProxy._address, privatePoolFactoryProxy._address);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
     });
 
     it("Retrieve Proposals Details",async function(){
@@ -239,54 +239,54 @@ contract("Testing Certificate Pool Manager",function(accounts){
         var NewcertisToken = contracts[0];
         var NewpublicPool = contracts[1];
         var Newtreasury = contracts[2];
-        var NewprivatePoolGenerator = contracts[3]; 
+        var NewprivatePoolFactory = contracts[3]; 
         var NewprivatePool = contracts[4]; 
 
         await SplitTokenSupply(certisTokenProxy);
 
         // Update contracts Not validated
-        await certPoolManager.updateContracts(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool, {from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await certPoolManager.updateContracts(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, {from: chairPerson, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(false, {from: tokenOwner_2, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(false, {from: tokenOwner_3, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         
         // Update contracts cancelled
-        await certPoolManager.updateContracts(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool, {from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await certPoolManager.updateContracts(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, {from: chairPerson, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_1, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_2, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.cancelProposition({from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
 
         // Update contracts validated
-        await certPoolManager.updateContracts(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool, {from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await certPoolManager.updateContracts(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, {from: chairPerson, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_1, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_2, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_3, gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool);
+        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool);
 
         // Rollback to original contracts
-        await certPoolManager.updateContracts(publicPool, treasury, certisToken, privatePoolGenerator, privatePool, {from: chairPerson, gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool);
+        await certPoolManager.updateContracts(publicPool, treasury, certisToken, privatePoolFactory, privatePool, {from: chairPerson, gas: Gas});
+        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool);
         await certPoolManager.voteProposition(false, {from: tokenOwner_1, gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool);
+        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_2, gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool);
+        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool);
         await certPoolManager.voteProposition(false, {from: tokenOwner_3, gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool);
+        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_4, gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolGenerator, NewprivatePool);
+        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool);
         await certPoolManager.voteProposition(true, {from: tokenOwner_5, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolGenerator, privatePool);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool);
         
     });
 

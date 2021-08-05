@@ -60,7 +60,7 @@ contract("Testing Provider",function(accounts){
         publicPoolProxy = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);
         provider = await Provider.new(ProviderOwners, minOwners, provider_1_Info, {from: user_1, value: (2 * CertificatePriceWei) + PublicPriceWei});
         //let result = await certPoolManager.retrieveConfiguration({from: user_1});
-        //const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolGeneratorAddress, 4: _chairPerson, 5: _balance} = result;
+        //const {0: _publicCertPoolAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolFactoryAddress, 4: _chairPerson, 5: _balance} = result;
         publicCertPoolAddress = publicPoolProxy._address;
         providerContract = new web3.eth.Contract(ProviderAbi, provider.address);
     });

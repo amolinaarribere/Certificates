@@ -8,15 +8,11 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
 import "../Interfaces/IProxyManager.sol";
-//import "./PublicCertificatesPool.sol";
 import "./Proxies/PublicCertificatesPoolProxy.sol";
 import "./PrivateCertificatesPool.sol";
-//import "./PrivatePoolGenerator.sol";
-import "./Proxies/PrivatePoolGeneratorProxy.sol";
-//import "./Treasury.sol";
+import "./Proxies/PrivatePoolFactoryProxy.sol";
 import "./Proxies/TreasuryProxy.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
-//import "./CertisToken.sol";
 import "./Proxies/CertisTokenProxy.sol";
 import "../Libraries/AddressLibrary.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -32,14 +28,14 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         address NewPublicPoolAddress;
         address NewTreasuryAddress;
         address NewCertisTokenAddress;
-        address NewPrivatePoolGeneratorAddress;
+        address NewPrivatePoolFactoryAddress;
         address NewPrivatePoolAddress;
     }
 
     ProposedContractsStruct _ProposedContracts;
     
-    // Private Certificate Pools Generator
-    PrivatePoolGeneratorProxy _PrivatePoolGenerator;
+    // Private Certificate Pools Factory
+    PrivatePoolFactoryProxy _PrivatePoolFactory;
 
     // Private Certificates Pool
     UpgradeableBeacon _PrivateCertificatePoolBeacon;
@@ -70,30 +66,30 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     }
 
 
-    function InitializeContracts(address payable PublicPoolProxyAddress, address payable TreasuryProxyAddress, address payable CertisTokenProxyAddress, address payable PrivatePoolGeneratorProxyAddress, address PrivateCertificatePoolImplAddress) 
+    function InitializeContracts(address payable PublicPoolProxyAddress, address payable TreasuryProxyAddress, address payable CertisTokenProxyAddress, address payable PrivatePoolFactoryProxyAddress, address PrivateCertificatePoolImplAddress) 
         isFromChairPerson()
         isNotInitialized()
     external
     {
         _init = true;
-        initProxies(PublicPoolProxyAddress, TreasuryProxyAddress, CertisTokenProxyAddress, PrivatePoolGeneratorProxyAddress, PrivateCertificatePoolImplAddress);
+        initProxies(PublicPoolProxyAddress, TreasuryProxyAddress, CertisTokenProxyAddress, PrivatePoolFactoryProxyAddress, PrivateCertificatePoolImplAddress);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
     // governance : contracts assignment and management
-    function updateContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress, address PrivatePoolImplAddress) external
+    function updateContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolFactoryAddress, address PrivatePoolImplAddress) external
     {
         _ProposedContracts.NewPublicPoolAddress = PublicPoolAddress;
         _ProposedContracts.NewTreasuryAddress = TreasuryAddress;
         _ProposedContracts.NewCertisTokenAddress = CertisTokenAddress;
-        _ProposedContracts.NewPrivatePoolGeneratorAddress = PrivatePoolGeneratorAddress;
+        _ProposedContracts.NewPrivatePoolFactoryAddress = PrivatePoolFactoryAddress;
         _ProposedContracts.NewPrivatePoolAddress = PrivatePoolImplAddress;
         addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
     }
 
     function propositionApproved() internal override
     {
-        upgradeContractsImplementations(_ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewTreasuryAddress, _ProposedContracts.NewCertisTokenAddress, _ProposedContracts.NewPrivatePoolGeneratorAddress, _ProposedContracts.NewPrivatePoolAddress);
+        upgradeContractsImplementations(_ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewTreasuryAddress, _ProposedContracts.NewCertisTokenAddress, _ProposedContracts.NewPrivatePoolFactoryAddress, _ProposedContracts.NewPrivatePoolAddress);
         removeProposition();
     }
 
@@ -118,26 +114,26 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         proposition[0] = AddressLibrary.AddressToString(_ProposedContracts.NewPublicPoolAddress);
         proposition[1] = AddressLibrary.AddressToString(_ProposedContracts.NewTreasuryAddress);
         proposition[2] = AddressLibrary.AddressToString(_ProposedContracts.NewCertisTokenAddress);
-        proposition[3] = AddressLibrary.AddressToString(_ProposedContracts.NewPrivatePoolGeneratorAddress);
+        proposition[3] = AddressLibrary.AddressToString(_ProposedContracts.NewPrivatePoolFactoryAddress);
         proposition[4] = AddressLibrary.AddressToString(_ProposedContracts.NewPrivatePoolAddress);
         return proposition;
     }
 
-    function initProxies(address payable PublicPoolProxyAddress, address payable TreasuryProxyAddress, address payable CertisTokenProxyAddress, address payable PrivatePoolGeneratorProxyAddress, address PrivateCertificatePoolImplAddress) internal
+    function initProxies(address payable PublicPoolProxyAddress, address payable TreasuryProxyAddress, address payable CertisTokenProxyAddress, address payable PrivatePoolFactoryProxyAddress, address PrivateCertificatePoolImplAddress) internal
     {
         _PublicCertificatesPool = PublicCertificatesPoolProxy(PublicPoolProxyAddress);
         _Treasury = TreasuryProxy(TreasuryProxyAddress);
         _CertisToken = CertisTokenProxy(CertisTokenProxyAddress);
-        _PrivatePoolGenerator = PrivatePoolGeneratorProxy(PrivatePoolGeneratorProxyAddress);
+        _PrivatePoolFactory = PrivatePoolFactoryProxy(PrivatePoolFactoryProxyAddress);
         _PrivateCertificatePoolBeacon = new UpgradeableBeacon(PrivateCertificatePoolImplAddress);
     }
 
-    function upgradeContractsImplementations(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolGeneratorAddress, address PrivatePoolImplAddress) internal
+    function upgradeContractsImplementations(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, address PrivatePoolFactoryAddress, address PrivatePoolImplAddress) internal
     {
         _PublicCertificatesPool.upgradeTo(PublicPoolAddress);
         _Treasury.upgradeTo(TreasuryAddress);
         _CertisToken.upgradeTo(CertisTokenAddress);
-        _PrivatePoolGenerator.upgradeTo(PrivatePoolGeneratorAddress);
+        _PrivatePoolFactory.upgradeTo(PrivatePoolFactoryAddress);
         _PrivateCertificatePoolBeacon.upgradeTo(PrivatePoolImplAddress);
     }
 
@@ -154,8 +150,8 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         return (address(_CertisToken));
     }
 
-    function retrievePrivatePoolGeneratorProxy() external override view returns (address) {
-        return (address(_PrivatePoolGenerator));
+    function retrievePrivatePoolFactoryProxy() external override view returns (address) {
+        return (address(_PrivatePoolFactory));
     }
 
     function retrievePrivatePoolBeacon() external override view returns (address) {
@@ -175,8 +171,8 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         return _CertisToken.implementation();
     }
 
-    function retrievePrivatePoolGenerator() external override view returns (address) {
-        return _PrivatePoolGenerator.implementation();
+    function retrievePrivatePoolFactory() external override view returns (address) {
+        return _PrivatePoolFactory.implementation();
     }
 
     function retrievePrivatePool() external override view returns (address) {
