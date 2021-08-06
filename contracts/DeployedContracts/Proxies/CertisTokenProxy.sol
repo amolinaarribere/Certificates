@@ -7,13 +7,21 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
-import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import "./GenericProxy.sol";
 
 
-contract CertisTokenProxy is ERC1967Proxy{
+contract CertisTokenProxy is GenericProxy{
+
+    // CONSTRUCTOR /////////////////////////////////////////
+    constructor(address CertisCodeContractAddress, address managerContractAddress, bytes memory data)
+        GenericProxy(CertisCodeContractAddress, managerContractAddress, data) 
+    {}
+
+    // CUSTOMIZATION /////////////////////////////////////////
+    function _beforeFallback() internal virtual override {}
 
     // MODIFIERS /////////////////////////////////////////
-    modifier ifAdmin() {
+    /*modifier ifAdmin() {
         require(msg.sender == _getAdmin(), "EC8"); 
         _;
     }
@@ -43,6 +51,6 @@ contract CertisTokenProxy is ERC1967Proxy{
 
     function upgradeToAndCall(address newImplementation, bytes calldata data) external payable ifAdmin {
         _upgradeToAndCall(newImplementation, data, true);
-    }
+    }*/
 
 }

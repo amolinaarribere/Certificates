@@ -12,11 +12,9 @@ const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 const ProviderFactory = artifacts.require("ProviderFactory");
 const ProviderFactoryAbi = ProviderFactory.abi;
 
-const TreasuryProxy = artifacts.require("TreasuryProxy");
-const PublicCertificatesPoolProxy = artifacts.require("PublicCertificatesPoolProxy");
+const GenericProxy = artifacts.require("GenericProxy");
 const CertisTokenProxy = artifacts.require("CertisTokenProxy");
-const PrivatePoolFactoryProxy = artifacts.require("PrivatePoolFactoryProxy");
-const ProviderFactoryProxy = artifacts.require("ProviderFactoryProxy");
+
 
 const constants = require("../test_libraries/constants.js");
 
@@ -191,19 +189,19 @@ async function deployProxies(chairPerson, PublicOwners, minOwners, user_1, certi
 
   let PublicCertificatesPoolProxyInitializerParameters = [PublicOwners, minOwners, certPoolManager];
   let PublicCertificatesPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicCertificatesPoolProxyInitializerMethod, PublicCertificatesPoolProxyInitializerParameters);
-  let publicPoolProxy = await PublicCertificatesPoolProxy.new(publicPool, certPoolManager, PublicCertificatesPoolProxyData, {from: user_1});
+  let publicPoolProxy = await GenericProxy.new(publicPool, certPoolManager, PublicCertificatesPoolProxyData, {from: user_1});
 
   let TreasuryProxyInitializerParameters = [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManager,  PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose];
   let TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
-  let treasuryProxy = await TreasuryProxy.new(treasury, certPoolManager, TreasuryProxyData, {from: chairPerson});
+  let treasuryProxy = await GenericProxy.new(treasury, certPoolManager, TreasuryProxyData, {from: chairPerson});
 
   let PrivatePoolFactoryProxyInitializerParameters = [certPoolManager];
   let PrivatePoolFactoryProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolFactoryProxyInitializerMethod, PrivatePoolFactoryProxyInitializerParameters);  
-  let privatePoolFactoryProxy = await PrivatePoolFactoryProxy.new(privatePoolFactory, certPoolManager, PrivatePoolFactoryProxyData, {from: user_1});
+  let privatePoolFactoryProxy = await GenericProxy.new(privatePoolFactory, certPoolManager, PrivatePoolFactoryProxyData, {from: user_1});
 
   let ProviderFactoryProxyInitializerParameters = [certPoolManager];
   let ProviderFactoryProxyData = web3.eth.abi.encodeFunctionCall(ProviderFactoryProxyInitializerMethod, ProviderFactoryProxyInitializerParameters);  
-  let providerFactoryProxy = await ProviderFactoryProxy.new(providerFactory, certPoolManager, ProviderFactoryProxyData, {from: user_1});
+  let providerFactoryProxy = await GenericProxy.new(providerFactory, certPoolManager, ProviderFactoryProxyData, {from: user_1});
 
   return [certisTokenProxy.address, publicPoolProxy.address, treasuryProxy.address, privatePoolFactoryProxy.address, providerFactoryProxy.address];
 }

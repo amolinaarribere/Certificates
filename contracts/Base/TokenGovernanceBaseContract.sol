@@ -282,7 +282,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         );
     }
 
-    function retrieveProposition() external virtual view returns(string[] memory){}
+    function retrieveProposition() external virtual view returns(bytes32[] memory){}
 
     function propositionApproved() internal virtual{}
 

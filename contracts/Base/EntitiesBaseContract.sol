@@ -49,7 +49,7 @@ abstract contract EntitiesBaseContract{
     }
     
     modifier HasNotAlreadyVoted(address entity, uint listId){
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         require(false == ItemsLibrary.hasVoted(msg.sender, entityInBytes, _Entities[listId]), "EC5");
         _;
     }
@@ -87,7 +87,7 @@ abstract contract EntitiesBaseContract{
         isEntityActivated(false, entity, listId) 
         isEntityPendingToAdd(false, entity, listId)
     { 
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, entityInfo, _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -101,7 +101,7 @@ abstract contract EntitiesBaseContract{
         isEntityActivated(true, entity, listId)
         isEntityPendingToRemove(false, entity, listId)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -115,7 +115,7 @@ abstract contract EntitiesBaseContract{
         isEntityPending(true, entity, listId)
         HasNotAlreadyVoted(entity, listId)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -129,7 +129,7 @@ abstract contract EntitiesBaseContract{
         isEntityPending(true, entity, listId)
         HasNotAlreadyVoted(entity, listId)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -141,7 +141,7 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length)
     view returns (string memory, bool) 
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.retrieveItem(entityInBytes, _Entities[listId]);
     }
 
@@ -149,14 +149,14 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length) 
     view returns (address[] memory) 
     {
-        return AddressLibrary.BytesArrayToAddress(ItemsLibrary.retrieveAllItems(_Entities[listId]));
+        return AddressLibrary.Bytes32ArrayToAddressArray(ItemsLibrary.retrieveAllItems(_Entities[listId]));
     }
 
     function isEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
     view returns (bool)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.isItem(entityInBytes, _Entities[listId]);
     }
 
@@ -164,7 +164,7 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length)
     view returns (bool)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.isItemPendingToAdded(entityInBytes,_Entities[listId]);
     }
 
@@ -172,7 +172,7 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length)
     view returns (bool)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.isItemPendingToRemoved(entityInBytes, _Entities[listId]);
     }
 
@@ -183,7 +183,7 @@ abstract contract EntitiesBaseContract{
         bytes32[] memory EntitiesInBytes;
         string[] memory EntitiesInfo;
         (EntitiesInBytes, EntitiesInfo) = ItemsLibrary.retrievePendingItems(addORemove, _Entities[listId]);
-        return(AddressLibrary.BytesArrayToAddress(EntitiesInBytes) , EntitiesInfo);
+        return(AddressLibrary.Bytes32ArrayToAddressArray(EntitiesInBytes) , EntitiesInfo);
     }
 
     // CALLBACKS /////////////////////////////////////////

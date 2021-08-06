@@ -37,7 +37,7 @@ pragma experimental ABIEncoderV2;
     override payable
     {
         Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProvider);
-        bytes32 providerInBytes = AddressLibrary.AddressToBytes(provider);
+        bytes32 providerInBytes = AddressLibrary.AddressToBytes32(provider);
         _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
         _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
 

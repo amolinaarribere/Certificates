@@ -9,6 +9,12 @@ pragma experimental ABIEncoderV2;
  */
 
  interface IProxyManager  {
+
+    function upgradeContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, 
+    address PrivatePoolFactoryAddress, address PrivatePoolImplAddress, address ProviderFactoryAddress, 
+    address ProviderImplAddress, bytes memory PublicPoolData, bytes memory TreasuryData, bytes memory CertisTokenData, 
+    bytes memory PrivatePoolFactoryData, bytes memory ProviderFactoryData) external;
+    
     function retrievePublicCertificatePoolProxy() external view returns (address);
     function retrieveTreasuryProxy() external view returns (address);
     function retrieveCertisTokenProxy() external view returns (address);

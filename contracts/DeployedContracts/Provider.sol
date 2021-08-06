@@ -246,7 +246,7 @@ pragma experimental ABIEncoderV2;
         super.onItemValidated(item, ids, addOrRemove);
 
         if(ids[0] == _poolId){
-            address pool = AddressLibrary.BytesToAddress(item);
+            address pool = AddressLibrary.Bytes32ToAddress(item);
 
             if(false == addOrRemove)removePricesForPool(pool);
             else{
@@ -264,7 +264,7 @@ pragma experimental ABIEncoderV2;
         super.onItemRejected(item, ids, addOrRemove);
 
         if(ids[0] == _poolId){
-            address pool = AddressLibrary.BytesToAddress(item);
+            address pool = AddressLibrary.Bytes32ToAddress(item);
 
             if(true == addOrRemove)removePricesForPool(pool);
         } 

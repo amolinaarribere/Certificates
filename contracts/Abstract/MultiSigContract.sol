@@ -42,7 +42,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
 
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
-            bytes32 ownerInBytes = AddressLibrary.AddressToBytes(owners[i]);
+            bytes32 ownerInBytes = AddressLibrary.AddressToBytes32(owners[i]);
             _Entities[_ownerId]._items[ownerInBytes]._activated = true;
             _Entities[_ownerId]._activatedItems.push(ownerInBytes); 
         } 

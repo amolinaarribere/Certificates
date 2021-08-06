@@ -51,8 +51,26 @@ library Library{
         return newArray;
     }
 
-    function BytesToString(bytes32 element) public pure returns(string memory){
+    function Bytes32ArrayToString(bytes32[] memory element) internal pure returns(string memory){
         return string(abi.encodePacked(element));
+    }
+
+    function BytestoBytes32(bytes memory _b) private pure returns(bytes32[] memory){
+        uint num = _b.length / 32;
+        bytes32[] memory result = new bytes32[](num + 1);
+        uint t = 0;
+        
+        for(uint i=0; i<_b.length; i = i + 32){
+            bytes32 r;
+            uint p = i + 32;
+             assembly {
+                r := mload(add(_b, p))
+            }
+            result[t] = r;
+            t += 1;
+        }
+       
+        return result;
     }
     
 }

@@ -137,14 +137,14 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
          delete(_ProposedPrices);
     }
 
-    function retrieveProposition() external override view returns(string[] memory)
+    function retrieveProposition() external override view returns(bytes32[] memory)
     {
-        string[] memory proposition = new string[](5);
-        proposition[0] = UintLibrary.UintToString(_ProposedPrices.NewPublicPriceWei);
-        proposition[1] = UintLibrary.UintToString(_ProposedPrices.NewPrivatePriceWei);
-        proposition[2] = UintLibrary.UintToString(_ProposedPrices.NewProviderPriceWei);
-        proposition[3] = UintLibrary.UintToString(_ProposedPrices.NewCertificatePriceWei);
-        proposition[4] = UintLibrary.UintToString(_ProposedPrices.NewOwnerRefundPriceWei);
+        bytes32[] memory proposition = new bytes32[](5);
+        proposition[0] = UintLibrary.UintToBytes32(_ProposedPrices.NewPublicPriceWei);
+        proposition[1] = UintLibrary.UintToBytes32(_ProposedPrices.NewPrivatePriceWei);
+        proposition[2] = UintLibrary.UintToBytes32(_ProposedPrices.NewProviderPriceWei);
+        proposition[3] = UintLibrary.UintToBytes32(_ProposedPrices.NewCertificatePriceWei);
+        proposition[4] = UintLibrary.UintToBytes32(_ProposedPrices.NewOwnerRefundPriceWei);
         return proposition;
     }
 

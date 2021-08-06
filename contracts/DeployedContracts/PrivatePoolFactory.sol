@@ -10,7 +10,7 @@ pragma solidity >=0.7.0 <0.9.0;
  import "./Treasury.sol";
  import "../Libraries/Library.sol";
  import "../Abstract/Factory.sol";
- import "./Proxies/PrivateCertificatesPoolProxy.sol";
+ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract PrivatePoolFactory is Initializable, Factory{
@@ -26,7 +26,7 @@ contract PrivatePoolFactory is Initializable, Factory{
     {
         Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewPool);
         bytes memory data = abi.encodeWithSignature("PrivateCertPool_init(address[],uint256)", owners, minOwners);
-        PrivateCertificatesPoolProxy certificatePoolProxy = new PrivateCertificatesPoolProxy(_managerContract.retrievePrivatePoolBeacon(), data);
+        BeaconProxy certificatePoolProxy = new BeaconProxy(_managerContract.retrievePrivatePoolBeacon(), data);
         _ElementStruct memory element = _ElementStruct(msg.sender, address(certificatePoolProxy));
         _Elements.push(element);
 
