@@ -159,23 +159,23 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         bytes memory PublicPoolData, bytes memory TreasuryData, bytes memory CertisTokenData, bytes memory PrivatePoolFactoryData, bytes memory ProviderFactoryData) internal
     {
         if(address(0) != PublicPoolAddress){
-            if(0 != PublicPoolData.length)_PublicCertificatesPool.upgradeToAndCall(PublicPoolAddress, PublicPoolData);
+            if(0 < PublicPoolData.length)_PublicCertificatesPool.upgradeToAndCall(PublicPoolAddress, PublicPoolData);
             else _PublicCertificatesPool.upgradeTo(PublicPoolAddress);
         }
         if(address(0) != TreasuryAddress){
-            if(0 != TreasuryData.length)_Treasury.upgradeToAndCall(TreasuryAddress, TreasuryData);
+            if(0 < TreasuryData.length)_Treasury.upgradeToAndCall(TreasuryAddress, TreasuryData);
             else _Treasury.upgradeTo(TreasuryAddress);
         }
         if(address(0) != CertisTokenAddress){
-            if(0 != CertisTokenData.length)_CertisToken.upgradeToAndCall(CertisTokenAddress, CertisTokenData);
+            if(0 < CertisTokenData.length)_CertisToken.upgradeToAndCall(CertisTokenAddress, CertisTokenData);
             else _CertisToken.upgradeTo(CertisTokenAddress);
         }
         if(address(0) != PrivatePoolFactoryAddress){
-            if(0 != PrivatePoolFactoryData.length)_PrivatePoolFactory.upgradeToAndCall(PrivatePoolFactoryAddress, PrivatePoolFactoryData);
+            if(0 < PrivatePoolFactoryData.length)_PrivatePoolFactory.upgradeToAndCall(PrivatePoolFactoryAddress, PrivatePoolFactoryData);
             else _PrivatePoolFactory.upgradeTo(PrivatePoolFactoryAddress);
         }
         if(address(0) != ProviderFactoryAddress){
-            if(0 != ProviderFactoryData.length)_ProviderFactory.upgradeToAndCall(ProviderFactoryAddress, ProviderFactoryData);
+            if(0 < ProviderFactoryData.length)_ProviderFactory.upgradeToAndCall(ProviderFactoryAddress, ProviderFactoryData);
             else _ProviderFactory.upgradeTo(ProviderFactoryAddress);
         }
         if(address(0) != PrivatePoolImplAddress)_PrivateCertificatePoolBeacon.upgradeTo(PrivatePoolImplAddress);
