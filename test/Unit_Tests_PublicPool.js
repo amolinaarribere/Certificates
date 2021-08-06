@@ -59,7 +59,7 @@ contract("Testing Public Pool",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);  
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][0]);  
         await publicCertPool.methods.addProvider(provider_1, provider_1_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
     });

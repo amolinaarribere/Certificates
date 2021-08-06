@@ -74,9 +74,9 @@ contract("Testing Treasury",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][0]);
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);   
-        Treasury = new web3.eth.Contract(TreasuryAbi, contracts[1][2]);
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][0]);   
+        Treasury = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
+        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
     });
 
     async function SendingNewProviders(){

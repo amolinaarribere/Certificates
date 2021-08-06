@@ -48,6 +48,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const tokenOwner_3 = accounts[7];
     const tokenOwner_4 = accounts[8];
     const tokenOwner_5 = accounts[9];
+    const address_0 = "0x0000000000000000000000000000000000000000";
     const address_1 = "0x0000000000000000000000000000000000000001";
     const address_2 = "0x0000000000000000000000000000000000000002";
     const address_3 = "0x0000000000000000000000000000000000000003";
@@ -71,14 +72,14 @@ contract("Testing Certificate Pool Manager",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][0]);
-        publicPoolProxy = new web3.eth.Contract(PublicCertificatesPoolAbi, contracts[1][1]);
-        treasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][2]);
+        publicPoolProxy = new web3.eth.Contract(PublicCertificatesPoolAbi, contracts[1][0]);
+        treasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
+        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
         privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, contracts[1][3]);
         providerFactoryProxy = new web3.eth.Contract(ProviderFactoryAbi, contracts[1][4]);
-        certisToken = contracts[2][0];
-        publicPool = contracts[2][1];
-        treasury = contracts[2][2];
+        publicPool = contracts[2][0];
+        treasury = contracts[2][1];
+        certisToken = contracts[2][2];
         privatePoolFactory = contracts[2][3];
         privatePool = contracts[2][4];
         providerFactory = contracts[2][5];
@@ -255,10 +256,10 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
     it("Vote/Propose/Cancel Contracts Configuration CORRECT",async function(){
         // act
-        let contracts = await init.InitializeManagedBaseContracts(chairPerson, PublicOwners, minOwners, user_1, certPoolManager.address);
-        var NewcertisToken = contracts[0];
-        var NewpublicPool = contracts[1];
-        var Newtreasury = contracts[2];
+        let contracts = await init.deployImplementations(chairPerson, PublicOwners, minOwners, user_1, certPoolManager.address);
+        var NewpublicPool = contracts[0];
+        var Newtreasury = contracts[1];
+        var NewcertisToken = contracts[2];
         var NewprivatePoolFactory = contracts[3]; 
         var NewprivatePool = contracts[4]; 
         var NewproviderFactory = contracts[5]; 
@@ -287,6 +288,18 @@ contract("Testing Certificate Pool Manager",function(accounts){
         await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider);
         await certPoolManager.cancelProposition({from: chairPerson, gas: Gas});
         await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider);
+
+        // Update contracts validated (address(0)) nothing done
+        await certPoolManager.upgradeContracts(address_0, address_0, address_0, address_0, address_0, address_0, address_0, 
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, {from: chairPerson, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_1, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_2, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider);
+        await certPoolManager.voteProposition(true, {from: tokenOwner_3, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider);
+
 
         // Update contracts validated
         await certPoolManager.upgradeContracts(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, 

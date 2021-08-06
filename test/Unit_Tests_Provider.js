@@ -54,7 +54,7 @@ contract("Testing Provider",function(accounts){
         // Public Pool creation and provider subscription
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        publicPoolProxy = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);
+        publicPoolProxy = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][0]);
         publicCertPoolAddress = publicPoolProxy._address;
         providerFactoryProxy = new web3.eth.Contract(ProviderFactoryAbi, contracts[1][4]);
         await providerFactoryProxy.methods.create(ProviderOwners, minOwners, provider_1_Info).send({from: user_1, value: ProviderPriceWei, gas: Gas}, function(error, result){});
