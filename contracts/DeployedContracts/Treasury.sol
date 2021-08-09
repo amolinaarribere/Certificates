@@ -8,10 +8,8 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
 import "../Interfaces/ITreasury.sol";
-import "./PublicCertificatesPool.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
-import "./CertisToken.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
 
 
@@ -32,7 +30,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     ProposedPricesStruct _ProposedPrices;
 
     // parameters
-    //PublicCertificatesPool  _PublicCertificatesPool;
     uint _PublicPriceWei;
     uint _CertificatePriceWei;
     uint _PrivatePriceWei;

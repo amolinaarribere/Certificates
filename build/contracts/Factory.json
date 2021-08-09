@@ -121,7 +121,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n import '../Interfaces/IFactory.sol';\r\n import \"../Base/ManagedBaseContract.sol\";\r\n import \"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\";\r\n\r\n\r\nabstract contract Factory is IFactory, Initializable, ManagedBaseContract{\r\n    using Library for *;\r\n\r\n     // EVENTS /////////////////////////////////////////\r\n    event _NewElement(string indexed, uint256, address indexed, address, string indexed);\r\n\r\n    // DATA /////////////////////////////////////////\r\n    // Private Certificates Pool structure\r\n    struct _ElementStruct{\r\n        address _creator;\r\n        address _ElementProxyAddress;\r\n    } \r\n\r\n    _ElementStruct[] _Elements;\r\n\r\n    // MODIFIERS /////////////////////////////////////////\r\n    modifier isIdCorrect(uint Id, uint length){\r\n        require(true == Library.IdCorrect(Id, length), \"EC1\");\r\n        _;\r\n    }\r\n\r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function Factory_init(address managerContractAddress) public initializer {\r\n        super.ManagedBaseContract_init(managerContractAddress);\r\n    }\r\n\r\n    // FUNCTIONALITY /////////////////////////////////////////\r\n    function internalCreate(address beaconProxyAddress, string memory eventLabel, string memory elementName) internal\r\n    {\r\n        _ElementStruct memory element = _ElementStruct(msg.sender, beaconProxyAddress);\r\n        _Elements.push(element);\r\n\r\n        emit _NewElement(eventLabel, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);\r\n    }\r\n\r\n    function retrieve(uint Id) external override\r\n        isIdCorrect(Id, _Elements.length)\r\n    view returns (address, address)\r\n    {\r\n        return(_Elements[Id]._creator, _Elements[Id]._ElementProxyAddress);\r\n    }\r\n\r\n    function retrieveTotal() external override view returns (uint)\r\n    {\r\n        return(_Elements.length);\r\n    }\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Abstract\\Factory.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Abstract/Factory.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/Factory.sol",
     "exportedSymbols": {
@@ -129,16 +129,16 @@
         142
       ],
       "IFactory": [
-        6012
+        5834
       ],
       "IProxyManager": [
-        6318
+        6140
       ],
       "Initializable": [
-        7959
+        7781
       ],
       "Library": [
-        7742
+        7564
       ],
       "ManagedBaseContract": [
         1862
@@ -169,7 +169,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 143,
-        "sourceUnit": 6013,
+        "sourceUnit": 5835,
         "src": "152:36:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -193,7 +193,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 143,
-        "sourceUnit": 7960,
+        "sourceUnit": 7782,
         "src": "235:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -206,7 +206,7 @@
               "id": 5,
               "name": "IFactory",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 6012,
+              "referencedDeclaration": 5834,
               "src": "345:8:0"
             },
             "id": 6,
@@ -218,7 +218,7 @@
               "id": 7,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7959,
+              "referencedDeclaration": 7781,
               "src": "355:13:0"
             },
             "id": 8,
@@ -245,8 +245,8 @@
         "linearizedBaseContracts": [
           142,
           1862,
-          7959,
-          6012
+          7781,
+          5834
         ],
         "name": "Factory",
         "nameLocation": "334:7:0",
@@ -258,7 +258,7 @@
               "id": 11,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7742,
+              "referencedDeclaration": 7564,
               "src": "402:7:0"
             },
             "nodeType": "UsingForDirective",
@@ -612,10 +612,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 7742,
+                              "referencedDeclaration": 7564,
                               "src": "942:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$7742_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$7564_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -626,7 +626,7 @@
                             "lValueRequested": false,
                             "memberName": "IdCorrect",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 7534,
+                            "referencedDeclaration": 7356,
                             "src": "942:17:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_pure$_t_uint256_$_t_uint256_$returns$_t_bool_$",
@@ -879,7 +879,7 @@
                   "id": 56,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 7958,
+                  "referencedDeclaration": 7780,
                   "src": "1130:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1438,7 +1438,7 @@
           },
           {
             "baseFunctions": [
-              6006
+              5828
             ],
             "body": {
               "id": 129,
@@ -1746,7 +1746,7 @@
           },
           {
             "baseFunctions": [
-              6011
+              5833
             ],
             "body": {
               "id": 140,
@@ -1878,16 +1878,16 @@
         142
       ],
       "IFactory": [
-        6012
+        5834
       ],
       "IProxyManager": [
-        6318
+        6140
       ],
       "Initializable": [
-        7959
+        7781
       ],
       "Library": [
-        7742
+        7564
       ],
       "ManagedBaseContract": [
         1862
@@ -1918,7 +1918,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 143,
-        "sourceUnit": 6013,
+        "sourceUnit": 5835,
         "src": "152:36:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1942,7 +1942,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 143,
-        "sourceUnit": 7960,
+        "sourceUnit": 7782,
         "src": "235:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1955,7 +1955,7 @@
               "id": 5,
               "name": "IFactory",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 6012,
+              "referencedDeclaration": 5834,
               "src": "345:8:0"
             },
             "id": 6,
@@ -1967,7 +1967,7 @@
               "id": 7,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7959,
+              "referencedDeclaration": 7781,
               "src": "355:13:0"
             },
             "id": 8,
@@ -1994,8 +1994,8 @@
         "linearizedBaseContracts": [
           142,
           1862,
-          7959,
-          6012
+          7781,
+          5834
         ],
         "name": "Factory",
         "nameLocation": "334:7:0",
@@ -2007,7 +2007,7 @@
               "id": 11,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7742,
+              "referencedDeclaration": 7564,
               "src": "402:7:0"
             },
             "nodeType": "UsingForDirective",
@@ -2361,10 +2361,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 7742,
+                              "referencedDeclaration": 7564,
                               "src": "942:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$7742_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$7564_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -2375,7 +2375,7 @@
                             "lValueRequested": false,
                             "memberName": "IdCorrect",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 7534,
+                            "referencedDeclaration": 7356,
                             "src": "942:17:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_pure$_t_uint256_$_t_uint256_$returns$_t_bool_$",
@@ -2628,7 +2628,7 @@
                   "id": 56,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 7958,
+                  "referencedDeclaration": 7780,
                   "src": "1130:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -3187,7 +3187,7 @@
           },
           {
             "baseFunctions": [
-              6006
+              5828
             ],
             "body": {
               "id": 129,
@@ -3495,7 +3495,7 @@
           },
           {
             "baseFunctions": [
-              6011
+              5833
             ],
             "body": {
               "id": 140,
@@ -3626,7 +3626,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-08-09T13:35:56.626Z",
+  "updatedAt": "2021-08-09T14:01:01.321Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

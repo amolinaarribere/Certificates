@@ -7,7 +7,7 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import "../DeployedContracts/CertisToken.sol";
+ import "../Interfaces/ICertisToken.sol";
  import "../Libraries/AddressLibrary.sol";
  import "../Libraries/Library.sol";
  import "./ManagedBaseContract.sol";
@@ -113,21 +113,21 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     }
 
     function GetAdminList() internal view returns(address[] memory){
-        (address[] memory list, ) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+        (address[] memory list, ) = ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return list;
     }
 
     function GetAdminWeights() internal view returns(uint256[] memory){
-        (, uint256[] memory weights) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+        (, uint256[] memory weights) = ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return weights;
     }
 
     function GetTokenOwners() internal view returns(address[] memory, uint256[] memory){
-        return CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
     }
 
     function totalSupply() internal view returns(uint256){
-        return CertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
+        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
     }
 
     function CheckIfPropostiionActive() internal returns(bool){

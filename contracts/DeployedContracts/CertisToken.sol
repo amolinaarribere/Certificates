@@ -9,8 +9,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "../Libraries/AddressLibrary.sol";
+import "../Interfaces/ICertisToken.sol";
 
- contract CertisToken is ERC20Upgradeable {
+ contract CertisToken is ICertisToken, ERC20Upgradeable {
     using AddressLibrary for *;
 
     // DATA /////////////////////////////////////////
@@ -30,7 +31,7 @@ import "../Libraries/AddressLibrary.sol";
         return _decimals;
     }
 
-    function TokenOwners() external view returns (address[] memory, uint256[] memory){
+    function TokenOwners() external view override returns (address[] memory, uint256[] memory){
         address[] memory tO = _tokenOwners;
         uint256[] memory OwnerBalance = new uint256[](tO.length);
 

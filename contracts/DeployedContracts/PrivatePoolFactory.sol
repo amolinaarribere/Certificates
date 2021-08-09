@@ -7,7 +7,7 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import "./Treasury.sol";
+ import "../Interfaces/ITreasury.sol";
  import "../Libraries/Library.sol";
  import "../Abstract/Factory.sol";
  import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
@@ -24,7 +24,7 @@ contract PrivatePoolFactory is Initializable, Factory{
     // FUNCTIONALITY /////////////////////////////////////////
     function create(address[] memory owners,  uint256 minOwners, string memory ElementName) external override payable
     {
-        Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewPool);
+        ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewPool);
         bytes memory data = abi.encodeWithSignature("PrivateCertPool_init(address[],uint256)", owners, minOwners);
         BeaconProxy certificatePoolProxy = new BeaconProxy(_managerContract.retrievePrivatePoolBeacon(), data);
         internalCreate(address(certificatePoolProxy), "Private Pool", ElementName);
