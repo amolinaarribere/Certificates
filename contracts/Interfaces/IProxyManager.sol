@@ -7,13 +7,11 @@ pragma experimental ABIEncoderV2;
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
+ import "../Libraries/Library.sol";
 
  interface IProxyManager  {
 
-    function upgradeContracts(address PublicPoolAddress, address TreasuryAddress, address CertisTokenAddress, 
-    address PrivatePoolFactoryAddress, address PrivatePoolImplAddress, address ProviderFactoryAddress, 
-    address ProviderImplAddress, bytes memory PublicPoolData, bytes memory TreasuryData, bytes memory CertisTokenData, 
-    bytes memory PrivatePoolFactoryData, bytes memory ProviderFactoryData) external;
+    function upgradeContracts(Library.ProposedContractsStruct calldata UpgradeProposition) external;
     
     function retrievePublicCertificatePoolProxy() external view returns (address);
     function retrieveTreasuryProxy() external view returns (address);

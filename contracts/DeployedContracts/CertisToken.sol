@@ -7,12 +7,10 @@ pragma solidity ^0.8.0;
  * @dev Store & retrieve value in a variable
  */
 
-//import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "../Libraries/AddressLibrary.sol";
 
  contract CertisToken is ERC20Upgradeable {
-
     using AddressLibrary for *;
 
     // DATA /////////////////////////////////////////

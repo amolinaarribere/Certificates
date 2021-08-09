@@ -9,9 +9,8 @@ pragma experimental ABIEncoderV2;
  */
  import "../Libraries/Library.sol";
  import "../Interfaces/IProvider.sol";
+ import "../Interfaces/IPool.sol";
  import "../Abstract/MultiSigContract.sol";
- import "./PrivateCertificatesPool.sol";
- import "./PublicCertificatesPool.sol";
  import "../Libraries/ItemsLibrary.sol";
  import "../Libraries/AddressLibrary.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -32,6 +31,11 @@ pragma experimental ABIEncoderV2;
     uint256 constant _poolId = 1;
     string constant _poolLabel = "Pool";
 
+    mapping(address => uint256) _AddCertificatePricePerPool;
+    mapping(address => uint256) _SubscriptionPricePerPool;
+    mapping(address => bool) _submited;
+
+
     // Certificates
     uint256 constant _certId = 2;
     string constant _certLabel = "Certificate";
@@ -43,11 +47,7 @@ pragma experimental ABIEncoderV2;
     }
    
     mapping(address => _CertificatesPerHolderStruct) _CertificatesPerPool;
-
-    mapping(address => uint256) _AddCertificatePricePerPool;
-    mapping(address => uint256) _SubscriptionPricePerPool;
-    mapping(address => bool) _submited;
-
+    
     // Provider
     string _ProviderInfo;
 
@@ -206,26 +206,24 @@ pragma experimental ABIEncoderV2;
      }
  
     function manipulateCertificate(address pool, bytes32 CertificateHash, address holder) internal
+        isAPool(pool)
     {
-        MultiSigCertificatesPool poolToSend;
-        (string memory p ,) = InternalRetrievePool(pool);
-
-        if(keccak256(abi.encodePacked("Private")) == keccak256(abi.encodePacked((p)))){
-                poolToSend = PrivateCertificatesPool(pool);
-            }
-        else {
-                poolToSend = PublicCertificatesPool(pool);
-        }
+        IPool poolToSend = IPool(pool);
 
         poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
-            
-        //delete(_CertificatesPerPool[getPoolId(pool)]._CertificatesPerHolder[getHolderId(holder)]._cert[CertificateHash]);
-        
+
+        ItemsLibrary._ItemsStruct storage itemStruct = _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
+
+        itemStruct._activatedItems = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, itemStruct._activatedItems), itemStruct._activatedItems);
+        delete(itemStruct._items[CertificateHash]);   
     }
 
     function isCertificate(address pool, bytes32 CertificateHash, address holder) public view returns(bool)
     {
-        return ItemsLibrary.isItem(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
+        IPool poolToCheck = IPool(pool);
+        address provider = poolToCheck.retrieveCertificateProvider(CertificateHash, holder);
+        if(provider == address(this)) return true;
+        return false;
     }
 
     function isCertificatePendingToAdded(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
@@ -250,7 +248,7 @@ pragma experimental ABIEncoderV2;
 
             if(false == addOrRemove)removePricesForPool(pool);
             else{
-                MultiSigCertificatesPool poolToSubscribe = PublicCertificatesPool(pool);
+                IPool poolToSubscribe = IPool(pool);
                 poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
             }
         }

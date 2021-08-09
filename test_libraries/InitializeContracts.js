@@ -15,8 +15,8 @@ const ProviderFactoryAbi = ProviderFactory.abi;
 const GenericProxy = artifacts.require("GenericProxy");
 const CertisTokenProxy = artifacts.require("CertisTokenProxy");
 
-
 const constants = require("../test_libraries/constants.js");
+const obj = require("../test_libraries/objects.js");
 
 const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
@@ -165,7 +165,7 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
   let implementations = await deployImplementations(user_1);
   let proxies = await deployProxies(chairPerson, PublicOwners, minOwners, user_1, implementations[0], implementations[1], implementations[2], implementations[3], implementations[5], certPoolManager.address)
 
-  await certPoolManager.InitializeContracts(proxies[0], proxies[1], proxies[2], proxies[3], implementations[4], proxies[4], implementations[6], {from: chairPerson});
+  await certPoolManager.InitializeContracts(obj.returnInitialObject(proxies[0], proxies[1], proxies[2], proxies[3], implementations[4], proxies[4], implementations[6]), {from: chairPerson});
 
   return [certPoolManager, proxies, implementations];
 }

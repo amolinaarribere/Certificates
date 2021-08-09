@@ -19,6 +19,33 @@ library Library{
         _;
     }
 
+    // Structures
+    // Certificate Manager
+    struct ProposedContractsStruct{
+        address NewPublicPoolAddress;
+        address NewTreasuryAddress;
+        address NewCertisTokenAddress;
+        address NewPrivatePoolFactoryAddress;
+        address NewPrivatePoolAddress;
+        address NewProviderFactoryAddress;
+        address NewProviderAddress;
+        bytes NewPublicPoolData;
+        bytes NewTreasuryData;
+        bytes NewCertisTokenData;
+        bytes NewPrivatePoolFactoryData;
+        bytes NewProviderFactoryData;
+    }
+
+    struct InitialContractsStruct{
+        address payable PublicPoolProxyAddress;
+        address payable TreasuryProxyAddress;
+        address payable CertisTokenProxyAddress;
+        address payable PrivatePoolFactoryProxyAddress;
+        address PrivateCertificatePoolImplAddress;
+        address payable ProviderFactoryProxyAddress;
+        address ProviderImplAddress;
+    }
+
     // auxiliary functions
     function IdCorrect(uint Id, uint length) public pure returns (bool){
         return (length > Id);

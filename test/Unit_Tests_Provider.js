@@ -100,6 +100,8 @@ contract("Testing Provider",function(accounts){
             await provider.methods.rejectCertificate(publicCertPoolAddress, hash_1, holder_2).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
             await provider.methods.rejectCertificate(publicCertPoolAddress, hash_1, holder_2).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
         }
+        var isCert = await provider.methods.isCertificate(publicCertPoolAddress, hash_1, holder_2).call({from: user_1, gas: Gas}, function(error, result){});
+        expect(isCert).to.equal(validateOrreject);
         
     }
 

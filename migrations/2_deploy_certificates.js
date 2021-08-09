@@ -10,6 +10,8 @@ let ProviderFactory = artifacts.require("./DeployedContracts/ProviderFactory");
 const GenericProxy = artifacts.require("./DeployedContracts/Proxies/GenericProxy");
 let CertisTokenProxy = artifacts.require("./DeployedContracts/Proxies/CertisTokenProxy");
 
+const obj = require("../test_libraries/objects.js");
+
 let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
 let AddressLibrary = artifacts.require("./Libraries/AddressLibrary");
@@ -302,7 +304,7 @@ module.exports = async function(deployer, network, accounts){
   console.log("ProviderFactoryProxy deployed : " + ProviderFactoryProxyInstance.address);
 
   // Initialized Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await CertificatesPoolManagerInstance.InitializeContracts(PublicCertificatesPoolProxyInstance.address, TreasuryProxyInstance.address, CertisTokenProxyInstance.address, PrivatePoolFactoryProxyInstance.address, PrivateCertificatesPoolInstance.address, ProviderFactoryProxyInstance.address, ProviderInstance.address);
+  await CertificatesPoolManagerInstance.InitializeContracts(obj.returnInitialObject(PublicCertificatesPoolProxyInstance.address, TreasuryProxyInstance.address, CertisTokenProxyInstance.address, PrivatePoolFactoryProxyInstance.address, PrivateCertificatesPoolInstance.address, ProviderFactoryProxyInstance.address, ProviderInstance.address));
   console.log("CertificatesPoolManager initialized");
     
 }
