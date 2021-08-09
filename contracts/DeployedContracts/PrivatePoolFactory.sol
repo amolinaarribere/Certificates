@@ -27,10 +27,7 @@ contract PrivatePoolFactory is Initializable, Factory{
         Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewPool);
         bytes memory data = abi.encodeWithSignature("PrivateCertPool_init(address[],uint256)", owners, minOwners);
         BeaconProxy certificatePoolProxy = new BeaconProxy(_managerContract.retrievePrivatePoolBeacon(), data);
-        _ElementStruct memory element = _ElementStruct(msg.sender, address(certificatePoolProxy));
-        _Elements.push(element);
-
-        emit _NewElement("Private Pool", _Elements.length - 1, element._creator, element._ElementProxyAddress);
+        internalCreate(address(certificatePoolProxy), "Private Pool", ElementName);
     }
 
 

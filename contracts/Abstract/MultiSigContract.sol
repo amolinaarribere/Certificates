@@ -28,8 +28,9 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function MultiSigContract_init(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) public initializer {
-        require(minOwners <= owners.length, "EC16");
+    function MultiSigContract_init(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) public initializer 
+        minRequired(minOwners, owners.length)
+    {
         require(minOwners > 0, "EC17");
         require(TotalEntities == labels.length, "EC18");
 

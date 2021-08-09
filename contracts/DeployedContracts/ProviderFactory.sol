@@ -27,10 +27,7 @@ contract ProviderFactory is Initializable, Factory{
         Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProviderContract);
         bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string)", owners, minOwners, ElementName);
         BeaconProxy providerProxy = new BeaconProxy(_managerContract.retrieveProviderBeacon(), data);
-        _ElementStruct memory element = _ElementStruct(msg.sender, address(providerProxy));
-        _Elements.push(element);
-
-        emit _NewElement("Provider", _Elements.length - 1, element._creator, element._ElementProxyAddress);
+        internalCreate(address(providerProxy), "Provider", ElementName);
     }
 
 

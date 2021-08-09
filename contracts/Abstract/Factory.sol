@@ -16,7 +16,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     using Library for *;
 
      // EVENTS /////////////////////////////////////////
-    event _NewElement(string indexed, uint256, address, address);
+    event _NewElement(string indexed, uint256, address indexed, address, string indexed);
 
     // DATA /////////////////////////////////////////
     // Private Certificates Pool structure
@@ -39,7 +39,13 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    //function create(address[] memory owners,  uint256 minOwners, string memory ElementName) external virtual payable{}
+    function internalCreate(address beaconProxyAddress, string memory eventLabel, string memory elementName) internal
+    {
+        _ElementStruct memory element = _ElementStruct(msg.sender, beaconProxyAddress);
+        _Elements.push(element);
+
+        emit _NewElement(eventLabel, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
+    }
 
     function retrieve(uint Id) external override
         isIdCorrect(Id, _Elements.length)
