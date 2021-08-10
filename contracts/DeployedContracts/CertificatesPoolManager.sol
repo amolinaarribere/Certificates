@@ -21,6 +21,9 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     using AddressLibrary for *;
     using Library for *;
 
+    // EVENTS /////////////////////////////////////////
+    event _NewContracts(address, address, address, address, address, address, address);
+
     // DATA /////////////////////////////////////////
     // proposition to change
     Library.ProposedContractsStruct _ProposedContracts;
@@ -148,6 +151,8 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         }
         if(address(0) != _ProposedContracts.NewPrivatePoolAddress)_PrivateCertificatePoolBeacon.upgradeTo(_ProposedContracts.NewPrivatePoolAddress);
         if(address(0) != _ProposedContracts.NewProviderAddress)_ProviderBeacon.upgradeTo(_ProposedContracts.NewProviderAddress);
+
+        emit _NewContracts(internalRetrievePublicCertificatePool(), internalRetrieveTreasury(), internalRetrieveCertisToken(), internalRetrievePrivatePoolFactory(), internalRetrievePrivatePool(), internalRetrieveProviderFactory(), internalRetrieveProvider());
     }
 
     // configuration Proxies
@@ -181,30 +186,59 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     // configuration implementations
     function retrievePublicCertificatePool() external override view returns (address) {
-        return _PublicCertificatesPool.retrieveImplementation();
+        return internalRetrievePublicCertificatePool();
     }
 
     function retrieveTreasury() external override view returns (address) {
-        return _Treasury.retrieveImplementation();
+        return internalRetrieveTreasury();
     }
 
     function retrieveCertisToken() external override view returns (address) {
-        return _CertisToken.retrieveImplementation();
+        return internalRetrieveCertisToken();
     }
 
     function retrievePrivatePoolFactory() external override view returns (address) {
-        return _PrivatePoolFactory.retrieveImplementation();
+        return internalRetrievePrivatePoolFactory();
     }
 
     function retrievePrivatePool() external override view returns (address) {
-        return _PrivateCertificatePoolBeacon.implementation();
+        return internalRetrievePrivatePool();
     }
 
     function retrieveProviderFactory() external override view returns (address) {
-        return _ProviderFactory.retrieveImplementation();
+        return internalRetrieveProviderFactory();
     }
 
     function retrieveProvider() external override view returns (address) {
+        return internalRetrieveProvider();
+    }
+
+    // internal
+    function internalRetrievePublicCertificatePool() internal view returns (address) {
+        return _PublicCertificatesPool.retrieveImplementation();
+    }
+
+    function internalRetrieveTreasury() internal view returns (address) {
+        return _Treasury.retrieveImplementation();
+    }
+
+    function internalRetrieveCertisToken() internal view returns (address) {
+        return _CertisToken.retrieveImplementation();
+    }
+
+    function internalRetrievePrivatePoolFactory() internal view returns (address) {
+        return _PrivatePoolFactory.retrieveImplementation();
+    }
+
+    function internalRetrievePrivatePool() internal view returns (address) {
+        return _PrivateCertificatePoolBeacon.implementation();
+    }
+
+    function internalRetrieveProviderFactory() internal view returns (address) {
+        return _ProviderFactory.retrieveImplementation();
+    }
+
+    function internalRetrieveProvider() internal view returns (address) {
         return _ProviderBeacon.implementation();
     }
     

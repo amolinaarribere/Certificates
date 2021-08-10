@@ -17,6 +17,12 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using Library for *;
     using UintLibrary for *;
 
+    // EVENTS /////////////////////////////////////////
+    event _NewPrices(uint, uint, uint, uint, uint);
+    event _Pay(address indexed, uint);
+    event _Refund(address indexed, uint);
+    event _Withdraw(address indexed, uint);
+
     // DATA /////////////////////////////////////////
     // proposition to change prices
     struct ProposedPricesStruct{
@@ -93,7 +99,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         if(fromConstructor){
             _PublicPriceWei = PublicPriceWei;
             _PrivatePriceWei = PrivatePriceWei;
-             _ProviderPriceWei = ProviderPriceWei;
+            _ProviderPriceWei = ProviderPriceWei;
             _CertificatePriceWei = CertificatePriceWei;
             _OwnerRefundPriceWei = OwnerRefundPriceWei;
         }
@@ -102,7 +108,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _ProposedPrices.NewPublicPriceWei = PublicPriceWei;
             _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
             _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
-             _ProposedPrices.NewProviderPriceWei = ProviderPriceWei;
+            _ProposedPrices.NewProviderPriceWei = ProviderPriceWei;
             _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
         }
         
@@ -117,6 +123,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
         
         removeProposition();
+
+        emit _NewPrices(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
     }
 
     function propositionRejected() internal override
@@ -153,6 +161,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint256 amount = msg.value;
         if(price == Library.Prices.NewProvider) amount -= _OwnerRefundPriceWei;
         AssignDividends(amount);
+
+        emit _Pay(msg.sender, msg.value);
     }
 
     function AssignDividends(uint256 amount) internal
@@ -171,6 +181,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     override
     {
         addBalance(addr, _OwnerRefundPriceWei, numberOfOwners);
+
+        emit _Refund(addr, numberOfOwners);
     }
 
     function withdraw(uint amount) external 
@@ -192,6 +204,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         require(total == amount, "UnExpected problem calculating the amount to withdraw");
 
         payable(msg.sender).transfer(total);
+
+        emit _Withdraw(msg.sender, total);
     }
 
     function retrieveBalance(address addr) external override view returns(uint)

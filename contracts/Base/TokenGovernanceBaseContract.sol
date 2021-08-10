@@ -17,6 +17,12 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     using Library for *;
     using AddressLibrary for *; 
 
+    // EVENTS /////////////////////////////////////////
+    event _AddedProposition(address indexed, uint256, uint256, address[], uint256[]);
+    event _CancelledProposition(address indexed);
+    event _PropositionApproved(address indexed, uint256, uint256, address[]);
+    event _PropositionRejected(address indexed, uint256, uint256, address[]);
+
     // DATA /////////////////////////////////////////
     // chair person
     address _chairperson;
@@ -192,6 +198,8 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         _Proposition.DeadLine = _DeadLine;
         _Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
         _Proposition.AdminsWeight = GetAdminWeights();
+
+        emit _AddedProposition(_Proposition.Proposer, _Proposition.DeadLine, _Proposition.validationThreshold, _Proposition.listOfAdmins, _Proposition.AdminsWeight);
     }
 
     function cancelProposition() external
@@ -199,6 +207,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         isAuthorizedToCancel()
     {
         InternalCancelProposition();
+        emit _CancelledProposition(_Proposition.Proposer);
     }
 
     function voteProposition(bool vote) external
@@ -246,6 +255,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
                 propositionApproved();
             }
             InternalCancelProposition();
+            emit _PropositionApproved(_Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst, _Proposition.AlreadyVoted);
         }
         else if(_Proposition.VotesAgainst > _Proposition.validationThreshold)
         {
@@ -256,6 +266,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
                 propositionRejected();
             }
             InternalCancelProposition();
+            emit _PropositionRejected(_Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst, _Proposition.AlreadyVoted);
         } 
     }
 

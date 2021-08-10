@@ -15,8 +15,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigContract {
     
     // EVENTS /////////////////////////////////////////
-    event _AddCertificateIdEvent(address, address);
-    event _RemoveCertificateIdEvent(address, address);
+    event _AddCertificateIdEvent(address indexed, address indexed, bytes32);
 
     // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;
@@ -126,7 +125,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;
         _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
 
-        emit _AddCertificateIdEvent(msg.sender, holder);
+        emit _AddCertificateIdEvent(msg.sender, holder, CertificateHash);
     }
 
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override

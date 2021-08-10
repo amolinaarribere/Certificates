@@ -17,12 +17,6 @@ abstract contract EntitiesBaseContract{
     using AddressLibrary for *;
     using ItemsLibrary for *;
 
-    //EVENTS /////////////////////////////////////////
-    event _AddEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
-    event _RemoveEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
-    event _AddEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
-    event _RemoveEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
-
     // DATA /////////////////////////////////////////
     // owners
     uint _ownerId;
