@@ -20,7 +20,7 @@ pragma experimental ABIEncoderV2;
     using AddressLibrary for *;
 
     // EVENTS /////////////////////////////////////////
-    event _SendProposalId(address indexed,  string indexed);
+    event _NewProposal(address indexed,  string indexed);
 
     // DATA /////////////////////////////////////////
 
@@ -41,7 +41,7 @@ pragma experimental ABIEncoderV2;
         _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
         _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
 
-        emit _SendProposalId(provider, providerInfo);
+        emit _NewProposal(provider, providerInfo);
     }
 
     function payBack(bytes32 entityInBytes, bool validatedOrRejected) internal

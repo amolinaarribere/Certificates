@@ -16,10 +16,10 @@ library ItemsLibrary{
     using Library for *;
 
     //events
-    event _AddItemValidationIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemValidationIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _AddItemRejectionIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemRejectionIdEvent(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _AddItemValidation(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _RemoveItemValidation(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _AddItemRejection(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _RemoveItemRejection(bool, string indexed,  bytes32 indexed,  string indexed);
     
     // Data structure
     struct _itemIdentity{
@@ -90,14 +90,14 @@ library ItemsLibrary{
                 itemStruct._pendingItemsAdd = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsAdd), itemStruct._pendingItemsAdd);
                 (bool success, ) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, true));
                 deleteVoters(item, itemStruct);
-                if(emitEvent) emit _AddItemValidationIdEvent(success, label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _AddItemValidation(success, label, item, itemStruct._items[item]._Info);
             }
             else{
                 itemStruct._activatedItems = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._activatedItems), itemStruct._activatedItems);
                 itemStruct._pendingItemsRemove = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsRemove), itemStruct._pendingItemsRemove);
                 (bool success, ) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));
                 delete(itemStruct._items[item]);
-                if(emitEvent) emit _RemoveItemValidationIdEvent(success, label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _RemoveItemValidation(success, label, item, itemStruct._items[item]._Info);
             }   
         }
     }
@@ -119,13 +119,13 @@ library ItemsLibrary{
                 (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true));
                 delete(itemStruct._items[item]._Info);
                 deleteVoters(item, itemStruct); 
-                if(emitEvent) emit _AddItemRejectionIdEvent(success, label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _AddItemRejection(success, label, item, itemStruct._items[item]._Info);
             }
             else{
                 itemStruct._pendingItemsRemove = Library.ArrayRemoveResize(Library.FindPosition(item, itemStruct._pendingItemsRemove), itemStruct._pendingItemsRemove);
                 (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, false));
                 deleteVoters(item, itemStruct);
-                if(emitEvent) emit _RemoveItemRejectionIdEvent(success, label, item, itemStruct._items[item]._Info);
+                if(emitEvent) emit _RemoveItemRejection(success, label, item, itemStruct._items[item]._Info);
             }
                 
         }
