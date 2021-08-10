@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -10,15 +9,13 @@ pragma experimental ABIEncoderV2;
 
  import "../Interfaces/IMultiSigContract.sol";
  import "../Base/EntitiesBaseContract.sol";
+ import "../Libraries/AddressLibrary.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
+abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, Initializable{
+    using AddressLibrary for *;
 
-    // modifier
-     modifier isSomeoneSpecific(address someone){
-        require(true == Library.ItIsSomeone(someone), "EC8");
-        _;
-    }
-
+    // MODIFIERS /////////////////////////////////////////
     modifier NotEmpty(bytes32 document){
         require(0 < document.length, "EC11");
         _;
@@ -29,9 +26,10 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
         _;
     }
 
-    // Constructor
-    constructor(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) payable{
-        require(minOwners <= owners.length, "EC16");
+    // CONSTRUCTOR /////////////////////////////////////////
+    function MultiSigContract_init(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) public initializer 
+        minRequired(minOwners, owners.length)
+    {
         require(minOwners > 0, "EC17");
         require(TotalEntities == labels.length, "EC18");
 
@@ -44,13 +42,15 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
 
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
-            _Entities[_ownerId]._entities[owners[i]]._activated = true;
-            _Entities[_ownerId]._activatedEntities.push(owners[i]); 
-        }
+            bytes32 ownerInBytes = AddressLibrary.AddressToBytes32(owners[i]);
+            _Entities[_ownerId]._items[ownerInBytes]._activated = true;
+            _Entities[_ownerId]._activatedItems.push(ownerInBytes); 
+        } 
     }
 
-    // OWNERS CRUD Operations
-    function addOwner(address owner, string memory ownerInfo) external override {
+    // FUNCTIONALITY /////////////////////////////////////////
+    function addOwner(address owner, string calldata ownerInfo) external override 
+    {
         addEntity(owner, ownerInfo, _ownerId);
     }
     
@@ -58,6 +58,19 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract{
         minRequired(_minOwners, retrieveAllEntities(_ownerId).length - 1)
     {
         removeEntity(owner, _ownerId);
+    }
+
+    function validateOwner(address owner) external override
+    {
+        if(true == isEntityPendingToRemoved(owner, _ownerId)){
+            require(_minOwners <= retrieveAllEntities(_ownerId).length - 1, "EC19");
+        }
+        validateEntity(owner, _ownerId);
+    }
+
+    function rejectOwner(address owner) external override
+    {
+        rejectEntity(owner, _ownerId);
     }
     
     function retrieveOwner(address owner) external override view returns (string memory, bool){

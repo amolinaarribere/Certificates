@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -16,45 +15,41 @@ library UintLibrary{
     // auxiliary functions
 
     function FindUintPosition(uint value, uint[] memory list) public pure returns (uint){
-        return Library.FindPosition(bytes32(value), UintArrayToBytes(list));
+        return Library.FindPosition(bytes32(value), UintArrayToBytes32Array(list));
     }
 
     function UintArrayRemoveResize(uint index, uint[] memory array) public 
     pure returns(uint[] memory) 
     {
-        return BytesArrayToUint(Library.ArrayRemoveResize(index, UintArrayToBytes(array)));
+        return Bytes32ArrayToUintArray(Library.ArrayRemoveResize(index, UintArrayToBytes32Array(array)));
     }
 
-    function UintArrayToBytes(uint[] memory array) internal pure returns(bytes32[] memory){
+    function UintArrayToBytes32Array(uint[] memory array) public pure returns(bytes32[] memory){
         bytes32[] memory arrayInBytes = new bytes32[](array.length);
 
         for(uint i=0; i < arrayInBytes.length; i++){
-            arrayInBytes[i] = UintToBytes(array[i]);
+            arrayInBytes[i] = UintToBytes32(array[i]);
         }
 
         return arrayInBytes;
     }
 
-    function UintToBytes(uint element) internal pure returns(bytes32){
+    function UintToBytes32(uint element) public pure returns(bytes32){
         return bytes32(element);
     }
 
-    function BytesArrayToUint(bytes32[] memory array) internal pure returns(uint[] memory){
+    function Bytes32ArrayToUintArray(bytes32[] memory array) public pure returns(uint[] memory){
         uint[] memory arrayInUint = new uint[](array.length);
 
         for(uint i=0; i < arrayInUint.length; i++){
-            arrayInUint[i] = BytesToUint(array[i]);
+            arrayInUint[i] = Bytes32ToUint(array[i]);
         }
 
         return arrayInUint;
     }
 
-    function BytesToUint(bytes32 element) internal pure returns(uint){
+    function Bytes32ToUint(bytes32 element) public pure returns(uint){
         return uint256(element);
-    }
-
-    function UintToString(uint element) internal pure returns(string memory){
-        return Library.BytesToString(UintToBytes(element));
     }
 
 }

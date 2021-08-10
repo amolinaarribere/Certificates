@@ -12,15 +12,13 @@ pragma solidity >=0.7.0 <0.9.0;
  interface ITreasury  {
 
     function pay(Library.Prices price) external payable;
-
     
-    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external;
-    function updateContracts(address PublicPoolAddress, address CertisTokenAddress) external;
+    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external;
     
     function getRefund(address addr, uint numberOfOwners) external;
     function withdraw(uint amount) external;
 
     function retrieveBalance(address addr) external view returns(uint);
-    function retrievePrices() external view returns(uint, uint, uint, uint);
+    function retrievePrices() external view returns(uint, uint, uint, uint, uint);
 
 }

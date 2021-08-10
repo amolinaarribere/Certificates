@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -11,7 +10,7 @@ pragma experimental ABIEncoderV2;
 library Library{
 
     // enum
-    enum Prices{NewProvider, NewPool, NewCertificate}
+    enum Prices{NewProvider, NewPool, NewCertificate, NewProviderContract}
 
     // modifier
     modifier isIdCorrect(uint Id, uint length){
@@ -19,22 +18,44 @@ library Library{
         _;
     }
 
+    // Structures
+    // Certificate Manager
+    struct ProposedContractsStruct{
+        address NewPublicPoolAddress;
+        address NewTreasuryAddress;
+        address NewCertisTokenAddress;
+        address NewPrivatePoolFactoryAddress;
+        address NewPrivatePoolAddress;
+        address NewProviderFactoryAddress;
+        address NewProviderAddress;
+        bytes NewPublicPoolData;
+        bytes NewTreasuryData;
+        bytes NewCertisTokenData;
+        bytes NewPrivatePoolFactoryData;
+        bytes NewProviderFactoryData;
+    }
+
+    struct InitialContractsStruct{
+        address payable PublicPoolProxyAddress;
+        address payable TreasuryProxyAddress;
+        address payable CertisTokenProxyAddress;
+        address payable PrivatePoolFactoryProxyAddress;
+        address PrivateCertificatePoolImplAddress;
+        address payable ProviderFactoryProxyAddress;
+        address ProviderImplAddress;
+    }
+
     // auxiliary functions
     function IdCorrect(uint Id, uint length) public pure returns (bool){
         return (length > Id);
     }
 
-    function CheckValidations(uint256 signatures, uint256 minSignatures) internal pure returns(bool){
-        if(signatures < minSignatures) return false;
-        return true;
-    }
-
-    function ItIsSomeone(address someone) internal view returns(bool){
+    function ItIsSomeone(address someone) public view returns(bool){
         if(msg.sender == someone) return true;
         return false;
     }
 
-    function FindPosition(bytes32 data, bytes32[] memory list) internal pure returns (uint){
+    function FindPosition(bytes32 data, bytes32[] memory list) public pure returns (uint){
         for(uint i=0; i < list.length; i++){
             if(data == list[i]) return i;
         }
@@ -56,8 +77,26 @@ library Library{
         return newArray;
     }
 
-    function BytesToString(bytes32 element) internal pure returns(string memory){
+    function Bytes32ArrayToString(bytes32[] memory element) internal pure returns(string memory){
         return string(abi.encodePacked(element));
+    }
+
+    function BytestoBytes32(bytes memory _b) private pure returns(bytes32[] memory){
+        uint num = _b.length / 32;
+        bytes32[] memory result = new bytes32[](num + 1);
+        uint t = 0;
+        
+        for(uint i=0; i<_b.length; i = i + 32){
+            bytes32 r;
+            uint p = i + 32;
+             assembly {
+                r := mload(add(_b, p))
+            }
+            result[t] = r;
+            t += 1;
+        }
+       
+        return result;
     }
     
 }
