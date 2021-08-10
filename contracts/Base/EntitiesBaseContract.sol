@@ -18,12 +18,12 @@ abstract contract EntitiesBaseContract{
 
     // DATA /////////////////////////////////////////
     // owners
-    uint _ownerId;
-    uint256 _minOwners;
+    uint internal _ownerId;
+    uint256 internal _minOwners;
 
     // Total Owners and other Entities
-    ItemsLibrary._ItemsStruct[] _Entities;
-    string[] _entitiesLabel;
+    ItemsLibrary._ItemsStruct[] internal _Entities;
+    string[] internal _entitiesLabel;
 
     // MODIFIERS /////////////////////////////////////////
     modifier isSomeoneSpecific(address someone){

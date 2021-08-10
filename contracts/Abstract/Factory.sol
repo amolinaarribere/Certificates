@@ -25,7 +25,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
         address _ElementProxyAddress;
     } 
 
-    _ElementStruct[] _Elements;
+    _ElementStruct[] internal _Elements;
 
     // MODIFIERS /////////////////////////////////////////
     modifier isIdCorrect(uint Id, uint length){

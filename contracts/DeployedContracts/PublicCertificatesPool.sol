@@ -21,8 +21,6 @@ pragma solidity >=0.7.0 <0.9.0;
     // EVENTS /////////////////////////////////////////
     event _NewProposal(address indexed,  string indexed);
 
-    // DATA /////////////////////////////////////////
-
     // CONSTRUCTOR /////////////////////////////////////////
     function PublicCertPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
         super.MultiSigCertPool_init(owners, minOwners); 

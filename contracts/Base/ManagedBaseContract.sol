@@ -15,7 +15,7 @@ contract ManagedBaseContract is Initializable{
     using Library for *;
 
     // DATA /////////////////////////////////////////
-    IProxyManager _managerContract;
+    IProxyManager internal _managerContract;
 
     // MODIFIERS /////////////////////////////////////////
      modifier isFromManagerContract(){

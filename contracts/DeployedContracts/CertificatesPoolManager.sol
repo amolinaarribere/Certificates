@@ -26,31 +26,31 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     // DATA /////////////////////////////////////////
     // proposition to change
-    Library.ProposedContractsStruct _ProposedContracts;
+    Library.ProposedContractsStruct private _ProposedContracts;
     
     // Private Certificate Pools Factory
-    GenericProxy _PrivatePoolFactory;
+    GenericProxy private _PrivatePoolFactory;
 
     // Private Certificates Pool
-    UpgradeableBeacon _PrivateCertificatePoolBeacon;
+    UpgradeableBeacon private _PrivateCertificatePoolBeacon;
 
     // Provider Factory
-    GenericProxy _ProviderFactory;
+    GenericProxy private _ProviderFactory;
 
     // Provider
-    UpgradeableBeacon _ProviderBeacon;
+    UpgradeableBeacon private _ProviderBeacon;
 
     // Public Certificates Pool
-    GenericProxy  _PublicCertificatesPool;
+    GenericProxy private _PublicCertificatesPool;
 
     // Treasury
-    GenericProxy _Treasury;
+    GenericProxy private _Treasury;
 
     // Certis Token
-    CertisTokenProxy _CertisToken;
+    CertisTokenProxy private _CertisToken;
 
     // init
-    bool _init;
+    bool private _init;
 
     // MODIFIERS /////////////////////////////////////////
     modifier isNotInitialized(){

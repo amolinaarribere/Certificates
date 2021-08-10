@@ -27,7 +27,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
     uint256 constant _providerId = 1;
     string constant _providerLabel = "Provider";
 
-    string[] _Label;
+    string[] internal _Label;
 
     // Holders
     struct _CertificatePerHolder{

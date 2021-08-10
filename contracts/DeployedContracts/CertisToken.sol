@@ -15,8 +15,8 @@ import "../Interfaces/ICertisToken.sol";
     using AddressLibrary for *;
 
     // DATA /////////////////////////////////////////
-    address[] _tokenOwners;
-    uint8 _decimals;
+    address[] private _tokenOwners;
+    uint8 private _decimals;
 
     // CONSTRUCTOR /////////////////////////////////////////
     function CertisToken_init(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) public initializer {

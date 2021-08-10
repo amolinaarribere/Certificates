@@ -33,14 +33,14 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint NewOwnerRefundPriceWei;
     }
 
-    ProposedPricesStruct _ProposedPrices;
+    ProposedPricesStruct private _ProposedPrices;
 
     // parameters
-    uint _PublicPriceWei;
-    uint _CertificatePriceWei;
-    uint _PrivatePriceWei;
-    uint _ProviderPriceWei;
-    uint _OwnerRefundPriceWei;
+    uint private _PublicPriceWei;
+    uint private _CertificatePriceWei;
+    uint private _PrivatePriceWei;
+    uint private _ProviderPriceWei;
+    uint private _OwnerRefundPriceWei;
 
     // dividends per token owner
     struct _BalanceStruct{
@@ -48,7 +48,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint[] _factors;
     }
     
-    mapping(address => _BalanceStruct) _balances;
+    mapping(address => _BalanceStruct) private _balances;
 
     // MODIFIERS /////////////////////////////////////////
     modifier areFundsEnough(Library.Prices price){

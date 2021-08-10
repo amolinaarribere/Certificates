@@ -30,25 +30,25 @@ pragma solidity >=0.7.0 <0.9.0;
     uint256 constant _poolId = 1;
     string constant _poolLabel = "Pool";
 
-    mapping(address => uint256) _AddCertificatePricePerPool;
-    mapping(address => uint256) _SubscriptionPricePerPool;
-    mapping(address => bool) _submited;
+    mapping(address => uint256) private _AddCertificatePricePerPool;
+    mapping(address => uint256) private _SubscriptionPricePerPool;
+    mapping(address => bool) private _submited;
 
 
     // Certificates
     uint256 constant _certId = 2;
     string constant _certLabel = "Certificate";
 
-    string[] _Label;
+    string[] private _Label;
     
     struct _CertificatesPerHolderStruct{
         mapping(address => ItemsLibrary._ItemsStruct) _CertificatesPerHolder;
     }
    
-    mapping(address => _CertificatesPerHolderStruct) _CertificatesPerPool;
+    mapping(address => _CertificatesPerHolderStruct) private _CertificatesPerPool;
     
     // Provider
-    string _ProviderInfo;
+    string private _ProviderInfo;
 
     // MODIFIERS /////////////////////////////////////////
     modifier isAPool(address pool){

@@ -25,7 +25,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
 
     // DATA /////////////////////////////////////////
     // chair person
-    address _chairperson;
+    address internal _chairperson;
 
     // Proposition Structure
     struct PropositionStruct{
@@ -39,23 +39,23 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         address[] AlreadyVoted;
     }
 
-    PropositionStruct _Proposition;
+    PropositionStruct internal _Proposition;
 
-    uint _PropositionLifeTime;
-    uint8 _PropositionThresholdPercentage;
-    uint8 _minWeightToProposePercentage;
+    uint internal _PropositionLifeTime;
+    uint8 internal _PropositionThresholdPercentage;
+    uint8 internal _minWeightToProposePercentage;
 
     // Proposition to change Prop parameters
+    bool internal _currentPropisProp;
+
     struct ProposedPropositionStruct{
         uint256 NewPropositionLifeTime;
         uint8 NewPropositionThresholdPercentage;
         uint8 NewMinWeightToProposePercentage;
     }
 
-    ProposedPropositionStruct _ProposedProposition;
+    ProposedPropositionStruct internal _ProposedProposition;
 
-    bool _currentPropisProp;
-    
     // MODIFIERS /////////////////////////////////////////
     modifier isFromChairPerson(){
         require(true == Library.ItIsSomeone(_chairperson), "EC8");
