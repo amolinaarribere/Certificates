@@ -243,7 +243,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
              _balances[addr]._factors.push(factor);
         }
 
-       _balances[addr]._balance[factor] += amount;
+        uint newFactorBalance = _balances[addr]._balance[factor] + amount;
+        require(newFactorBalance >= _balances[addr]._balance[factor], "uint overflow adding");
+
+       _balances[addr]._balance[factor] = newFactorBalance;
     }
 
     function substractBalance(address addr, uint amount, uint factor) private
