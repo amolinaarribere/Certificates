@@ -17,6 +17,7 @@ const UintLibrary = artifacts.require("./Libraries/UintLibrary");
 
 const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
+const ProviderPriceWei = constants.ProviderPriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
 const PropositionLifeTime = constants.PropositionLifeTime;
@@ -29,7 +30,6 @@ const Gas = constants.Gas;
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Treasury",function(accounts){
-    var certPoolManager;
     var certisTokenProxy;
     var publicCertPool;
     var Treasury;
@@ -74,9 +74,9 @@ contract("Testing Treasury",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][0]);
-        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][1]);   
-        Treasury = new web3.eth.Contract(TreasuryAbi, contracts[1][2]);
+        publicCertPool = new web3.eth.Contract(PublicCertificatesAbi, contracts[1][0]);   
+        Treasury = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
+        certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
     });
 
     async function SendingNewProviders(){
@@ -113,7 +113,7 @@ contract("Testing Treasury",function(accounts){
     it("Update Price Configuration WRONG",async function(){
         // act
         try{
-            await Treasury.methods.updatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei).send({from: user_1, gas: Gas}, function(error, result){});
+            await Treasury.methods.updatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -121,7 +121,7 @@ contract("Testing Treasury",function(accounts){
             expect(error.message).to.match(Unauthorized);
         }
         try{
-            await Treasury.methods.updatePrices(OwnerRefundPriceWei, PrivatePriceWei, CertificatePriceWei, PublicPriceWei).send({from: chairPerson, gas: Gas}, function(error, result){});
+            await Treasury.methods.updatePrices(OwnerRefundPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, PublicPriceWei).send({from: chairPerson, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -181,7 +181,7 @@ contract("Testing Treasury",function(accounts){
         }
         // act
         try{
-            await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
+            await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
             await Treasury.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
             expect.fail();
         }
@@ -200,7 +200,7 @@ contract("Testing Treasury",function(accounts){
         }
         // act
         try{
-            await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
+            await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -237,51 +237,51 @@ contract("Testing Treasury",function(accounts){
 
         // Rejected 
 
-        await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
 
         // Cancelled
 
-        await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
 
         // Validated
 
-        await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei);
+        await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
 
         // Validated again
 
-        await Treasury.methods.updatePrices(PublicPriceWei + 2, PrivatePriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await Treasury.methods.updatePrices(PublicPriceWei + 2, PrivatePriceWei + 2, ProviderPriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_2, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_4, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
+        await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_5, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 2, PrivatePriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2);
+        await checkPrices(PublicPriceWei + 2, PrivatePriceWei + 2, ProviderPriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2);
     });
 
     it("Update Prop Configuration CORRECT",async function(){
@@ -334,7 +334,7 @@ contract("Testing Treasury",function(accounts){
 
     // ****** TESTING Paying ***************************************************************** //
 
-     it("Pay New Proposal & New Pool & New Certificate WRONG",async function(){
+     it("Pay New Proposal & New Pool & New Certificate & New Provider WRONG",async function(){
         // act
         try{
             await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
@@ -362,9 +362,27 @@ contract("Testing Treasury",function(accounts){
         catch(error){
             expect(error.message).to.match(NotEnoughFunds);
         }
+        // act
+        try{
+            await Treasury.methods.pay(3).send({from: user_1, value: ProviderPriceWei - 1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughFunds);
+        }
+        // act
+        try{
+            await Treasury.methods.pay(4).send({from: user_1, value: 1000000000000}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.not.match(NotEnoughFunds);
+        }
     });
 
-    it("Pay New Proposal & New Pool & New Certificate CORRECT",async function(){
+    it("Pay New Proposal & New Pool & New Certificate & New Provider CORRECT",async function(){
         // act
         var CertisTokenBalance = (new BigNumber(await certisTokenProxy.methods.balanceOf(chairPerson).call({from: chairPerson, gas: Gas}))).dividedBy(2);
         await certisTokenProxy.methods.transfer(user_1, CertisTokenBalance.toNumber()).send({from: chairPerson, gas: Gas}, function(error, result){});
@@ -374,9 +392,11 @@ contract("Testing Treasury",function(accounts){
         await Treasury.methods.pay(1).send({from: user_1, value: PrivatePriceWei + 1, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(2).send({from: user_1, value: CertificatePriceWei, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(2).send({from: user_1, value: CertificatePriceWei + 1, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(3).send({from: user_1, value: ProviderPriceWei, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(3).send({from: user_1, value: ProviderPriceWei + 1, gas: Gas}, function(error, result){});
         // assert
         var balance = parseInt(await web3.eth.getBalance(Treasury._address));
-        expect(balance).to.be.equal(PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1));
+        expect(balance).to.be.equal(PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + ProviderPriceWei + (ProviderPriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1));
         var Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
         var Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
         expect(Balance1).to.be.equal(Balance2);

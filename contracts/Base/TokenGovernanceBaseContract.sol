@@ -7,7 +7,7 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import "../DeployedContracts/CertisToken.sol";
+ import "../Interfaces/ICertisToken.sol";
  import "../Libraries/AddressLibrary.sol";
  import "../Libraries/Library.sol";
  import "./ManagedBaseContract.sol";
@@ -17,12 +17,15 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     using Library for *;
     using AddressLibrary for *; 
 
-    // DATA
-    // chair person
-    address _chairperson;
+    // EVENTS /////////////////////////////////////////
+    event _AddedProposition(address indexed, uint256, uint256, address[], uint256[]);
+    event _CancelledProposition(address indexed);
+    event _PropositionApproved(address indexed, uint256, uint256, address[]);
+    event _PropositionRejected(address indexed, uint256, uint256, address[]);
 
-    // Token contract
-    //CertisToken _CertisToken;
+    // DATA /////////////////////////////////////////
+    // chair person
+    address internal _chairperson;
 
     // Proposition Structure
     struct PropositionStruct{
@@ -36,24 +39,24 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         address[] AlreadyVoted;
     }
 
-    PropositionStruct _Proposition;
+    PropositionStruct internal _Proposition;
 
-    uint _PropositionLifeTime;
-    uint8 _PropositionThresholdPercentage;
-    uint8 _minWeightToProposePercentage;
+    uint internal _PropositionLifeTime;
+    uint8 internal _PropositionThresholdPercentage;
+    uint8 internal _minWeightToProposePercentage;
 
     // Proposition to change Prop parameters
+    bool internal _currentPropisProp;
+
     struct ProposedPropositionStruct{
         uint256 NewPropositionLifeTime;
         uint8 NewPropositionThresholdPercentage;
         uint8 NewMinWeightToProposePercentage;
     }
 
-    ProposedPropositionStruct _ProposedProposition;
+    ProposedPropositionStruct internal _ProposedProposition;
 
-    bool _currentPropisProp;
-    
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isFromChairPerson(){
         require(true == Library.ItIsSomeone(_chairperson), "EC8");
         _;
@@ -116,21 +119,21 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     }
 
     function GetAdminList() internal view returns(address[] memory){
-        (address[] memory list, ) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+        (address[] memory list, ) = ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return list;
     }
 
     function GetAdminWeights() internal view returns(uint256[] memory){
-        (, uint256[] memory weights) = CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+        (, uint256[] memory weights) = ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
         return weights;
     }
 
     function GetTokenOwners() internal view returns(address[] memory, uint256[] memory){
-        return CertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
+        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
     }
 
     function totalSupply() internal view returns(uint256){
-        return CertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
+        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
     }
 
     function CheckIfPropostiionActive() internal returns(bool){
@@ -148,12 +151,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         }
     }
 
-    // CONSTRUCTOR
-    /*constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
-        _chairperson = msg.sender; 
-        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
-    }*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {
         super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson; 
@@ -188,7 +186,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
         isAuthorizedToPropose()
@@ -200,6 +198,8 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         _Proposition.DeadLine = _DeadLine;
         _Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
         _Proposition.AdminsWeight = GetAdminWeights();
+
+        emit _AddedProposition(_Proposition.Proposer, _Proposition.DeadLine, _Proposition.validationThreshold, _Proposition.listOfAdmins, _Proposition.AdminsWeight);
     }
 
     function cancelProposition() external
@@ -207,6 +207,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         isAuthorizedToCancel()
     {
         InternalCancelProposition();
+        emit _CancelledProposition(_Proposition.Proposer);
     }
 
     function voteProposition(bool vote) external
@@ -254,6 +255,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
                 propositionApproved();
             }
             InternalCancelProposition();
+            emit _PropositionApproved(_Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst, _Proposition.AlreadyVoted);
         }
         else if(_Proposition.VotesAgainst > _Proposition.validationThreshold)
         {
@@ -264,6 +266,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
                 propositionRejected();
             }
             InternalCancelProposition();
+            emit _PropositionRejected(_Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst, _Proposition.AlreadyVoted);
         } 
     }
 
@@ -290,7 +293,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         );
     }
 
-    function retrieveProposition() external virtual view returns(string[] memory){}
+    function retrieveProposition() external virtual view returns(bytes32[] memory){}
 
     function propositionApproved() internal virtual{}
 

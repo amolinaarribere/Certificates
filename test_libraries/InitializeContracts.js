@@ -4,22 +4,23 @@ const TreasuryAbi = Treasury.abi;
 const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
 const PublicCertificatesPoolAbi = PublicCertificatesPool.abi;
 const PrivateCertificatesPool = artifacts.require("PrivateCertificatesPool");
-const PrivateCertificatesPoolAbi = PrivateCertificatesPool.abi;
+const Provider = artifacts.require("Provider");
 const CertisToken = artifacts.require("CertisToken");
 const CertisTokenAbi = CertisToken.abi;
-const PrivatePoolGenerator = artifacts.require("PrivatePoolGenerator");
-const PrivatePoolGeneratorAbi = PrivatePoolGenerator.abi;
+const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
+const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
+const ProviderFactory = artifacts.require("ProviderFactory");
+const ProviderFactoryAbi = ProviderFactory.abi;
 
-const TreasuryProxy = artifacts.require("TreasuryProxy");
-const PublicCertificatesPoolProxy = artifacts.require("PublicCertificatesPoolProxy");
-const PrivateCertificatesPoolProxy = artifacts.require("PrivateCertificatesPoolProxy");
+const GenericProxy = artifacts.require("GenericProxy");
 const CertisTokenProxy = artifacts.require("CertisTokenProxy");
-const PrivatePoolGeneratorProxy = artifacts.require("PrivatePoolGeneratorProxy");
 
 const constants = require("../test_libraries/constants.js");
+const obj = require("../test_libraries/objects.js");
 
 const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
+const ProviderPriceWei = constants.ProviderPriceWei;
 const CertificatePriceWei = constants.CertificatePriceWei;
 const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
 const PropositionLifeTime = constants.PropositionLifeTime;
@@ -56,7 +57,7 @@ const CertisTokenProxyInitializerMethod = {
     "stateMutability": "nonpayable",
     "type": "function"
 };
-var TreasuryProxyInitializerMethod = {
+const TreasuryProxyInitializerMethod = {
     "inputs": [
       {
         "internalType": "uint256",
@@ -66,6 +67,11 @@ var TreasuryProxyInitializerMethod = {
       {
         "internalType": "uint256",
         "name": "PrivatePriceWei",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ProviderPriceWei",
         "type": "uint256"
       },
       {
@@ -104,7 +110,7 @@ var TreasuryProxyInitializerMethod = {
     "stateMutability": "nonpayable",
     "type": "function"
 };
-var PrivatePoolGeneratorProxyInitializerMethod = {
+const PrivatePoolFactoryProxyInitializerMethod = {
     "inputs": [
       {
         "internalType": "address",
@@ -112,12 +118,25 @@ var PrivatePoolGeneratorProxyInitializerMethod = {
         "type": "address"
       }
     ],
-    "name": "PrivatePoolGenerator_init",
+    "name": "PrivatePoolFactory_init",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
 };
-var PublicCertificatesPoolProxyInitializerMethod = {
+const ProviderFactoryProxyInitializerMethod = {
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "managerContractAddress",
+      "type": "address"
+    }
+  ],
+  "name": "ProviderFactory_init",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+};
+const PublicCertificatesPoolProxyInitializerMethod = {
     "inputs": [
       {
         "internalType": "address[]",
@@ -144,60 +163,51 @@ var PublicCertificatesPoolProxyInitializerMethod = {
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
   let certPoolManager = await CertificatesPoolManager.new(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, {from: chairPerson});
   let implementations = await deployImplementations(user_1);
-  let proxies = await deployProxies(chairPerson, PublicOwners, minOwners, user_1, implementations[0], implementations[1], implementations[2], implementations[3], certPoolManager.address)
+  let proxies = await deployProxies(chairPerson, PublicOwners, minOwners, user_1, implementations[0], implementations[1], implementations[2], implementations[3], implementations[5], certPoolManager.address)
 
-  await certPoolManager.InitializeContracts(proxies[1], proxies[2], proxies[0], proxies[3], implementations[4], {from: chairPerson});
+  await certPoolManager.InitializeContracts(obj.returnInitialObject(proxies[0], proxies[1], proxies[2], proxies[3], implementations[4], proxies[4], implementations[6]), {from: chairPerson});
 
   return [certPoolManager, proxies, implementations];
 }
 
 async function deployImplementations(user_1){
-    let certisToken = await CertisToken.new({from: user_1});
     let publicPool = await PublicCertificatesPool.new({from: user_1});
     let treasury = await Treasury.new({from: user_1});
-    let privatePoolGenerator = await PrivatePoolGenerator.new({from: user_1});
+    let certisToken = await CertisToken.new({from: user_1});
+    let privatePoolFactory = await PrivatePoolFactory.new({from: user_1});
     let privatePool = await PrivateCertificatesPool.new({from: user_1});
+    let providerFactory = await ProviderFactory.new({from: user_1});
+    let provider = await Provider.new({from: user_1});
 
-    return [certisToken.address, publicPool.address, treasury.address, privatePoolGenerator.address, privatePool.address];
+    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address];
 }
 
-async function deployProxies(chairPerson, PublicOwners, minOwners, user_1, certisToken, publicPool, treasury, privatePoolGenerator, certPoolManager){
-  let CertisTokenProxyInitializerParameters = ["Certis Token for Test", "CERT", 0, TotalTokenSupply];
-  let CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
-  let certisTokenProxy = await CertisTokenProxy.new(certisToken, certPoolManager, CertisProxyData, {from: chairPerson});
+async function deployProxies(chairPerson, PublicOwners, minOwners, user_1, publicPool, treasury, certisToken, privatePoolFactory, providerFactory, certPoolManager){
+  let ProxyData = returnProxyInitData(PublicOwners, minOwners, certPoolManager);
 
-  let PublicCertificatesPoolProxyInitializerParameters = [PublicOwners, minOwners, certPoolManager];
-  let PublicCertificatesPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicCertificatesPoolProxyInitializerMethod, PublicCertificatesPoolProxyInitializerParameters);
-  let publicPoolProxy = await PublicCertificatesPoolProxy.new(publicPool, certPoolManager, PublicCertificatesPoolProxyData, {from: user_1});
+  let publicPoolProxy = await GenericProxy.new(publicPool, certPoolManager, ProxyData[0], {from: user_1});
+  let treasuryProxy = await GenericProxy.new(treasury, certPoolManager, ProxyData[1], {from: chairPerson});
+  let certisTokenProxy = await CertisTokenProxy.new(certisToken, certPoolManager, ProxyData[2], {from: chairPerson});
+  let privatePoolFactoryProxy = await GenericProxy.new(privatePoolFactory, certPoolManager, ProxyData[3], {from: user_1});
+  let providerFactoryProxy = await GenericProxy.new(providerFactory, certPoolManager, ProxyData[4], {from: user_1});
 
-  let TreasuryProxyInitializerParameters = [PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManager,  PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose];
-  let TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
-  let treasuryProxy = await TreasuryProxy.new(treasury, certPoolManager, TreasuryProxyData, {from: chairPerson});
-
-  let PrivatePoolGeneratorProxyInitializerParameters = [certPoolManager];
-  let PrivatePoolGeneratorProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolGeneratorProxyInitializerMethod, PrivatePoolGeneratorProxyInitializerParameters);  
-  let privatePoolGeneratorProxy = await PrivatePoolGeneratorProxy.new(privatePoolGenerator, certPoolManager, PrivatePoolGeneratorProxyData, {from: user_1});
-
-  return [certisTokenProxy.address, publicPoolProxy.address, treasuryProxy.address, privatePoolGeneratorProxy.address];
+  return [publicPoolProxy.address, treasuryProxy.address, certisTokenProxy.address, privatePoolFactoryProxy.address, providerFactoryProxy.address];
 }
 
-async function InitializeManagedBaseContracts(chairPerson, PublicOwners, minOwners, user_1, certPoolManagerAddress){
-  let implementations = await deployImplementations(user_1);
+function getProxyData(method, parameters){
+  return web3.eth.abi.encodeFunctionCall(method, parameters);
+}
 
-  let certisToken = new web3.eth.Contract(CertisTokenAbi, implementations[0]);
-  await certisToken.methods.CertisToken_init("Certis Token for Test", "CERT", 0, TotalTokenSupply).send({from: chairPerson, gas: Gas});
+function returnProxyInitData(PublicOwners, minOwners, certPoolManager){
+  let CertisProxyData = getProxyData(CertisTokenProxyInitializerMethod, ["Certis Token for Test", "CERT", 0, TotalTokenSupply]);
+  let PublicCertificatesPoolProxyData = getProxyData(PublicCertificatesPoolProxyInitializerMethod, [PublicOwners, minOwners, certPoolManager]);
+  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManager,  PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose]);
+  let PrivatePoolFactoryProxyData = getProxyData(PrivatePoolFactoryProxyInitializerMethod, [certPoolManager]);
+  let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
 
-  let publicPool = new web3.eth.Contract(PublicCertificatesPoolAbi, implementations[1]);
-  await publicPool.methods.PublicCertPool_init(PublicOwners, minOwners, certPoolManagerAddress).send({from: user_1, gas: Gas});
-
-  let treasury = new web3.eth.Contract(TreasuryAbi, implementations[2]);
-  await treasury.methods.Treasury_init(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManagerAddress, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas});
-
-  let privatePoolGenerator = new web3.eth.Contract(PrivatePoolGeneratorAbi, implementations[3]);
-  await privatePoolGenerator.methods.PrivatePoolGenerator_init(certPoolManagerAddress).send({from: user_1, gas: Gas});
-
-  return implementations;
+  return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData];
 }
 
 exports.InitializeContracts = InitializeContracts;
-exports.InitializeManagedBaseContracts = InitializeManagedBaseContracts;
+exports.deployImplementations = deployImplementations;
+exports.returnProxyInitData = returnProxyInitData;

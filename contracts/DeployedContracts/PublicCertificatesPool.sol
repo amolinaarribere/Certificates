@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -9,7 +8,7 @@ pragma experimental ABIEncoderV2;
  */
 
  import "../Abstract/MultiSigCertificatesPool.sol";
- import "./Treasury.sol";
+ import "../Interfaces/ITreasury.sol";
  import "../Libraries/Library.sol";
  import "../Base/ManagedBaseContract.sol";
  import "../Libraries/AddressLibrary.sol";
@@ -20,9 +19,7 @@ pragma experimental ABIEncoderV2;
     using AddressLibrary for *;
 
     // EVENTS /////////////////////////////////////////
-    event _SendProposalId(address, address indexed,  string indexed);
-
-    // DATA /////////////////////////////////////////
+    event _NewProposal(address indexed,  string indexed);
 
     // CONSTRUCTOR /////////////////////////////////////////
     function PublicCertPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
@@ -36,12 +33,12 @@ pragma experimental ABIEncoderV2;
         isEntityPendingToAdd(false, provider, _providerId)
     override payable
     {
-        Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProvider);
-        bytes32 providerInBytes = AddressLibrary.AddressToBytes(provider);
+        ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProvider);
+        bytes32 providerInBytes = AddressLibrary.AddressToBytes32(provider);
         _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
         _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
 
-        emit _SendProposalId(address(this), provider, providerInfo);
+        emit _NewProposal(provider, providerInfo);
     }
 
     function payBack(bytes32 entityInBytes, bool validatedOrRejected) internal
@@ -49,13 +46,13 @@ pragma experimental ABIEncoderV2;
         address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._items[entityInBytes]._Validations : _Entities[_providerId]._items[entityInBytes]._Rejections;
 
         for(uint i=0; i < Voters.length; i++){
-            Treasury(_managerContract.retrieveTreasuryProxy()).getRefund(Voters[i], Voters.length);
+            ITreasury(_managerContract.retrieveTreasuryProxy()).getRefund(Voters[i], Voters.length);
         }
     }
 
     function addCertificate(bytes32 CertificateHash, address holder) external override payable
     {
-        Treasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewCertificate);
+        ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewCertificate);
         addCertificateInternal(CertificateHash, holder);
     }
 

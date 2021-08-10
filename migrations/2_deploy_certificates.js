@@ -4,12 +4,13 @@ let Treasury = artifacts.require("./DeployedContracts/Treasury");
 let PublicCertificatesPool = artifacts.require("./DeployedContracts/PublicCertificatesPool");
 let PrivateCertificatesPool = artifacts.require("./DeployedContracts/PrivateCertificatesPool");
 let CertisToken = artifacts.require("./DeployedContracts/CertisToken");
-let PrivatePoolGenerator = artifacts.require("./DeployedContracts/PrivatePoolGenerator");
+let PrivatePoolFactory = artifacts.require("./DeployedContracts/PrivatePoolFactory");
+let ProviderFactory = artifacts.require("./DeployedContracts/ProviderFactory");
 
-let TreasuryProxy = artifacts.require("./DeployedContracts/Proxies/TreasuryProxy");
-let PublicCertificatesPoolProxy = artifacts.require("./DeployedContracts/Proxies/PublicCertificatesPoolProxy");
+const GenericProxy = artifacts.require("./DeployedContracts/Proxies/GenericProxy");
 let CertisTokenProxy = artifacts.require("./DeployedContracts/Proxies/CertisTokenProxy");
-let PrivatePoolGeneratorProxy = artifacts.require("./DeployedContracts/Proxies/PrivatePoolGeneratorProxy");
+
+const obj = require("../test_libraries/objects.js");
 
 let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
@@ -128,6 +129,11 @@ module.exports = async function(deployer, network, accounts){
       },
       {
         "internalType": "uint256",
+        "name": "ProviderPriceWei",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "CertificatePriceWei",
         "type": "uint256"
       },
@@ -162,11 +168,11 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var TreasuryProxyInitializerParameters = [ 10, 20, 5, 2, CertificatesPoolManagerInstance.address, 604800, 50, 5];
+  var TreasuryProxyInitializerParameters = [ 10, 20, 25, 5, 2, CertificatesPoolManagerInstance.address, 604800, 50, 5];
   var TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
 
-  await deployer.deploy(TreasuryProxy, TreasuryInstance.address, CertificatesPoolManagerInstance.address, TreasuryProxyData);
-  TreasuryProxyInstance = await TreasuryProxy.deployed();
+  await deployer.deploy(GenericProxy, TreasuryInstance.address, CertificatesPoolManagerInstance.address, TreasuryProxyData);
+  TreasuryProxyInstance = await GenericProxy.deployed();
   console.log("TreasuryProxy deployed : " + TreasuryProxyInstance.address);
 
   // Private Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,21 +189,15 @@ module.exports = async function(deployer, network, accounts){
   PrivateCertificatesPoolInstance = await PrivateCertificatesPool.deployed();
   console.log("PrivateCertificatesPool deployed : " + PrivateCertificatesPoolInstance.address);
 
-  // Private Pool Generator -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, PrivatePoolGenerator);
-  console.log("Library linked to PrivatePoolGenerator");
+  // Private Pool Factory -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, PrivatePoolFactory);
+  console.log("Library linked to PrivatePoolFactory");
 
-  await deployer.link(AddressLibrary, PrivatePoolGenerator);
-  console.log("AddressLibrary linked to PrivatePoolGenerator");
-
-  await deployer.link(ItemsLibrary, PrivatePoolGenerator);
-  console.log("ItemsLibrary linked to PrivatePoolGenerator");
-
-  await deployer.deploy(PrivatePoolGenerator);
-  PrivatePoolGeneratorInstance = await PrivatePoolGenerator.deployed();
-  console.log("PrivatePoolGenerator deployed : " + PrivatePoolGeneratorInstance.address);
+  await deployer.deploy(PrivatePoolFactory);
+  PrivatePoolFactoryInstance = await PrivatePoolFactory.deployed();
+  console.log("PrivatePoolFactory deployed : " + PrivatePoolFactoryInstance.address);
   
-  var PrivatePoolGeneratorProxyInitializerMethod = {
+  var PrivatePoolFactoryProxyInitializerMethod = {
     "inputs": [
       {
         "internalType": "address",
@@ -205,17 +205,17 @@ module.exports = async function(deployer, network, accounts){
         "type": "address"
       }
     ],
-    "name": "PrivatePoolGenerator_init",
+    "name": "PrivatePoolFactory_init",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var PrivatePoolGeneratorProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
-  var PrivatePoolGeneratorProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolGeneratorProxyInitializerMethod, PrivatePoolGeneratorProxyInitializerParameters);
+  var PrivatePoolFactoryProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
+  var PrivatePoolFactoryProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolFactoryProxyInitializerMethod, PrivatePoolFactoryProxyInitializerParameters);
 
-  await deployer.deploy(PrivatePoolGeneratorProxy, PrivatePoolGeneratorInstance.address, CertificatesPoolManagerInstance.address, PrivatePoolGeneratorProxyData);
-  PrivatePoolGeneratorProxyInstance = await PrivatePoolGeneratorProxy.deployed();
-  console.log("PrivatePoolGeneratorProxy deployed : " + PrivatePoolGeneratorProxyInstance.address);
+  await deployer.deploy(GenericProxy, PrivatePoolFactoryInstance.address, CertificatesPoolManagerInstance.address, PrivatePoolFactoryProxyData);
+  PrivatePoolFactoryProxyInstance = await GenericProxy.deployed();
+  console.log("PrivatePoolFactoryProxy deployed : " + PrivatePoolFactoryProxyInstance.address);
 
   // Public Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, PublicCertificatesPool);
@@ -257,28 +257,54 @@ module.exports = async function(deployer, network, accounts){
   var PublicCertificatesPoolProxyInitializerParameters = [[accounts[0]], 1, CertificatesPoolManagerInstance.address];
   var PublicCertificatesPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicCertificatesPoolProxyInitializerMethod, PublicCertificatesPoolProxyInitializerParameters);
 
-  await deployer.deploy(PublicCertificatesPoolProxy, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address, PublicCertificatesPoolProxyData);
-  PublicCertificatesPoolProxyInstance = await PublicCertificatesPoolProxy.deployed();
+  await deployer.deploy(GenericProxy, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address, PublicCertificatesPoolProxyData);
+  PublicCertificatesPoolProxyInstance = await GenericProxy.deployed();
   console.log("PublicCertificatesPoolProxy deployed : " + PublicCertificatesPoolProxyInstance.address);
-
-  // Initialized Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await CertificatesPoolManagerInstance.InitializeContracts(PublicCertificatesPoolProxyInstance.address, TreasuryProxyInstance.address, CertisTokenProxyInstance.address, PrivatePoolGeneratorProxyInstance.address, PrivateCertificatesPoolInstance.address);
-  console.log("CertificatesPoolManager initialized");
 
   // Provider -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, Provider);
   console.log("Library linked to Provider");
 
   await deployer.link(AddressLibrary, Provider);
-  console.log("AddressLibrary linked to Provider");
+  console.log("Address Library linked to Provider");
 
   await deployer.link(ItemsLibrary, Provider);
-  console.log("ItemsLibrary linked to Provider");
+  console.log("Items Library linked to Provider");
 
-  await deployer.deploy(Provider, [accounts[0]], 1, "Provider Info");
-  console.log("Provider deployed");
-    
+  await deployer.deploy(Provider);
+  ProviderInstance = await Provider.deployed();
+  console.log("Provider deployed : " + ProviderInstance.address);
 
-    
+  // Provider Factory -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, ProviderFactory);
+  console.log("Library linked to ProviderFactory");
+
+  await deployer.deploy(ProviderFactory);
+  ProviderFactoryInstance = await ProviderFactory.deployed();
+  console.log("ProviderFactory deployed : " + ProviderFactoryInstance.address);
+  
+  var ProviderFactoryProxyInitializerMethod = {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ProviderFactory_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  };
+  var ProviderFactoryProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
+  var ProviderFactoryProxyData = web3.eth.abi.encodeFunctionCall(ProviderFactoryProxyInitializerMethod, ProviderFactoryProxyInitializerParameters);
+
+  await deployer.deploy(GenericProxy, ProviderFactoryInstance.address, CertificatesPoolManagerInstance.address, ProviderFactoryProxyData);
+  ProviderFactoryProxyInstance = await GenericProxy.deployed();
+  console.log("ProviderFactoryProxy deployed : " + ProviderFactoryProxyInstance.address);
+
+  // Initialized Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await CertificatesPoolManagerInstance.InitializeContracts(obj.returnInitialObject(PublicCertificatesPoolProxyInstance.address, TreasuryProxyInstance.address, CertisTokenProxyInstance.address, PrivatePoolFactoryProxyInstance.address, PrivateCertificatesPoolInstance.address, ProviderFactoryProxyInstance.address, ProviderInstance.address));
+  console.log("CertificatesPoolManager initialized");
     
 }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -16,7 +15,7 @@ pragma experimental ABIEncoderV2;
 abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, Initializable{
     using AddressLibrary for *;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier NotEmpty(bytes32 document){
         require(0 < document.length, "EC11");
         _;
@@ -27,9 +26,10 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         _;
     }
 
-    // CONSTRUCTOR
-    /*constructor(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) payable{
-        require(minOwners <= owners.length, "EC16");
+    // CONSTRUCTOR /////////////////////////////////////////
+    function MultiSigContract_init(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) public initializer 
+        minRequired(minOwners, owners.length)
+    {
         require(minOwners > 0, "EC17");
         require(TotalEntities == labels.length, "EC18");
 
@@ -42,33 +42,13 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
 
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
-            bytes32 ownerInBytes = AddressLibrary.AddressToBytes(owners[i]);
-            _Entities[_ownerId]._items[ownerInBytes]._activated = true;
-            _Entities[_ownerId]._activatedItems.push(ownerInBytes); 
-        }
-    }*/
-
-    function MultiSigContract_init(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) public initializer {
-        require(minOwners <= owners.length, "EC16");
-        require(minOwners > 0, "EC17");
-        require(TotalEntities == labels.length, "EC18");
-
-        _ownerId = ownerId;
-
-        for(uint j=0; j < TotalEntities; j++){
-            _Entities.push();
-            _entitiesLabel.push(labels[j]);
-        }
-
-        _minOwners = minOwners;
-        for (uint i=0; i < owners.length; i++) {
-            bytes32 ownerInBytes = AddressLibrary.AddressToBytes(owners[i]);
+            bytes32 ownerInBytes = AddressLibrary.AddressToBytes32(owners[i]);
             _Entities[_ownerId]._items[ownerInBytes]._activated = true;
             _Entities[_ownerId]._activatedItems.push(ownerInBytes); 
         } 
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     function addOwner(address owner, string calldata ownerInfo) external override 
     {
         addEntity(owner, ownerInfo, _ownerId);

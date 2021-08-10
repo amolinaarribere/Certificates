@@ -7,11 +7,11 @@ var PrivateCertificatesAbi = PrivateCertificates.abi;
 const PublicCertificates = artifacts.require("PublicCertificatesPool");
 var PublicCertificatesAbi = PublicCertificates.abi;
 const Library = artifacts.require("./Libraries/Library");
+const constants = require("../test_libraries/constants.js");
 
-const PublicPriceWei = 10;
-const PrivatePriceWei = 20;
-const CertificatePriceWei = 5;
-const Gas = 6721975;
+const PublicPriceWei = constants.PublicPriceWei;
+const CertificatePriceWei = constants.CertificatePriceWei;
+const Gas = constants.Gas;
 const minOwners = 2;
 // providers info
 const provider_1_Info = "Provider 1 Info";

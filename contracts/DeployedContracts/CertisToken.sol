@@ -7,25 +7,18 @@ pragma solidity ^0.8.0;
  * @dev Store & retrieve value in a variable
  */
 
-//import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "../Libraries/AddressLibrary.sol";
+import "../Interfaces/ICertisToken.sol";
 
- contract CertisToken is ERC20Upgradeable {
-
+ contract CertisToken is ICertisToken, ERC20Upgradeable {
     using AddressLibrary for *;
 
-    // DATA
-    address[] _tokenOwners;
-    uint8 _decimals;
+    // DATA /////////////////////////////////////////
+    address[] private _tokenOwners;
+    uint8 private _decimals;
 
-    // CONSTRUCTOR
-   /* constructor(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) ERC20(name, symbol){
-        _tokenOwners = new address[](0);
-        _decimals = decimalsValue;
-        _mint(msg.sender, MaxSupply);
-    }*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function CertisToken_init(string memory name, string memory symbol, uint8 decimalsValue, uint256 MaxSupply) public initializer {
         super.__ERC20_init(name, symbol);
         _tokenOwners = new address[](0);
@@ -33,12 +26,12 @@ import "../Libraries/AddressLibrary.sol";
         _mint(msg.sender, MaxSupply);
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     function decimals() public view override returns (uint8) {
         return _decimals;
     }
 
-    function TokenOwners() external view returns (address[] memory, uint256[] memory){
+    function TokenOwners() external view override returns (address[] memory, uint256[] memory){
         address[] memory tO = _tokenOwners;
         uint256[] memory OwnerBalance = new uint256[](tO.length);
 

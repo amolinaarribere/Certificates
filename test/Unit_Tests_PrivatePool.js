@@ -5,20 +5,13 @@ const pool_common = require("../test_libraries/Pools.js");
 const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
 
-const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PrivateCertificates = artifacts.require("PrivateCertificatesPool");
 var PrivateCertificatesAbi = PrivateCertificates.abi;
 const CertisToken = artifacts.require("CertisToken");
-var CertisTokenAbi = CertisToken.abi;
-const Library = artifacts.require("./Libraries/Library");
-const PrivatePoolGenerator = artifacts.require("PrivatePoolGenerator");
-const PrivatePoolGeneratorAbi = PrivatePoolGenerator.abi;
+const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
+const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 
-
-const PublicPriceWei = constants.PublicPriceWei;
 const PrivatePriceWei = constants.PrivatePriceWei;
-const CertificatePriceWei = constants.CertificatePriceWei;
-const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
 const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
@@ -28,7 +21,7 @@ contract("Testing Private Pool",function(accounts){
     var certPoolManager;
     var privateCertPool;
     var publicPool;
-    var privatePoolGenerator;
+    var privatePoolFactory;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -45,9 +38,9 @@ contract("Testing Private Pool",function(accounts){
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
-        privatePoolGeneratorProxy = new web3.eth.Contract(PrivatePoolGeneratorAbi, contracts[1][3]);
-        await privatePoolGeneratorProxy.methods.createPrivateCertificatesPool(PrivateOwners, minOwners).send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
-        let response = await privatePoolGeneratorProxy.methods.retrievePrivateCertificatesPool(0).call({from: user_1}, function(error, result){});
+        privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, contracts[1][3]);
+        await privatePoolFactoryProxy.methods.create(PrivateOwners, minOwners, "").send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
+        let response = await privatePoolFactoryProxy.methods.retrieve(0).call({from: user_1}, function(error, result){});
         const {0: creator, 1: privateCertPoolAddress} = response;
         privateCertPool = new web3.eth.Contract(PrivateCertificatesAbi, privateCertPoolAddress); 
     });

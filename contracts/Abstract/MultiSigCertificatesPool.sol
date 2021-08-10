@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -14,11 +13,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigContract {
     
-    // EVENTS
-    event _AddCertificateIdEvent(address, address);
-    event _RemoveCertificateIdEvent(address, address);
+    // EVENTS /////////////////////////////////////////
+    event _AddCertificate(address indexed, address indexed, bytes32);
 
-    // DATA
+    // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;
 
     // Owners
@@ -29,7 +27,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
     uint256 constant _providerId = 1;
     string constant _providerLabel = "Provider";
 
-    string[] _Label;
+    string[] internal _Label;
 
     // Holders
     struct _CertificatePerHolder{
@@ -39,7 +37,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
     
     mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isAProvider(){
         require(true == isProvider(msg.sender), "EC12");
         _;
@@ -60,12 +58,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         _;
     }
     
-    // CONSTRUCTOR
-    /*constructor(address[] memory owners,  uint256 minOwners) 
-        MultiSigContract(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates)
-    payable
-    {}*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 
     {
         _Label = new string[](2);
@@ -75,7 +68,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); 
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     // Providers CRUD Operations
     function addProvider(address provider, string calldata providerInfo) external override payable virtual
     {
@@ -131,7 +124,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;
         _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
 
-        emit _AddCertificateIdEvent(msg.sender, holder);
+        emit _AddCertificate(msg.sender, holder, CertificateHash);
     }
 
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override

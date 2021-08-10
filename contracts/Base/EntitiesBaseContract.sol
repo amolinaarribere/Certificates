@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -17,22 +16,16 @@ abstract contract EntitiesBaseContract{
     using AddressLibrary for *;
     using ItemsLibrary for *;
 
-    //EVENTS 
-    event _AddEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
-    event _RemoveEntityValidationIdEvent(string indexed,  address indexed,  string indexed);
-    event _AddEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
-    event _RemoveEntityRejectionIdEvent(string indexed,  address indexed,  string indexed);
-
-    // DATA
+    // DATA /////////////////////////////////////////
     // owners
-    uint _ownerId;
-    uint256 _minOwners;
+    uint internal _ownerId;
+    uint256 internal _minOwners;
 
     // Total Owners and other Entities
-    ItemsLibrary._ItemsStruct[] _Entities;
-    string[] _entitiesLabel;
+    ItemsLibrary._ItemsStruct[] internal _Entities;
+    string[] internal _entitiesLabel;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier isSomeoneSpecific(address someone){
         require(true == Library.ItIsSomeone(someone), "EC8");
         _;
@@ -49,7 +42,7 @@ abstract contract EntitiesBaseContract{
     }
     
     modifier HasNotAlreadyVoted(address entity, uint listId){
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         require(false == ItemsLibrary.hasVoted(msg.sender, entityInBytes, _Entities[listId]), "EC5");
         _;
     }
@@ -80,14 +73,14 @@ abstract contract EntitiesBaseContract{
         _;
     }
 
-    // FUNCTIONALITY
+    // FUNCTIONALITY /////////////////////////////////////////
     function addEntity(address entity, string calldata entityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
         isAnOwner
         isEntityActivated(false, entity, listId) 
         isEntityPendingToAdd(false, entity, listId)
     { 
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, entityInfo, _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -101,7 +94,7 @@ abstract contract EntitiesBaseContract{
         isEntityActivated(true, entity, listId)
         isEntityPendingToRemove(false, entity, listId)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -115,7 +108,7 @@ abstract contract EntitiesBaseContract{
         isEntityPending(true, entity, listId)
         HasNotAlreadyVoted(entity, listId)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -129,7 +122,7 @@ abstract contract EntitiesBaseContract{
         isEntityPending(true, entity, listId)
         HasNotAlreadyVoted(entity, listId)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         uint[] memory listIdArray = new uint[](1);
         listIdArray[0] = listId;
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(entityInBytes, "", _minOwners, _entitiesLabel[listId], listIdArray, true);
@@ -141,7 +134,7 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length)
     view returns (string memory, bool) 
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.retrieveItem(entityInBytes, _Entities[listId]);
     }
 
@@ -149,14 +142,14 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length) 
     view returns (address[] memory) 
     {
-        return AddressLibrary.BytesArrayToAddress(ItemsLibrary.retrieveAllItems(_Entities[listId]));
+        return AddressLibrary.Bytes32ArrayToAddressArray(ItemsLibrary.retrieveAllItems(_Entities[listId]));
     }
 
     function isEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
     view returns (bool)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.isItem(entityInBytes, _Entities[listId]);
     }
 
@@ -164,7 +157,7 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length)
     view returns (bool)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.isItemPendingToAdded(entityInBytes,_Entities[listId]);
     }
 
@@ -172,7 +165,7 @@ abstract contract EntitiesBaseContract{
         isIdCorrect(listId, _Entities.length)
     view returns (bool)
     {
-        bytes32 entityInBytes = AddressLibrary.AddressToBytes(entity);
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.isItemPendingToRemoved(entityInBytes, _Entities[listId]);
     }
 
@@ -183,11 +176,10 @@ abstract contract EntitiesBaseContract{
         bytes32[] memory EntitiesInBytes;
         string[] memory EntitiesInfo;
         (EntitiesInBytes, EntitiesInfo) = ItemsLibrary.retrievePendingItems(addORemove, _Entities[listId]);
-        return(AddressLibrary.BytesArrayToAddress(EntitiesInBytes) , EntitiesInfo);
+        return(AddressLibrary.Bytes32ArrayToAddressArray(EntitiesInBytes) , EntitiesInfo);
     }
 
-    // CALLBACKS
-
+    // CALLBACKS /////////////////////////////////////////
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
         isSomeoneSpecific(address(this))
     {}

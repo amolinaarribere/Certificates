@@ -8,10 +8,8 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
 import "../Interfaces/ITreasury.sol";
-import "./PublicCertificatesPool.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
-import "./CertisToken.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
 
 
@@ -19,23 +17,30 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using Library for *;
     using UintLibrary for *;
 
-    // DATA
+    // EVENTS /////////////////////////////////////////
+    event _NewPrices(uint, uint, uint, uint, uint);
+    event _Pay(address indexed, uint);
+    event _Refund(address indexed, uint);
+    event _Withdraw(address indexed, uint);
+
+    // DATA /////////////////////////////////////////
     // proposition to change prices
     struct ProposedPricesStruct{
         uint NewPublicPriceWei;
         uint NewCertificatePriceWei;
         uint NewPrivatePriceWei;
+        uint NewProviderPriceWei;
         uint NewOwnerRefundPriceWei;
     }
 
-    ProposedPricesStruct _ProposedPrices;
+    ProposedPricesStruct private _ProposedPrices;
 
     // parameters
-    //PublicCertificatesPool  _PublicCertificatesPool;
-    uint _PublicPriceWei;
-    uint _CertificatePriceWei;
-    uint _PrivatePriceWei;
-    uint _OwnerRefundPriceWei;
+    uint private _PublicPriceWei;
+    uint private _CertificatePriceWei;
+    uint private _PrivatePriceWei;
+    uint private _ProviderPriceWei;
+    uint private _OwnerRefundPriceWei;
 
     // dividends per token owner
     struct _BalanceStruct{
@@ -43,15 +48,16 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint[] _factors;
     }
     
-    mapping(address => _BalanceStruct) _balances;
+    mapping(address => _BalanceStruct) private _balances;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
     modifier areFundsEnough(Library.Prices price){
         uint256 minPrice = 2**256 - 1;
 
         if(Library.Prices.NewProvider == price) minPrice = _PublicPriceWei;
         else if(Library.Prices.NewPool == price) minPrice = _PrivatePriceWei;
         else if(Library.Prices.NewCertificate == price) minPrice = _CertificatePriceWei;
+        else minPrice = _ProviderPriceWei;
 
         require(msg.value >= minPrice, "EC2");
         _;
@@ -73,34 +79,27 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
     
-    // CONSTRUCTOR
-    /*constructor(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
-    TokenGovernanceBaseContract(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage)
-    ManagedBaseContract(managerContractAddress)
-    {
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
-    }*/
-
-    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
+    // CONSTRUCTOR /////////////////////////////////////////
+    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
     {
         super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, managerContractAddress);
-        //super.ManagedBaseContract_init(managerContractAddress);
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
     }
 
 
-    // GOVERNANCE 
-    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
+    // GOVERNANCE /////////////////////////////////////////
+    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
     {
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
     }
 
-    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
+    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
         isPriceOK(PublicPriceWei, OwnerRefundPriceWei)
     {
         if(fromConstructor){
             _PublicPriceWei = PublicPriceWei;
             _PrivatePriceWei = PrivatePriceWei;
+            _ProviderPriceWei = ProviderPriceWei;
             _CertificatePriceWei = CertificatePriceWei;
             _OwnerRefundPriceWei = OwnerRefundPriceWei;
         }
@@ -109,6 +108,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _ProposedPrices.NewPublicPriceWei = PublicPriceWei;
             _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
             _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
+            _ProposedPrices.NewProviderPriceWei = ProviderPriceWei;
             _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
         }
         
@@ -118,10 +118,13 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     {
         _PublicPriceWei = _ProposedPrices.NewPublicPriceWei;
         _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
+        _ProviderPriceWei = _ProposedPrices.NewProviderPriceWei;
         _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
         _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
         
         removeProposition();
+
+        emit _NewPrices(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
     }
 
     function propositionRejected() internal override
@@ -139,25 +142,18 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
          delete(_ProposedPrices);
     }
 
-    function retrieveProposition() external override view returns(string[] memory)
+    function retrieveProposition() external override view returns(bytes32[] memory)
     {
-        string[] memory proposition = new string[](4);
-        proposition[0] = UintLibrary.UintToString(_ProposedPrices.NewPublicPriceWei);
-        proposition[1] = UintLibrary.UintToString(_ProposedPrices.NewPrivatePriceWei);
-        proposition[2] = UintLibrary.UintToString(_ProposedPrices.NewCertificatePriceWei);
-        proposition[3] = UintLibrary.UintToString(_ProposedPrices.NewOwnerRefundPriceWei);
+        bytes32[] memory proposition = new bytes32[](5);
+        proposition[0] = UintLibrary.UintToBytes32(_ProposedPrices.NewPublicPriceWei);
+        proposition[1] = UintLibrary.UintToBytes32(_ProposedPrices.NewPrivatePriceWei);
+        proposition[2] = UintLibrary.UintToBytes32(_ProposedPrices.NewProviderPriceWei);
+        proposition[3] = UintLibrary.UintToBytes32(_ProposedPrices.NewCertificatePriceWei);
+        proposition[4] = UintLibrary.UintToBytes32(_ProposedPrices.NewOwnerRefundPriceWei);
         return proposition;
     }
 
-    // FUNCTIONALITY
-    /*function updateContracts(address PublicPoolAddressProxy, address CertisTokenAddressProxy) external 
-        isFromManagerContract()
-    override
-    {
-        _PublicCertificatesPool = PublicCertificatesPool(PublicPoolAddressProxy);
-        _CertisToken = CertisToken(CertisTokenAddressProxy); 
-    }*/
-
+    // FUNCTIONALITY /////////////////////////////////////////
     function pay(Library.Prices price) external 
         areFundsEnough(price)
     override payable
@@ -165,6 +161,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint256 amount = msg.value;
         if(price == Library.Prices.NewProvider) amount -= _OwnerRefundPriceWei;
         AssignDividends(amount);
+
+        emit _Pay(msg.sender, msg.value);
     }
 
     function AssignDividends(uint256 amount) internal
@@ -183,6 +181,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     override
     {
         addBalance(addr, _OwnerRefundPriceWei, numberOfOwners);
+
+        emit _Refund(addr, numberOfOwners);
     }
 
     function withdraw(uint amount) external 
@@ -204,6 +204,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         require(total == amount, "UnExpected problem calculating the amount to withdraw");
 
         payable(msg.sender).transfer(total);
+
+        emit _Withdraw(msg.sender, total);
     }
 
     function retrieveBalance(address addr) external override view returns(uint)
@@ -211,9 +213,9 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return checkBalance(addr);
     }
 
-    function retrievePrices() external override view returns(uint, uint, uint, uint)
+    function retrievePrices() external override view returns(uint, uint, uint, uint, uint)
     {
-        return(_PublicPriceWei, _PrivatePriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
+        return(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
     }
 
     function checkBalance(address addr) internal view returns(uint){
@@ -241,7 +243,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
              _balances[addr]._factors.push(factor);
         }
 
-       _balances[addr]._balance[factor] += amount;
+        uint newFactorBalance = _balances[addr]._balance[factor] + amount;
+        require(newFactorBalance >= _balances[addr]._balance[factor], "uint overflow adding");
+
+       _balances[addr]._balance[factor] = newFactorBalance;
     }
 
     function substractBalance(address addr, uint amount, uint factor) private

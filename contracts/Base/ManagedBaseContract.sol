@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @title Storage
@@ -15,20 +14,16 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract ManagedBaseContract is Initializable{
     using Library for *;
 
-    // DATA
-    IProxyManager _managerContract;
+    // DATA /////////////////////////////////////////
+    IProxyManager internal _managerContract;
 
-    // MODIFIERS
+    // MODIFIERS /////////////////////////////////////////
      modifier isFromManagerContract(){
         require(true == Library.ItIsSomeone(address(_managerContract)), "EC8");
         _;
     }
 
-    // CONSTRUCTOR
-    /*constructor(address managerContractAddress) {
-        _managerContract = managerContractAddress;
-    }*/
-
+    // CONSTRUCTOR /////////////////////////////////////////
     function ManagedBaseContract_init(address managerContractAddress) internal initializer {
         _managerContract = IProxyManager(managerContractAddress);
     }
