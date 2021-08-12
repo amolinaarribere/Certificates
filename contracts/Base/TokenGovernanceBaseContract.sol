@@ -18,10 +18,11 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     using AddressLibrary for *; 
 
     // EVENTS /////////////////////////////////////////
-    event _AddedProposition(address indexed, uint256, uint256, address[], uint256[]);
-    event _CancelledProposition(address indexed);
-    event _PropositionApproved(address indexed, uint256, uint256, address[]);
-    event _PropositionRejected(address indexed, uint256, uint256, address[]);
+    event _AddedProposition(uint256, address indexed, uint256, uint256);
+    event _CancelledProposition(uint256, address indexed);
+    event _PropositionVote(uint256, address indexed, bool, uint256);
+    event _PropositionApproved(uint256, address indexed, uint256, uint256);
+    event _PropositionRejected(uint256, address indexed, uint256, uint256);
 
     // DATA /////////////////////////////////////////
     // chair person
@@ -29,14 +30,12 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
 
     // Proposition Structure
     struct PropositionStruct{
+        uint256 PropID;
         address Proposer;
         uint256 DeadLine;
         uint256 validationThreshold;
         uint256 VotesFor;
         uint256 VotesAgainst;
-        address[] listOfAdmins;
-        uint256[] AdminsWeight;
-        address[] AlreadyVoted;
     }
 
     PropositionStruct internal _Proposition;
@@ -73,20 +72,20 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     }
 
     modifier canVote(){
-        require(true == AuthorizedToVote(msg.sender, _Proposition.listOfAdmins), "EC23");
+        require(true == AuthorizedToVote(msg.sender), "EC23");
          _;
     }
 
     modifier PropositionInProgress(bool yesOrno){
-        if(yesOrno) require(true == CheckIfPropostiionActive(), "EC25");
-        else require(false == CheckIfPropostiionActive(), "EC24");
+        if(yesOrno) require(true == CheckIfPropositionActive(), "EC25");
+        else require(false == CheckIfPropositionActive(), "EC24");
         _;
     }
-
+/*
     modifier HasNotAlreadyVoted(){
         require(false == AddressLibrary.FindAddress(msg.sender, _Proposition.AlreadyVoted), "EC5");
         _;
-    }
+    }*/
 
     modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
         require(100 >= PropositionThresholdPercentage, "EC21");
@@ -95,42 +94,25 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     }
 
     // auxiliairy function
-    function AuthorizedToPropose(address add) internal view returns(bool) {
-        if(msg.sender == _chairperson) return true;
+    function AuthorizedToPropose(address addr) internal view returns(bool) {
+        if(addr == _chairperson) return true;
         else 
         {
-            address[] memory list = GetAdminList();
-            uint256[] memory weights = GetAdminWeights();
-            uint256 id = GetId(add, list);
-            if(id < list.length){
-                if(weights[id] >= (_minWeightToProposePercentage * totalSupply() / 100)) return true;
-            }
+            uint numberOfTokens = GetTokensBalance(addr);
+            if(numberOfTokens >= (_minWeightToProposePercentage * totalSupply() / 100)) return true;
             return false;
         }
     }
 
-    function AuthorizedToVote(address add, address[] memory list) internal pure returns(bool) {
-        return (GetId(add, list) < list.length);
+    function AuthorizedToVote(address addr) internal view returns(bool) {
+        uint votingTokens = GetVotingTokens(addr);
+        return (votingTokens > 0);
     }
 
-    function GetId(address add, address[] memory list) internal pure returns(uint256)
+ /*   function GetId(address add, address[] memory list) internal pure returns(uint256)
     {
         return AddressLibrary.FindAddressPosition(add, list);
-    }
-
-    function GetAdminList() internal view returns(address[] memory){
-        (address[] memory list, ) = ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
-        return list;
-    }
-
-    function GetAdminWeights() internal view returns(uint256[] memory){
-        (, uint256[] memory weights) = ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
-        return weights;
-    }
-
-    function GetTokenOwners() internal view returns(address[] memory, uint256[] memory){
-        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).TokenOwners();
-    }
+    }*/
 
     function totalSupply() internal view returns(uint256){
         return ICertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
@@ -140,7 +122,11 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         return ICertisToken(_managerContract.retrieveCertisTokenProxy()).balanceOf(add);
     }
 
-    function CheckIfPropostiionActive() internal returns(bool){
+    function GetVotingTokens(address addr) internal view returns(uint256){
+        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).GetVotingTokens(_Proposition.PropID, addr);
+    }
+
+    function CheckIfPropositionActive() internal returns(bool){
         if(block.timestamp < _Proposition.DeadLine)
         {
             return true;
@@ -195,15 +181,12 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         PropositionInProgress(false)
         isAuthorizedToPropose()
     {
-        _Proposition.listOfAdmins = GetAdminList();
-        require(0 < _Proposition.listOfAdmins.length, "Impossible to add proposition, there are no admins");
-
         _Proposition.Proposer = msg.sender;
         _Proposition.DeadLine = _DeadLine;
         _Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
-        _Proposition.AdminsWeight = GetAdminWeights();
+        _Proposition.PropID = ICertisToken(_managerContract.retrieveCertisTokenProxy()).RegisterProp(_DeadLine);
 
-        emit _AddedProposition(_Proposition.Proposer, _Proposition.DeadLine, _Proposition.validationThreshold, _Proposition.listOfAdmins, _Proposition.AdminsWeight);
+        emit _AddedProposition(_Proposition.PropID, _Proposition.Proposer, _Proposition.DeadLine, _Proposition.validationThreshold);
     }
 
     function cancelProposition() external
@@ -211,25 +194,25 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         isAuthorizedToCancel()
     {
         InternalCancelProposition();
-        emit _CancelledProposition(_Proposition.Proposer);
+        emit _CancelledProposition(_Proposition.PropID, _Proposition.Proposer);
     }
 
     function voteProposition(bool vote) external
         PropositionInProgress(true)
         canVote()
-        HasNotAlreadyVoted()
     {
         if(block.timestamp < _Proposition.DeadLine)
         {
-            _Proposition.AlreadyVoted.push(msg.sender);
 
             if(vote){
-                _Proposition.VotesFor += _Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
+                _Proposition.VotesFor += GetTokensBalance(msg.sender);
             }
             else{
-                _Proposition.VotesAgainst += _Proposition.AdminsWeight[GetId(msg.sender, GetAdminList())];
+                _Proposition.VotesAgainst += GetTokensBalance(msg.sender);
             }
 
+            ICertisToken(_managerContract.retrieveCertisTokenProxy()).Voted(_Proposition.PropID, msg.sender, GetTokensBalance(msg.sender));
+            emit _PropositionVote(_Proposition.PropID, msg.sender, vote, GetTokensBalance(msg.sender));
             checkProposition();
         }
 
@@ -259,7 +242,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
                 propositionApproved();
             }
             InternalCancelProposition();
-            emit _PropositionApproved(_Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst, _Proposition.AlreadyVoted);
+            emit _PropositionApproved(_Proposition.PropID, _Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst);
         }
         else if(_Proposition.VotesAgainst > _Proposition.validationThreshold)
         {
@@ -270,7 +253,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
                 propositionRejected();
             }
             InternalCancelProposition();
-            emit _PropositionRejected(_Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst, _Proposition.AlreadyVoted);
+            emit _PropositionRejected(_Proposition.PropID, _Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst);
         } 
     }
 
@@ -283,17 +266,15 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     function InternalCancelProposition() internal
     {
         delete(_Proposition);
+        ICertisToken(_managerContract.retrieveCertisTokenProxy()).RemoveProp(_Proposition.PropID);
     }
 
-    function retrievePropositionStatus() external view returns(address, uint256, uint256, uint256, uint256, address[] memory, uint256[] memory, address[] memory){
+    function retrievePropositionStatus() external view returns(address, uint256, uint256, uint256, uint256){
         return (_Proposition.Proposer,
             _Proposition.DeadLine,
             _Proposition.validationThreshold,
             _Proposition.VotesFor,
-            _Proposition.VotesAgainst,
-            _Proposition.listOfAdmins,
-            _Proposition.AdminsWeight,
-            _Proposition.AlreadyVoted
+            _Proposition.VotesAgainst
         );
     }
 
