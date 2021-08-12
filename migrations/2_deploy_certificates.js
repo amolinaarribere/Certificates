@@ -8,7 +8,7 @@ let PrivatePoolFactory = artifacts.require("./DeployedContracts/PrivatePoolFacto
 let ProviderFactory = artifacts.require("./DeployedContracts/ProviderFactory");
 
 const GenericProxy = artifacts.require("./DeployedContracts/Proxies/GenericProxy");
-let CertisTokenProxy = artifacts.require("./DeployedContracts/Proxies/CertisTokenProxy");
+const CertisTokenProxy = artifacts.require("./DeployedContracts/Proxies/CertisTokenProxy");
 
 const obj = require("../test_libraries/objects.js");
 
@@ -67,34 +67,39 @@ module.exports = async function(deployer, network, accounts){
   console.log("CertisToken deployed : " + CertisTokenInstance.address);
 
   var CertisTokenProxyInitializerMethod = {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "internalType": "uint8",
-          "name": "decimalsValue",
-          "type": "uint8"
-        },
-        {
-          "internalType": "uint256",
-          "name": "MaxSupply",
-          "type": "uint256"
-        }
-      ],
-      "name": "CertisToken_init",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    };
-  var CertisTokenProxyInitializerParameters = ["CertisToken", "CERT", 0, 1000000];
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "MaxSupply",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "decimalsValue",
+        "type": "uint8"
+      },
+    ],
+    "name": "CertisToken_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  };
+  var CertisTokenProxyInitializerParameters = ["CertisToken", "CERT", 1000000, CertificatesPoolManagerInstance.address, 0];
   var CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
 
   await deployer.deploy(CertisTokenProxy, CertisTokenInstance.address, CertificatesPoolManagerInstance.address, CertisProxyData);

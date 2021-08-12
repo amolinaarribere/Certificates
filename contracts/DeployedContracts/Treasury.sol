@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 /**
  * @title Storage
@@ -11,6 +11,7 @@ import "../Interfaces/ITreasury.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 
 contract Treasury is ITreasury, TokenGovernanceBaseContract{
@@ -19,8 +20,9 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     // EVENTS /////////////////////////////////////////
     event _NewPrices(uint, uint, uint, uint, uint);
-    event _Pay(address indexed, uint);
-    event _Refund(address indexed, uint);
+    event _Pay(address indexed, uint, uint);
+    event _Refund(address indexed, uint, uint);
+    event _AssignDividend(address indexed, uint, uint);
     event _Withdraw(address indexed, uint);
 
     // DATA /////////////////////////////////////////
@@ -41,6 +43,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     uint private _PrivatePriceWei;
     uint private _ProviderPriceWei;
     uint private _OwnerRefundPriceWei;
+
+    // last amount at which dividends where assigned for each token owner
+    uint private _AggregatedDividendAmount;
+    mapping(address => uint) _lastAssigned;
 
     // dividends per token owner
     struct _BalanceStruct{
@@ -73,11 +79,15 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _;
     }
 
+    modifier isFromTokenContract(){
+        require(true == Library.ItIsSomeone(_managerContract.retrieveCertisTokenProxy()), "EC8");
+        _;
+    }
+
     modifier isPriceOK(uint256 PublicPriceWei, uint256 OwnerRefundPriceWei){
         require(PublicPriceWei >= OwnerRefundPriceWei, "EC21");
         _;
     }
-
     
     // CONSTRUCTOR /////////////////////////////////////////
     function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
@@ -85,7 +95,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, managerContractAddress);
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
     }
-
 
     // GOVERNANCE /////////////////////////////////////////
     function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
@@ -160,20 +169,32 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     {
         uint256 amount = msg.value;
         if(price == Library.Prices.NewProvider) amount -= _OwnerRefundPriceWei;
-        AssignDividends(amount);
+        _AggregatedDividendAmount += amount;
 
-        emit _Pay(msg.sender, msg.value);
+        emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);
     }
 
-    function AssignDividends(uint256 amount) internal
+    function AssignDividends(address recipient) external
+        isFromTokenContract()
+    override
     {
-        (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = GetTokenOwners();
-        uint256 TotalTokenSupply = totalSupply();
+       InternalAssignDividends(recipient);
+    }
 
-        for(uint i=0; i < DividendsRecipients.length; i++){
-            addBalance(DividendsRecipients[i], DividendsRecipientsTokens[i] * amount, TotalTokenSupply);
+    function AssignDividends() external override
+    {
+       InternalAssignDividends(msg.sender);
+    }
+
+    function InternalAssignDividends(address recipient) internal
+    {
+        if(_lastAssigned[recipient] < _AggregatedDividendAmount){
+           uint amountToSplit = _AggregatedDividendAmount - _lastAssigned[recipient];
+           _lastAssigned[recipient] = _AggregatedDividendAmount;
+           addBalance(recipient, amountToSplit * GetTokensBalance(recipient), totalSupply());
+           
+           emit _AssignDividend(recipient, amountToSplit * GetTokensBalance(recipient), totalSupply());
         }
-
     }
 
     function getRefund(address addr, uint numberOfOwners) external 
@@ -182,7 +203,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     {
         addBalance(addr, _OwnerRefundPriceWei, numberOfOwners);
 
-        emit _Refund(addr, numberOfOwners);
+        emit _Refund(addr, _OwnerRefundPriceWei, numberOfOwners);
     }
 
     function withdraw(uint amount) external 
@@ -239,14 +260,12 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     function addBalance(address addr, uint amount, uint factor) private
     {
-        if(0 == _balances[addr]._balance[factor]){
-             _balances[addr]._factors.push(factor);
+        if(amount > 0){
+             if(0 == _balances[addr]._balance[factor]){
+                _balances[addr]._factors.push(factor);
+            }
+            _balances[addr]._balance[factor] += amount;
         }
-
-        uint newFactorBalance = _balances[addr]._balance[factor] + amount;
-        require(newFactorBalance >= _balances[addr]._balance[factor], "uint overflow adding");
-
-       _balances[addr]._balance[factor] = newFactorBalance;
     }
 
     function substractBalance(address addr, uint amount, uint factor) private

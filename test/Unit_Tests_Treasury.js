@@ -334,7 +334,7 @@ contract("Testing Treasury",function(accounts){
 
     // ****** TESTING Paying ***************************************************************** //
 
-     it("Pay New Proposal & New Pool & New Certificate & New Provider WRONG",async function(){
+    it("Pay New Proposal & New Pool & New Certificate & New Provider WRONG",async function(){
         // act
         try{
             await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
@@ -400,7 +400,13 @@ contract("Testing Treasury",function(accounts){
         var Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
         var Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
         expect(Balance1).to.be.equal(Balance2);
-        expect(Balance1).to.be.greaterThan(0);
+        expect(Balance1).to.be.equal(0);
+
+        await certisTokenProxy.methods.transfer(user_1, CertisTokenBalance.toNumber()).send({from: chairPerson, gas: Gas}, function(error, result){});
+        Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
+        Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
+        expect(Balance1).to.be.equal(Balance2);
+        expect(Balance2).to.be.greaterThan(0);
     });
 
     // ****** TESTING Owners Refunding ***************************************************************** //
@@ -423,6 +429,7 @@ contract("Testing Treasury",function(accounts){
         // asert
         var BalanceOwners = 0;
         for(var i=0; i < PublicOwners.length; i++){
+            await Treasury.methods.AssignDividends().send({from: PublicOwners[i]}, function(error, result){});
             BalanceOwners += parseInt(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
         }
         expect(BalanceOwners).to.be.equal(2 * OwnerRefundPriceWei);
@@ -448,6 +455,7 @@ contract("Testing Treasury",function(accounts){
         // assert
         let TreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         for(let i=0; i < PublicOwners.length; i++){
+            await Treasury.methods.AssignDividends().send({from: PublicOwners[i]}, function(error, result){});
             let balance = new BigNumber(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
             TreasuryBalance -= balance.toNumber();
             let initialBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
@@ -462,5 +470,21 @@ contract("Testing Treasury",function(accounts){
         let FinalTreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         expect(FinalTreasuryBalance).to.be.equal(TreasuryBalance);
     });
+
+    
+    // ****** TESTING Owners Refunding ***************************************************************** //
+
+    it("Assign Dividends WRONG",async function(){
+        // act
+        try{
+            await Treasury.methods.AssignDividends(user_1).send({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(WrongSender);
+        }
+    });
+
 
 });

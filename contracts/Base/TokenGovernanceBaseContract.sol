@@ -136,6 +136,10 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         return ICertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
     }
 
+    function GetTokensBalance(address add) internal view returns(uint256){
+        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).balanceOf(add);
+    }
+
     function CheckIfPropostiionActive() internal returns(bool){
         if(block.timestamp < _Proposition.DeadLine)
         {
