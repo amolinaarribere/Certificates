@@ -24,7 +24,7 @@ function returnUpgradeObject(address_1, address_2, address_3, address_4, address
             "NewProviderFactoryAddress": address_6,
             "NewProviderAddress": address_7,
             "NewPublicPoolData": data_1,
-            "NewPTreasuryData":  data_2,
+            "NewTreasuryData":  data_2,
             "NewCertisTokenData": data_3,
             "NewPrivatePoolFactoryData": data_4,
             "NewProviderFactoryData":  data_5

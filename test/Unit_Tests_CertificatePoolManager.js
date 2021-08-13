@@ -239,7 +239,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
         }
         // assert
         catch(error){
-            expect(error.message).to.match(AlreadyVoted);
+            expect(error.message).to.match(CanNotVote);
         }
         // act
         try{
@@ -414,7 +414,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
         }
         // assert
         catch(error){
-            expect(error.message).to.match(AlreadyVoted);
+            expect(error.message).to.match(CanNotVote);
         }
         // act
         try{
@@ -476,7 +476,5 @@ contract("Testing Certificate Pool Manager",function(accounts){
         await checkProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2);
         
     });
-
-
 
 });
