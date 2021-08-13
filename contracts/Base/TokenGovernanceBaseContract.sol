@@ -7,13 +7,14 @@ pragma solidity >=0.7.0 <0.9.0;
  * @dev Store & retrieve value in a variable
  */
 
- import "../Interfaces/ICertisToken.sol";
+ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+ import "../Interfaces/ITokenEventSubscriber.sol";
  import "../Libraries/AddressLibrary.sol";
  import "../Libraries/Library.sol";
  import "./ManagedBaseContract.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContract {
+abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initializable, ManagedBaseContract {
     using Library for *;
     using AddressLibrary for *; 
 
@@ -23,6 +24,7 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     event _PropositionVote(uint256, address indexed, bool, uint256);
     event _PropositionApproved(uint256, address indexed, uint256, uint256);
     event _PropositionRejected(uint256, address indexed, uint256, uint256);
+    event _UsedTokensTransfered(uint256 indexed, address, address, uint256);
 
     // DATA /////////////////////////////////////////
     // chair person
@@ -39,6 +41,10 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     }
 
     PropositionStruct internal _Proposition;
+
+    uint256 internal _nextPropID;
+
+    mapping(uint => mapping(address => uint)) internal _votersPerProp;
 
     uint internal _PropositionLifeTime;
     uint8 internal _PropositionThresholdPercentage;
@@ -67,12 +73,12 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     }
 
     modifier isAuthorizedToCancel(){
-        require(msg.sender == _Proposition.Proposer, "EC22");
+        require(true == Library.ItIsSomeone(_Proposition.Proposer), "EC22");
         _;
     }
 
     modifier canVote(){
-        require(true == AuthorizedToVote(msg.sender), "EC23");
+        require(true == AuthorizedToVote(msg.sender, _Proposition.PropID), "EC23");
          _;
     }
 
@@ -81,11 +87,11 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         else require(false == CheckIfPropositionActive(), "EC24");
         _;
     }
-/*
-    modifier HasNotAlreadyVoted(){
-        require(false == AddressLibrary.FindAddress(msg.sender, _Proposition.AlreadyVoted), "EC5");
+
+    modifier isFromTokenContract(){
+        require(true == Library.ItIsSomeone(_managerContract.retrieveCertisTokenProxy()), "EC8");
         _;
-    }*/
+    }
 
     modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
         require(100 >= PropositionThresholdPercentage, "EC21");
@@ -104,26 +110,21 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         }
     }
 
-    function AuthorizedToVote(address addr) internal view returns(bool) {
-        uint votingTokens = GetVotingTokens(addr);
+    function AuthorizedToVote(address addr, uint256 id) internal view returns(bool) {
+        uint votingTokens = GetVotingTokens(addr, id);
         return (votingTokens > 0);
     }
 
- /*   function GetId(address add, address[] memory list) internal pure returns(uint256)
-    {
-        return AddressLibrary.FindAddressPosition(add, list);
-    }*/
-
     function totalSupply() internal view returns(uint256){
-        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).totalSupply();
+        return IERC20Upgradeable(_managerContract.retrieveCertisTokenProxy()).totalSupply();
     }
 
     function GetTokensBalance(address add) internal view returns(uint256){
-        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).balanceOf(add);
+        return IERC20Upgradeable(_managerContract.retrieveCertisTokenProxy()).balanceOf(add);
     }
 
-    function GetVotingTokens(address addr) internal view returns(uint256){
-        return ICertisToken(_managerContract.retrieveCertisTokenProxy()).GetVotingTokens(_Proposition.PropID, addr);
+    function GetVotingTokens(address addr, uint id) internal view returns(uint256){
+        return (GetTokensBalance(addr) - _votersPerProp[id][addr]);
     }
 
     function CheckIfPropositionActive() internal returns(bool){
@@ -144,7 +145,8 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     // CONSTRUCTOR /////////////////////////////////////////
     function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {
         super.ManagedBaseContract_init(managerContractAddress);
-        _chairperson = chairperson; 
+        _chairperson = chairperson;
+        _nextPropID = 0; 
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
     
@@ -184,7 +186,8 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         _Proposition.Proposer = msg.sender;
         _Proposition.DeadLine = _DeadLine;
         _Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
-        _Proposition.PropID = ICertisToken(_managerContract.retrieveCertisTokenProxy()).RegisterProp(_DeadLine);
+        _Proposition.PropID = _nextPropID;
+        _nextPropID++;
 
         emit _AddedProposition(_Proposition.PropID, _Proposition.Proposer, _Proposition.DeadLine, _Proposition.validationThreshold);
     }
@@ -201,31 +204,54 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
         PropositionInProgress(true)
         canVote()
     {
-        if(block.timestamp < _Proposition.DeadLine)
+        uint VotingTokens = GetVotingTokens(msg.sender, _Proposition.PropID);
+
+        if(vote)
         {
-
-            if(vote){
-                _Proposition.VotesFor += GetTokensBalance(msg.sender);
-            }
-            else{
-                _Proposition.VotesAgainst += GetTokensBalance(msg.sender);
-            }
-
-            ICertisToken(_managerContract.retrieveCertisTokenProxy()).Voted(_Proposition.PropID, msg.sender, GetTokensBalance(msg.sender));
-            emit _PropositionVote(_Proposition.PropID, msg.sender, vote, GetTokensBalance(msg.sender));
-            checkProposition();
+            _Proposition.VotesFor += VotingTokens;
+        }
+        else
+        {
+            _Proposition.VotesAgainst += VotingTokens;
         }
 
-        else 
+        Voted(_Proposition.PropID, msg.sender,VotingTokens);
+
+        emit _PropositionVote(_Proposition.PropID, msg.sender, vote, VotingTokens);
+
+        checkProposition();
+    }
+
+    function onTokenBalanceChanged(address from, address to, uint256 amount) external
+        isFromTokenContract()
+    override
+    {
+        InternalonTokenBalanceChanged(from, to, amount);
+    }
+
+    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal virtual
+    {
+        if(true == CheckIfPropositionActive()) transferVoting(from, to, amount);
+    }
+
+    function transferVoting(address from, address to, uint256 amount) internal 
+    {
+        if(address(0) != from && _votersPerProp[_Proposition.PropID][from] > 0)
         {
-            if(_currentPropisProp){
-                removePropositionProp();
-            }
-            else{
-                propositionExpired();
-            }
-            InternalCancelProposition();
+            uint256 usedTokenToTransfer = amount;
+            if(amount > _votersPerProp[_Proposition.PropID][from]) usedTokenToTransfer = _votersPerProp[_Proposition.PropID][from];
+
+            _votersPerProp[_Proposition.PropID][from] -= usedTokenToTransfer;
+
+            if(address(0) != to)  _votersPerProp[_Proposition.PropID][to] += usedTokenToTransfer;
+
+            emit _UsedTokensTransfered(_Proposition.PropID, from, to, usedTokenToTransfer);
         }
+    }
+
+    function Voted(uint256 id, address voter, uint256 votingTokens) internal
+    {
+        _votersPerProp[id][voter] += votingTokens;
     }
 
     function checkProposition() internal
@@ -266,7 +292,6 @@ abstract contract TokenGovernanceBaseContract is Initializable, ManagedBaseContr
     function InternalCancelProposition() internal
     {
         delete(_Proposition);
-        ICertisToken(_managerContract.retrieveCertisTokenProxy()).RemoveProp(_Proposition.PropID);
     }
 
     function retrievePropositionStatus() external view returns(address, uint256, uint256, uint256, uint256){

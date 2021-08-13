@@ -79,11 +79,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _;
     }
 
-    modifier isFromTokenContract(){
-        require(true == Library.ItIsSomeone(_managerContract.retrieveCertisTokenProxy()), "EC8");
-        _;
-    }
-
     modifier isPriceOK(uint256 PublicPriceWei, uint256 OwnerRefundPriceWei){
         require(PublicPriceWei >= OwnerRefundPriceWei, "EC21");
         _;
@@ -174,11 +169,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);
     }
 
-    function AssignDividends(address recipient) external
-        isFromTokenContract()
-    override
+    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal override
     {
-       InternalAssignDividends(recipient);
+        super.InternalonTokenBalanceChanged(from, to, amount);
+        if(address(0) != from) InternalAssignDividends(from);
+        if(address(0) != to) InternalAssignDividends(to);
     }
 
     function AssignDividends() external override

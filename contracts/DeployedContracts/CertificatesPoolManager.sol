@@ -17,6 +17,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
+
 contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     using AddressLibrary for *;
     using Library for *;
@@ -153,6 +154,11 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         if(address(0) != _ProposedContracts.NewProviderAddress)_ProviderBeacon.upgradeTo(_ProposedContracts.NewProviderAddress);
 
         emit _NewContracts(internalRetrievePublicCertificatePool(), internalRetrieveTreasury(), internalRetrieveCertisToken(), internalRetrievePrivatePoolFactory(), internalRetrievePrivatePool(), internalRetrieveProviderFactory(), internalRetrieveProvider());
+    }
+
+    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal override
+    {
+        super.InternalonTokenBalanceChanged(from, to, amount);
     }
 
     // configuration Proxies

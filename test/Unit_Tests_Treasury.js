@@ -471,20 +471,6 @@ contract("Testing Treasury",function(accounts){
         expect(FinalTreasuryBalance).to.be.equal(TreasuryBalance);
     });
 
-    
-    // ****** TESTING Owners Refunding ***************************************************************** //
-
-    it("Assign Dividends WRONG",async function(){
-        // act
-        try{
-            await Treasury.methods.AssignDividends(user_1).send({from: user_1}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(WrongSender);
-        }
-    });
 
 
 });
