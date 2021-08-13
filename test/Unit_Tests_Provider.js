@@ -38,6 +38,7 @@ contract("Testing Provider",function(accounts){
     const user_1 = accounts[7];
     const holder_1 = accounts[8];
     const holder_2 = accounts[9];
+    const extra_owner = accounts[1];
     // providers info
     const provider_1_Info = "Provider 1 Info";
     const pool_Info = "Public Pool";
@@ -126,6 +127,20 @@ contract("Testing Provider",function(accounts){
         }
         
     }
+
+    // ****** TESTING Adding Owners ***************************************************************** //
+
+    it("Add Owner WRONG",async function(){
+        await pool_common.AddOwnerWrong(provider, ProviderOwners, extra_owner, user_1);
+    });
+
+    it("Add Owner CORRECT 1",async function(){
+        await pool_common.AddOwnerCorrect(provider, ProviderOwners, extra_owner, user_1);
+    });
+
+    it("Add Owner CORRECT 2",async function(){
+        await pool_common.AddOwnerCorrect2(provider, ProviderOwners, extra_owner, user_1);
+    });
 
     // ****** TESTING Subscribing Pool ***************************************************************** //
 

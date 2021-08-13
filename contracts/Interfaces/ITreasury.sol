@@ -21,5 +21,6 @@ pragma solidity >=0.7.0 <0.9.0;
 
     function retrieveBalance(address addr) external view returns(uint);
     function retrievePrices() external view returns(uint, uint, uint, uint, uint);
+    function retrieveAggregatedAmount() external view returns(uint);
 
 }

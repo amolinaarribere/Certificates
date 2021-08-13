@@ -510,30 +510,30 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\nimport \"./MultiSigContract.sol\";\r\nimport \"../Interfaces/IPool.sol\";\r\nimport \"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\";\r\n\r\nabstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigContract {\r\n    \r\n    // EVENTS /////////////////////////////////////////\r\n    event _AddCertificate(address indexed, address indexed, bytes32);\r\n\r\n    // DATA /////////////////////////////////////////\r\n    uint256 constant _TotalEntities = 2;\r\n\r\n    // Owners\r\n    uint256 constant _ownerIdCertificates = 0;\r\n    string constant _ownerLabel = \"Owner\";\r\n\r\n    // Providers\r\n    uint256 constant _providerId = 1;\r\n    string constant _providerLabel = \"Provider\";\r\n\r\n    string[] internal _Label;\r\n\r\n    // Holders\r\n    struct _CertificatePerHolder{\r\n        mapping(bytes32 => address) _CertificateFromProvider;\r\n        bytes32[] _ListOfCertificates;\r\n    }\r\n    \r\n    mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;\r\n\r\n    // MODIFIERS /////////////////////////////////////////\r\n    modifier isAProvider(){\r\n        require(true == isProvider(msg.sender), \"EC12\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProvider(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC13\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, \"EC14\");\r\n        _;\r\n    }\r\n    \r\n    modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){\r\n        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC15\");\r\n        _;\r\n    }\r\n    \r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer \r\n    {\r\n        _Label = new string[](2);\r\n        _Label[0] = _ownerLabel;\r\n        _Label[1] = _providerLabel;\r\n\r\n        super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); \r\n    }\r\n\r\n    // FUNCTIONALITY /////////////////////////////////////////\r\n    // Providers CRUD Operations\r\n    function addProvider(address provider, string calldata providerInfo) external override payable virtual\r\n    {\r\n        addEntity(provider, providerInfo, _providerId);\r\n    }\r\n\r\n    function removeProvider(address provider) external override\r\n    {\r\n       removeEntity(provider, _providerId); \r\n    }   \r\n\r\n    function validateProvider(address provider) external override\r\n    {\r\n        validateEntity(provider, _providerId);\r\n    }\r\n\r\n    function rejectProvider(address provider) external override\r\n    {\r\n        rejectEntity(provider, _providerId);\r\n    }\r\n    \r\n    function retrieveProvider(address provider) external override view returns (string memory, bool)\r\n    {\r\n        return (retrieveEntity(provider, _providerId));\r\n    }\r\n\r\n    function retrieveAllProviders() external override view returns (address[] memory)\r\n    {\r\n        return(retrieveAllEntities(_providerId));\r\n    }\r\n\r\n    function isProvider(address provider) public view returns (bool)\r\n    {\r\n        return(isEntity(provider, _providerId));\r\n    }\r\n\r\n    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory, string[] memory)\r\n    {\r\n        return(retrievePendingEntities(addedORremove, _providerId));\r\n    }\r\n    \r\n    // Certificates CRUD Operations\r\n    function addCertificate(bytes32 CertificateHash, address holder) external override payable virtual\r\n    {\r\n        addCertificateInternal(CertificateHash, holder);\r\n    }\r\n\r\n    function addCertificateInternal(bytes32 CertificateHash, address holder) internal\r\n        isAProvider \r\n        NotEmpty(CertificateHash)\r\n        CertificateDoesNotExist(holder, CertificateHash)\r\n    {\r\n        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;\r\n        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);\r\n\r\n        emit _AddCertificate(msg.sender, holder, CertificateHash);\r\n    }\r\n\r\n    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override\r\n    view returns (address)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);\r\n    }\r\n\r\n    function retrieveTotalCertificatesByHolder(address holder) public override \r\n    view returns (uint256)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);\r\n    }\r\n\r\n    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override\r\n    view returns (bytes32[] memory)\r\n    {\r\n        if(retrieveTotalCertificatesByHolder(holder) <= skipFirst){\r\n            return (new bytes32[](0));\r\n        }\r\n\r\n        uint maxSize = max;\r\n        if(retrieveTotalCertificatesByHolder(holder) - skipFirst < max){\r\n            maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst;\r\n        }\r\n        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](maxSize);\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        uint count = 0;\r\n        uint skipped = 0;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(count >= max) break;\r\n            if(skipFirst > skipped){\r\n                    skipped += 1;\r\n            }\r\n            else{\r\n                ListOfCertificatesByHolder[count] = listOfCert[i];\r\n                count += 1;\r\n            }             \r\n        }\r\n\r\n        return (ListOfCertificatesByHolder);\r\n    }\r\n\r\n\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Abstract\\MultiSigCertificatesPool.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        6877
+        5410
       ],
       "EntitiesBaseContract": [
         1779
       ],
       "IMultiSigContract": [
-        6306
+        4805
       ],
       "IPool": [
-        6393
+        4892
       ],
       "Initializable": [
-        8238
+        6738
       ],
       "ItemsLibrary": [
-        7700
+        6233
       ],
       "Library": [
-        7989
+        6522
       ],
       "MultiSigCertificatesPool": [
         644
@@ -579,7 +579,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 645,
-        "sourceUnit": 6394,
+        "sourceUnit": 4893,
         "src": "185:33:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -591,7 +591,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 645,
-        "sourceUnit": 8239,
+        "sourceUnit": 6739,
         "src": "220:75:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -604,7 +604,7 @@
               "id": 148,
               "name": "IPool",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 6393,
+              "referencedDeclaration": 4892,
               "src": "345:5:1"
             },
             "id": 149,
@@ -616,7 +616,7 @@
               "id": 150,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8238,
+              "referencedDeclaration": 6738,
               "src": "352:13:1"
             },
             "id": 151,
@@ -643,10 +643,10 @@
         "linearizedBaseContracts": [
           644,
           952,
-          8238,
+          6738,
           1779,
-          6306,
-          6393
+          4805,
+          4892
         ],
         "name": "MultiSigCertificatesPool",
         "nameLocation": "317:24:1",
@@ -2650,7 +2650,7 @@
                   "id": 283,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 8237,
+                  "referencedDeclaration": 6737,
                   "src": "2104:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2745,7 +2745,7 @@
           },
           {
             "baseFunctions": [
-              6351
+              4850
             ],
             "body": {
               "id": 331,
@@ -2929,7 +2929,7 @@
           },
           {
             "baseFunctions": [
-              6356
+              4855
             ],
             "body": {
               "id": 343,
@@ -3070,7 +3070,7 @@
           },
           {
             "baseFunctions": [
-              6361
+              4860
             ],
             "body": {
               "id": 355,
@@ -3211,7 +3211,7 @@
           },
           {
             "baseFunctions": [
-              6366
+              4865
             ],
             "body": {
               "id": 367,
@@ -3352,7 +3352,7 @@
           },
           {
             "baseFunctions": [
-              6375
+              4874
             ],
             "body": {
               "id": 384,
@@ -3565,7 +3565,7 @@
           },
           {
             "baseFunctions": [
-              6381
+              4880
             ],
             "body": {
               "id": 397,
@@ -3893,7 +3893,7 @@
           },
           {
             "baseFunctions": [
-              6392
+              4891
             ],
             "body": {
               "id": 430,
@@ -4124,7 +4124,7 @@
           },
           {
             "baseFunctions": [
-              6316
+              4815
             ],
             "body": {
               "id": 444,
@@ -4789,7 +4789,7 @@
           },
           {
             "baseFunctions": [
-              6325
+              4824
             ],
             "body": {
               "id": 505,
@@ -5016,7 +5016,7 @@
           },
           {
             "baseFunctions": [
-              6332
+              4831
             ],
             "body": {
               "id": 521,
@@ -5204,7 +5204,7 @@
           },
           {
             "baseFunctions": [
-              6344
+              4843
             ],
             "body": {
               "id": 642,
@@ -6644,25 +6644,25 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        6877
+        5410
       ],
       "EntitiesBaseContract": [
         1779
       ],
       "IMultiSigContract": [
-        6306
+        4805
       ],
       "IPool": [
-        6393
+        4892
       ],
       "Initializable": [
-        8238
+        6738
       ],
       "ItemsLibrary": [
-        7700
+        6233
       ],
       "Library": [
-        7989
+        6522
       ],
       "MultiSigCertificatesPool": [
         644
@@ -6708,7 +6708,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 645,
-        "sourceUnit": 6394,
+        "sourceUnit": 4893,
         "src": "185:33:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -6720,7 +6720,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 645,
-        "sourceUnit": 8239,
+        "sourceUnit": 6739,
         "src": "220:75:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -6733,7 +6733,7 @@
               "id": 148,
               "name": "IPool",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 6393,
+              "referencedDeclaration": 4892,
               "src": "345:5:1"
             },
             "id": 149,
@@ -6745,7 +6745,7 @@
               "id": 150,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8238,
+              "referencedDeclaration": 6738,
               "src": "352:13:1"
             },
             "id": 151,
@@ -6772,10 +6772,10 @@
         "linearizedBaseContracts": [
           644,
           952,
-          8238,
+          6738,
           1779,
-          6306,
-          6393
+          4805,
+          4892
         ],
         "name": "MultiSigCertificatesPool",
         "nameLocation": "317:24:1",
@@ -8779,7 +8779,7 @@
                   "id": 283,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 8237,
+                  "referencedDeclaration": 6737,
                   "src": "2104:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -8874,7 +8874,7 @@
           },
           {
             "baseFunctions": [
-              6351
+              4850
             ],
             "body": {
               "id": 331,
@@ -9058,7 +9058,7 @@
           },
           {
             "baseFunctions": [
-              6356
+              4855
             ],
             "body": {
               "id": 343,
@@ -9199,7 +9199,7 @@
           },
           {
             "baseFunctions": [
-              6361
+              4860
             ],
             "body": {
               "id": 355,
@@ -9340,7 +9340,7 @@
           },
           {
             "baseFunctions": [
-              6366
+              4865
             ],
             "body": {
               "id": 367,
@@ -9481,7 +9481,7 @@
           },
           {
             "baseFunctions": [
-              6375
+              4874
             ],
             "body": {
               "id": 384,
@@ -9694,7 +9694,7 @@
           },
           {
             "baseFunctions": [
-              6381
+              4880
             ],
             "body": {
               "id": 397,
@@ -10022,7 +10022,7 @@
           },
           {
             "baseFunctions": [
-              6392
+              4891
             ],
             "body": {
               "id": 430,
@@ -10253,7 +10253,7 @@
           },
           {
             "baseFunctions": [
-              6316
+              4815
             ],
             "body": {
               "id": 444,
@@ -10918,7 +10918,7 @@
           },
           {
             "baseFunctions": [
-              6325
+              4824
             ],
             "body": {
               "id": 505,
@@ -11145,7 +11145,7 @@
           },
           {
             "baseFunctions": [
-              6332
+              4831
             ],
             "body": {
               "id": 521,
@@ -11333,7 +11333,7 @@
           },
           {
             "baseFunctions": [
-              6344
+              4843
             ],
             "body": {
               "id": 642,
@@ -12775,7 +12775,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-08-13T08:48:22.351Z",
+  "updatedAt": "2021-08-13T10:15:52.661Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

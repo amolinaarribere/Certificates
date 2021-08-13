@@ -57,8 +57,8 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     modifier isCertificateActivated(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == isCertificate(pool, cert, holder), "EC6");
-        else require(true == isCertificate(pool, cert, holder), "EC7");
+        if(false == YesOrNo) require(false == internalisCertificate(pool, cert, holder), "EC6");
+        else require(true == internalisCertificate(pool, cert, holder), "EC7");
         _;
     }
 
@@ -149,11 +149,15 @@ pragma solidity >=0.7.0 <0.9.0;
         return retrieveAllEntities(_poolId);
     }
 
-    function isPool(address pool) public view returns (bool)
+    function retrievePendingPools(bool addedORremove) external override view returns (address[] memory, string[] memory)
+    {
+        return(retrievePendingEntities(addedORremove, _poolId));
+    }
+
+    function isPool(address pool) internal view returns (bool)
     {
         return(isEntity(pool, _poolId));
     }
-    
     // Certificates management
     function extractCertIds(address pool, address holder) internal pure returns(uint[] memory)
     {
@@ -217,7 +221,12 @@ pragma solidity >=0.7.0 <0.9.0;
         delete(itemStruct._items[CertificateHash]);   
     }
 
-    function isCertificate(address pool, bytes32 CertificateHash, address holder) public view returns(bool)
+    function isCertificate(address pool, bytes32 CertificateHash, address holder) external override view returns(bool)
+    {
+        return internalisCertificate(pool, CertificateHash, holder);
+    }
+
+    function internalisCertificate(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
     {
         IPool poolToCheck = IPool(pool);
         address provider = poolToCheck.retrieveCertificateProvider(CertificateHash, holder);

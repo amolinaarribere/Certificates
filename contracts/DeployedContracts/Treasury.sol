@@ -234,6 +234,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
     }
 
+    function retrieveAggregatedAmount() external override view returns(uint){
+        return _AggregatedDividendAmount;
+    }
+
     function checkBalance(address addr) internal view returns(uint){
         uint[] memory f = returnFactors(addr);
         uint total = 0;
@@ -245,11 +249,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return total;
     }
 
-    function returnFactors(address addr) public view returns(uint[] memory){
+    function returnFactors(address addr) internal view returns(uint[] memory){
         return _balances[addr]._factors;
     }
 
-    function returnBalanceForFactor(address addr, uint factor) public view returns(uint){
+    function returnBalanceForFactor(address addr, uint factor) internal view returns(uint){
         return _balances[addr]._balance[factor];
     }
 

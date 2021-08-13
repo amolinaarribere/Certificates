@@ -69,7 +69,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     function InitializeContracts(Library.InitialContractsStruct calldata initialContracts) 
         isFromChairPerson()
         isNotInitialized()
-    external
+    external override
     {
         _init = true;
         initProxies(initialContracts);

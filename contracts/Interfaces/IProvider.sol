@@ -11,6 +11,7 @@ pragma solidity >=0.7.0 <0.9.0;
     function addCertificate(address pool, bytes32 CertificateHash, address holder) external;
     function validateCertificate(address pool, bytes32 CertificateHash, address holder) external;
     function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external;
+    function isCertificate(address pool, bytes32 CertificateHash, address holder) external view returns(bool);
 
     function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external;
     function removePool(address pool) external;
@@ -18,7 +19,8 @@ pragma solidity >=0.7.0 <0.9.0;
     function rejectPool(address pool) external;
     function retrievePool(address pool) external view returns (string memory, bool, uint256, uint256);
     function retrieveAllPools() external view returns (address[] memory);
-
+    function retrievePendingPools(bool addedORremove) external view returns (address[] memory, string[] memory);
+    
     receive() external payable;
     
 }
