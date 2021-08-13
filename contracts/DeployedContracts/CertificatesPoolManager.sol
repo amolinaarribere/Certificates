@@ -219,6 +219,10 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         return internalRetrieveProvider();
     }
 
+    function isInitialized() external override view returns(bool){
+        return _init;
+    }
+
     // internal
     function internalRetrievePublicCertificatePool() internal view returns (address) {
         return _PublicCertificatesPool.retrieveImplementation();

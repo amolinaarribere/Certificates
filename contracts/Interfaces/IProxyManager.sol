@@ -27,4 +27,6 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrievePrivatePool() external view returns (address);
     function retrieveProviderFactory() external view returns (address);
     function retrieveProvider() external view returns (address);
+
+    function isInitialized() external view returns(bool);
 }
