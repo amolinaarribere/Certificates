@@ -100,7 +100,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         return(retrieveAllEntities(_providerId));
     }
 
-    function isProvider(address provider) public view returns (bool)
+    function isProvider(address provider) internal view returns (bool)
     {
         return(isEntity(provider, _providerId));
     }

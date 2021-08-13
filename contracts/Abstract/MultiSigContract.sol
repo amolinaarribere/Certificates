@@ -85,7 +85,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         return (_minOwners);
     }
 
-    function isOwner(address owner) public view returns (bool){
+    function isOwner(address owner) internal view returns (bool){
         return(isEntity(owner, _ownerId));
     }
 
