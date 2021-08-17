@@ -274,7 +274,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _balances[addr]._balance[factor] -= amount;
 
         if(0 == _balances[addr]._balance[factor]){
-            _balances[addr]._factors = UintLibrary.UintArrayRemoveResize(UintLibrary.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
+            UintLibrary.UintArrayRemoveResize(UintLibrary.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
         }
         
     }

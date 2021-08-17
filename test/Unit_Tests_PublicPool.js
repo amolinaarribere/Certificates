@@ -64,7 +64,7 @@ contract("Testing Public Pool",function(accounts){
         await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
     });
 
-     // ****** TESTING Adding Owners ***************************************************************** //
+    // ****** TESTING Adding Owners ***************************************************************** //
 
      it("Add Owner WRONG",async function(){
         await pool_common.AddOwnerWrong(publicCertPool, PublicOwners, extra_owner, user_1);
@@ -140,6 +140,20 @@ contract("Testing Public Pool",function(accounts){
 
     it("on Item Rejected WRONG",async function(){
         await pool_common.onItemRejectedWrong(publicCertPool, user_1);
+    });
+
+    // ****** TESTING Updating Min Owners ***************************************************************** //
+
+    it("Update Min Owner WRONG",async function(){
+        await pool_common.UpdateMinOwnersWrong(publicCertPool, PublicOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 1",async function(){
+        await pool_common.UpdateMinOwnersCorrect(publicCertPool, PublicOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 2",async function(){
+        await pool_common.UpdateMinOwnersCorrect2(publicCertPool, PublicOwners, user_1);
     });
 
 });

@@ -116,7 +116,7 @@ contract("Testing Provider",function(accounts){
             expect(_AddCertificatePrice.toString()).to.be.equal(CertificatePriceWei.toString());
             expect(_SubscriptionPrice.toString()).to.be.equal(subscriptionPriceForPool.toString());
             expect(_Total).to.equal(1);
-            expect(_Pools[0]).to.equal(publicCertPoolAddress);
+            expect(_Pools[0]).to.equal(pool_common.AddressToBytes32(publicCertPoolAddress));
         }
         else{
             expect(_PoolInfo).to.equal("");
@@ -337,6 +337,20 @@ contract("Testing Provider",function(accounts){
 
     it("on Item Rejected WRONG",async function(){
         await pool_common.onItemRejectedWrong(provider, user_1);
+    });
+
+    // ****** TESTING Updating Min Owners ***************************************************************** //
+
+    it("Update Min Owner WRONG",async function(){
+        await pool_common.UpdateMinOwnersWrong(provider, ProviderOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 1",async function(){
+        await pool_common.UpdateMinOwnersCorrect(provider, ProviderOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 2",async function(){
+        await pool_common.UpdateMinOwnersCorrect2(provider, ProviderOwners, user_1);
     });
  
 

@@ -144,12 +144,12 @@ pragma solidity >=0.7.0 <0.9.0;
         return retrieveEntity(pool, _poolId);
     }
 
-    function retrieveAllPools() external override view returns (address[] memory)
+    function retrieveAllPools() external override view returns (bytes32[] memory)
     {
         return retrieveAllEntities(_poolId);
     }
 
-    function retrievePendingPools(bool addedORremove) external override view returns (address[] memory, string[] memory)
+    function retrievePendingPools(bool addedORremove) external override view returns (bytes32[] memory, string[] memory)
     {
         return(retrievePendingEntities(addedORremove, _poolId));
     }
@@ -217,7 +217,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
         ItemsLibrary._ItemsStruct storage itemStruct = _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
 
-        itemStruct._activatedItems = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, itemStruct._activatedItems), itemStruct._activatedItems);
+        ItemsLibrary.RemoveResizeActivated(CertificateHash, itemStruct);
         delete(itemStruct._items[CertificateHash]);   
     }
 

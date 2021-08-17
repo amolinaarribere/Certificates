@@ -18,8 +18,8 @@ pragma solidity >=0.7.0 <0.9.0;
     function validatePool(address pool) external;
     function rejectPool(address pool) external;
     function retrievePool(address pool) external view returns (string memory, bool, uint256, uint256);
-    function retrieveAllPools() external view returns (address[] memory);
-    function retrievePendingPools(bool addedORremove) external view returns (address[] memory, string[] memory);
+    function retrieveAllPools() external view returns (bytes32[] memory);
+    function retrievePendingPools(bool addedORremove) external view returns (bytes32[] memory, string[] memory);
     
     receive() external payable;
     

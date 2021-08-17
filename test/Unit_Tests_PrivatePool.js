@@ -121,4 +121,18 @@ contract("Testing Private Pool",function(accounts){
         await pool_common.onItemRejectedWrong(privateCertPool,  user_1);
     });
 
+    // ****** TESTING Updating Min Owners ***************************************************************** //
+
+    it("Update Min Owner WRONG",async function(){
+        await pool_common.UpdateMinOwnersWrong(privateCertPool, PrivateOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 1",async function(){
+        await pool_common.UpdateMinOwnersCorrect(privateCertPool, PrivateOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 2",async function(){
+        await pool_common.UpdateMinOwnersCorrect2(privateCertPool, PrivateOwners, user_1);
+    });
+
 });

@@ -37,6 +37,7 @@ pragma solidity >=0.7.0 <0.9.0;
         bytes32 providerInBytes = AddressLibrary.AddressToBytes32(provider);
         _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
         _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
+        _Entities[_providerId]._items[providerInBytes]._pendingId = _Entities[_providerId]._pendingItemsAdd.length - 1;
 
         emit _NewProposal(provider, providerInfo);
     }

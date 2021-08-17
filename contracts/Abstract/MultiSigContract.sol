@@ -101,7 +101,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         return (retrieveEntity(owner, _ownerId));
     }
 
-    function retrieveAllOwners() external override view returns (address[] memory){
+    function retrieveAllOwners() external override view returns (bytes32[] memory){
         return(retrieveAllEntities(_ownerId));
     }
 
@@ -113,7 +113,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         return(isEntity(owner, _ownerId));
     }
 
-    function retrievePendingOwners(bool addedORremove) external override view returns (address[] memory, string[] memory){
+    function retrievePendingOwners(bool addedORremove) external override view returns (bytes32[] memory, string[] memory){
         return(retrievePendingEntities(addedORremove, _ownerId));
     }
 
@@ -125,7 +125,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         greaterThan(0, newMinOwners)
     {
         _newMinOwners = newMinOwners;
-        
+        voteNewMinOwners(true);
     }
 
     function validateMinOwners() external override
