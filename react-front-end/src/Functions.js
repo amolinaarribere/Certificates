@@ -188,37 +188,36 @@ async function CallBackFrame(callback){
   }
   
   export async function ValidateProposal(address){
-    var nonce = await web3.eth.getTransactionCount(account);
-    await CallBackFrame(publicPool.methods.validateProvider(address, nonce).send({from: account}));
+    await CallBackFrame(publicPool.methods.validateProvider(address).send({from: account}));
   }
   
-  export async function AddPrivateProvider(address, Info){
-    var nonce = await web3.eth.getTransactionCount(account);
-    await CallBackFrame(privatePool.methods.addProvider(address, Info, nonce).send({from: account}));
+  export async function AddProviderPool(address, Info, contractType){
+    if(2 == contractType)await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
+    else await CallBackFrame(provider.methods.addPool(address, Info).send({from: account}));
   }
   
-  export async function RemoveProvider(address, isPrivate){
-    var nonce = await web3.eth.getTransactionCount(account);
-    if(true == isPrivate) await CallBackFrame(privatePool.methods.removeProvider(address, nonce).send({from: account}));
-    else await CallBackFrame(publicPool.methods.removeProvider(address, nonce).send({from: account}));
+  export async function RemoveProviderPool(address, contractType){
+    if(1 == contractType) await CallBackFrame(publicPool.methods.removeProvider(address).send({from: account}));
+    else if(2 == contractType) await CallBackFrame(privatePool.methods.removeProvider(address).send({from: account}));
+    else await CallBackFrame(provider.methods.removePool(address).send({from: account}));
   }
   
-  export async function AddOwner(address, info, isPrivate){
-    var nonce = await web3.eth.getTransactionCount(account);
-    if(true == isPrivate) await CallBackFrame(privatePool.methods.addOwner(address, info, nonce).send({from: account}));
-    else await CallBackFrame(publicPool.methods.addOwner(address, info, nonce).send({from: account}));
+  export async function AddOwner(address, info, contractType){
+    if(1 == contractType) await CallBackFrame(publicPool.methods.addOwner(address, info).send({from: account}));
+    else if(2 == contractType) await CallBackFrame(privatePool.methods.addOwner(address, info).send({from: account}));
+    else await CallBackFrame(provider.methods.addOwner(address, info).send({from: account}));
   }
   
-  export async function RemoveOwner(address, isPrivate){
-    var nonce = await web3.eth.getTransactionCount(account);
-    if(true == isPrivate) await CallBackFrame(privatePool.methods.removeOwner(address, nonce).send({from: account}));
-    else await CallBackFrame(publicPool.methods.removeOwner(address, nonce).send({from: account}));
+  export async function RemoveOwner(address, contractType){
+    if(1 == contractType) await CallBackFrame(publicPool.methods.removeOwner(address).send({from: account}));
+    else if(2 == contractType) await CallBackFrame(privatePool.methods.removeOwner(address).send({from: account}));
+    else await CallBackFrame(provider.methods.removeOwner(address).send({from: account}));
+
   }
 
   export async function AddCertificate(hash, address, isPrivate){
-    var nonce = await web3.eth.getTransactionCount(account);
-    if(true == isPrivate) await CallBackFrame(privatePool.methods.addCertificate(hash, address, nonce).send({from: account}));
-    else await CallBackFrame(publicPool.methods.addCertificate(hash, address, nonce).send({from: account}));
+    if(true == isPrivate) await CallBackFrame(privatePool.methods.addCertificate(hash, address).send({from: account}));
+    else await CallBackFrame(publicPool.methods.addCertificate(hash, address).send({from: account}));
   }
 
   export async function CheckCertificate(hash, address, isPrivate){

@@ -7,7 +7,7 @@ class RemoveProviderComponent extends React.Component{
     };
     handleRemoveProvider = async (event) => {
         event.preventDefault();
-      await func.RemoveProvider(this.state.removeProvider, this.props.privateEnv)
+      await func.RemoveProviderPool(this.state.removeProvider, this.props.privateEnv)
       this.setState({ removeProvider: "" })
     };
   

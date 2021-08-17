@@ -2,7 +2,7 @@ import React from 'react';
 import CertificateComponent from './subcomponents/CertificateComponent.js';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import OwnerComponent from './subcomponents/Owners/OwnerComponent.js';
-import ProviderComponent from './subcomponents/Providers/ProviderComponent.js';
+import ProviderPoolComponent from './subcomponents/ProvidersPools/ProviderPoolComponent.js';
 const func = require("../Functions.js");
 
 class PrivateComponent extends React.Component {
@@ -17,7 +17,8 @@ class PrivateComponent extends React.Component {
       minOwners : 0,
       listOfOwners : [],
       privatePool : "",
-      privateEnv : true
+      privateEnv : true,
+      contractType : 2
     };
   
     handleNewPrivatePool = async (event) => {
@@ -70,9 +71,9 @@ class PrivateComponent extends React.Component {
           <br />
           <CertificateComponent privateEnv={this.state.privateEnv}/>
           <br />
-          <OwnerComponent privateEnv={this.state.privateEnv}/>
+          <OwnerComponent contractType={this.state.contractType}/>
           <br/>
-          <ProviderComponent privateEnv={this.state.privateEnv}/>
+          <ProviderPoolComponent contractType={this.state.contractType}/>
         </div>
       );
     }

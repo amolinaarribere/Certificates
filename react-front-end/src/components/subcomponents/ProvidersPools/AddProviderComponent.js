@@ -15,7 +15,7 @@ class AddProviderComponent extends React.Component{
     };
     handleAddProvider = async (event) => {
         event.preventDefault();
-      await func.AddPrivateProvider(this.state.addProvider, this.state.addProviderInfo)
+      await func.AddProviderPool(this.state.addProvider, this.state.addProviderInfo)
       this.setState({ addProviderInfo: "" })
       this.setState({ addProvider: "" })
     };

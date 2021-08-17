@@ -2,7 +2,7 @@ import React from 'react';
 import CertificateComponent from './subcomponents/CertificateComponent.js';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import OwnerComponent from './subcomponents/Owners/OwnerComponent.js';
-import ProviderComponent from './subcomponents/Providers/ProviderComponent.js';
+import ProviderPoolComponent from './subcomponents/ProvidersPools/ProviderPoolComponent.js';
 const func = require("../Functions.js");
 
 class PublicComponent extends React.Component {
@@ -13,7 +13,8 @@ class PublicComponent extends React.Component {
     state = {
       newProvider : "",
       newProviderInfo : "",
-      privateEnv : false
+      privateEnv : false,
+      contractType : 1
     };
   
     handleNewProposal = async (event) => {
@@ -40,9 +41,9 @@ class PublicComponent extends React.Component {
           <br />
           <CertificateComponent privateEnv={this.state.privateEnv}/>
           <br />
-          <OwnerComponent privateEnv={this.state.privateEnv}/>
+          <OwnerComponent contractType={this.state.contractType}/>
           <br/>
-          <ProviderComponent privateEnv={this.state.privateEnv}/>
+          <ProviderPoolComponent contractType={this.state.contractType}/>
         </div>
       );
     }

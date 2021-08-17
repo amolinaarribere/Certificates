@@ -3,7 +3,6 @@ import AddOwnerComponent from './AddOwnerComponent.js';
 import RemoveOwnerComponent from './RemoveOwnerComponent.js';
 import ListOwnersComponent from './ListOwnersComponent.js';
 import ListPendingOwnersComponent from './ListPendingOwnersComponent.js';
-const func = require("../../../Functions.js");
 
 class OwnerComponent extends React.Component{
     render(){
