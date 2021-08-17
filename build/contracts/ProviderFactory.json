@@ -4358,7 +4358,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_enum$_Prices_$8011__to_t_uint8__fromStack_reversed",
+            "name": "abi_encode_tuple_t_enum$_Prices_$8027__to_t_uint8__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -6341,7 +6341,7 @@
           }
         ]
       },
-      "contents": "{\n    { }\n    function abi_decode_string(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        if gt(_1, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        let array_1 := allocate_memory(add(and(add(_1, 0x1f), not(31)), 0x20))\n        mstore(array_1, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(array_1, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(array_1, _1), 0x20), 0)\n        array := array_1\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_address_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptrt_uint256t_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := calldataload(_2)\n        let _4 := 0x20\n        if gt(_3, _1) { panic_error_0x41() }\n        let _5 := shl(5, _3)\n        let dst := allocate_memory(add(_5, _4))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _4)\n        let src := add(_2, _4)\n        if gt(add(add(_2, _5), _4), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := calldataload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _4)\n            src := add(src, _4)\n        }\n        value0 := dst_1\n        value1 := calldataload(add(headStart, _4))\n        let offset_1 := calldataload(add(headStart, 64))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value2 := abi_decode_string(add(headStart, offset_1), dataEnd)\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        if iszero(eq(value, iszero(iszero(value)))) { revert(0, 0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_uint256(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := calldataload(headStart)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        copy_memory_to_memory(add(value, 0x20), add(pos, 0x20), length)\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_tuple_packed_t_string_memory_ptr__to_t_string_memory_ptr__nonPadded_inplace_fromStack_reversed(pos, value0) -> end\n    {\n        let length := mload(value0)\n        copy_memory_to_memory(add(value0, 0x20), pos, length)\n        end := add(pos, length)\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_address_t_bytes_memory_ptr__to_t_address_t_bytes_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), 64)\n        tail := abi_encode_bytes(value1, add(headStart, 64))\n    }\n    function abi_encode_tuple_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr__to_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        let tail_1 := add(headStart, 96)\n        mstore(headStart, 96)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 128)\n        let _1 := 0x20\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, and(mload(srcPtr), sub(shl(160, 1), 1)))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        mstore(add(headStart, _1), value1)\n        mstore(add(headStart, 64), sub(pos, headStart))\n        tail := abi_encode_bytes(value2, pos)\n    }\n    function abi_encode_tuple_t_enum$_Prices_$8011__to_t_uint8__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        if iszero(lt(value0, 4))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x21)\n            revert(0, 0x24)\n        }\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_a944f1b41f6a804da79fa67678960b78f7d26756513cb14d2415ac5b6e744ef2__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 3)\n        mstore(add(headStart, 64), \"EC1\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_address__to_t_uint256_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), and(value1, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_uint256_t_uint256__to_t_uint256_t_uint256__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function allocate_memory(size) -> memPtr\n    {\n        memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(size, 31), not(31)))\n        if or(gt(newFreePtr, sub(shl(64, 1), 1)), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x11)\n            revert(0, 0x24)\n        }\n        diff := sub(x, y)\n    }\n    function copy_memory_to_memory(src, dst, length)\n    {\n        let i := 0\n        for { } lt(i, length) { i := add(i, 32) }\n        {\n            mstore(add(dst, i), mload(add(src, i)))\n        }\n        if gt(i, length) { mstore(add(dst, length), 0) }\n    }\n    function panic_error_0x32()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x32)\n        revert(0, 0x24)\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n}",
+      "contents": "{\n    { }\n    function abi_decode_string(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        if gt(_1, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        let array_1 := allocate_memory(add(and(add(_1, 0x1f), not(31)), 0x20))\n        mstore(array_1, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(array_1, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(array_1, _1), 0x20), 0)\n        array := array_1\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_address_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptrt_uint256t_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := calldataload(_2)\n        let _4 := 0x20\n        if gt(_3, _1) { panic_error_0x41() }\n        let _5 := shl(5, _3)\n        let dst := allocate_memory(add(_5, _4))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _4)\n        let src := add(_2, _4)\n        if gt(add(add(_2, _5), _4), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := calldataload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _4)\n            src := add(src, _4)\n        }\n        value0 := dst_1\n        value1 := calldataload(add(headStart, _4))\n        let offset_1 := calldataload(add(headStart, 64))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value2 := abi_decode_string(add(headStart, offset_1), dataEnd)\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        if iszero(eq(value, iszero(iszero(value)))) { revert(0, 0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_uint256(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := calldataload(headStart)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        copy_memory_to_memory(add(value, 0x20), add(pos, 0x20), length)\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_tuple_packed_t_string_memory_ptr__to_t_string_memory_ptr__nonPadded_inplace_fromStack_reversed(pos, value0) -> end\n    {\n        let length := mload(value0)\n        copy_memory_to_memory(add(value0, 0x20), pos, length)\n        end := add(pos, length)\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_address_t_bytes_memory_ptr__to_t_address_t_bytes_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), 64)\n        tail := abi_encode_bytes(value1, add(headStart, 64))\n    }\n    function abi_encode_tuple_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr__to_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        let tail_1 := add(headStart, 96)\n        mstore(headStart, 96)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 128)\n        let _1 := 0x20\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, and(mload(srcPtr), sub(shl(160, 1), 1)))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        mstore(add(headStart, _1), value1)\n        mstore(add(headStart, 64), sub(pos, headStart))\n        tail := abi_encode_bytes(value2, pos)\n    }\n    function abi_encode_tuple_t_enum$_Prices_$8027__to_t_uint8__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        if iszero(lt(value0, 4))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x21)\n            revert(0, 0x24)\n        }\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_a944f1b41f6a804da79fa67678960b78f7d26756513cb14d2415ac5b6e744ef2__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 3)\n        mstore(add(headStart, 64), \"EC1\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_address__to_t_uint256_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), and(value1, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_uint256_t_uint256__to_t_uint256_t_uint256__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function allocate_memory(size) -> memPtr\n    {\n        memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(size, 31), not(31)))\n        if or(gt(newFreePtr, sub(shl(64, 1), 1)), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x11)\n            revert(0, 0x24)\n        }\n        diff := sub(x, y)\n    }\n    function copy_memory_to_memory(src, dst, length)\n    {\n        let i := 0\n        for { } lt(i, length) { i := add(i, 32) }\n        {\n            mstore(add(dst, i), mload(add(src, i)))\n        }\n        if gt(i, length) { mstore(add(dst, length), 0) }\n    }\n    function panic_error_0x32()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x32)\n        revert(0, 0x24)\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n}",
       "id": 44,
       "language": "Yul",
       "name": "#utility.yul"
@@ -6355,34 +6355,34 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/DeployedContracts/ProviderFactory.sol",
     "exportedSymbols": {
       "Address": [
-        10297
+        10313
       ],
       "BeaconProxy": [
-        9752
+        9768
       ],
       "ERC1967Upgrade": [
-        9618
+        9634
       ],
       "Factory": [
         142
       ],
       "IBeacon": [
-        9762
+        9778
       ],
       "IFactory": [
-        6514
+        6530
       ],
       "IProxyManager": [
-        6866
+        6882
       ],
       "ITreasury": [
-        6942
+        6958
       ],
       "Initializable": [
-        8393
+        8409
       ],
       "Library": [
-        8220
+        8236
       ],
       "ManagedBaseContract": [
         2023
@@ -6391,10 +6391,10 @@
         5162
       ],
       "Proxy": [
-        9670
+        9686
       ],
       "StorageSlot": [
-        10378
+        10394
       ]
     },
     "id": 5163,
@@ -6422,7 +6422,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 6943,
+        "sourceUnit": 6959,
         "src": "152:37:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -6434,7 +6434,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 8221,
+        "sourceUnit": 8237,
         "src": "192:34:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -6458,7 +6458,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 9753,
+        "sourceUnit": 9769,
         "src": "265:62:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -6470,7 +6470,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 8394,
+        "sourceUnit": 8410,
         "src": "330:75:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -6483,7 +6483,7 @@
               "id": 5085,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8393,
+              "referencedDeclaration": 8409,
               "src": "437:13:11"
             },
             "id": 5086,
@@ -6504,7 +6504,7 @@
           }
         ],
         "contractDependencies": [
-          9752
+          9768
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
@@ -6513,8 +6513,8 @@
           5162,
           142,
           2023,
-          8393,
-          6514
+          8409,
+          6530
         ],
         "name": "ProviderFactory",
         "nameLocation": "418:15:11",
@@ -6526,7 +6526,7 @@
               "id": 5089,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8220,
+              "referencedDeclaration": 8236,
               "src": "472:7:11"
             },
             "nodeType": "UsingForDirective",
@@ -6620,7 +6620,7 @@
                   "id": 5094,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 8392,
+                  "referencedDeclaration": 8408,
                   "src": "629:11:11"
                 },
                 "nodeType": "ModifierInvocation",
@@ -6679,7 +6679,7 @@
           },
           {
             "baseFunctions": [
-              6499
+              6515
             ],
             "body": {
               "id": 5160,
@@ -6696,10 +6696,10 @@
                             "name": "Library",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 8220,
+                            "referencedDeclaration": 8236,
                             "src": "977:7:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_Library_$8220_$",
+                              "typeIdentifier": "t_type$_t_contract$_Library_$8236_$",
                               "typeString": "type(library Library)"
                             }
                           },
@@ -6710,10 +6710,10 @@
                           "lValueRequested": false,
                           "memberName": "Prices",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 8011,
+                          "referencedDeclaration": 8027,
                           "src": "977:14:11",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_enum$_Prices_$8011_$",
+                            "typeIdentifier": "t_type$_t_enum$_Prices_$8027_$",
                             "typeString": "type(enum Library.Prices)"
                           }
                         },
@@ -6724,10 +6724,10 @@
                         "lValueRequested": false,
                         "memberName": "NewProviderContract",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 8010,
+                        "referencedDeclaration": 8026,
                         "src": "977:34:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$8011",
+                          "typeIdentifier": "t_enum$_Prices_$8027",
                           "typeString": "enum Library.Prices"
                         }
                       }
@@ -6735,14 +6735,14 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_enum$_Prices_$8011",
+                          "typeIdentifier": "t_enum$_Prices_$8027",
                           "typeString": "enum Library.Prices"
                         }
                       ],
                       "expression": {
                         "argumentTypes": [
                           {
-                            "typeIdentifier": "t_enum$_Prices_$8011",
+                            "typeIdentifier": "t_enum$_Prices_$8027",
                             "typeString": "enum Library.Prices"
                           }
                         ],
@@ -6760,7 +6760,7 @@
                                   "referencedDeclaration": 1991,
                                   "src": "914:16:11",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$6866",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$6882",
                                     "typeString": "contract IProxyManager"
                                   }
                                 },
@@ -6771,7 +6771,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveTreasuryProxy",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 6800,
+                                "referencedDeclaration": 6816,
                                 "src": "914:38:11",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -6805,10 +6805,10 @@
                             "name": "ITreasury",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 6942,
+                            "referencedDeclaration": 6958,
                             "src": "904:9:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$6942_$",
+                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$6958_$",
                               "typeString": "type(contract ITreasury)"
                             }
                           },
@@ -6823,7 +6823,7 @@
                           "src": "904:51:11",
                           "tryCall": false,
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ITreasury_$6942",
+                            "typeIdentifier": "t_contract$_ITreasury_$6958",
                             "typeString": "contract ITreasury"
                           }
                         },
@@ -6834,10 +6834,10 @@
                         "lValueRequested": false,
                         "memberName": "pay",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 6888,
+                        "referencedDeclaration": 6904,
                         "src": "904:55:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8011_$returns$__$",
+                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8027_$returns$__$",
                           "typeString": "function (enum Library.Prices) payable external"
                         }
                       },
@@ -6880,7 +6880,7 @@
                       ],
                       "src": "904:72:11",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8011_$returns$__$value",
+                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8027_$returns$__$value",
                         "typeString": "function (enum Library.Prices) payable external"
                       }
                     },
@@ -7071,7 +7071,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                        "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                         "typeString": "contract BeaconProxy"
                       },
                       "typeName": {
@@ -7081,13 +7081,13 @@
                           "id": 5139,
                           "name": "BeaconProxy",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 9752,
+                          "referencedDeclaration": 9768,
                           "src": "1152:11:11"
                         },
-                        "referencedDeclaration": 9752,
+                        "referencedDeclaration": 9768,
                         "src": "1152:11:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                          "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                           "typeString": "contract BeaconProxy"
                         }
                       },
@@ -7109,7 +7109,7 @@
                             "referencedDeclaration": 1991,
                             "src": "1196:16:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_IProxyManager_$6866",
+                              "typeIdentifier": "t_contract$_IProxyManager_$6882",
                               "typeString": "contract IProxyManager"
                             }
                           },
@@ -7120,7 +7120,7 @@
                           "lValueRequested": false,
                           "memberName": "retrieveProviderBeacon",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 6825,
+                          "referencedDeclaration": 6841,
                           "src": "1196:39:11",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -7174,7 +7174,7 @@
                       "nodeType": "NewExpression",
                       "src": "1180:15:11",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_payable$_t_address_$_t_bytes_memory_ptr_$returns$_t_contract$_BeaconProxy_$9752_$",
+                        "typeIdentifier": "t_function_creation_payable$_t_address_$_t_bytes_memory_ptr_$returns$_t_contract$_BeaconProxy_$9768_$",
                         "typeString": "function (address,bytes memory) payable returns (contract BeaconProxy)"
                       },
                       "typeName": {
@@ -7184,13 +7184,13 @@
                           "id": 5142,
                           "name": "BeaconProxy",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 9752,
+                          "referencedDeclaration": 9768,
                           "src": "1184:11:11"
                         },
-                        "referencedDeclaration": 9752,
+                        "referencedDeclaration": 9768,
                         "src": "1184:11:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                          "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                           "typeString": "contract BeaconProxy"
                         }
                       }
@@ -7206,7 +7206,7 @@
                     "src": "1180:64:11",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                      "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                       "typeString": "contract BeaconProxy"
                     }
                   },
@@ -7226,7 +7226,7 @@
                             "referencedDeclaration": 5141,
                             "src": "1278:13:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                              "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                               "typeString": "contract BeaconProxy"
                             }
                           }
@@ -7234,7 +7234,7 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                              "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                               "typeString": "contract BeaconProxy"
                             }
                           ],
@@ -7484,34 +7484,34 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/DeployedContracts/ProviderFactory.sol",
     "exportedSymbols": {
       "Address": [
-        10297
+        10313
       ],
       "BeaconProxy": [
-        9752
+        9768
       ],
       "ERC1967Upgrade": [
-        9618
+        9634
       ],
       "Factory": [
         142
       ],
       "IBeacon": [
-        9762
+        9778
       ],
       "IFactory": [
-        6514
+        6530
       ],
       "IProxyManager": [
-        6866
+        6882
       ],
       "ITreasury": [
-        6942
+        6958
       ],
       "Initializable": [
-        8393
+        8409
       ],
       "Library": [
-        8220
+        8236
       ],
       "ManagedBaseContract": [
         2023
@@ -7520,10 +7520,10 @@
         5162
       ],
       "Proxy": [
-        9670
+        9686
       ],
       "StorageSlot": [
-        10378
+        10394
       ]
     },
     "id": 5163,
@@ -7551,7 +7551,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 6943,
+        "sourceUnit": 6959,
         "src": "152:37:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7563,7 +7563,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 8221,
+        "sourceUnit": 8237,
         "src": "192:34:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7587,7 +7587,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 9753,
+        "sourceUnit": 9769,
         "src": "265:62:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7599,7 +7599,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 5163,
-        "sourceUnit": 8394,
+        "sourceUnit": 8410,
         "src": "330:75:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7612,7 +7612,7 @@
               "id": 5085,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8393,
+              "referencedDeclaration": 8409,
               "src": "437:13:11"
             },
             "id": 5086,
@@ -7633,7 +7633,7 @@
           }
         ],
         "contractDependencies": [
-          9752
+          9768
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
@@ -7642,8 +7642,8 @@
           5162,
           142,
           2023,
-          8393,
-          6514
+          8409,
+          6530
         ],
         "name": "ProviderFactory",
         "nameLocation": "418:15:11",
@@ -7655,7 +7655,7 @@
               "id": 5089,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8220,
+              "referencedDeclaration": 8236,
               "src": "472:7:11"
             },
             "nodeType": "UsingForDirective",
@@ -7749,7 +7749,7 @@
                   "id": 5094,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 8392,
+                  "referencedDeclaration": 8408,
                   "src": "629:11:11"
                 },
                 "nodeType": "ModifierInvocation",
@@ -7808,7 +7808,7 @@
           },
           {
             "baseFunctions": [
-              6499
+              6515
             ],
             "body": {
               "id": 5160,
@@ -7825,10 +7825,10 @@
                             "name": "Library",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 8220,
+                            "referencedDeclaration": 8236,
                             "src": "977:7:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_Library_$8220_$",
+                              "typeIdentifier": "t_type$_t_contract$_Library_$8236_$",
                               "typeString": "type(library Library)"
                             }
                           },
@@ -7839,10 +7839,10 @@
                           "lValueRequested": false,
                           "memberName": "Prices",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 8011,
+                          "referencedDeclaration": 8027,
                           "src": "977:14:11",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_enum$_Prices_$8011_$",
+                            "typeIdentifier": "t_type$_t_enum$_Prices_$8027_$",
                             "typeString": "type(enum Library.Prices)"
                           }
                         },
@@ -7853,10 +7853,10 @@
                         "lValueRequested": false,
                         "memberName": "NewProviderContract",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 8010,
+                        "referencedDeclaration": 8026,
                         "src": "977:34:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$8011",
+                          "typeIdentifier": "t_enum$_Prices_$8027",
                           "typeString": "enum Library.Prices"
                         }
                       }
@@ -7864,14 +7864,14 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_enum$_Prices_$8011",
+                          "typeIdentifier": "t_enum$_Prices_$8027",
                           "typeString": "enum Library.Prices"
                         }
                       ],
                       "expression": {
                         "argumentTypes": [
                           {
-                            "typeIdentifier": "t_enum$_Prices_$8011",
+                            "typeIdentifier": "t_enum$_Prices_$8027",
                             "typeString": "enum Library.Prices"
                           }
                         ],
@@ -7889,7 +7889,7 @@
                                   "referencedDeclaration": 1991,
                                   "src": "914:16:11",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$6866",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$6882",
                                     "typeString": "contract IProxyManager"
                                   }
                                 },
@@ -7900,7 +7900,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveTreasuryProxy",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 6800,
+                                "referencedDeclaration": 6816,
                                 "src": "914:38:11",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -7934,10 +7934,10 @@
                             "name": "ITreasury",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 6942,
+                            "referencedDeclaration": 6958,
                             "src": "904:9:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$6942_$",
+                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$6958_$",
                               "typeString": "type(contract ITreasury)"
                             }
                           },
@@ -7952,7 +7952,7 @@
                           "src": "904:51:11",
                           "tryCall": false,
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ITreasury_$6942",
+                            "typeIdentifier": "t_contract$_ITreasury_$6958",
                             "typeString": "contract ITreasury"
                           }
                         },
@@ -7963,10 +7963,10 @@
                         "lValueRequested": false,
                         "memberName": "pay",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 6888,
+                        "referencedDeclaration": 6904,
                         "src": "904:55:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8011_$returns$__$",
+                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8027_$returns$__$",
                           "typeString": "function (enum Library.Prices) payable external"
                         }
                       },
@@ -8009,7 +8009,7 @@
                       ],
                       "src": "904:72:11",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8011_$returns$__$value",
+                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$8027_$returns$__$value",
                         "typeString": "function (enum Library.Prices) payable external"
                       }
                     },
@@ -8200,7 +8200,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                        "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                         "typeString": "contract BeaconProxy"
                       },
                       "typeName": {
@@ -8210,13 +8210,13 @@
                           "id": 5139,
                           "name": "BeaconProxy",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 9752,
+                          "referencedDeclaration": 9768,
                           "src": "1152:11:11"
                         },
-                        "referencedDeclaration": 9752,
+                        "referencedDeclaration": 9768,
                         "src": "1152:11:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                          "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                           "typeString": "contract BeaconProxy"
                         }
                       },
@@ -8238,7 +8238,7 @@
                             "referencedDeclaration": 1991,
                             "src": "1196:16:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_IProxyManager_$6866",
+                              "typeIdentifier": "t_contract$_IProxyManager_$6882",
                               "typeString": "contract IProxyManager"
                             }
                           },
@@ -8249,7 +8249,7 @@
                           "lValueRequested": false,
                           "memberName": "retrieveProviderBeacon",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 6825,
+                          "referencedDeclaration": 6841,
                           "src": "1196:39:11",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -8303,7 +8303,7 @@
                       "nodeType": "NewExpression",
                       "src": "1180:15:11",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_payable$_t_address_$_t_bytes_memory_ptr_$returns$_t_contract$_BeaconProxy_$9752_$",
+                        "typeIdentifier": "t_function_creation_payable$_t_address_$_t_bytes_memory_ptr_$returns$_t_contract$_BeaconProxy_$9768_$",
                         "typeString": "function (address,bytes memory) payable returns (contract BeaconProxy)"
                       },
                       "typeName": {
@@ -8313,13 +8313,13 @@
                           "id": 5142,
                           "name": "BeaconProxy",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 9752,
+                          "referencedDeclaration": 9768,
                           "src": "1184:11:11"
                         },
-                        "referencedDeclaration": 9752,
+                        "referencedDeclaration": 9768,
                         "src": "1184:11:11",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                          "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                           "typeString": "contract BeaconProxy"
                         }
                       }
@@ -8335,7 +8335,7 @@
                     "src": "1180:64:11",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                      "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                       "typeString": "contract BeaconProxy"
                     }
                   },
@@ -8355,7 +8355,7 @@
                             "referencedDeclaration": 5141,
                             "src": "1278:13:11",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                              "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                               "typeString": "contract BeaconProxy"
                             }
                           }
@@ -8363,7 +8363,7 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_BeaconProxy_$9752",
+                              "typeIdentifier": "t_contract$_BeaconProxy_$9768",
                               "typeString": "contract BeaconProxy"
                             }
                           ],
@@ -8615,7 +8615,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-08-17T09:26:52.117Z",
+  "updatedAt": "2021-08-17T11:30:10.239Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

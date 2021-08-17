@@ -477,16 +477,16 @@ contract("Testing Treasury",function(accounts){
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
 
-        for(let i=0; i < 10; i++){
+        for(let i=0; i < accounts.length; i++){
             var balanceInit = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
             await Treasury.methods.AssignDividends().send({from: accounts[i]}, function(error, result){});
-            var balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: accounts[i]}, function(error, result){}));
+            var balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
             expect(balanceInit).to.be.equal(0);
             total += balanceEnd;
         }
 
-        var AggregatedAmount = parseInt(Treasury.methods.retrieveAggregatedAmount().send({from: user_1}, function(error, result){}));
-        expect(AggregatedAmount).to.be.equal(3 * PublicPriceWei);
+        var AggregatedAmount = parseInt(await Treasury.methods.retrieveAggregatedAmount().call({from: user_1}, function(error, result){}));
+        expect(AggregatedAmount).to.be.equal(3 * (PublicPriceWei - OwnerRefundPriceWei));
         expect(AggregatedAmount).to.be.equal(total);
         
     });

@@ -35,18 +35,18 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint NewOwnerRefundPriceWei;
     }
 
-    ProposedPricesStruct private _ProposedPrices;
+    ProposedPricesStruct internal _ProposedPrices;
 
     // parameters
-    uint private _PublicPriceWei;
-    uint private _CertificatePriceWei;
-    uint private _PrivatePriceWei;
-    uint private _ProviderPriceWei;
-    uint private _OwnerRefundPriceWei;
+    uint internal _PublicPriceWei;
+    uint internal _CertificatePriceWei;
+    uint internal _PrivatePriceWei;
+    uint internal _ProviderPriceWei;
+    uint internal _OwnerRefundPriceWei;
 
     // last amount at which dividends where assigned for each token owner
-    uint private _AggregatedDividendAmount;
-    mapping(address => uint) _lastAssigned;
+    uint internal _AggregatedDividendAmount;
+    mapping(address => uint) internal _lastAssigned;
 
     // dividends per token owner
     struct _BalanceStruct{
@@ -54,7 +54,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint[] _factors;
     }
     
-    mapping(address => _BalanceStruct) private _balances;
+    mapping(address => _BalanceStruct) internal _balances;
 
     // MODIFIERS /////////////////////////////////////////
     modifier areFundsEnough(Library.Prices price){
@@ -257,23 +257,25 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return _balances[addr]._balance[factor];
     }
 
-    function addBalance(address addr, uint amount, uint factor) private
+    function addBalance(address addr, uint amount, uint factor) internal
     {
         if(amount > 0){
-             if(0 == _balances[addr]._balance[factor]){
+            if(0 == _balances[addr]._balance[factor])
+            {
                 _balances[addr]._factors.push(factor);
             }
             _balances[addr]._balance[factor] += amount;
         }
     }
 
-    function substractBalance(address addr, uint amount, uint factor) private
+    function substractBalance(address addr, uint amount, uint factor) internal
     {
         require(_balances[addr]._balance[factor] >= amount, "Not enough balance for this factor");
 
         _balances[addr]._balance[factor] -= amount;
 
-        if(0 == _balances[addr]._balance[factor]){
+        if(0 == _balances[addr]._balance[factor])
+        {
             UintLibrary.UintArrayRemoveResize(UintLibrary.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
         }
         
