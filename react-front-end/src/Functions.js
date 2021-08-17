@@ -1,15 +1,37 @@
-import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATE_ABI } from './config'
+import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATEFACTORY_ABI, PROVIDERFACTORY_ABI, TREASURY_ABI, CERTIS_ABI, PRIVATE_ABI, PROVIDER_ABI } from './config'
 import Web3 from 'web3';
 
-export var web3 = ""
-var certificatePoolManager = ""
-var publicPool = ""
-var privatePool = ""
-const PublicPriceWei = 10
-const PrivatePriceWei = 20
+export var web3 = "";
+var certificatePoolManager = "";
+var publicPool = "";
+var privatePoolFactory = "";
+var providerFactory = "";
+var Treasury = "";
+var CertisToken = "";
+var privatePool = "";
+var provider = "";
+const PublicPriceWei = 10;
+const PrivatePriceWei = 20;
+const CertificatePriceWei = 5;
+const ProviderPriceWei = 25;
+
+
+
 export const privatePoolKey = 'privatePool';
+export const providerKey = 'provider';
 
 export var publicPoolAddress = ""
+export var privatePoolFactoryAddress = ""
+export var privatePoolImplAddress = "";
+export var privatePoolAddresses = []
+export var privatePoolAddress = sessionStorage.getItem(privatePoolKey);
+export var providerFactoryAddress = ""
+export var providerImplAddress = "";
+export var providerAddresses = []
+export var providerAddress = sessionStorage.getItem(providerKey);
+export var TreasuryAddress = ""
+export var CertisTokenAddress = ""
+
 export var chairPerson = ""
 export var balance = ""
 export var publicTotalProviders = ""
@@ -23,8 +45,7 @@ export var privateMinOwners = ""
 export var privateTotalOwners = ""
 export var privateOwners = []
 export var account = ""
-export var privatePoolAddresses = []
-export var privatePoolAddress = sessionStorage.getItem(privatePoolKey);
+
 export var certificatesByHolder = []
 export var currentHolder = "";
 export var certificateProvider = ""
@@ -58,14 +79,24 @@ export async function LoadBlockchain() {
   account = accounts[0];
 
   certificatePoolManager = new web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS)
-  const config = await certificatePoolManager.methods.retrieveConfiguration().call()
-  publicPoolAddress = config[0]
-  chairPerson = config[1]
-  balance = config[2]
+  publicPoolAddress = await certificatePoolManager.methods.retrievePublicCertificatePool().call();
+  privatePoolFactoryAddress = await certificatePoolManager.methods.retrievePrivatePoolFactory().call();
+  privatePoolImplAddress = await certificatePoolManager.methods.retrievePrivatePool().call();
+  providerFactoryAddress = await certificatePoolManager.methods.retrieveProviderFactory().call();
+  providerImplAddress = await certificatePoolManager.methods.retrieveProvider().call();
+  TreasuryAddress = await certificatePoolManager.methods.retrieveTreasury().call();
+  CertisTokenAddress = await certificatePoolManager.methods.retrieveCertisToken().call();
 
   publicPool = new web3.eth.Contract(PUBLIC_ABI, publicPoolAddress)
-  publicTotalProviders = await publicPool.methods.retrieveTotalProviders().call()
+  privatePoolFactory = new web3.eth.Contract(PRIVATEFACTORY_ABI, privatePoolFactoryAddress)
+  providerFactory = new web3.eth.Contract(PROVIDERFACTORY_ABI, providerFactoryAddress)
+  Treasury = new web3.eth.Contract(TREASURY_ABI, TreasuryAddress)
+  CertisToken = new web3.eth.Contract(CERTIS_ABI, CertisTokenAddress)
+
+
+
   let publicProvidersAddresses = await publicPool.methods.retrieveAllProviders().call()
+  publicTotalProviders = publicProvidersAddresses.length
   publicProviders = []
 
   for (let i = 0; i < publicTotalProviders; i++) {
@@ -73,15 +104,15 @@ export async function LoadBlockchain() {
     publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
   }
 
-  publicTotalOwners = await publicPool.methods.retrieveTotalOwners().call()
   publicMinOwners = await publicPool.methods.retrieveMinOwners().call()
   publicOwners = await publicPool.methods.retrieveAllOwners().call()
+  publicTotalOwners = publicOwners.length
 
-  let privateTotalPool = await certificatePoolManager.methods.retrieveTotalPrivateCertificatesPool().call()
+  let privateTotalPool = await privatePoolFactoryAddress.methods.retrieveTotal().call()
   privatePoolAddresses = []
 
   for (let i = 0; i < privateTotalPool; i++) {
-    let privatePoolAddress = await certificatePoolManager.methods.retrievePrivateCertificatesPool(i).call()
+    let privatePoolAddress = await privatePoolFactoryAddress.methods.retrieve(i).call()
     privatePoolAddresses[i] = privatePoolAddress
   }
 
@@ -97,7 +128,7 @@ export function SwitchContext(){
   certificatesByHolder = []
   certificateProvider = ""
 }
-
+/*
 export async function DisconnectBlockchain() {
   web3 = ""
   certificatePoolManager = ""
@@ -136,7 +167,7 @@ export async function DisconnectBlockchain() {
   pendingPrivateProvidersAdd = [] 
   pendingPrivateProvidersRemove = []
 }
-
+*/
 async function CallBackFrame(callback){
   try{
     await callback;
@@ -145,11 +176,15 @@ async function CallBackFrame(callback){
 }
 
  export async function SendnewProposal(address, info){
-   await CallBackFrame(certificatePoolManager.methods.sendProposal(address, info).send({from: account, value: PublicPriceWei}));
+   await CallBackFrame(publicPool.methods.addProvider(address, info).send({from: account, value: PublicPriceWei}));
   }
   
-  export async function CreatenewPrivatePool(min, list){
-    await CallBackFrame(certificatePoolManager.methods.createPrivateCertificatesPool(list, min).send({from: account, value: PrivatePriceWei}));
+  export async function CreatenewPrivatePool(min, list, name){
+    await CallBackFrame(privatePoolFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
+  }
+
+  export async function CreatenewProvider(min, list, name){
+    await CallBackFrame(providerFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
   }
   
   export async function ValidateProposal(address){
@@ -215,8 +250,8 @@ async function CallBackFrame(callback){
     try{
       privatePoolAddress = address
       privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
-      privateTotalProviders = await privatePool.methods.retrieveTotalProviders().call()
       let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
+      privateTotalProviders = privateProvidersAddresses.length
       privateProviders = []
     
       for (let i = 0; i < privateTotalProviders; i++) {
@@ -224,9 +259,9 @@ async function CallBackFrame(callback){
         privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
       }
     
-      privateTotalOwners = await privatePool.methods.retrieveTotalOwners().call()
       privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
       privateOwners = await privatePool.methods.retrieveAllOwners().call()
+      privateTotalOwners = privateOwners.length
 
       pendingPrivateOwnersAdd = await RetrievePendings(privatePool.methods.retrievePendingOwners(true).call());
       pendingPrivateOwnersRemove = await RetrievePendings(privatePool.methods.retrievePendingOwners(false).call());
