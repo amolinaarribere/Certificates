@@ -3,7 +3,28 @@ const func = require("../../../Functions.js");
 
 class ListPendingOwnersComponent extends React.Component{
     render(){
-      if(this.props.privateEnv){
+      if (this.props.contractType == 1){
+        return(
+          <div>
+            <p><b>Pending Public Owners to be Added :</b>
+              <ol>
+                {func.pendingPublicOwnersAdd.map(pendingPublicOwnerAdd => (
+                <li key={pendingPublicOwnerAdd}>{pendingPublicOwnerAdd}</li>
+                ))}
+              </ol>
+            </p>
+            <br />
+            <p><b>Pending Public Owners to be Removed :</b>
+              <ol>
+                {func.pendingPublicOwnersRemove.map(pendingPublicOwnerRemove => (
+                <li key={pendingPublicOwnerRemove}>{pendingPublicOwnerRemove}</li>
+                ))}
+              </ol>
+            </p>
+          </div>
+        );
+      }
+      else  if (this.props.contractType == 2){
         return(
           <div>
             <p><b>Pending Private Owners to be Added :</b>
@@ -27,18 +48,18 @@ class ListPendingOwnersComponent extends React.Component{
       else{
         return(
           <div>
-            <p><b>Pending Public Owners to be Added :</b>
+            <p><b>Pending Provider Owners to be Added :</b>
               <ol>
-                {func.pendingPublicOwnersAdd.map(pendingPublicOwnerAdd => (
-                <li key={pendingPublicOwnerAdd}>{pendingPublicOwnerAdd}</li>
+                {func.pendingProviderOwnersAdd.map(pendingProviderOwnerAdd => (
+                <li key={pendingProviderOwnerAdd}>{pendingProviderOwnerAdd}</li>
                 ))}
               </ol>
             </p>
             <br />
-            <p><b>Pending Public Owners to be Removed :</b>
+            <p><b>Pending Provider Owners to be Removed :</b>
               <ol>
-                {func.pendingPublicOwnersRemove.map(pendingPublicOwnerRemove => (
-                <li key={pendingPublicOwnerRemove}>{pendingPublicOwnerRemove}</li>
+                {func.pendingProviderOwnersRemove.map(pendingProviderOwnerRemove => (
+                <li key={pendingProviderOwnerRemove}>{pendingProviderOwnerRemove}</li>
                 ))}
               </ol>
             </p>

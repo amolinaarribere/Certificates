@@ -3,7 +3,22 @@ const func = require("../../../Functions.js");
 
 class ListOwnersComponent extends React.Component{
     render(){
-      if(this.props.privateEnv){
+      if (this.props.contractType == 1){
+        return(
+          <div>
+            <p><b>Total Public Owners :</b> {func.publicTotalOwners}</p>
+            <p><b>Min Public Owners :</b> {func.publicMinOwners}</p>
+            <p><b>Public Owners :</b>
+              <ol>
+                {func.publicOwners.map(publicOwner => (
+                <li key={publicOwner}>{publicOwner}</li>
+                ))}
+              </ol>
+            </p>
+          </div>
+        );
+      }
+      else if (this.props.contractType == 2){
         return(
           <div>
             <p><b>Total Private Owners :</b> {func.privateTotalOwners}</p>
@@ -21,12 +36,12 @@ class ListOwnersComponent extends React.Component{
       else{
         return(
           <div>
-            <p><b>Total Public Owners :</b> {func.publicTotalOwners}</p>
-            <p><b>Min Public Owners :</b> {func.publicMinOwners}</p>
-            <p><b>Public Owners :</b>
+            <p><b>Total Provider Owners :</b> {func.providerTotalOwners}</p>
+            <p><b>Min Provider Owners :</b> {func.providerMinOwners}</p>
+            <p><b>Provider Owners :</b>
               <ol>
-                {func.publicOwners.map(publicOwner => (
-                <li key={publicOwner}>{publicOwner}</li>
+                {func.providerOwners.map(providerOwner => (
+                <li key={providerOwner}>{providerOwner}</li>
                 ))}
               </ol>
             </p>

@@ -15,8 +15,6 @@ const PrivatePriceWei = 20;
 const CertificatePriceWei = 5;
 const ProviderPriceWei = 25;
 
-
-
 export const privatePoolKey = 'privatePool';
 export const providerKey = 'provider';
 
@@ -44,6 +42,11 @@ export var privateProviders = []
 export var privateMinOwners = ""
 export var privateTotalOwners = ""
 export var privateOwners = []
+export var providerTotalPools = ""
+export var providerPools = []
+export var providerMinOwners = ""
+export var providerTotalOwners = ""
+export var providerOwners = []
 export var account = ""
 
 export var certificatesByHolder = []
@@ -54,10 +57,14 @@ export var pendingPublicOwnersAdd = []
 export var pendingPublicOwnersRemove = []
 export var pendingPrivateOwnersAdd = [] 
 export var pendingPrivateOwnersRemove = []
+export var pendingProviderOwnersAdd = []
+export var pendingProviderOwnersRemove = []
 export var pendingPublicProvidersAdd = [] 
 export var pendingPublicProvidersRemove = []
 export var pendingPrivateProvidersAdd = [] 
 export var pendingPrivateProvidersRemove = []
+export var pendingProviderPoolsAdd = [] 
+export var pendingProviderPoolsRemove = []
 
 async function RetrievePendings(callback){
   let{0:addr,1:info} = await callback;
@@ -116,6 +123,14 @@ export async function LoadBlockchain() {
     privatePoolAddresses[i] = privatePoolAddress
   }
 
+
+  let providerTotalPool = await providerFactoryAddress.methods.retrieveTotal().call()
+  providerAddresses = []
+
+  for (let i = 0; i < providerTotalPool; i++) {
+    let providerAddress = await providerFactoryAddress.methods.retrieve(i).call()
+    providerAddresses[i] = providerAddress
+  }
   pendingPublicOwnersAdd = await RetrievePendings(publicPool.methods.retrievePendingOwners(true).call());
   pendingPublicOwnersRemove = await RetrievePendings(publicPool.methods.retrievePendingOwners(false).call());
   pendingPublicProvidersAdd = await RetrievePendings(publicPool.methods.retrievePendingProviders(true).call());

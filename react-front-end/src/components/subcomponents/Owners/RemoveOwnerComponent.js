@@ -7,7 +7,7 @@ class RemoveOwnerComponent extends React.Component{
     };
     handleRemoveOwner = async (event) => {
         event.preventDefault();
-      await func.RemoveOwner(this.state.removeOwner, this.props.privateEnv)
+      await func.RemoveOwner(this.state.removeOwner, this.props.contractType)
       this.setState({ removeOwner: "" })
     };
   

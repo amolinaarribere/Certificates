@@ -67,7 +67,7 @@ const func = require("../Functions.js");
           <br />
           <h4> Selected Provider : {func.providerAddress}</h4>
           <br />
-          <OwnerComponent privateEnv={this.state.privateEnv}/>
+          <OwnerComponent contractType={this.state.contractType}/>
           <br/>
           <ProviderPoolComponent contractType={this.state.contractType}/>
         </div>

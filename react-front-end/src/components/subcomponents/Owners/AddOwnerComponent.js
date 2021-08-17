@@ -7,7 +7,7 @@ class AddOwnerComponent extends React.Component{
     };
     handleAddOwner = async (event) => {
         event.preventDefault();
-      await func.AddOwner(this.state.addOwner, "", this.props.privateEnv)
+      await func.AddOwner(this.state.addOwner, "", this.props.contractType)
       this.setState({ addOwner: "" })
     };
   

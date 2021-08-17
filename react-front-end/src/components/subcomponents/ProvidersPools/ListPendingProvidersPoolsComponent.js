@@ -50,7 +50,7 @@ class ListPendingProvidersPoolsComponent extends React.Component{
           <div>
             <p><b>Pending Pools to be Added :</b>
               <ol>
-                {func.pendingPoolsAdd.map(pendingPoolAdd => (
+                {func.pendingProviderPoolsAdd.map(pendingPoolAdd => (
                 <li key={pendingPoolAdd[0]}>{pendingPoolAdd[0]}: {pendingPoolAdd[1]}</li>
                 ))}
               </ol>
@@ -58,7 +58,7 @@ class ListPendingProvidersPoolsComponent extends React.Component{
             <br />
             <p><b>Pending Pools to be Removed :</b>
               <ol>
-                {func.pendingPoolsRemove.map(pendingPoolRemove => (
+                {func.pendingProviderPoolsRemove.map(pendingPoolRemove => (
                 <li key={pendingPoolRemove[0]}>{pendingPoolRemove[0]}: {pendingPoolRemove[1]}</li>
                 ))}
               </ol>

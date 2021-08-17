@@ -10,13 +10,13 @@ class OwnerComponent extends React.Component{
         <div>
           <h4 class="text-primary">Owners</h4>
           <br />
-          <AddOwnerComponent privateEnv={this.props.privateEnv}/>
+          <AddOwnerComponent contractType={this.props.contractType}/>
           <br/>
-          <RemoveOwnerComponent privateEnv={this.props.privateEnv}/>
+          <RemoveOwnerComponent contractType={this.props.contractType}/>
           <br />
-          <ListOwnersComponent privateEnv={this.props.privateEnv}/>
+          <ListOwnersComponent contractType={this.props.contractType}/>
           <br />
-          <ListPendingOwnersComponent privateEnv={this.props.privateEnv}/>
+          <ListPendingOwnersComponent contractType={this.props.contractType}/>
         </div>
       );
     }

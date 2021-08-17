@@ -35,10 +35,10 @@ class ListProvidersPoolsComponent extends React.Component{
       else{
         return(
           <div>
-            <p><b>Total Pools :</b> {func.TotalPools}</p>
+            <p><b>Total Pools :</b> {func.providerTotalPools}</p>
             <p><b>Pools :</b>
               <ol>
-                {func.Pools.map(Pool => (
+                {func.providerPools.map(Pool => (
                 <li key={Pool[0]}>{Pool[0]}: {Pool[1]}</li>
                 ))}
               </ol>
