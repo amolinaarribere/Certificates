@@ -1,24 +1,26 @@
 import React from 'react';
-import AddProviderComponent from './AddProviderComponent.js';
-import RemoveProviderComponent from './RemoveProviderComponent.js';
-import ListProvidersComponent from './ListProvidersComponent.js';
-import ListPendingProvidersComponent from './ListPendingProvidersComponent.js';
+import AddProviderPoolComponent from './AddProviderPoolComponent.js';
+import RemoveProviderPoolComponent from './RemoveProviderPoolComponent.js';
+import ListProvidersPoolsComponent from './ListProvidersPoolsComponent.js';
+import ListPendingProvidersPoolsComponent from './ListPendingProvidersPoolsComponent.js';
 
 class ProviderPoolComponent extends React.Component{
     render(){
-      return(
-        <div>
-          <h4 class="text-primary">Providers / Pools</h4>
-          <br />
-          <AddProviderComponent contractType={this.props.contractType}/>
-          <br />
-          <RemoveProviderComponent contractType={this.props.contractType}/>
-          <br/>
-          <ListProvidersComponent contractType={this.props.contractType} />
-          <br/>
-          <ListPendingProvidersComponent contractType={this.props.contractType} />
-        </div>
-      );
+      var text = "Providers";
+      if(3 == this.props.contractType)text = "Pools";
+        return(
+          <div>
+            <h4 class="text-primary">{text}</h4>
+            <br />
+            <AddProviderPoolComponent contractType={this.props.contractType}/>
+            <br />
+            <RemoveProviderPoolComponent contractType={this.props.contractType} privateEnv={this.props.privateEnv}/>
+            <br/>
+            <ListProvidersPoolsComponent contractType={this.props.contractType} />
+            <br/>
+            <ListPendingProvidersPoolsComponent contractType={this.props.contractType} />
+          </div>
+        );
     }
   }
 

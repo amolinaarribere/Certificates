@@ -1,7 +1,7 @@
 import React from 'react';
 const func = require("../../../Functions.js");
 
-class AddProviderComponent extends React.Component{
+class AddProviderPoolComponent extends React.Component{
     state = {
       validateProvider : "",
       addProvider : "",
@@ -51,4 +51,4 @@ class AddProviderComponent extends React.Component{
     }
   }
 
-export default AddProviderComponent;
+export default AddProviderPoolComponent;
