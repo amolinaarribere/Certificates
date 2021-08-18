@@ -189,17 +189,10 @@ async function CallBackFrame(callback){
    }
    catch(e) { window.alert(e); }
 }
-
- export async function SendnewProposal(address, info){
-   await CallBackFrame(publicPool.methods.addProvider(address, info).send({from: account, value: PublicPriceWei}));
-  }
   
-  export async function CreatenewPrivatePool(min, list, name){
-    await CallBackFrame(privatePoolFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
-  }
-
-  export async function CreatenewProvider(min, list, name){
-    await CallBackFrame(providerFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
+  export async function CreatenewPoolProvider(min, list, name, contractType){
+    if(2 == contractType) await CallBackFrame(privatePoolFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
+    else await CallBackFrame(providerFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
   }
   
   export async function ValidateProposal(address){
@@ -207,7 +200,8 @@ async function CallBackFrame(callback){
   }
   
   export async function AddProviderPool(address, Info, contractType){
-    if(2 == contractType)await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
+    if(1 == contractType)await CallBackFrame(publicPool.methods.addProvider(address, Info).send({from: account, value: PublicPriceWei}));
+    else if(2 == contractType)await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
     else await CallBackFrame(provider.methods.addPool(address, Info).send({from: account}));
   }
   

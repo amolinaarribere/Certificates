@@ -1,5 +1,5 @@
 import React from 'react';
-import CertificateComponent from './subcomponents/CertificateComponent.js';
+import CertificateComponent from './subcomponents/Certificates/CertificateComponent.js';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import OwnerComponent from './subcomponents/Owners/OwnerComponent.js';
 import ProviderPoolComponent from './subcomponents/ProvidersPools/ProviderPoolComponent.js';
@@ -19,7 +19,7 @@ class PublicComponent extends React.Component {
   
     handleNewProposal = async (event) => {
         event.preventDefault();
-      await func.SendnewProposal(this.state.newProvider, this.state.newProviderInfo)
+      await func.AddProviderPool(this.state.newProvider, this.state.newProviderInfo, this.state.contractType)
       this.setState({ newProvider: "" })
       this.setState({ newProviderInfo: "" })
     };
@@ -39,7 +39,7 @@ class PublicComponent extends React.Component {
                 <button>Send Proposal for Public Provider</button>
             </form>
           <br />
-          <CertificateComponent privateEnv={this.state.privateEnv}/>
+          <CertificateComponent contractType={this.state.contractType} privateEnv={this.state.privateEnv}/>
           <br />
           <OwnerComponent contractType={this.state.contractType}/>
           <br/>

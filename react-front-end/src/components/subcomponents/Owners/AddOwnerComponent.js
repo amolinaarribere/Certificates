@@ -22,7 +22,7 @@ class AddOwnerComponent extends React.Component{
           </form>
         </div>
       );
-  }
+    }
   }
 
   export default AddOwnerComponent;

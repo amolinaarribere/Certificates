@@ -12,9 +12,9 @@ class ProviderPoolComponent extends React.Component{
           <div>
             <h4 class="text-primary">{text}</h4>
             <br />
-            <AddProviderPoolComponent contractType={this.props.contractType}/>
+            <AddProviderPoolComponent contractType={this.props.contractType}  privateEnv={this.props.privateEnv}/>
             <br />
-            <RemoveProviderPoolComponent contractType={this.props.contractType} privateEnv={this.props.privateEnv}/>
+            <RemoveProviderPoolComponent contractType={this.props.contractType}/>
             <br/>
             <ListProvidersPoolsComponent contractType={this.props.contractType} />
             <br/>

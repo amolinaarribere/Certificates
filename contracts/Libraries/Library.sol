@@ -45,6 +45,13 @@ library Library{
         address ProviderImplAddress;
     }
 
+    // Pending Certificates
+    struct _pendingCertificatesStruct{
+        address pool;
+        address holder;
+        bytes32 certificate;
+    }
+
     // auxiliary functions
     function IdCorrect(uint Id, uint length) public pure returns (bool){
         return (length > Id);
