@@ -1,5 +1,7 @@
 import React from 'react';
 import ListPendingCertificatesComponent from './ListPendingCertificatesComponent';
+import ValidateCertificateComponent from './ValidateCertificateComponent';
+import RejectCertificateComponent from './RejectCertificateComponent';
 const func = require("../../../Functions.js");
 
 
@@ -98,6 +100,10 @@ class CertificateComponent extends React.Component{
                 <br />
                 <button type="submit">Add Certificate</button>
             </form>
+            <br />
+            <ValidateCertificateComponent />
+            <br />
+            <RejectCertificateComponent />
             <br />
             <p>{func.certificateProvider}</p>
             <br />

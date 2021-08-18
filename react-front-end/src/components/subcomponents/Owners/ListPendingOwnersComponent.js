@@ -6,6 +6,8 @@ class ListPendingOwnersComponent extends React.Component{
       if (this.props.contractType == 1){
         return(
           <div>
+            <p><b>Pending Public Min Owner : {func.publicPendingMinOwners}</b></p>
+            <br />
             <p><b>Pending Public Owners to be Added :</b>
               <ol>
                 {func.pendingPublicOwnersAdd.map(pendingPublicOwnerAdd => (
@@ -27,6 +29,8 @@ class ListPendingOwnersComponent extends React.Component{
       else  if (this.props.contractType == 2){
         return(
           <div>
+            <p><b>Pending Private Min Owner : {func.privatePendingMinOwners}</b></p>
+            <br />
             <p><b>Pending Private Owners to be Added :</b>
               <ol>
                 {func.pendingPrivateOwnersAdd.map(pendingPrivateOwnerAdd => (
@@ -48,6 +52,8 @@ class ListPendingOwnersComponent extends React.Component{
       else{
         return(
           <div>
+            <p><b>Pending Provider Min Owner : {func.providerPendingMinOwners}</b></p>
+            <br />
             <p><b>Pending Provider Owners to be Added :</b>
               <ol>
                 {func.pendingProviderOwnersAdd.map(pendingProviderOwnerAdd => (

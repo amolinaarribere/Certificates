@@ -1,5 +1,6 @@
 import React from 'react';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
+import PropositionConfigComponent from './subcomponents/Proposition/PropositionConfigComponent.js';
 import { CERTIFICATE_POOL_MANAGER_ADDRESS} from '../config';
 const func = require("../Functions.js");
 const address_0 = "0x0000000000000000000000000000000000000000"
@@ -9,6 +10,7 @@ class ManagerComponent extends React.Component {
       func.LoadBlockchain()
    }
    state = {
+     contractType : 1,
      NewPublicPoolAddress: "",
      NewTreasuryAddress: "",
      NewCertisTokenAddress: "", 
@@ -60,6 +62,8 @@ class ManagerComponent extends React.Component {
           <p><b>Treasury Address :</b> {func.TreasuryAddress}</p>
           <p><b>Certis Token Address :</b> {func.CertisTokenAddress}</p>
           <br/>
+          <PropositionConfigComponent contractType={this.state.contractType}/>
+          <br />
           <form onSubmit={this.handleUpgradeContracts}>
             <p>
               <input type="text" name="NewPublicPoolAddress" placeholder="NewPublicPoolAddress" 

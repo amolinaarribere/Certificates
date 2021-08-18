@@ -35,16 +35,19 @@ export var balance = ""
 export var publicTotalProviders = ""
 export var publicProviders = []
 export var publicMinOwners = ""
+export var publicPendingMinOwners = ""
 export var publicTotalOwners = ""
 export var publicOwners = []
 export var privateTotalProviders = ""
 export var privateProviders = []
 export var privateMinOwners = ""
+export var privatePendingMinOwners = ""
 export var privateTotalOwners = ""
 export var privateOwners = []
 export var providerTotalPools = ""
 export var providerPools = []
 export var providerMinOwners = ""
+export var providerPendingMinOwners = ""
 export var providerTotalOwners = ""
 export var providerOwners = []
 export var account = ""
@@ -196,6 +199,15 @@ export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress,
 
 }
 
+// Proposition
+export async function UpgradeProposition(NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage, contractType){
+  if(contractType == 1){
+    await CallBackFrame(certificatePoolManager.methods.updateProp({NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage}).send({from: account}));
+  }
+  else{
+    await CallBackFrame(Treasury.methods.updateProp({NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage}).send({from: account}));
+  }
+}
 
 // Provider - Pool
   export async function CreatenewPoolProvider(min, list, name, contractType){
@@ -328,6 +340,7 @@ export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress,
 
       pendingPublicOwnersAdd = await RetrievePendings(publicPool.methods.retrievePendingOwners(true).call());
       pendingPublicOwnersRemove = await RetrievePendings(publicPool.methods.retrievePendingOwners(false).call());
+      publicPendingMinOwners = await publicPool.methods.retrievePendingMinOwners().call();
     }
     else if(2 == contractType){
       privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
@@ -336,6 +349,7 @@ export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress,
 
       pendingPrivateOwnersAdd = await RetrievePendings(privatePool.methods.retrievePendingOwners(true).call());
       pendingPrivateOwnersRemove = await RetrievePendings(privatePool.methods.retrievePendingOwners(false).call());
+      privatePendingMinOwners = await privatePool.methods.retrievePendingMinOwners().call();
     }
     else{
       providerMinOwners = await provider.methods.retrieveMinOwners().call()
@@ -344,8 +358,28 @@ export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress,
 
       pendingProviderOwnersAdd = await RetrievePendings(provider.methods.retrievePendingOwners(true).call());
       pendingProviderOwnersRemove = await RetrievePendings(provider.methods.retrievePendingOwners(false).call());
+      providerPendingMinOwners = await provider.methods.retrievePendingMinOwners().call();
     }
   }
+
+  export async function UpdateMinOwner(minOwner, contractType){
+    if(1 == contractType) await CallBackFrame(publicPool.methods.changeMinOwners(minOwner).send({from: account}));
+    else if(2 == contractType) await CallBackFrame(privatePool.methods.changeMinOwners(minOwner).send({from: account}));
+    else await CallBackFrame(provider.methods.changeMinOwners(minOwner).send({from: account}));
+  }
+
+  export async function ValidateMinOwner(contractType){
+    if(1 == contractType)await CallBackFrame(publicPool.methods.validateMinOwners().send({from: account}));
+    else if(2 == contractType)await CallBackFrame(privatePool.methods.validateMinOwners().send({from: account}));
+    else await CallBackFrame(provider.methods.validateMinOwners().send({from: account}));
+  }
+
+  export async function RejectMinOwner(contractType){
+    if(1 == contractType)await CallBackFrame(publicPool.methods.rejectMinOwners().send({from: account}));
+    else if(2 == contractType)await CallBackFrame(privatePool.methods.rejectMinOwners().send({from: account}));
+    else await CallBackFrame(provider.methods.rejectMinOwners().send({from: account}));
+  }
+
 
 // Certificate
 
