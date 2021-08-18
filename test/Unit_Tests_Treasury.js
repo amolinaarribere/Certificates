@@ -472,22 +472,28 @@ contract("Testing Treasury",function(accounts){
 
     it("AssignDividends CORRECT",async function(){
         // act
-        var total = 0;
+        await SendingNewProviders();
+        var total_1 = 0;
+        var total_2 = 0;
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
         await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
 
         for(let i=0; i < accounts.length; i++){
-            var balanceInit = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
+            let balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
+            total_1 += balanceEnd;
+        }
+
+        for(let i=0; i < accounts.length; i++){
             await Treasury.methods.AssignDividends().send({from: accounts[i], gas: Gas}, function(error, result){});
-            var balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
-            expect(balanceInit).to.be.equal(0);
-            total += balanceEnd;
+            let balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
+            total_2 += balanceEnd;
         }
 
         var AggregatedAmount = parseInt(await Treasury.methods.retrieveAggregatedAmount().call({from: user_1}, function(error, result){}));
-        expect(AggregatedAmount).to.be.equal(3 * (PublicPriceWei - OwnerRefundPriceWei));
-        expect(AggregatedAmount).to.be.equal(total);
+        expect(AggregatedAmount).to.be.equal(5 * (PublicPriceWei - OwnerRefundPriceWei));
+        expect(total_2).to.be.equal((5 * PublicPriceWei) - (3 * OwnerRefundPriceWei));
+        expect(total_1).to.be.equal(2 * OwnerRefundPriceWei);
         
     });
 

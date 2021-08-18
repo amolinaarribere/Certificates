@@ -14,12 +14,23 @@ library UintLibrary{
 
     // auxiliary functions
 
-    function FindUintPosition(uint value, uint[] memory list) public pure returns (uint){
+    function FindUintPosition(uint value, uint[] memory list) public pure returns (uint)
+    {
         for(uint i=0; i < list.length; i++){
             if(value == list[i]) return i;
         }
 
         return list.length + 1;
+    }
+
+    function ProductOfFactors(uint[] memory factors) public pure returns (uint)
+    {
+        uint result = 1;
+         for(uint i=0; i < factors.length; i++){
+            result = result * factors[i];
+        }
+
+        return result;
     }
 
     function UintArrayRemoveResize(uint index, uint[] storage array) public 
@@ -28,11 +39,13 @@ library UintLibrary{
         array.pop();
     }
 
-    function UintToBytes32(uint element) public pure returns(bytes32){
+    function UintToBytes32(uint element) public pure returns(bytes32)
+    {
         return bytes32(element);
     }
 
-    function Bytes32ToUint(bytes32 element) public pure returns(uint){
+    function Bytes32ToUint(bytes32 element) public pure returns(uint)
+    {
         return uint256(element);
     }
 

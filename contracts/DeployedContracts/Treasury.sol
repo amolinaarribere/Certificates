@@ -206,22 +206,18 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     override
     {
         uint[] memory f = returnFactors(msg.sender);
-        uint total = 0;
-        uint i = 0;
+        (uint total, uint commonDividend) = sumUpTotal(msg.sender);
+        uint remainder =  total - (amount * commonDividend);
 
-        while ((total < amount) && (i < f.length)){
-            uint amountForFactor = returnBalanceForFactor(msg.sender, f[i]) / f[i];
-            if(amountForFactor > (amount - total)) amountForFactor = amount - total;
-            total += amountForFactor;
-            substractBalance(msg.sender, amountForFactor * f[i], f[i]);
-            i++;
+        for(uint i=0; i < f.length; i++){
+            substractBalance(msg.sender, returnBalanceForFactor(msg.sender, f[i]), f[i]);
         }
 
-        require(total == amount, "UnExpected problem calculating the amount to withdraw");
+        addBalance(msg.sender, remainder, commonDividend);
 
-        payable(msg.sender).transfer(total);
+        payable(msg.sender).transfer(amount);
 
-        emit _Withdraw(msg.sender, total);
+        emit _Withdraw(msg.sender, amount);
     }
 
     function retrieveBalance(address addr) external override view returns(uint)
@@ -239,14 +235,22 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
     function checkBalance(address addr) internal view returns(uint){
+        (uint total, uint commonDividend) = sumUpTotal(addr);
+
+        return total / commonDividend;
+    }
+
+    function sumUpTotal(address addr) internal view returns (uint, uint)
+    {
         uint[] memory f = returnFactors(addr);
+        uint CommonDividend = UintLibrary.ProductOfFactors(f);
         uint total = 0;
 
         for(uint i=0; i < f.length; i++){
-            total += returnBalanceForFactor(addr, f[i]) / f[i];
+            total += returnBalanceForFactor(addr, f[i]) * CommonDividend / f[i];
         }
 
-        return total;
+        return (total, CommonDividend);
     }
 
     function returnFactors(address addr) internal view returns(uint[] memory){
