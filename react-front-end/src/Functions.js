@@ -87,13 +87,7 @@ export async function LoadBlockchain() {
   account = accounts[0];
 
   certificatePoolManager = new web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS)
-  publicPoolAddress = await certificatePoolManager.methods.retrievePublicCertificatePool().call();
-  privatePoolFactoryAddress = await certificatePoolManager.methods.retrievePrivatePoolFactory().call();
-  privatePoolImplAddress = await certificatePoolManager.methods.retrievePrivatePool().call();
-  providerFactoryAddress = await certificatePoolManager.methods.retrieveProviderFactory().call();
-  providerImplAddress = await certificatePoolManager.methods.retrieveProvider().call();
-  TreasuryAddress = await certificatePoolManager.methods.retrieveTreasury().call();
-  CertisTokenAddress = await certificatePoolManager.methods.retrieveCertisToken().call();
+  RetrieveContractsAddresses();
 
   publicPool = new web3.eth.Contract(PUBLIC_ABI, publicPoolAddress)
   privatePoolFactory = new web3.eth.Contract(PRIVATEFACTORY_ABI, privatePoolFactoryAddress)
@@ -173,9 +167,37 @@ async function CallBackFrame(callback){
    }
    catch(e) { window.alert(e); }
 }
-  
-// Provider - Pool
+// Manager
+export async function RetrieveContractsAddresses(){
+  publicPoolAddress = await certificatePoolManager.methods.retrievePublicCertificatePool().call();
+  privatePoolFactoryAddress = await certificatePoolManager.methods.retrievePrivatePoolFactory().call();
+  privatePoolImplAddress = await certificatePoolManager.methods.retrievePrivatePool().call();
+  providerFactoryAddress = await certificatePoolManager.methods.retrieveProviderFactory().call();
+  providerImplAddress = await certificatePoolManager.methods.retrieveProvider().call();
+  TreasuryAddress = await certificatePoolManager.methods.retrieveTreasury().call();
+  CertisTokenAddress = await certificatePoolManager.methods.retrieveCertisToken().call();
+}
 
+export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress, NewCertisTokenAddress, NewPrivatePoolFactoryAddress, NewPrivatePoolAddress, NewProviderFactoryAddress, NewProviderAddress){
+  await CallBackFrame(certificatePoolManager.methods.upgradeContracts({
+              "NewPublicPoolAddress": NewPublicPoolAddress,
+              "NewTreasuryAddress": NewTreasuryAddress,
+              "NewCertisTokenAddress": NewCertisTokenAddress,
+              "NewPrivatePoolFactoryAddress": NewPrivatePoolFactoryAddress,
+              "NewPrivatePoolAddress": NewPrivatePoolAddress,
+              "NewProviderFactoryAddress": NewProviderFactoryAddress,
+              "NewProviderAddress": NewProviderAddress,
+              "NewPublicPoolData": "0x",
+              "NewTreasuryData":  "0x",
+              "NewCertisTokenData": "0x",
+              "NewPrivatePoolFactoryData": "0x",
+              "NewProviderFactoryData":  "0x"
+          }).send({from: account}));
+
+}
+
+
+// Provider - Pool
   export async function CreatenewPoolProvider(min, list, name, contractType){
     if(2 == contractType) await CallBackFrame(privatePoolFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
     else await CallBackFrame(providerFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
@@ -273,7 +295,6 @@ async function CallBackFrame(callback){
   }
   
 // Owner
-
   export async function AddOwner(address, info, contractType){
     if(1 == contractType) await CallBackFrame(publicPool.methods.addOwner(address, info).send({from: account}));
     else if(2 == contractType) await CallBackFrame(privatePool.methods.addOwner(address, info).send({from: account}));
