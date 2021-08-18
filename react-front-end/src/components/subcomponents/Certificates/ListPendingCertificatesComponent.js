@@ -7,8 +7,8 @@ class ListPendingCertificatesComponent extends React.Component{
         <div>
           <p><b>Pending Certificates to be Added :</b>
             <ol>
-              {func.pendingProviderPoolsAdd.map(pendingPoolAdd => (
-              <li key={pendingPoolAdd[0]}>{pendingPoolAdd[0]}: {pendingPoolAdd[1]}</li>
+              {func.pendingCertificates.map(pendingCertificate => (
+              <li key={pendingCertificate[0] + pendingCertificate[1] + pendingCertificate[2]}>{pendingCertificate[0]} - {pendingCertificate[1]} - {pendingCertificate[2]}</li>
               ))}
             </ol>
           </p>

@@ -1,4 +1,5 @@
 import React from 'react';
+import ListPendingCertificatesComponent from './ListPendingCertificatesComponent';
 const func = require("../../../Functions.js");
 
 
@@ -6,6 +7,7 @@ class CertificateComponent extends React.Component{
     state = {
       certificateHash : "",
       holderAddress: "",
+      poolAddress: "",
       retrieveholderAddress: ""
     };
   
@@ -25,7 +27,7 @@ class CertificateComponent extends React.Component{
   
     handleAddCertificate = async (event) => {
         event.preventDefault();
-      await func.AddCertificate(this.state.certificateHash, this.state.holderAddress, this.props.privateEnv);
+      await func.AddCertificate(this.state.certificateHash, this.state.holderAddress, this.props.privateEnv, this.props.contractType, this.state.poolAddress);
       this.setState({ certificateHash: "",  holderAddress: ""})
     };
   
@@ -90,27 +92,17 @@ class CertificateComponent extends React.Component{
                     value={this.state.holderAddress}
                     onChange={event => this.setState({ holderAddress: event.target.value })}/>
                 <br />
+                <input type="text" name="PoolAddress" placeholder="pool address" 
+                    value={this.state.poolAddress}
+                    onChange={event => this.setState({ poolAddress: event.target.value })}/>
+                <br />
                 <button type="submit">Add Certificate</button>
-                <button type="button" onClick={this.handleCheckCertificate}>Check Certificate</button>
             </form>
             <br />
             <p>{func.certificateProvider}</p>
             <br />
             <br/>
-            <form onSubmit={this.handleRetrieveByHolder}>
-                <input type="text" name="RetreiveByHolder" placeholder="holder address" 
-                    value={this.state.retrieveholderAddress}
-                    onChange={event => this.setState({ retrieveholderAddress: event.target.value })}/>
-                <button>Retrieve By Holder</button>
-            </form>
-            <br />
-            <p><b>Certificates for Holder : {func.currentHolder}</b>
-              <ol>
-                {func.certificatesByHolder.map(certificateByHolder => (
-                <li key={certificateByHolder}>{certificateByHolder}</li>
-                ))}
-              </ol>
-            </p>
+            <ListPendingCertificatesComponent />
           </div>
         );
       }

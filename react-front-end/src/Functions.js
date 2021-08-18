@@ -65,6 +65,7 @@ export var pendingPrivateProvidersAdd = []
 export var pendingPrivateProvidersRemove = []
 export var pendingProviderPoolsAdd = [] 
 export var pendingProviderPoolsRemove = []
+export var pendingCertificates = []
 
 async function RetrievePendings(callback){
   let{0:addr,1:info} = await callback;
@@ -100,20 +101,8 @@ export async function LoadBlockchain() {
   Treasury = new web3.eth.Contract(TREASURY_ABI, TreasuryAddress)
   CertisToken = new web3.eth.Contract(CERTIS_ABI, CertisTokenAddress)
 
-
-
-  let publicProvidersAddresses = await publicPool.methods.retrieveAllProviders().call()
-  publicTotalProviders = publicProvidersAddresses.length
-  publicProviders = []
-
-  for (let i = 0; i < publicTotalProviders; i++) {
-    let {0:publicProviderInfo,1:isProvider} = await publicPool.methods.retrieveProvider(publicProvidersAddresses[i]).call()
-    publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
-  }
-
-  publicMinOwners = await publicPool.methods.retrieveMinOwners().call()
-  publicOwners = await publicPool.methods.retrieveAllOwners().call()
-  publicTotalOwners = publicOwners.length
+  RetrieveProviderPool(1);
+  RetrieveOwners(1);
 
   let privateTotalPool = await privatePoolFactoryAddress.methods.retrieveTotal().call()
   privatePoolAddresses = []
@@ -123,7 +112,6 @@ export async function LoadBlockchain() {
     privatePoolAddresses[i] = privatePoolAddress
   }
 
-
   let providerTotalPool = await providerFactoryAddress.methods.retrieveTotal().call()
   providerAddresses = []
 
@@ -131,11 +119,7 @@ export async function LoadBlockchain() {
     let providerAddress = await providerFactoryAddress.methods.retrieve(i).call()
     providerAddresses[i] = providerAddress
   }
-  pendingPublicOwnersAdd = await RetrievePendings(publicPool.methods.retrievePendingOwners(true).call());
-  pendingPublicOwnersRemove = await RetrievePendings(publicPool.methods.retrievePendingOwners(false).call());
-  pendingPublicProvidersAdd = await RetrievePendings(publicPool.methods.retrievePendingProviders(true).call());
-  pendingPublicProvidersRemove = await RetrievePendings(publicPool.methods.retrievePendingProviders(false).call());
-  
+
 }
 
 export function SwitchContext(){
@@ -190,15 +174,13 @@ async function CallBackFrame(callback){
    catch(e) { window.alert(e); }
 }
   
+// Provider - Pool
+
   export async function CreatenewPoolProvider(min, list, name, contractType){
     if(2 == contractType) await CallBackFrame(privatePoolFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
     else await CallBackFrame(providerFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
   }
-  
-  export async function ValidateProposal(address){
-    await CallBackFrame(publicPool.methods.validateProvider(address).send({from: account}));
-  }
-  
+
   export async function AddProviderPool(address, Info, contractType){
     if(1 == contractType)await CallBackFrame(publicPool.methods.addProvider(address, Info).send({from: account, value: PublicPriceWei}));
     else if(2 == contractType)await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
@@ -210,7 +192,88 @@ async function CallBackFrame(callback){
     else if(2 == contractType) await CallBackFrame(privatePool.methods.removeProvider(address).send({from: account}));
     else await CallBackFrame(provider.methods.removePool(address).send({from: account}));
   }
+
+  export async function ValidateProviderPool(address, contractType){
+    if(1 == contractType)await CallBackFrame(publicPool.methods.validateProvider(address).send({from: account}));
+    else if(2 == contractType)await CallBackFrame(privatePool.methods.validateProvider(address).send({from: account}));
+    else await CallBackFrame(provider.methods.validatePool(address).send({from: account}));
+  }
   
+  export async function RejectProviderPool(address, contractType){
+    if(1 == contractType)await CallBackFrame(publicPool.methods.rejectProvider(address).send({from: account}));
+    else if(2 == contractType)await CallBackFrame(privatePool.methods.rejectProvider(address).send({from: account}));
+    else await CallBackFrame(provider.methods.rejectPool(address).send({from: account}));
+  }
+
+  export async function RetrieveProviderPool(contractType){
+    if(1 == contractType){
+      let publicProvidersAddresses = await publicPool.methods.retrieveAllProviders().call()
+      publicTotalProviders = publicProvidersAddresses.length
+      publicProviders = []
+
+      for (let i = 0; i < publicTotalProviders; i++) {
+        let {0:publicProviderInfo,1:isProvider} = await publicPool.methods.retrieveProvider(publicProvidersAddresses[i]).call()
+        publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
+      }
+
+      pendingPublicProvidersAdd = await RetrievePendings(publicPool.methods.retrievePendingProviders(true).call());
+      pendingPublicProvidersRemove = await RetrievePendings(publicPool.methods.retrievePendingProviders(false).call());
+    }
+    else if(2 == contractType){
+      let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
+      privateTotalProviders = privateProvidersAddresses.length
+      privateProviders = []
+    
+      for (let i = 0; i < privateTotalProviders; i++) {
+        let {0:privateProviderInfo,1:isProvider} = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
+        privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
+      }
+
+      pendingPrivateProvidersAdd = await RetrievePendings(privatePool.methods.retrievePendingProviders(true).call());
+      pendingPrivateProvidersRemove = await RetrievePendings(privatePool.methods.retrievePendingProviders(false).call());
+    }
+    else{
+      let providerPoolsAddresses = await provider.methods.retrieveAllPools().call()
+      providerTotalPools = providerPoolsAddresses.length
+      providerPools = []
+    
+      for (let i = 0; i < providerTotalPools; i++) {
+        let {0:providerPoolInfo,1:isPool} = await provider.methods.retrievePools(providerPoolsAddresses[i]).call()
+        providerPools[i] = [providerPoolsAddresses[i], providerPoolInfo]
+      }
+    
+      pendingProviderPoolsAdd = await RetrievePendings(provider.methods.retrievePendingPools(true).call());
+      pendingProviderPoolsRemove = await RetrievePendings(provider.methods.retrievePendingPools(false).call());
+    }
+  }
+
+  export async function SelectPrivatePool(address){
+    try{
+      privatePoolAddress = address
+      privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
+
+      RetrieveProviderPool(2);
+      RetrieveOwners(2);
+
+    }
+    catch(e) { window.alert(e); }
+  }
+
+  export async function SelectProvider(address){
+    try{
+      providerAddress = address
+      provider = new web3.eth.Contract(PROVIDER_ABI, address)
+      
+      RetrieveProviderPool(3);
+      RetrieveOwners(3);
+      RetrievePendingCertificates();
+
+    }
+    catch(e) { window.alert(e); }
+  }
+  
+// Owner
+
   export async function AddOwner(address, info, contractType){
     if(1 == contractType) await CallBackFrame(publicPool.methods.addOwner(address, info).send({from: account}));
     else if(2 == contractType) await CallBackFrame(privatePool.methods.addOwner(address, info).send({from: account}));
@@ -224,9 +287,72 @@ async function CallBackFrame(callback){
 
   }
 
-  export async function AddCertificate(hash, address, isPrivate){
-    if(true == isPrivate) await CallBackFrame(privatePool.methods.addCertificate(hash, address).send({from: account}));
-    else await CallBackFrame(publicPool.methods.addCertificate(hash, address).send({from: account}));
+  export async function ValidateOwner(address, contractType){
+    if(1 == contractType)await CallBackFrame(publicPool.methods.validateOwner(address).send({from: account}));
+    else if(2 == contractType)await CallBackFrame(privatePool.methods.validateOwner(address).send({from: account}));
+    else await CallBackFrame(provider.methods.validateOwner(address).send({from: account}));
+  }
+
+  export async function RejectOwner(address, contractType){
+    if(1 == contractType)await CallBackFrame(publicPool.methods.rejectOwner(address).send({from: account}));
+    else if(2 == contractType)await CallBackFrame(privatePool.methods.rejectOwner(address).send({from: account}));
+    else await CallBackFrame(provider.methods.rejectOwner(address).send({from: account}));
+  }
+
+  export async function RetrieveOwners(contractType){
+    if(1 == contractType){
+      publicMinOwners = await publicPool.methods.retrieveMinOwners().call()
+      publicOwners = await publicPool.methods.retrieveAllOwners().call()
+      publicTotalOwners = privateOwners.length
+
+      pendingPublicOwnersAdd = await RetrievePendings(publicPool.methods.retrievePendingOwners(true).call());
+      pendingPublicOwnersRemove = await RetrievePendings(publicPool.methods.retrievePendingOwners(false).call());
+    }
+    else if(2 == contractType){
+      privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
+      privateOwners = await privatePool.methods.retrieveAllOwners().call()
+      privateTotalOwners = privateOwners.length
+
+      pendingPrivateOwnersAdd = await RetrievePendings(privatePool.methods.retrievePendingOwners(true).call());
+      pendingPrivateOwnersRemove = await RetrievePendings(privatePool.methods.retrievePendingOwners(false).call());
+    }
+    else{
+      providerMinOwners = await provider.methods.retrieveMinOwners().call()
+      providerOwners = await provider.methods.retrieveAllOwners().call()
+      providerTotalOwners = providerOwners.length
+
+      pendingProviderOwnersAdd = await RetrievePendings(provider.methods.retrievePendingOwners(true).call());
+      pendingProviderOwnersRemove = await RetrievePendings(provider.methods.retrievePendingOwners(false).call());
+    }
+  }
+
+// Certificate
+
+  export async function AddCertificate(hash, holder, isPrivate, contractType, pool){
+    if(3 != contractType){
+      if(true == isPrivate) await CallBackFrame(privatePool.methods.addCertificate(hash, holder).send({from: account}));
+      else await CallBackFrame(publicPool.methods.addCertificate(hash, holder).send({from: account, value: CertificatePriceWei}));
+    }
+    else{
+      await CallBackFrame(provider.methods.addCertificate(pool, hash, holder).send({from: account}));
+    }
+    
+  }
+
+  export async function ValidateCertificate(pool, hash, holder){
+    await CallBackFrame(provider.methods.validateCertificate(pool, hash, holder).send({from: account}));
+  }
+
+  export async function RejectCertificate(pool, hash, holder){
+    await CallBackFrame(provider.methods.rejectCertificate(pool, hash, holder).send({from: account}));
+  }
+
+  export async function RetrievePendingCertificates(){
+    let pendingCerts = await provider.methods.retrievePendingCertificates().call({from: account});
+
+    for (let i = 0; i < pendingCerts; i++) {
+      pendingCertificates[i] = [pendingCerts[i][0], pendingCerts[i][1], pendingCerts[i][3]]
+    }
   }
 
   export async function CheckCertificate(hash, address, isPrivate){
@@ -254,28 +380,6 @@ async function CallBackFrame(callback){
     
   }
 
-  export async function SelectPrivatePool(address){
-    try{
-      privatePoolAddress = address
-      privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
-      let privateProvidersAddresses = await privatePool.methods.retrieveAllProviders().call()
-      privateTotalProviders = privateProvidersAddresses.length
-      privateProviders = []
-    
-      for (let i = 0; i < privateTotalProviders; i++) {
-        let {0:privateProviderInfo,1:isProvider} = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
-        privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
-      }
-    
-      privateMinOwners = await privatePool.methods.retrieveMinOwners().call()
-      privateOwners = await privatePool.methods.retrieveAllOwners().call()
-      privateTotalOwners = privateOwners.length
 
-      pendingPrivateOwnersAdd = await RetrievePendings(privatePool.methods.retrievePendingOwners(true).call());
-      pendingPrivateOwnersRemove = await RetrievePendings(privatePool.methods.retrievePendingOwners(false).call());
-      pendingPrivateProvidersAdd = await RetrievePendings(privatePool.methods.retrievePendingProviders(true).call());
-      pendingPrivateProvidersRemove = await RetrievePendings(privatePool.methods.retrievePendingProviders(false).call());
 
-    }
-    catch(e) { window.alert(e); }
-  }
+  
