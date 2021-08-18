@@ -479,7 +479,7 @@ contract("Testing Treasury",function(accounts){
 
         for(let i=0; i < accounts.length; i++){
             var balanceInit = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
-            await Treasury.methods.AssignDividends().send({from: accounts[i]}, function(error, result){});
+            await Treasury.methods.AssignDividends().send({from: accounts[i], gas: Gas}, function(error, result){});
             var balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
             expect(balanceInit).to.be.equal(0);
             total += balanceEnd;
