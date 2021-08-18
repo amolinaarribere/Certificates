@@ -10,10 +10,18 @@ var Treasury = "";
 var CertisToken = "";
 var privatePool = "";
 var provider = "";
-const PublicPriceWei = 10;
-const PrivatePriceWei = 20;
-const CertificatePriceWei = 5;
-const ProviderPriceWei = 25;
+export var PublicPriceWei = "";
+export var PrivatePriceWei = "";
+export var CertificatePriceWei = "";
+export var ProviderPriceWei = "";
+export var OwnerRefundPriceWei = "";
+
+export var ManagerPropositionLifeTime = "";
+export var ManagerPropositionThresholdPercentage = "";
+export var ManagerMinWeightToProposePercentage = "";
+export var TreasuryPropositionLifeTime = "";
+export var TreasuryPropositionThresholdPercentage = "";
+export var TreasuryMinWeightToProposePercentage = "";
 
 export const privatePoolKey = 'privatePool';
 export const providerKey = 'provider';
@@ -117,6 +125,10 @@ export async function LoadBlockchain() {
     providerAddresses[i] = providerAddress
   }
 
+  RetrievePricesTreasury();
+  RetrieveProposition(1);
+  RetrieveProposition(2);
+
 }
 
 export function SwitchContext(){
@@ -206,6 +218,15 @@ export async function UpgradeProposition(NewPropositionLifeTime, NewPropositionT
   }
   else{
     await CallBackFrame(Treasury.methods.updateProp({NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage}).send({from: account}));
+  }
+}
+
+export async function RetrieveProposition(contractType){
+  if(contractType == 1){
+    [ManagerPropositionLifeTime,ManagerPropositionThresholdPercentage,ManagerMinWeightToProposePercentage] = await certificatePoolManager.methods.retrievePropConfig().call({from: account});
+  }
+  else{
+    [TreasuryPropositionLifeTime,TreasuryPropositionThresholdPercentage,TreasuryMinWeightToProposePercentage] = await Treasury.methods.retrievePropConfig().call({from: account});
   }
 }
 
@@ -433,6 +454,12 @@ export async function UpgradeProposition(NewPropositionLifeTime, NewPropositionT
     }
     catch(e) { window.alert("here " + e); }
     
+  }
+
+  // Treasury
+
+  export async function RetrievePricesTreasury(){
+    [PublicPriceWei,PrivatePriceWei,CertificatePriceWei,ProviderPriceWei,OwnerRefundPriceWei] = await Treasury.methods.retrievePrices().call();
   }
 
 

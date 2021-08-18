@@ -1,4 +1,5 @@
 import React from 'react';
+import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 const func = require("../Functions.js");
 
 class CertisTokensComponent extends React.Component {
@@ -13,6 +14,8 @@ class CertisTokensComponent extends React.Component {
     render(){
       return (
         <div>
+          <CurrentAddressComponent />
+          <br />
         </div>
       );
     }
