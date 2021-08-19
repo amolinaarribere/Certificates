@@ -9,7 +9,7 @@ class SelectPoolIssuerComponent extends React.Component{
       handleSelectProviderPool = async (event) => {
         event.preventDefault();
         sessionStorage.setItem(this.props.Key, this.state.ProviderPool, { path: '/' });
-        await func.SelectProvider(this.state.ProviderPool);
+        await func.SelectProviderPool(this.state.ProviderPool, this.props.contractType);
         this.setState({ ProviderPool: "" })
       };
       

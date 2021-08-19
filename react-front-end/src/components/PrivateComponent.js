@@ -12,7 +12,7 @@ class PrivateComponent extends React.Component {
       func.LoadBlockchain()
       func.SwitchContext()
       if(func.privatePoolAddress != null && func.privatePoolAddress !== "" && func.privatePoolAddress !== "undefined"){
-        func.SelectPrivatePool(func.privatePoolAddress);
+        func.SelectProviderPool(func.privatePoolAddress, this.state.contractType);
       }
    }
     state = {

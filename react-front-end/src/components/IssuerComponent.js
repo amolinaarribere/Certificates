@@ -12,18 +12,11 @@ const func = require("../Functions.js");
       func.LoadBlockchain()
       func.SwitchContext()
       if(func.providerAddress != null && func.providerAddress !== "" && func.providerAddress !== "undefined"){
-        func.SelectProvider(func.providerAddress);
+        func.SelectProviderPool(func.providerAddress, this.state.contractType);
       }
    }
     state = {
       contractType : 3
-    };
-  
-    handleNewProvider = async (event) => {
-        event.preventDefault();
-      await func.CreatenewProvider(this.state.minOwners, this.state.listOfOwners)
-      this.setState({ minOwners: 0 })
-      this.setState({ listOfOwners: [] })
     };
     
     render(){

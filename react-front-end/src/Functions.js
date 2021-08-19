@@ -106,6 +106,9 @@ export var pendingProviderPoolsAdd = []
 export var pendingProviderPoolsRemove = []
 export var pendingCertificates = []
 
+export var AccountBalance = "";
+export var TreasuryBalance = "";
+
 export var TokensTotalSupply = "";
 export var TokensBalance = "";
 
@@ -149,6 +152,8 @@ export async function LoadBlockchain() {
   await RetrievePendingProposition(2);
   await totalSupply();
   await balanceOf(account);
+  await RetrieveBalance(account);
+  await RetrieveTreasuryBalance();
 }
 
 export function SwitchContext(){
@@ -300,8 +305,8 @@ export async function RetrieveProposition(contractType){
 
 // Provider - Pool
   export async function CreatenewPoolProvider(min, list, name, contractType){
-    if(2 == contractType) await CallBackFrame(privatePoolFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
-    else await CallBackFrame(providerFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
+    if(2 == contractType) await CallBackFrame(privatePoolFactory.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
+    else await CallBackFrame(providerFactory.methods.create(list, min, name).send({from: account, value: ProviderPriceWei}));
   }
 
   export async function AddProviderPool(address, Info, subsprice, certprice, contractType){
@@ -370,26 +375,24 @@ export async function RetrieveProposition(contractType){
     }
   }
 
-  export async function SelectPrivatePool(address){
+  export async function SelectProviderPool(address, contractType){
     try{
-      privatePoolAddress = address
-      privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
+      if(2 == contractType){
+        privatePoolAddress = address
+        privatePool = new web3.eth.Contract(PRIVATE_ABI, address)
 
-      RetrieveProviderPool(2);
-      RetrieveOwners(2);
-
-    }
-    catch(e) { window.alert(e); }
-  }
-
-  export async function SelectProvider(address){
-    try{
-      providerAddress = address
-      provider = new web3.eth.Contract(PROVIDER_ABI, address)
+        RetrieveProviderPool(2);
+        RetrieveOwners(2);
+      }
+      else{
+        providerAddress = address
+        provider = new web3.eth.Contract(PROVIDER_ABI, address)
+        
+        RetrieveProviderPool(3);
+        RetrieveOwners(3);
+        RetrievePendingCertificates();
+      }
       
-      RetrieveProviderPool(3);
-      RetrieveOwners(3);
-      RetrievePendingCertificates();
 
     }
     catch(e) { window.alert(e); }
@@ -531,17 +534,31 @@ export async function RetrieveProposition(contractType){
 
     PublicPriceWei = response[0];
     PrivatePriceWei = response[1];
-    CertificatePriceWei = response[2];
-    ProviderPriceWei = response[3];
+    ProviderPriceWei = response[2];
+    CertificatePriceWei = response[3];
     OwnerRefundFeeWei = response[4];
   }
 
   export async function RetrievePendingPricesTreasury(){
-    [PendingPublicPriceWei,PendingPrivatePriceWei,PendingCertificatePriceWei,PendingProviderPriceWei,PendingOwnerRefundFeeWei] = await Treasury.methods.retrieveProposition().call({from: account});
+    let response = await Treasury.methods.retrieveProposition().call();
+    PendingPublicPriceWei = Number(response[0]);
+    PendingPrivatePriceWei = Number(response[1]);
+    PendingProviderPriceWei = Number(response[2]);
+    PendingCertificatePriceWei = Number(response[3]);
+    PendingOwnerRefundFeeWei = Number(response[4]);
   }
+    
 
   export async function UpgradePricesTreasury(NewPublicPriceWei, NewPrivatePriceWei, NewProviderPriceWei, NewCertificatePriceWei, NewOwnerRefundFeeWei){
     await CallBackFrame(Treasury.methods.updatePrices(NewPublicPriceWei, NewPrivatePriceWei, NewProviderPriceWei, NewCertificatePriceWei, NewOwnerRefundFeeWei).send({from: account}));
+  }
+
+  export async function RetrieveBalance(address){
+    AccountBalance = await Treasury.methods.retrieveBalance(address).call();
+  }
+
+  export async function RetrieveTreasuryBalance(){
+    TreasuryBalance = await web3.eth.getBalance(TreasuryAddress);
   }
 
   export async function AssignDividends(){
