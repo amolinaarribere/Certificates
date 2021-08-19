@@ -42,16 +42,21 @@ export const privatePoolKey = 'privatePool';
 export const providerKey = 'provider';
 
 export var publicPoolAddress = ""
+export var publicPoolAddressProxy = ""
 export var privatePoolFactoryAddress = ""
+export var privatePoolFactoryAddressProxy = ""
 export var privatePoolImplAddress = "";
 export var privatePoolAddresses = []
 export var privatePoolAddress = sessionStorage.getItem(privatePoolKey);
 export var providerFactoryAddress = ""
+export var providerFactoryAddressProxy = ""
 export var providerImplAddress = "";
 export var providerAddresses = []
 export var providerAddress = sessionStorage.getItem(providerKey);
 export var TreasuryAddress = ""
+export var TreasuryAddressProxy = ""
 export var CertisTokenAddress = ""
+export var CertisTokenAddressProxy = ""
 
 export var PendingPublicPoolAddress = ""
 export var PendingPrivatePoolFactoryAddress = ""
@@ -123,43 +128,27 @@ export async function LoadBlockchain() {
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
   account = accounts[0];
 
-  certificatePoolManager = new web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS)
-  RetrieveContractsAddresses();
-  RetrievePendingContractsAddresses();
+  certificatePoolManager = await new web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS)
+  await RetrieveContractsAddresses();
+  await RetrievePendingContractsAddresses();
+  
+  publicPool = await new web3.eth.Contract(PUBLIC_ABI, publicPoolAddressProxy)
+  privatePoolFactory = await new web3.eth.Contract(PRIVATEFACTORY_ABI, privatePoolFactoryAddressProxy)
+  providerFactory = await new web3.eth.Contract(PROVIDERFACTORY_ABI, providerFactoryAddressProxy)
+  Treasury = await new web3.eth.Contract(TREASURY_ABI, TreasuryAddressProxy)
+  CertisToken = await new web3.eth.Contract(CERTIS_ABI, CertisTokenAddressProxy)
 
-  publicPool = new web3.eth.Contract(PUBLIC_ABI, publicPoolAddress)
-  privatePoolFactory = new web3.eth.Contract(PRIVATEFACTORY_ABI, privatePoolFactoryAddress)
-  providerFactory = new web3.eth.Contract(PROVIDERFACTORY_ABI, providerFactoryAddress)
-  Treasury = new web3.eth.Contract(TREASURY_ABI, TreasuryAddress)
-  CertisToken = new web3.eth.Contract(CERTIS_ABI, CertisTokenAddress)
-
-  RetrieveProviderPool(1);
-  RetrieveOwners(1);
-
-  let privateTotalPool = await privatePoolFactoryAddress.methods.retrieveTotal().call()
-  privatePoolAddresses = []
-
-  for (let i = 0; i < privateTotalPool; i++) {
-    let privatePoolAddress = await privatePoolFactoryAddress.methods.retrieve(i).call()
-    privatePoolAddresses[i] = privatePoolAddress
-  }
-
-  let providerTotalPool = await providerFactoryAddress.methods.retrieveTotal().call()
-  providerAddresses = []
-
-  for (let i = 0; i < providerTotalPool; i++) {
-    let providerAddress = await providerFactoryAddress.methods.retrieve(i).call()
-    providerAddresses[i] = providerAddress
-  }
-
-  RetrievePricesTreasury();
-  RetrievePendingPricesTreasury();
-  RetrieveProposition(1);
-  RetrieveProposition(2);
-  RetrievePendingProposition(1);
-  RetrievePendingProposition(2);
-  totalSupply();
-  balanceOf(account);
+  await RetrieveProviderPool(1);
+  await RetrieveOwners(1);
+  await RetrieveFactories();
+  await RetrievePricesTreasury();
+  await RetrievePendingPricesTreasury();
+  await RetrieveProposition(1);
+  await RetrieveProposition(2);
+  await RetrievePendingProposition(1);
+  await RetrievePendingProposition(2);
+  await totalSupply();
+  await balanceOf(account);
 }
 
 export function SwitchContext(){
@@ -215,6 +204,12 @@ async function CallBackFrame(callback){
 }
 // Manager
 export async function RetrieveContractsAddresses(){
+  publicPoolAddressProxy = await certificatePoolManager.methods.retrievePublicCertificatePoolProxy().call();
+  privatePoolFactoryAddressProxy = await certificatePoolManager.methods.retrievePrivatePoolFactoryProxy().call();
+  providerFactoryAddressProxy = await certificatePoolManager.methods.retrieveProviderFactoryProxy().call();
+  TreasuryAddressProxy = await certificatePoolManager.methods.retrieveTreasuryProxy().call();
+  CertisTokenAddressProxy = await certificatePoolManager.methods.retrieveCertisTokenProxy().call();
+
   publicPoolAddress = await certificatePoolManager.methods.retrievePublicCertificatePool().call();
   privatePoolFactoryAddress = await certificatePoolManager.methods.retrievePrivatePoolFactory().call();
   privatePoolImplAddress = await certificatePoolManager.methods.retrievePrivatePool().call();
@@ -273,19 +268,33 @@ export async function VoteProposition(Vote, contractType){
 
 export async function RetrievePendingProposition(contractType){
   if(contractType == 1){
-    [PendingManagerPropositionLifeTime,PendingManagerPropositionThresholdPercentage,PendingManagerMinWeightToProposePercentage, PendingManagerProp] = await certificatePoolManager.methods.retrievePendingPropConfig().call({from: account});
+    let response = await certificatePoolManager.methods.retrievePendingPropConfig().call();
+    PendingManagerPropositionLifeTime = response[0];
+    PendingManagerPropositionThresholdPercentage = response[1];
+    PendingManagerMinWeightToProposePercentage = response[2];
+    PendingManagerProp = response[3];
   }
   else{
-    [PendingTreasuryPropositionLifeTime,PendingTreasuryPropositionThresholdPercentage,PendingTreasuryMinWeightToProposePercentage, PendingTreasuryProp] = await Treasury.methods.retrievePendingPropConfig().call({from: account});
+    let response = await Treasury.methods.retrievePendingPropConfig().call();
+    PendingTreasuryPropositionLifeTime = response[0];
+    PendingTreasuryPropositionThresholdPercentage = response[1];
+    PendingTreasuryMinWeightToProposePercentage = response[2];
+    PendingTreasuryProp = response[3];
   }
 }
 
 export async function RetrieveProposition(contractType){
   if(contractType == 1){
-    [ManagerPropositionLifeTime,ManagerPropositionThresholdPercentage,ManagerMinWeightToProposePercentage] = await certificatePoolManager.methods.retrievePropConfig().call({from: account});
+    let response = await certificatePoolManager.methods.retrievePropConfig().call();
+    ManagerPropositionLifeTime = response[0];
+    ManagerPropositionThresholdPercentage = response[1];
+    ManagerMinWeightToProposePercentage = response[2];
   }
   else{
-    [TreasuryPropositionLifeTime,TreasuryPropositionThresholdPercentage,TreasuryMinWeightToProposePercentage] = await Treasury.methods.retrievePropConfig().call({from: account});
+    let response = await Treasury.methods.retrievePropConfig().call();
+    TreasuryPropositionLifeTime = response[0];
+    TreasuryPropositionThresholdPercentage = response[1];
+    TreasuryMinWeightToProposePercentage = response[2];
   }
 }
 
@@ -326,7 +335,7 @@ export async function RetrieveProposition(contractType){
       publicProviders = []
 
       for (let i = 0; i < publicTotalProviders; i++) {
-        let {0:publicProviderInfo,1:isProvider} = await publicPool.methods.retrieveProvider(publicProvidersAddresses[i]).call()
+        let {0:publicProviderInfo,1:isProvider} = await publicPool.methods.retrieveProvider(Bytes32ToAddress(publicProvidersAddresses[i])).call()
         publicProviders[i] = [publicProvidersAddresses[i], publicProviderInfo]
       }
 
@@ -339,7 +348,7 @@ export async function RetrieveProposition(contractType){
       privateProviders = []
     
       for (let i = 0; i < privateTotalProviders; i++) {
-        let {0:privateProviderInfo,1:isProvider} = await privatePool.methods.retrieveProvider(privateProvidersAddresses[i]).call()
+        let {0:privateProviderInfo,1:isProvider} = await privatePool.methods.retrieveProvider(Bytes32ToAddress(privateProvidersAddresses[i])).call()
         privateProviders[i] = [privateProvidersAddresses[i], privateProviderInfo]
       }
 
@@ -352,7 +361,7 @@ export async function RetrieveProposition(contractType){
       providerPools = []
     
       for (let i = 0; i < providerTotalPools; i++) {
-        let {0:providerPoolInfo,1:isPool} = await provider.methods.retrievePools(providerPoolsAddresses[i]).call()
+        let {0:providerPoolInfo,1:isPool} = await provider.methods.retrievePools(Bytes32ToAddress(providerPoolsAddresses[i])).call()
         providerPools[i] = [providerPoolsAddresses[i], providerPoolInfo]
       }
     
@@ -518,7 +527,13 @@ export async function RetrieveProposition(contractType){
   // Treasury
 
   export async function RetrievePricesTreasury(){
-    [PublicPriceWei,PrivatePriceWei,CertificatePriceWei,ProviderPriceWei,OwnerRefundFeeWei] = await Treasury.methods.retrievePrices().call();
+    let response = await Treasury.methods.retrievePrices().call();
+
+    PublicPriceWei = response[0];
+    PrivatePriceWei = response[1];
+    CertificatePriceWei = response[2];
+    ProviderPriceWei = response[3];
+    OwnerRefundFeeWei = response[4];
   }
 
   export async function RetrievePendingPricesTreasury(){
@@ -550,5 +565,31 @@ export async function RetrieveProposition(contractType){
   export async function transfer(address, amount){
     await CallBackFrame(CertisToken.methods.transfer(address, amount).send({from: account}));
   }
+
+  // Factories
+
+  export async function RetrieveFactories(){
+    let privateTotalPool = await privatePoolFactory.methods.retrieveTotal().call()
+    privatePoolAddresses = []
+
+    for (let i = 0; i < privateTotalPool; i++) {
+      let privatePoolAddress = await privatePoolFactory.methods.retrieve(i).call()
+      privatePoolAddresses[i] = privatePoolAddress
+    }
+
+    let providerTotalPool = await providerFactory.methods.retrieveTotal().call()
+    providerAddresses = []
+
+    for (let i = 0; i < providerTotalPool; i++) {
+      let providerAddress = await providerFactory.methods.retrieve(i).call()
+      providerAddresses[i] = providerAddress
+    }
+  }
+
+  // auxiliary
+
+  export function Bytes32ToAddress(bytes){
+    return ("0x" + bytes.substring(26, bytes.length));
+}
 
   

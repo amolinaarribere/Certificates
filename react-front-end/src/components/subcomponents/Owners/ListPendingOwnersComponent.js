@@ -11,7 +11,7 @@ class ListPendingOwnersComponent extends React.Component{
             <p class="text-warning"><b>Pending Public Owners to be Added :</b>
               <ol>
                 {func.pendingPublicOwnersAdd.map(pendingPublicOwnerAdd => (
-                <li key={pendingPublicOwnerAdd}>{pendingPublicOwnerAdd}</li>
+                <li key={pendingPublicOwnerAdd}>{func.Bytes32ToAddress(pendingPublicOwnerAdd)}</li>
                 ))}
               </ol>
             </p>
@@ -19,7 +19,7 @@ class ListPendingOwnersComponent extends React.Component{
             <p class="text-warning"><b>Pending Public Owners to be Removed :</b>
               <ol>
                 {func.pendingPublicOwnersRemove.map(pendingPublicOwnerRemove => (
-                <li key={pendingPublicOwnerRemove}>{pendingPublicOwnerRemove}</li>
+                <li key={pendingPublicOwnerRemove}>{func.Bytes32ToAddress(pendingPublicOwnerRemove)}</li>
                 ))}
               </ol>
             </p>
@@ -34,7 +34,7 @@ class ListPendingOwnersComponent extends React.Component{
             <p class="text-warning"><b>Pending Private Owners to be Added :</b>
               <ol>
                 {func.pendingPrivateOwnersAdd.map(pendingPrivateOwnerAdd => (
-                <li key={pendingPrivateOwnerAdd[0]}>{pendingPrivateOwnerAdd[0]}</li>
+                <li key={pendingPrivateOwnerAdd[0]}>{func.Bytes32ToAddress(pendingPrivateOwnerAdd[0])}</li>
                 ))}
               </ol>
             </p>
@@ -42,7 +42,7 @@ class ListPendingOwnersComponent extends React.Component{
             <p class="text-warning"><b>Pending Private Owners to be Removed :</b>
               <ol>
                 {func.pendingPrivateOwnersRemove.map(pendingPrivateOwnerRemove => (
-                <li key={pendingPrivateOwnerRemove[0]}>{pendingPrivateOwnerRemove[0]}</li>
+                <li key={pendingPrivateOwnerRemove[0]}>{func.Bytes32ToAddress(pendingPrivateOwnerRemove[0])}</li>
                 ))}
               </ol>
             </p>
@@ -57,7 +57,7 @@ class ListPendingOwnersComponent extends React.Component{
             <p class="text-warning"><b>Pending Provider Owners to be Added :</b>
               <ol>
                 {func.pendingProviderOwnersAdd.map(pendingProviderOwnerAdd => (
-                <li key={pendingProviderOwnerAdd}>{pendingProviderOwnerAdd}</li>
+                <li key={pendingProviderOwnerAdd}>{func.Bytes32ToAddress(pendingProviderOwnerAdd)}</li>
                 ))}
               </ol>
             </p>
@@ -65,7 +65,7 @@ class ListPendingOwnersComponent extends React.Component{
             <p class="text-warning"><b>Pending Provider Owners to be Removed :</b>
               <ol>
                 {func.pendingProviderOwnersRemove.map(pendingProviderOwnerRemove => (
-                <li key={pendingProviderOwnerRemove}>{pendingProviderOwnerRemove}</li>
+                <li key={pendingProviderOwnerRemove}>{func.Bytes32ToAddress(pendingProviderOwnerRemove)}</li>
                 ))}
               </ol>
             </p>

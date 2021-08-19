@@ -11,7 +11,7 @@ class ListProvidersPoolsComponent extends React.Component{
             <p><b>Public Providers :</b>
               <ol>
                 {func.publicProviders.map(publicProvider => (
-                <li key={publicProvider[0]}>{publicProvider[0]}: {publicProvider[1]}</li>
+                <li key={publicProvider[0]}>{func.Bytes32ToAddress(publicProvider[0])}: {publicProvider[1]}</li>
                 ))}
               </ol>
             </p>
@@ -25,7 +25,7 @@ class ListProvidersPoolsComponent extends React.Component{
             <p><b>Private Providers :</b>
               <ol>
                 {func.privateProviders.map(privateProvider => (
-                <li key={privateProvider[0]}>{privateProvider[0]}: {privateProvider[1]}</li>
+                <li key={privateProvider[0]}>{func.Bytes32ToAddress(privateProvider[0])}: {privateProvider[1]}</li>
                 ))}
               </ol>
             </p>
@@ -39,7 +39,7 @@ class ListProvidersPoolsComponent extends React.Component{
             <p><b>Pools :</b>
               <ol>
                 {func.providerPools.map(Pool => (
-                <li key={Pool[0]}>{Pool[0]}: {Pool[1]}</li>
+                <li key={Pool[0]}>{func.Bytes32ToAddress(Pool[0])}: {Pool[1]}</li>
                 ))}
               </ol>
             </p>
