@@ -178,6 +178,17 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
         return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
     }
 
+    function retrievePendingPropConfig() external view returns(uint, uint8, uint8, bool)
+    {
+        if(_currentPropisProp && (block.timestamp < _Proposition.DeadLine)){
+            return (_ProposedProposition.NewPropositionLifeTime,
+                _ProposedProposition.NewPropositionThresholdPercentage,
+                _ProposedProposition.NewMinWeightToProposePercentage,
+                true);
+        }
+        return (0,0,0,false);
+    }
+
     // FUNCTIONALITY /////////////////////////////////////////
     function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
         PropositionInProgress(false)
