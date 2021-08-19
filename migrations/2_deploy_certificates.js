@@ -17,7 +17,23 @@ let UintLibrary = artifacts.require("./Libraries/UintLibrary");
 let AddressLibrary = artifacts.require("./Libraries/AddressLibrary");
 let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
 
+const PropositionLifeTime = 604800;
+const PropositionThresholdPercentage = 50;
+const minWeightToProposePercentage = 5;
+const TokenName = "CertisToken";
+const TokenSymbol = "CERT";
+const TokenSupply = 100000000;
+const TokenDecimals = 0;
+const PublicPriceWei = 10;
+const PrivatePriceWei = 20;
+const ProviderPriceWei = 25;
+const CertificatePriceWei = 5;
+const OwnerRefundFeeWei = 2;
+const PublicMinOwners = 1;
+
+
 module.exports = async function(deployer, network, accounts){
+  const PublicOwners = [accounts[0]];
 
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.deploy(Library);
@@ -51,7 +67,7 @@ module.exports = async function(deployer, network, accounts){
   await deployer.link(AddressLibrary, CertificatesPoolManager);
   console.log("AddressLibrary linked to Certificate Pool Manager");
 
-  await deployer.deploy(CertificatesPoolManager, 604800, 50, 5);
+  await deployer.deploy(CertificatesPoolManager, PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage);
   CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
 
@@ -99,7 +115,7 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var CertisTokenProxyInitializerParameters = ["CertisToken", "CERT", 1000000, CertificatesPoolManagerInstance.address, 0];
+  var CertisTokenProxyInitializerParameters = [TokenName, TokenSymbol, TokenSupply, CertificatesPoolManagerInstance.address, TokenDecimals];
   var CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
 
   await deployer.deploy(CertisTokenProxy, CertisTokenInstance.address, CertificatesPoolManagerInstance.address, CertisProxyData);
@@ -173,7 +189,8 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var TreasuryProxyInitializerParameters = [ 10, 20, 25, 5, 2, CertificatesPoolManagerInstance.address, 604800, 50, 5];
+
+  var TreasuryProxyInitializerParameters = [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, CertificatesPoolManagerInstance.address, PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
   var TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
 
   await deployer.deploy(GenericProxy, TreasuryInstance.address, CertificatesPoolManagerInstance.address, TreasuryProxyData);
@@ -259,7 +276,7 @@ module.exports = async function(deployer, network, accounts){
      "stateMutability": "nonpayable",
      "type": "function"
   };
-  var PublicCertificatesPoolProxyInitializerParameters = [[accounts[0]], 1, CertificatesPoolManagerInstance.address];
+  var PublicCertificatesPoolProxyInitializerParameters = [PublicOwners, PublicMinOwners, CertificatesPoolManagerInstance.address];
   var PublicCertificatesPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicCertificatesPoolProxyInitializerMethod, PublicCertificatesPoolProxyInitializerParameters);
 
   await deployer.deploy(GenericProxy, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address, PublicCertificatesPoolProxyData);

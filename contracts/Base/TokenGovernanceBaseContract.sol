@@ -105,7 +105,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
         else 
         {
             uint numberOfTokens = GetTokensBalance(addr);
-            if(numberOfTokens >= (_minWeightToProposePercentage * totalSupply() / 100)) return true;
+            if(numberOfTokens > (_minWeightToProposePercentage * totalSupply() / 100)) return true;
             return false;
         }
     }
