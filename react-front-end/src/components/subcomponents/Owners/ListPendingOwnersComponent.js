@@ -6,9 +6,9 @@ class ListPendingOwnersComponent extends React.Component{
       if (this.props.contractType == 1){
         return(
           <div>
-            <p><b>Pending Public Min Owner : {func.publicPendingMinOwners}</b></p>
+            <p class="text-warning"><b>Pending Public Min Owner : {func.publicPendingMinOwners}</b></p>
             <br />
-            <p><b>Pending Public Owners to be Added :</b>
+            <p class="text-warning"><b>Pending Public Owners to be Added :</b>
               <ol>
                 {func.pendingPublicOwnersAdd.map(pendingPublicOwnerAdd => (
                 <li key={pendingPublicOwnerAdd}>{pendingPublicOwnerAdd}</li>
@@ -16,7 +16,7 @@ class ListPendingOwnersComponent extends React.Component{
               </ol>
             </p>
             <br />
-            <p><b>Pending Public Owners to be Removed :</b>
+            <p class="text-warning"><b>Pending Public Owners to be Removed :</b>
               <ol>
                 {func.pendingPublicOwnersRemove.map(pendingPublicOwnerRemove => (
                 <li key={pendingPublicOwnerRemove}>{pendingPublicOwnerRemove}</li>
@@ -29,9 +29,9 @@ class ListPendingOwnersComponent extends React.Component{
       else  if (this.props.contractType == 2){
         return(
           <div>
-            <p><b>Pending Private Min Owner : {func.privatePendingMinOwners}</b></p>
+            <p class="text-warning"><b>Pending Private Min Owner : {func.privatePendingMinOwners}</b></p>
             <br />
-            <p><b>Pending Private Owners to be Added :</b>
+            <p class="text-warning"><b>Pending Private Owners to be Added :</b>
               <ol>
                 {func.pendingPrivateOwnersAdd.map(pendingPrivateOwnerAdd => (
                 <li key={pendingPrivateOwnerAdd[0]}>{pendingPrivateOwnerAdd[0]}</li>
@@ -39,7 +39,7 @@ class ListPendingOwnersComponent extends React.Component{
               </ol>
             </p>
             <br />
-            <p><b>Pending Private Owners to be Removed :</b>
+            <p class="text-warning"><b>Pending Private Owners to be Removed :</b>
               <ol>
                 {func.pendingPrivateOwnersRemove.map(pendingPrivateOwnerRemove => (
                 <li key={pendingPrivateOwnerRemove[0]}>{pendingPrivateOwnerRemove[0]}</li>
@@ -52,9 +52,9 @@ class ListPendingOwnersComponent extends React.Component{
       else{
         return(
           <div>
-            <p><b>Pending Provider Min Owner : {func.providerPendingMinOwners}</b></p>
+            <p class="text-warning"><b>Pending Provider Min Owner : {func.providerPendingMinOwners}</b></p>
             <br />
-            <p><b>Pending Provider Owners to be Added :</b>
+            <p class="text-warning"><b>Pending Provider Owners to be Added :</b>
               <ol>
                 {func.pendingProviderOwnersAdd.map(pendingProviderOwnerAdd => (
                 <li key={pendingProviderOwnerAdd}>{pendingProviderOwnerAdd}</li>
@@ -62,7 +62,7 @@ class ListPendingOwnersComponent extends React.Component{
               </ol>
             </p>
             <br />
-            <p><b>Pending Provider Owners to be Removed :</b>
+            <p class="text-warning"><b>Pending Provider Owners to be Removed :</b>
               <ol>
                 {func.pendingProviderOwnersRemove.map(pendingProviderOwnerRemove => (
                 <li key={pendingProviderOwnerRemove}>{pendingProviderOwnerRemove}</li>

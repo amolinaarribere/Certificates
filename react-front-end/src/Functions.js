@@ -14,7 +14,13 @@ export var PublicPriceWei = "";
 export var PrivatePriceWei = "";
 export var CertificatePriceWei = "";
 export var ProviderPriceWei = "";
-export var OwnerRefundPriceWei = "";
+export var OwnerRefundFeeWei = "";
+
+export var PendingPublicPriceWei = "";
+export var PendingPrivatePriceWei = "";
+export var PendingCertificatePriceWei = "";
+export var PendingProviderPriceWei = "";
+export var PendingOwnerRefundFeeWei = "";
 
 export var ManagerPropositionLifeTime = "";
 export var ManagerPropositionThresholdPercentage = "";
@@ -22,6 +28,15 @@ export var ManagerMinWeightToProposePercentage = "";
 export var TreasuryPropositionLifeTime = "";
 export var TreasuryPropositionThresholdPercentage = "";
 export var TreasuryMinWeightToProposePercentage = "";
+
+export var PendingManagerPropositionLifeTime = "";
+export var PendingManagerPropositionThresholdPercentage = "";
+export var PendingManagerMinWeightToProposePercentage = "";
+export var PendingTreasuryPropositionLifeTime = "";
+export var PendingTreasuryPropositionThresholdPercentage = "";
+export var PendingTreasuryMinWeightToProposePercentage = "";
+export var PendingManagerProp = "";
+export var PendingTreasuryProp = "";
 
 export const privatePoolKey = 'privatePool';
 export const providerKey = 'provider';
@@ -37,6 +52,14 @@ export var providerAddresses = []
 export var providerAddress = sessionStorage.getItem(providerKey);
 export var TreasuryAddress = ""
 export var CertisTokenAddress = ""
+
+export var PendingPublicPoolAddress = ""
+export var PendingPrivatePoolFactoryAddress = ""
+export var PendingPrivatePoolImplAddress = "";
+export var PendingProviderFactoryAddress = ""
+export var PendingProviderImplAddress = "";
+export var PendingTreasuryAddress = ""
+export var PendingCertisTokenAddress = ""
 
 export var chairPerson = ""
 export var balance = ""
@@ -99,6 +122,7 @@ export async function LoadBlockchain() {
 
   certificatePoolManager = new web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS)
   RetrieveContractsAddresses();
+  RetrievePendingContractsAddresses();
 
   publicPool = new web3.eth.Contract(PUBLIC_ABI, publicPoolAddress)
   privatePoolFactory = new web3.eth.Contract(PRIVATEFACTORY_ABI, privatePoolFactoryAddress)
@@ -126,9 +150,11 @@ export async function LoadBlockchain() {
   }
 
   RetrievePricesTreasury();
+  RetrievePendingPricesTreasury();
   RetrieveProposition(1);
   RetrieveProposition(2);
-
+  RetrievePendingProposition(1);
+  RetrievePendingProposition(2);
 }
 
 export function SwitchContext(){
@@ -211,6 +237,16 @@ export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress,
 
 }
 
+export async function RetrievePendingContractsAddresses(){
+  [PendingPublicPoolAddress,
+    PendingTreasuryAddress,
+    PendingCertisTokenAddress,
+    PendingPrivatePoolFactoryAddress,
+    PendingPrivatePoolImplAddress,
+    PendingProviderFactoryAddress,
+    PendingProviderImplAddress] = await certificatePoolManager.methods.retrieveProposition().call({from: account});
+}
+
 // Proposition
 export async function UpgradeProposition(NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage, contractType){
   if(contractType == 1){
@@ -218,6 +254,24 @@ export async function UpgradeProposition(NewPropositionLifeTime, NewPropositionT
   }
   else{
     await CallBackFrame(Treasury.methods.updateProp({NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage}).send({from: account}));
+  }
+}
+
+export async function VoteProposition(Vote, contractType){
+  if(contractType == 1){
+    await CallBackFrame(certificatePoolManager.methods.voteProposition(Vote).send({from: account}));
+  }
+  else{
+    await CallBackFrame(Treasury.methods.voteProposition(Vote).send({from: account}));
+  }
+}
+
+export async function RetrievePendingProposition(contractType){
+  if(contractType == 1){
+    [PendingManagerPropositionLifeTime,PendingManagerPropositionThresholdPercentage,PendingManagerMinWeightToProposePercentage, PendingManagerProp] = await certificatePoolManager.methods.retrievePendingPropConfig().call({from: account});
+  }
+  else{
+    [PendingTreasuryPropositionLifeTime,PendingTreasuryPropositionThresholdPercentage,PendingTreasuryMinWeightToProposePercentage, PendingTreasuryProp] = await Treasury.methods.retrievePendingPropConfig().call({from: account});
   }
 }
 
@@ -459,7 +513,11 @@ export async function RetrieveProposition(contractType){
   // Treasury
 
   export async function RetrievePricesTreasury(){
-    [PublicPriceWei,PrivatePriceWei,CertificatePriceWei,ProviderPriceWei,OwnerRefundPriceWei] = await Treasury.methods.retrievePrices().call();
+    [PublicPriceWei,PrivatePriceWei,CertificatePriceWei,ProviderPriceWei,OwnerRefundFeeWei] = await Treasury.methods.retrievePrices().call();
+  }
+
+  export async function RetrievePendingPricesTreasury(){
+    [PendingPublicPriceWei,PendingPrivatePriceWei,PendingCertificatePriceWei,PendingProviderPriceWei,PendingOwnerRefundFeeWei] = await Treasury.methods.retrieveProposition().call({from: account});
   }
 
 

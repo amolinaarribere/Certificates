@@ -1,6 +1,5 @@
 import React from 'react';
 import PropositionConfigComponent from './subcomponents/Proposition/PropositionConfigComponent.js';
-import ListPropositionConfigComponent from './subcomponents/Proposition/ListPropositionConfigComponent.js';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 const func = require("../Functions.js");
 
@@ -15,7 +14,7 @@ class TreasuryComponent extends React.Component {
       NewPrivatePriceWei : "",
       NewProviderPriceWei : "",
       NewCertificatePriceWei : "",
-      NewOwnerRefundPriceWei : ""
+      NewOwnerRefundFeeWei : ""
     };
     
     render(){
@@ -27,7 +26,7 @@ class TreasuryComponent extends React.Component {
           <p><b>Create New Private Pool Price :</b> {func.PrivatePriceWei}</p>
           <p><b>Create New Provider Price :</b> {func.ProviderPriceWei}</p>
           <p><b>Send Certificate to Public Pool Price :</b> {func.CertificatePriceWei}</p>
-          <p><b>Refund Fee :</b> {func.OwnerRefundPriceWei}</p>
+          <p><b>Refund Fee :</b> {func.OwnerRefundFeeWei}</p>
           <br />
           <form onSubmit={this.handleUpgradeContracts}>
             <p>
@@ -51,15 +50,19 @@ class TreasuryComponent extends React.Component {
                   onChange={event => this.setState({ NewCertificatePriceWei: event.target.value })}/>
             </p>
             <p>
-              <input type="integer" name="NewOwnerRefundPriceWei" placeholder="NewOwnerRefundPriceWei" 
-                  value={this.state.NewOwnerRefundPriceWei}
-                  onChange={event => this.setState({ NewOwnerRefundPriceWei: event.target.value })}/>
+              <input type="integer" name="NewOwnerRefundFeeWei" placeholder="NewOwnerRefundFeeWei" 
+                  value={this.state.NewOwnerRefundFeeWei}
+                  onChange={event => this.setState({ NewOwnerRefundFeeWei: event.target.value })}/>
             </p>
               <button>Upgrade Prices</button>
           </form>
           <br />
-          <ListPropositionConfigComponent contractType={this.state.contractType}/>
-          <br/>
+          <p class="text-warning"><b>Pending Public Price :</b> {func.PendingPublicPriceWei}</p>
+          <p class="text-warning"><b>Pending Private Price :</b> {func.PendingPrivatePriceWei}</p>
+          <p class="text-warning"><b>Pending Provider Price :</b> {func.PendingProviderPriceWei}</p>
+          <p class="text-warning"><b>Pending Certificate Price :</b> {func.PendingCertificatePriceWei}</p>
+          <p class="text-warning"><b>Pending Refund Fee :</b> {func.PendingOwnerRefundFeeWei}</p>
+          <br />
           <PropositionConfigComponent contractType={this.state.contractType}/>
         </div>
       );

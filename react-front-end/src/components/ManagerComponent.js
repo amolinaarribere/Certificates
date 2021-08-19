@@ -1,7 +1,6 @@
 import React from 'react';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import PropositionConfigComponent from './subcomponents/Proposition/PropositionConfigComponent.js';
-import ListPropositionConfigComponent from './subcomponents/Proposition/ListPropositionConfigComponent.js';
 import { CERTIFICATE_POOL_MANAGER_ADDRESS} from '../config';
 const func = require("../Functions.js");
 const address_0 = "0x0000000000000000000000000000000000000000"
@@ -102,8 +101,14 @@ class ManagerComponent extends React.Component {
               <button>Upgrade Contracts</button>
           </form>
           <br />
-          <ListPropositionConfigComponent contractType={this.state.contractType}/>
-          <br/>
+          <p class="text-warning"><b>Pending Public Pool Address :</b> {func.PendingPublicPoolAddress}</p>
+          <p class="text-warning"><b>Pending Treasury Address :</b> {func.PendingTreasuryAddress}</p>
+          <p class="text-warning"><b>Pending Certis Token Address :</b> {func.PendingCertisTokenAddress}</p>
+          <p class="text-warning"><b>Pending Private Factory Address :</b> {func.PendingPrivatePoolFactoryAddress}</p>
+          <p class="text-warning"><b>Pending Private Pool Impl Address :</b> {func.PendingPrivatePoolImplAddress}</p>
+          <p class="text-warning"><b>Pending Provider Factory Address :</b> {func.PendingProviderFactoryAddress}</p>
+          <p class="text-warning"><b>Pending Provider Impl Address :</b> {func.PendingProviderImplAddress}</p>
+          <br />
           <PropositionConfigComponent contractType={this.state.contractType}/>
           <br/>
         </div>
