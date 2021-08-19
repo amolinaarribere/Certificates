@@ -520,6 +520,18 @@ export async function RetrieveProposition(contractType){
     [PendingPublicPriceWei,PendingPrivatePriceWei,PendingCertificatePriceWei,PendingProviderPriceWei,PendingOwnerRefundFeeWei] = await Treasury.methods.retrieveProposition().call({from: account});
   }
 
+  export async function UpgradePricesTreasury(NewPublicPriceWei, NewPrivatePriceWei, NewProviderPriceWei, NewCertificatePriceWei, NewOwnerRefundFeeWei){
+    await CallBackFrame(Treasury.methods.updatePrices(NewPublicPriceWei, NewPrivatePriceWei, NewProviderPriceWei, NewCertificatePriceWei, NewOwnerRefundFeeWei).send({from: account}));
+  }
+
+  export async function AssignDividends(){
+    await CallBackFrame(Treasury.methods.AssignDividends().send({from: account}));
+  }
+
+  export async function WithdrawAmount(amount){
+    await CallBackFrame(Treasury.methods.withdraw(amount).send({from: account}));
+  }
+
 
 
   
