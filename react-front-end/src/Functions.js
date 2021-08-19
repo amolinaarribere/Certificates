@@ -101,6 +101,9 @@ export var pendingProviderPoolsAdd = []
 export var pendingProviderPoolsRemove = []
 export var pendingCertificates = []
 
+export var TokensTotalSupply = "";
+export var TokensBalance = "";
+
 async function RetrievePendings(callback){
   let{0:addr,1:info} = await callback;
   var output = [];
@@ -155,6 +158,8 @@ export async function LoadBlockchain() {
   RetrieveProposition(2);
   RetrievePendingProposition(1);
   RetrievePendingProposition(2);
+  totalSupply();
+  balanceOf(account);
 }
 
 export function SwitchContext(){
@@ -290,10 +295,10 @@ export async function RetrieveProposition(contractType){
     else await CallBackFrame(providerFactoryAddress.methods.create(list, min, name).send({from: account, value: PrivatePriceWei}));
   }
 
-  export async function AddProviderPool(address, Info, contractType){
+  export async function AddProviderPool(address, Info, subsprice, certprice, contractType){
     if(1 == contractType)await CallBackFrame(publicPool.methods.addProvider(address, Info).send({from: account, value: PublicPriceWei}));
     else if(2 == contractType)await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
-    else await CallBackFrame(provider.methods.addPool(address, Info).send({from: account}));
+    else await CallBackFrame(provider.methods.addPool(address, Info, certprice, subsprice).send({from: account}));
   }
   
   export async function RemoveProviderPool(address, contractType){
@@ -532,6 +537,18 @@ export async function RetrieveProposition(contractType){
     await CallBackFrame(Treasury.methods.withdraw(amount).send({from: account}));
   }
 
+  // Certis Tokens
 
+  export async function totalSupply(){
+    TokensTotalSupply = await CertisToken.methods.totalSupply().call({from: account});
+  }
+
+  export async function balanceOf(address){
+    TokensBalance = await CertisToken.methods.balanceOf(address).call({from: account});
+  }
+
+  export async function transfer(address, amount){
+    await CallBackFrame(CertisToken.methods.transfer(address, amount).send({from: account}));
+  }
 
   

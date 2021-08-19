@@ -14,8 +14,8 @@ class SelectPoolIssuerComponent extends React.Component{
       };
       
       render(){
-        var text = "Provider";
-        if (this.props.contractType == 3)text = "Pool";
+        var text = "Pool";
+        if (this.props.contractType == 3)text = "Provider";
         return (
             <div>
                 <form onSubmit={this.handleSelectProviderPool}>
