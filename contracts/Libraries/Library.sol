@@ -35,16 +35,6 @@ library Library{
         bytes NewProviderFactoryData;
     }
 
-    struct InitialContractsStruct{
-        address payable PublicPoolProxyAddress;
-        address payable TreasuryProxyAddress;
-        address payable CertisTokenProxyAddress;
-        address payable PrivatePoolFactoryProxyAddress;
-        address PrivateCertificatePoolImplAddress;
-        address payable ProviderFactoryProxyAddress;
-        address ProviderImplAddress;
-    }
-
     // Pending Certificates
     struct _pendingCertificatesStruct{
         address pool;

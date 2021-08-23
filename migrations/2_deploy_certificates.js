@@ -7,9 +7,6 @@ let CertisToken = artifacts.require("./DeployedContracts/CertisToken");
 let PrivatePoolFactory = artifacts.require("./DeployedContracts/PrivatePoolFactory");
 let ProviderFactory = artifacts.require("./DeployedContracts/ProviderFactory");
 
-const GenericProxy = artifacts.require("./DeployedContracts/Proxies/GenericProxy");
-const CertisTokenProxy = artifacts.require("./DeployedContracts/Proxies/CertisTokenProxy");
-
 const obj = require("../test_libraries/objects.js");
 
 let Library = artifacts.require("./Libraries/Library");
@@ -109,18 +106,19 @@ module.exports = async function(deployer, network, accounts){
         "name": "decimalsValue",
         "type": "uint8"
       },
+      {
+        "internalType": "address",
+        "name": "initialOwner",
+        "type": "address"
+      }
     ],
     "name": "CertisToken_init",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var CertisTokenProxyInitializerParameters = [TokenName, TokenSymbol, TokenSupply, CertificatesPoolManagerInstance.address, TokenDecimals];
+  var CertisTokenProxyInitializerParameters = [TokenName, TokenSymbol, TokenSupply, CertificatesPoolManagerInstance.address, TokenDecimals, accounts[0]];
   var CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
-
-  await deployer.deploy(CertisTokenProxy, CertisTokenInstance.address, CertificatesPoolManagerInstance.address, CertisProxyData);
-  CertisTokenProxyInstance = await CertisTokenProxy.deployed();
-  console.log("CertisTokenProxy deployed : " + CertisTokenProxyInstance.address);
 
   // Treasury -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, Treasury);
@@ -193,10 +191,6 @@ module.exports = async function(deployer, network, accounts){
   var TreasuryProxyInitializerParameters = [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, CertificatesPoolManagerInstance.address, PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
   var TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
 
-  await deployer.deploy(GenericProxy, TreasuryInstance.address, CertificatesPoolManagerInstance.address, TreasuryProxyData);
-  TreasuryProxyInstance = await GenericProxy.deployed();
-  console.log("TreasuryProxy deployed : " + TreasuryProxyInstance.address);
-
   // Private Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, PrivateCertificatesPool);
   console.log("Library linked to PrivateCertificatesPool");
@@ -234,10 +228,6 @@ module.exports = async function(deployer, network, accounts){
   };
   var PrivatePoolFactoryProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
   var PrivatePoolFactoryProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolFactoryProxyInitializerMethod, PrivatePoolFactoryProxyInitializerParameters);
-
-  await deployer.deploy(GenericProxy, PrivatePoolFactoryInstance.address, CertificatesPoolManagerInstance.address, PrivatePoolFactoryProxyData);
-  PrivatePoolFactoryProxyInstance = await GenericProxy.deployed();
-  console.log("PrivatePoolFactoryProxy deployed : " + PrivatePoolFactoryProxyInstance.address);
 
   // Public Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, PublicCertificatesPool);
@@ -279,10 +269,6 @@ module.exports = async function(deployer, network, accounts){
   var PublicCertificatesPoolProxyInitializerParameters = [PublicOwners, PublicMinOwners, CertificatesPoolManagerInstance.address];
   var PublicCertificatesPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicCertificatesPoolProxyInitializerMethod, PublicCertificatesPoolProxyInitializerParameters);
 
-  await deployer.deploy(GenericProxy, PublicCertificatesPoolInstance.address, CertificatesPoolManagerInstance.address, PublicCertificatesPoolProxyData);
-  PublicCertificatesPoolProxyInstance = await GenericProxy.deployed();
-  console.log("PublicCertificatesPoolProxy deployed : " + PublicCertificatesPoolProxyInstance.address);
-
   // Provider -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, Provider);
   console.log("Library linked to Provider");
@@ -321,12 +307,12 @@ module.exports = async function(deployer, network, accounts){
   var ProviderFactoryProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
   var ProviderFactoryProxyData = web3.eth.abi.encodeFunctionCall(ProviderFactoryProxyInitializerMethod, ProviderFactoryProxyInitializerParameters);
 
-  await deployer.deploy(GenericProxy, ProviderFactoryInstance.address, CertificatesPoolManagerInstance.address, ProviderFactoryProxyData);
-  ProviderFactoryProxyInstance = await GenericProxy.deployed();
-  console.log("ProviderFactoryProxy deployed : " + ProviderFactoryProxyInstance.address);
-
   // Initialized Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await CertificatesPoolManagerInstance.InitializeContracts(obj.returnInitialObject(PublicCertificatesPoolProxyInstance.address, TreasuryProxyInstance.address, CertisTokenProxyInstance.address, PrivatePoolFactoryProxyInstance.address, PrivateCertificatesPoolInstance.address, ProviderFactoryProxyInstance.address, ProviderInstance.address));
+  await CertificatesPoolManagerInstance.InitializeContracts(
+    obj.returnUpgradeObject(PublicCertificatesPoolInstance.address,
+       TreasuryInstance.address,
+        CertisTokenInstance.address, PrivatePoolFactoryInstance.address, PrivateCertificatesPoolInstance.address, ProviderFactoryInstance.address, ProviderInstance.address, 
+      PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData));
   console.log("CertificatesPoolManager initialized");
     
 }

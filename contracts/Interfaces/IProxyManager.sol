@@ -9,7 +9,7 @@ pragma solidity >=0.7.0 <0.9.0;
  import "../Libraries/Library.sol";
 
  interface IProxyManager  {
-    function InitializeContracts(Library.InitialContractsStruct calldata initialContracts) external;
+    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) external;
     function upgradeContracts(Library.ProposedContractsStruct calldata UpgradeProposition) external;
     
     function retrievePublicCertificatePoolProxy() external view returns (address);

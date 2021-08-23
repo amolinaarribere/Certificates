@@ -21,12 +21,12 @@ import "../Base/ManagedBaseContract.sol";
     uint8 private _decimals;
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function CertisToken_init(string memory name, string memory symbol, uint256 MaxSupply, address managerContractAddress, uint8 decimalsValue) public initializer {
+    function CertisToken_init(string memory name, string memory symbol, uint256 MaxSupply, address managerContractAddress, uint8 decimalsValue, address initialOwner) public initializer {
         super.ManagedBaseContract_init(managerContractAddress);
         super.__ERC20_init(name, symbol);
     
         _decimals = decimalsValue;
-        _mint(msg.sender, MaxSupply);
+        _mint(initialOwner, MaxSupply);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
