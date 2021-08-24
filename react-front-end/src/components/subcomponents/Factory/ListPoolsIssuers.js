@@ -64,6 +64,8 @@ class ListPoolsIssuers extends React.Component {
                     <SelectPoolIssuerComponent contractType={this.props.contractType} Key={this.props.Key}/>
                     <br />
                     <h4> Selected Provider : {func.providerAddress}</h4>
+                    <br />
+                    <p><b>Contract Balance :</b> {func.providerBalance}</p>
                 </div>
             );
         }

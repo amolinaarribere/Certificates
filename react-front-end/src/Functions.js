@@ -41,6 +41,8 @@ export var PendingTreasuryProp = "";
 export const privatePoolKey = 'privatePool';
 export const providerKey = 'provider';
 
+export var providerBalance = "";
+
 export var publicPoolAddress = ""
 export var publicPoolAddressProxy = ""
 export var privatePoolFactoryAddress = ""
@@ -311,7 +313,6 @@ export async function RetrieveProposition(contractType){
   }
 
   export async function AddProviderPool(address, Info, subsprice, certprice, subscribe, contractType){
-    window.alert(address + Info + subsprice + certprice + subscribe + contractType)
     if(1 == contractType)await CallBackFrame(publicPool.methods.addProvider(address, Info).send({from: account, value: PublicPriceWei}));
     else if(2 == contractType)await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
     else await CallBackFrame(provider.methods.addPool(address, Info, certprice, subsprice, subscribe).send({from: account}));
@@ -389,6 +390,7 @@ export async function RetrieveProposition(contractType){
       else{
         providerAddress = address
         provider = new web3.eth.Contract(PROVIDER_ABI, address)
+        providerBalance = await web3.eth.getBalance(providerAddress);
         
         RetrieveProviderPool(3);
         RetrieveOwners(3);
