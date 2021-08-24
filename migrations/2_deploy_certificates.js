@@ -21,11 +21,11 @@ const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const PublicPriceWei = 10;
-const PrivatePriceWei = 20;
-const ProviderPriceWei = 25;
-const CertificatePriceWei = 5;
-const OwnerRefundFeeWei = 2;
+const PublicPriceWei = 10000;
+const PrivatePriceWei = 200;
+const ProviderPriceWei = 250;
+const CertificatePriceWei = 1000;
+const OwnerRefundFeeWei = 2000;
 const PublicMinOwners = 1;
 
 

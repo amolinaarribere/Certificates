@@ -108,6 +108,7 @@ export var pendingCertificates = []
 
 export var AccountBalance = "";
 export var TreasuryBalance = "";
+export var TreasuryAggregatedBalance = "";
 
 export var TokensTotalSupply = "";
 export var TokensBalance = "";
@@ -558,7 +559,8 @@ export async function RetrieveProposition(contractType){
   }
 
   export async function RetrieveTreasuryBalance(){
-    TreasuryBalance = await web3.eth.getBalance(TreasuryAddress);
+    TreasuryBalance = await web3.eth.getBalance(TreasuryAddressProxy);
+    TreasuryAggregatedBalance = await Treasury.methods.retrieveAggregatedAmount().call();
   }
 
   export async function AssignDividends(){
@@ -606,7 +608,7 @@ export async function RetrieveProposition(contractType){
   // auxiliary
 
   export function Bytes32ToAddress(bytes){
-    return ("0x" + bytes.substring(26, bytes.length));
+    return ("0x" + (bytes.toString()).substring(26));
 }
 
   

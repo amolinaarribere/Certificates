@@ -45,6 +45,12 @@ class AddressPropositionComponent extends React.Component {
       return (
         <div>
           <p><b>Manager Address :</b> {CERTIFICATE_POOL_MANAGER_ADDRESS}</p>
+          <p><b>Public Address Proxy :</b> {func.publicPoolAddressProxy}</p>
+          <p><b>Private Factory Address Proxy :</b> {func.privatePoolFactoryAddressProxy}</p>
+          <p><b>Provider Factory Address Proxy :</b> {func.providerFactoryAddressProxy}</p>
+          <p><b>Treasury Address Proxy :</b> {func.TreasuryAddressProxy}</p>
+          <p><b>Certis Token Address Proxy :</b> {func.CertisTokenAddressProxy}</p>
+          <br />
           <p><b>Public Address :</b> {func.publicPoolAddress}</p>
           <p><b>Private Factory Address :</b> {func.privatePoolFactoryAddress}</p>
           <p><b>Private Implementation Address :</b> {func.privatePoolImplAddress}</p>
