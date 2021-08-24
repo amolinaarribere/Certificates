@@ -367,7 +367,7 @@ export async function RetrieveProposition(contractType){
       providerPools = []
     
       for (let i = 0; i < providerTotalPools; i++) {
-        let {0:providerPoolInfo,1:isPool} = await provider.methods.retrievePools(Bytes32ToAddress(providerPoolsAddresses[i])).call()
+        let {0:providerPoolInfo,1:isPool} = await provider.methods.retrievePool(Bytes32ToAddress(providerPoolsAddresses[i])).call()
         providerPools[i] = [providerPoolsAddresses[i], providerPoolInfo]
       }
     

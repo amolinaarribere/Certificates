@@ -58,7 +58,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     // MODIFIERS /////////////////////////////////////////
     modifier isNotInitialized(){
-        require(false == _init, "EC26");
+        require(false == _init, "EC26-");
         _;
     }
 

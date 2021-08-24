@@ -14,7 +14,7 @@ library Library{
 
     // modifier
     modifier isIdCorrect(uint Id, uint length){
-        require(true == IdCorrect(Id, length), "EC1");
+        require(true == IdCorrect(Id, length), "EC1-");
         _;
     }
 

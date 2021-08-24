@@ -39,22 +39,22 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
 
     // MODIFIERS /////////////////////////////////////////
     modifier isAProvider(){
-        require(true == isProvider(msg.sender), "EC12");
+        require(true == isProvider(msg.sender), "EC12-");
         _;
     }
 
     modifier isTheProvider(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC13");
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC13-");
         _;
     }
 
     modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "EC14");
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "EC14-");
         _;
     }
     
     modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){
-        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC15");
+        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC15-");
         _;
     }
     

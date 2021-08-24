@@ -59,19 +59,19 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     modifier isCertificateActivated(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == internalisCertificate(pool, cert, holder), "EC6");
-        else require(true == internalisCertificate(pool, cert, holder), "EC7");
+        if(false == YesOrNo) require(false == internalisCertificate(pool, cert, holder), "EC6-");
+        else require(true == internalisCertificate(pool, cert, holder), "EC7-");
         _;
     }
 
     modifier isCertificatePendingToAdd(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder), "EC27");
-        else require(true == isCertificatePendingToAdded(pool, cert, holder), "EC28");
+        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder), "EC27-");
+        else require(true == isCertificatePendingToAdded(pool, cert, holder), "EC28-");
         _;
     }
 
     modifier HasNotAlreadyVotedForCertificate(bytes32 cert, address pool, address holder){
-        require(false == ItemsLibrary.hasVoted(msg.sender, cert, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]), "EC5");
+        require(false == ItemsLibrary.hasVoted(msg.sender, cert, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]), "EC5-");
         _;
     }
 

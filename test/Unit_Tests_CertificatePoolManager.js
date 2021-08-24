@@ -61,14 +61,11 @@ contract("Testing Certificate Pool Manager",function(accounts){
     // providers info
     const provider_1_Info = "Account 1 Info";
     // test constants
-    const WrongSender = new RegExp("EC8");
-    const NotEnoughBalance = new RegExp("EC20");
-    const Unauthorized = new RegExp("EC22");
-    const WrongConfig = new RegExp("EC21");
-    const NoPropositionActivated = new RegExp("EC25");
-    const PropositionAlreadyInProgress = new RegExp("EC24");
-    const CanNotVote = new RegExp("EC23");
-    const AlreadyVoted = new RegExp("EC5");
+    const Unauthorized = new RegExp("EC22-");
+    const WrongConfig = new RegExp("EC21-");
+    const NoPropositionActivated = new RegExp("EC25-");
+    const PropositionAlreadyInProgress = new RegExp("EC24-");
+    const CanNotVote = new RegExp("EC23-");
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);

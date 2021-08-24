@@ -27,49 +27,49 @@ abstract contract EntitiesBaseContract{
 
     // MODIFIERS /////////////////////////////////////////
     modifier isSomeoneSpecific(address someone){
-        require(true == Library.ItIsSomeone(someone), "EC8");
+        require(true == Library.ItIsSomeone(someone), "EC8-");
         _;
     }
     
     modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "EC1");
+        require(true == Library.IdCorrect(Id, length), "EC1-");
         _;
     }
 
     modifier isAnOwner(){
-        require(true == isEntity(msg.sender, _ownerId), "EC9");
+        require(true == isEntity(msg.sender, _ownerId), "EC9-");
         _;
     }
     
     modifier HasNotAlreadyVoted(address entity, uint listId){
         bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
-        require(false == ItemsLibrary.hasVoted(msg.sender, entityInBytes, _Entities[listId]), "EC5");
+        require(false == ItemsLibrary.hasVoted(msg.sender, entityInBytes, _Entities[listId]), "EC5-");
         _;
     }
     
     modifier isEntityActivated(bool YesOrNo, address entity, uint listId){
-        if(false == YesOrNo) require(false == isEntity(entity, listId), "EC6");
-        else require(true == isEntity(entity, listId), "EC7");
+        if(false == YesOrNo) require(false == isEntity(entity, listId), "EC6-");
+        else require(true == isEntity(entity, listId), "EC7-");
         _;
     }
 
     modifier isEntityPending(bool YesOrNo, address entity, uint listId){
         if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId) && 
-                                    false == isEntityPendingToRemoved(entity, listId), "EC27");
+                                    false == isEntityPendingToRemoved(entity, listId), "EC27-");
         else require(true == isEntityPendingToAdded(entity, listId) || 
-                    true == isEntityPendingToRemoved(entity, listId), "EC28");
+                    true == isEntityPendingToRemoved(entity, listId), "EC28-");
         _;
     }
 
     modifier isEntityPendingToAdd(bool YesOrNo, address entity, uint listId){
-        if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId), "EC27");
-        else require(true == isEntityPendingToAdded(entity, listId), "EC28");
+        if(false == YesOrNo) require(false == isEntityPendingToAdded(entity, listId), "EC27-");
+        else require(true == isEntityPendingToAdded(entity, listId), "EC28-");
         _;
     }
 
     modifier isEntityPendingToRemove(bool YesOrNo, address entity, uint listId){
-        if(false == YesOrNo) require(false == isEntityPendingToRemoved(entity, listId), "EC27");
-        else require(true == isEntityPendingToRemoved(entity, listId), "EC28");
+        if(false == YesOrNo) require(false == isEntityPendingToRemoved(entity, listId), "EC27-");
+        else require(true == isEntityPendingToRemoved(entity, listId), "EC28-");
         _;
     }
 

@@ -2,10 +2,10 @@ const constants = require("../test_libraries/constants.js");
 
 const Gas = constants.Gas;
 
-const IDWrong = new RegExp("EC1");
-const AtLeastOne = new RegExp("EC17");
-const MinNumberRequired = new RegExp("EC19");
-const NotEnoughFunds = new RegExp("EC2");
+const IDWrong = new RegExp("EC1-");
+const AtLeastOne = new RegExp("EC17-");
+const MinNumberRequired = new RegExp("EC19-");
+const NotEnoughFunds = new RegExp("EC2-");
 
 
 async function createElementWrong(FactoryProxy, Owners, minOwners, ElementName, Price, user_1){

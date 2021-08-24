@@ -63,39 +63,39 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
 
     // MODIFIERS /////////////////////////////////////////
     modifier isFromChairPerson(){
-        require(true == Library.ItIsSomeone(_chairperson), "EC8");
+        require(true == Library.ItIsSomeone(_chairperson), "EC8-");
         _;
     }
 
     modifier isAuthorizedToPropose(){
-        require(true == AuthorizedToPropose(msg.sender), "EC22");
+        require(true == AuthorizedToPropose(msg.sender), "EC22-");
         _;
     }
 
     modifier isAuthorizedToCancel(){
-        require(true == Library.ItIsSomeone(_Proposition.Proposer), "EC22");
+        require(true == Library.ItIsSomeone(_Proposition.Proposer), "EC22-");
         _;
     }
 
     modifier canVote(){
-        require(true == AuthorizedToVote(msg.sender, _Proposition.PropID), "EC23");
+        require(true == AuthorizedToVote(msg.sender, _Proposition.PropID), "EC23-");
          _;
     }
 
     modifier PropositionInProgress(bool yesOrno){
-        if(yesOrno) require(true == CheckIfPropositionActive(), "EC25");
-        else require(false == CheckIfPropositionActive(), "EC24");
+        if(yesOrno) require(true == CheckIfPropositionActive(), "EC25-");
+        else require(false == CheckIfPropositionActive(), "EC24-");
         _;
     }
 
     modifier isFromTokenContract(){
-        require(true == Library.ItIsSomeone(_managerContract.retrieveCertisTokenProxy()), "EC8");
+        require(true == Library.ItIsSomeone(_managerContract.retrieveCertisTokenProxy()), "EC8-");
         _;
     }
 
     modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
-        require(100 >= PropositionThresholdPercentage, "EC21");
-        require(100 >= minWeightToProposePercentage, "EC21");
+        require(100 >= PropositionThresholdPercentage, "EC21-");
+        require(100 >= minWeightToProposePercentage, "EC21-");
         _;
     }
 

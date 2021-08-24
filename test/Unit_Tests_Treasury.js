@@ -54,21 +54,14 @@ contract("Testing Treasury",function(accounts){
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     const hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     // test constants
-    const NotEnoughFunds = new RegExp("EC2");
-    const WrongSender = new RegExp("EC8");
-    const NotEnoughBalance = new RegExp("EC20");
-    const Unauthorized = new RegExp("EC22");
-    const WrongConfig = new RegExp("EC21");
-    const NoPropositionActivated = new RegExp("EC25");
-    const PropositionAlreadyInProgress = new RegExp("EC24");
-    const CanNotVote = new RegExp("EC23");
-    const AlreadyVoted = new RegExp("EC5");
-    const MustBeActivated = new RegExp("EC7");
-    const MinNumberRequired = new RegExp("EC19");
-    const NotAProvider = new RegExp("EC12");
-    const NotEmpty = new RegExp("EC11");
-    const CertificateAlreadyExists = new RegExp("EC15");
-    const NotAllowedToRemoveCertificate = new RegExp("EC14");
+    const NotEnoughFunds = new RegExp("EC2-");
+    const WrongSender = new RegExp("EC8-");
+    const NotEnoughBalance = new RegExp("EC20-");
+    const Unauthorized = new RegExp("EC22-");
+    const WrongConfig = new RegExp("EC21-");
+    const NoPropositionActivated = new RegExp("EC25-");
+    const PropositionAlreadyInProgress = new RegExp("EC24-");
+    const CanNotVote = new RegExp("EC23-");
 
 
     beforeEach(async function(){

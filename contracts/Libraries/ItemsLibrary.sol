@@ -124,14 +124,21 @@ library ItemsLibrary{
                 itemStruct._items[item]._id = itemStruct._activatedItems.length - 1;
 
                 RemoveResizePending(true, item, itemStruct);
-                (bool success, ) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, true));
+
+                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, true));
+                require(success, string(data));
+                
+
                 deleteVoters(item, itemStruct);
                 if(emitEvent) emit _AddItemValidation(success, label, item, itemStruct._items[item]._Info);
             }
             else{
                 RemoveResizeActivated(item, itemStruct);
                 RemoveResizePending(false, item, itemStruct);
-                (bool success, ) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));
+
+                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));
+                require(success, string(data));
+
                 if(emitEvent) emit _RemoveItemValidation(success, label, item, itemStruct._items[item]._Info);
                 delete(itemStruct._items[item]);
             }   
@@ -152,13 +159,19 @@ library ItemsLibrary{
 
             if(isItemPendingToAdded(item, itemStruct)){
                 RemoveResizePending(true, item, itemStruct);
-                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true)); 
+
+                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true)); 
+                require(success, string(data));
+
                 if(emitEvent) emit _AddItemRejection(success, label, item, itemStruct._items[item]._Info);
                 delete(itemStruct._items[item]);
             }
             else{
                 RemoveResizePending(false, item, itemStruct);
-                (bool success, ) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, false));
+
+                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, false));
+                require(success, string(data));
+
                 deleteVoters(item, itemStruct);
                 if(emitEvent) emit _RemoveItemRejection(success, label, item, itemStruct._items[item]._Info);
             }

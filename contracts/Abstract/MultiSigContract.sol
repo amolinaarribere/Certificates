@@ -24,29 +24,29 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
 
     // MODIFIERS /////////////////////////////////////////
     modifier NotEmpty(bytes32 document){
-        require(0 < document.length, "EC11");
+        require(0 < document.length, "EC11-");
         _;
     }
     
     modifier minRequired(uint min, uint number){
-        require(min <= number, "EC19");
+        require(min <= number, "EC19-");
         _;
     }
 
     modifier greaterThan(uint min, uint number){
-        require(number > min, "EC17");
+        require(number > min, "EC17-");
         _;
     }
 
     modifier HasNotAlreadyVotedMinOwner(){
-        require(false == AddressLibrary.FindAddress(msg.sender, _newMinOwnersVoters), "EC5");
+        require(false == AddressLibrary.FindAddress(msg.sender, _newMinOwnersVoters), "EC5-");
        _;
     }
 
     
     modifier NewMinOwnerInProgress(bool YesOrNo){
-        if(YesOrNo) require(0 != _newMinOwners, "EC31");
-        else require(0 == _newMinOwners, "EC30");
+        if(YesOrNo) require(0 != _newMinOwners, "EC31-");
+        else require(0 == _newMinOwners, "EC30-");
         _;
     }
 
@@ -55,7 +55,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         minRequired(minOwners, owners.length)
         greaterThan(0, minOwners)
     {
-        require(TotalEntities == labels.length, "EC18");
+        require(TotalEntities == labels.length, "EC18-");
 
         _ownerId = ownerId;
 
@@ -87,7 +87,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
     function validateOwner(address owner) external override
     {
         if(true == isEntityPendingToRemoved(owner, _ownerId)){
-            require(_minOwners <= retrieveAllEntities(_ownerId).length - 1, "EC19");
+            require(_minOwners <= retrieveAllEntities(_ownerId).length - 1, "EC19-");
         }
         validateEntity(owner, _ownerId);
     }

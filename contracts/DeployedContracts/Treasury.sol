@@ -65,22 +65,22 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         else if(Library.Prices.NewCertificate == price) minPrice = _CertificatePriceWei;
         else minPrice = _ProviderPriceWei;
 
-        require(msg.value >= minPrice, "EC2");
+        require(msg.value >= minPrice, "EC2-");
         _;
     }
 
     modifier isBalanceEnough(uint amount){
-        require(checkBalance(msg.sender) >= amount, "EC20");
+        require(checkBalance(msg.sender) >= amount, "EC20-");
         _;
     }
 
     modifier isFromPublicPool(){
-        require(true == Library.ItIsSomeone(_managerContract.retrievePublicCertificatePoolProxy()), "EC8");
+        require(true == Library.ItIsSomeone(_managerContract.retrievePublicCertificatePoolProxy()), "EC8-");
         _;
     }
 
     modifier isPriceOK(uint256 PublicPriceWei, uint256 OwnerRefundFeeWei){
-        require(PublicPriceWei >= OwnerRefundFeeWei, "EC21");
+        require(PublicPriceWei >= OwnerRefundFeeWei, "EC21-");
         _;
     }
     

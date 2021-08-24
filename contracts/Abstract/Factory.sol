@@ -29,7 +29,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
 
     // MODIFIERS /////////////////////////////////////////
     modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "EC1");
+        require(true == Library.IdCorrect(Id, length), "EC1-");
         _;
     }
 

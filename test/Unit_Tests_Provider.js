@@ -45,11 +45,10 @@ contract("Testing Provider",function(accounts){
     // certificates
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     // test constants
-    const NotAnOwner = new RegExp("EC9");
-    const OwnerAlreadyvoted = new RegExp("EC5");
-    const MustBeActivated = new RegExp("EC7");
-    const NotAllowedToRemoveCertificate = new RegExp("EC14");
-    const NotEnoughFunds = new RegExp("EC2");
+    const NotEnoughFunds = new RegExp("EC2-");
+    const NotAnOwner = new RegExp("EC9-");
+    const OwnerAlreadyvoted = new RegExp("EC5-");
+    const MustBeActivated = new RegExp("EC7-");
 
     beforeEach(async function(){
         // Public Pool creation and provider subscription
@@ -170,7 +169,7 @@ contract("Testing Provider",function(accounts){
         // act
         try{
             await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: ProviderOwners[2], gas: Gas}, function(error, result){});
+            await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[2], gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -197,39 +196,6 @@ contract("Testing Provider",function(accounts){
         // assert
         await CheckPool(false, 0);
         expect(InitBalance - FinalBalance).to.equal(0);
-    });
-
-    // ****** TESTING Adding Pool ***************************************************************** //
-
-    it("Add Pool WRONG",async function(){
-        // act
-        try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0).send({from: user_1}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotAnOwner);
-        }
-        // act
-        try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
-            await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(OwnerAlreadyvoted);
-        }
-    });
-
-    it("Add Pool CORRECT",async function(){
-        // act
-        AddProvider();
-        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
-        await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
-        // assert
-        await CheckPool(true, 0);
     });
 
     // ****** TESTING Removing Pool ***************************************************************** //

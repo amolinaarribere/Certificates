@@ -22,21 +22,20 @@ const extra_owner_Info = "Extra Owner";
 const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
 const hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
 // test constants
-const NotAnOwner = new RegExp("EC9");
-const OwnerAlreadyvoted = new RegExp("EC5");
-const MustBeActivated = new RegExp("EC7");
-const MinNumberRequired = new RegExp("EC19");
-const NotAProvider = new RegExp("EC12");
-const CertificateAlreadyExists = new RegExp("EC15");
-const NotAllowedToRemoveCertificate = new RegExp("EC14");
-const WrongSender = new RegExp("EC8");
-const NotSentYet = new RegExp("EC28");
-const NotEmpty = new RegExp("EC11");
-const NotEnoughFunds = new RegExp("EC2");
-const AlreadySent = new RegExp("EC27");
-const AtLeastOne = new RegExp("EC17");
-const MinOwnerNotInProgress = new RegExp("EC31");
-const MinOwnerAlreadyInProgress = new RegExp("EC30");
+const NotAnOwner = new RegExp("EC9-");
+const OwnerAlreadyvoted = new RegExp("EC5-");
+const MustBeActivated = new RegExp("EC7-");
+const MinNumberRequired = new RegExp("EC19-");
+const NotAProvider = new RegExp("EC12-");
+const CertificateAlreadyExists = new RegExp("EC15-");
+const NotAllowedToRemoveCertificate = new RegExp("EC14-");
+const WrongSender = new RegExp("EC8-");
+const NotSentYet = new RegExp("EC28-");
+const NotEnoughFunds = new RegExp("EC2-");
+const AlreadySent = new RegExp("EC27-");
+const AtLeastOne = new RegExp("EC17-");
+const MinOwnerNotInProgress = new RegExp("EC31-");
+const MinOwnerAlreadyInProgress = new RegExp("EC30-");
 
 function AddressToBytes32(address){
     return ("0x000000000000000000000000" + address.substring(2, address.length)).toLowerCase();

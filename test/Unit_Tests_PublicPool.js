@@ -43,18 +43,7 @@ contract("Testing Public Pool",function(accounts){
     // certificates
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     const hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
-    // test constants
-    const WrongSender = new RegExp("EC8");
-    const NotAnOwner = new RegExp("EC9");
-    const OwnerAlreadyvoted = new RegExp("EC5");
-    const NotSubmittedByCreator = new RegExp("EC4");
-    const NotAllowedRemoveEntity = new RegExp("EC10");
-    const MustBeActivated = new RegExp("EC7");
-    const MinNumberRequired = new RegExp("EC19");
-    const NotAProvider = new RegExp("EC12");
-    const NotEmpty = new RegExp("EC11");
-    const CertificateAlreadyExists = new RegExp("EC15");
-    const NotAllowedToRemoveCertificate = new RegExp("EC14");
+
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
