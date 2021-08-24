@@ -310,10 +310,11 @@ export async function RetrieveProposition(contractType){
     else await CallBackFrame(providerFactory.methods.create(list, min, name).send({from: account, value: ProviderPriceWei}));
   }
 
-  export async function AddProviderPool(address, Info, subsprice, certprice, contractType){
+  export async function AddProviderPool(address, Info, subsprice, certprice, subscribe, contractType){
+    window.alert(address + Info + subsprice + certprice + subscribe + contractType)
     if(1 == contractType)await CallBackFrame(publicPool.methods.addProvider(address, Info).send({from: account, value: PublicPriceWei}));
     else if(2 == contractType)await CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: account}));
-    else await CallBackFrame(provider.methods.addPool(address, Info, certprice, subsprice).send({from: account}));
+    else await CallBackFrame(provider.methods.addPool(address, Info, certprice, subsprice, subscribe).send({from: account}));
   }
   
   export async function RemoveProviderPool(address, contractType){

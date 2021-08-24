@@ -6,13 +6,14 @@ class AddProviderPoolComponent extends React.Component{
       addProviderPool : "",
       addProviderPoolInfo : "",
       subscriptionPrice : 0,
-      certificatePrice : 0
+      certificatePrice : 0,
+      subscribe : false
     };
 
     handleAddProvider = async (event) => {
         event.preventDefault();
-      await func.AddProviderPool(this.state.addProviderPool, this.state.addProviderPoolInfo, this.state.subscriptionPrice, this.state.certificatePrice, this.props.contractType)
-      this.setState({ addProviderPoolInfo: "", addProviderPool: "",  subscriptionPrice : 0, certificatePrice : 0})
+      await func.AddProviderPool(this.state.addProviderPool, this.state.addProviderPoolInfo, this.state.subscriptionPrice, this.state.certificatePrice, this.state.subscribe, this.props.contractType)
+      this.setState({ addProviderPoolInfo: "", addProviderPool: "",  subscriptionPrice : 0, certificatePrice : 0, subscribe: false})
     };
   
     render(){
@@ -47,6 +48,9 @@ class AddProviderPoolComponent extends React.Component{
                 <input type="integer" name="certificatePrice" placeholder="certificatePrice" 
                   value={this.state.certificatePrice}
                   onChange={event => this.setState({ certificatePrice: event.target.value })}/>
+                <input type="checkbox" name="subscribe"
+                  checked={this.state.subscribe}
+                  onChange={event => this.setState({ subscribe: event.target.checked })} />
                 <button>Add Pool</button>
             </form>
             </div>
