@@ -97,6 +97,11 @@ const TreasuryProxyInitializerMethod = {
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "PropositionLifeTime",
         "type": "uint256"
@@ -209,7 +214,7 @@ function getProxyData(method, parameters){
 function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPerson){
   let CertisProxyData = getProxyData(CertisTokenProxyInitializerMethod, ["Certis Token for Test", "CERT", TotalTokenSupply, certPoolManager, 0, chairPerson]);
   let PublicCertificatesPoolProxyData = getProxyData(PublicCertificatesPoolProxyInitializerMethod, [PublicOwners, minOwners, certPoolManager]);
-  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManager,  PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose]);
+  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose]);
   let PrivatePoolFactoryProxyData = getProxyData(PrivatePoolFactoryProxyInitializerMethod, [certPoolManager]);
   let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
 

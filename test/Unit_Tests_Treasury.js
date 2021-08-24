@@ -426,7 +426,7 @@ contract("Testing Treasury",function(accounts){
         // asert
         var BalanceOwners = 0;
         for(var i=0; i < PublicOwners.length; i++){
-            await Treasury.methods.AssignDividends().send({from: PublicOwners[i]}, function(error, result){});
+            await Treasury.methods.AssignDividends().send({from: PublicOwners[i], gas: Gas}, function(error, result){});
             BalanceOwners += parseInt(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
         }
         expect(BalanceOwners).to.be.equal(2 * OwnerRefundPriceWei);
@@ -452,11 +452,11 @@ contract("Testing Treasury",function(accounts){
         // assert
         let TreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         for(let i=0; i < PublicOwners.length; i++){
-            await Treasury.methods.AssignDividends().send({from: PublicOwners[i]}, function(error, result){});
+            await Treasury.methods.AssignDividends().send({from: PublicOwners[i], gas: Gas}, function(error, result){});
             let balance = new BigNumber(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
             TreasuryBalance -= balance.toNumber();
             let initialBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
-            let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gasPrice: 1}, function(error, result){});
+            let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gas: Gas, gasPrice: 1}, function(error, result){});
             // assert that money has been transfered
             let finalBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
             expect(finalBalance.minus(initialBalance.minus(request.gasUsed).plus(balance)).toString()).to.be.equal("0");

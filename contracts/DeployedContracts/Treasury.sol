@@ -85,9 +85,9 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
+    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, managerContractAddress);
+        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress);
         InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, true);
     }
 

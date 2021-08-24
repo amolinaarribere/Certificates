@@ -167,6 +167,11 @@ module.exports = async function(deployer, network, accounts){
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "PropositionLifeTime",
         "type": "uint256"
@@ -188,7 +193,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var TreasuryProxyInitializerParameters = [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, CertificatesPoolManagerInstance.address, PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
+  var TreasuryProxyInitializerParameters = [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, CertificatesPoolManagerInstance.address, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
   var TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
 
   // Private Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
