@@ -32,6 +32,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
     mapping(address => uint256) private _AddCertificatePricePerPool;
     mapping(address => uint256) private _SubscriptionPricePerPool;
+    mapping(address => bool) private _mustSubscribe;
     mapping(address => bool) private _submited;
 
 
@@ -87,13 +88,14 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
-        addEntity(pool, poolInfo, _poolId);
-        if(false == _submited[pool]){
+    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice, bool mustSubscribe) external override{
+         if(false == _submited[pool]){
             _AddCertificatePricePerPool[pool] = AddCertificatePrice;
             _SubscriptionPricePerPool[pool] = SubscriptionPrice;
+            _mustSubscribe[pool] = mustSubscribe;
             _submited[pool] = true;
         }
+        addEntity(pool, poolInfo, _poolId);
     }
 
     function removePool(address pool) external override
@@ -114,17 +116,18 @@ pragma solidity >=0.7.0 <0.9.0;
     function removePricesForPool(address pool) internal
     {
         delete(_submited[pool]);
+        delete(_mustSubscribe[pool]);
         delete(_AddCertificatePricePerPool[pool]);
         delete(_SubscriptionPricePerPool[pool]);
     }
     
-    function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256)
+    function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256, bool)
     {
         string memory poolInfo;
         bool isActivated;
 
         (poolInfo, isActivated) = InternalRetrievePool(pool);
-        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool], _SubscriptionPricePerPool[pool]);
+        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool], _SubscriptionPricePerPool[pool], _mustSubscribe[pool]);
     }
     
     function InternalRetrievePool(address pool) internal view returns (string memory, bool)
@@ -274,7 +277,7 @@ pragma solidity >=0.7.0 <0.9.0;
             address pool = AddressLibrary.Bytes32ToAddress(item);
 
             if(false == addOrRemove)removePricesForPool(pool);
-            else{
+            else if(true == _mustSubscribe[pool]){
                 IPool poolToSubscribe = IPool(pool);
                 poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
             }

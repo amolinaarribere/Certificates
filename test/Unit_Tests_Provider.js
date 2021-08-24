@@ -75,7 +75,7 @@ contract("Testing Provider",function(accounts){
     }
 
     async function SubscribingToPublicPool(validateOrreject){
-        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
         if(validateOrreject){
             await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[1], gas: Gas}, function(error, result){}); 
             await ValidateProvider();
@@ -146,7 +146,7 @@ contract("Testing Provider",function(accounts){
     it("Subscribe Pool WRONG 1",async function(){
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: user_1, gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -155,7 +155,7 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
             await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
@@ -168,7 +168,7 @@ contract("Testing Provider",function(accounts){
     it("Subscribe Pool WRONG 2",async function(){
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1, true).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
             await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[2], gas: Gas}, function(error, result){});
             expect.fail();
         }
@@ -184,6 +184,11 @@ contract("Testing Provider",function(accounts){
         await SubscribingToPublicPool(true);
         let FinalBalance = parseInt(await web3.eth.getBalance(provider._address));
         // assert
+        let result = await publicPoolProxy.methods.retrieveProvider(provider._address).call({from: user_1});
+        let providerInfo = result[0];
+        let exists = result[1];
+        expect(exists).to.be.true;
+        expect(providerInfo).to.equal(provider_1_Info);
         await CheckPool(true, PublicPriceWei);
         expect(InitBalance - PublicPriceWei).to.equal(FinalBalance);
     });
@@ -197,6 +202,18 @@ contract("Testing Provider",function(accounts){
         await CheckPool(false, 0);
         expect(InitBalance - FinalBalance).to.equal(0);
     });
+
+    // ****** TESTING Adding Pool ***************************************************************** //
+
+    it("Add Pool CORRECT",async function(){
+        // act
+        AddProvider();
+        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0, false).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+        await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
+        // assert
+        await CheckPool(true, 0);
+    });
+
 
     // ****** TESTING Removing Pool ***************************************************************** //
 
