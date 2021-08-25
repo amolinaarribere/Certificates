@@ -5,8 +5,8 @@ class AddProviderPoolComponent extends React.Component{
     state = {
       addProviderPool : "",
       addProviderPoolInfo : "",
-      subscriptionPrice : 0,
-      certificatePrice : 0,
+      subscriptionPrice : "",
+      certificatePrice : "",
       subscribe : false
     };
 

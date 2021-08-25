@@ -401,6 +401,10 @@ export async function RetrieveProposition(contractType){
     }
     catch(e) { window.alert(e); }
   }
+
+  export async function FundProvider(amount){
+    await web3.eth.sendTransaction({from:account, to:provider._address, value:amount});
+  }
   
 // Owner
   export async function AddOwner(address, info, contractType){
@@ -500,9 +504,8 @@ export async function RetrieveProposition(contractType){
 
   export async function RetrievePendingCertificates(){
     let pendingCerts = await provider.methods.retrievePendingCertificates().call({from: account});
-
-    for (let i = 0; i < pendingCerts; i++) {
-      pendingCertificates[i] = [pendingCerts[i][0], pendingCerts[i][1], pendingCerts[i][3]]
+    for (let i = 0; i < pendingCerts.length; i++) {
+      pendingCertificates[i] = [pendingCerts[i][0], pendingCerts[i][1], pendingCerts[i][2]]
     }
   }
 

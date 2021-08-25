@@ -1,6 +1,31 @@
 import React from 'react';
 const func = require("../../../Functions.js");
 
+class FundProviderComponent extends React.Component{
+    state = {
+      Amount : 0
+    };
+  
+    handleFundProvider = async (event) => {
+      event.preventDefault();
+      await func.FundProvider(this.state.Amount);
+      this.setState({ Amount: 0 })
+    };
+    
+    render(){
+      return (
+          <div>
+              <form onSubmit={this.handleFundProvider}>
+                  <input type="interger" name="Amount" placeholder="amount" 
+                      value={this.state.Amount}
+                      onChange={event => this.setState({ Amount: event.target.value })}/>
+                  <button>Fund Provider</button>
+              </form>
+          </div>
+      );
+    }
+}
+
 class SelectPoolIssuerComponent extends React.Component{
       state = {
         ProviderPool : ""
@@ -66,6 +91,8 @@ class ListPoolsIssuers extends React.Component {
                     <h4> Selected Provider : {func.providerAddress}</h4>
                     <br />
                     <p><b>Contract Balance :</b> {func.providerBalance}</p>
+                    <br />
+                    <FundProviderComponent />
                 </div>
             );
         }
