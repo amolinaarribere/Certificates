@@ -215,7 +215,8 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
         addBalance(msg.sender, remainder, commonDividend);
 
-        payable(msg.sender).transfer(amount);
+        (bool success, bytes memory data) = msg.sender.call{value: amount}("");
+        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
 
         emit _Withdraw(msg.sender, amount);
     }
