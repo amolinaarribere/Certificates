@@ -8,14 +8,14 @@ pragma solidity >=0.7.0 <0.9.0;
  */
 
 import "../Interfaces/IProxyManager.sol";
-import "./Proxies/GenericProxy.sol";
-import "./Proxies/CertisTokenProxy.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
 import "../Libraries/AddressLibrary.sol";
 import "../Libraries/Library.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+
 
 contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     using AddressLibrary for *;
@@ -25,36 +25,40 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     event _NewContracts(address, address, address, address, address, address, address);
 
     // DATA /////////////////////////////////////////
+    // Admin Proxy to manage all the TransparentUpgradeableProxies
+    ProxyAdmin private _Admin;
+
     // proposition to change
     Library.ProposedContractsStruct private _ProposedContracts;
     
     // Private Certificate Pools Factory
-    GenericProxy private _PrivatePoolFactory;
+    TransparentUpgradeableProxy private _PrivatePoolFactory;
 
     // Private Certificates Pool
     UpgradeableBeacon private _PrivateCertificatePoolBeacon;
 
     // Provider Factory
-    GenericProxy private _ProviderFactory;
+    TransparentUpgradeableProxy private _ProviderFactory;
 
     // Provider
     UpgradeableBeacon private _ProviderBeacon;
 
     // Public Certificates Pool
-    GenericProxy private _PublicCertificatesPool;
+    TransparentUpgradeableProxy private _PublicCertificatesPool;
 
     // Treasury
-    GenericProxy private _Treasury;
+    //GenericProxy private _Treasury;
+    TransparentUpgradeableProxy private _Treasury;
 
     // Certis Token
-    CertisTokenProxy private _CertisToken;
+    TransparentUpgradeableProxy private _CertisToken;
 
     // init
     bool private _init;
 
     // MODIFIERS /////////////////////////////////////////
     modifier isNotInitialized(){
-        require(false == _init, "EC26");
+        require(false == _init, "EC26-");
         _;
     }
 
@@ -62,16 +66,17 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) 
     {
         super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, address(this));
+        _Admin = new ProxyAdmin();
         _init = false;
     }
 
-    function InitializeContracts(Library.InitialContractsStruct calldata initialContracts) 
+    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) 
         isFromChairPerson()
         isNotInitialized()
-    external
+    external override
     {
-        _init = true;
         initProxies(initialContracts);
+        _init = true;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -116,43 +121,43 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         return proposition;
     }
 
-    function initProxies(Library.InitialContractsStruct calldata initialContracts) private
+    function initProxies(Library.ProposedContractsStruct calldata initialContracts) private
     {
-        _PublicCertificatesPool = GenericProxy(initialContracts.PublicPoolProxyAddress);
-        _Treasury = GenericProxy(initialContracts.TreasuryProxyAddress);
-        _CertisToken = CertisTokenProxy(initialContracts.CertisTokenProxyAddress);
-        _PrivatePoolFactory = GenericProxy(initialContracts.PrivatePoolFactoryProxyAddress);
-        _PrivateCertificatePoolBeacon = new UpgradeableBeacon(initialContracts.PrivateCertificatePoolImplAddress);
-        _ProviderFactory = GenericProxy(initialContracts.ProviderFactoryProxyAddress);
-        _ProviderBeacon = new UpgradeableBeacon(initialContracts.ProviderImplAddress);
+        _PublicCertificatesPool = new TransparentUpgradeableProxy(initialContracts.NewPublicPoolAddress, address(_Admin), initialContracts.NewPublicPoolData);
+        _Treasury = new TransparentUpgradeableProxy(initialContracts.NewTreasuryAddress, address(_Admin), initialContracts.NewTreasuryData);
+        _CertisToken = new TransparentUpgradeableProxy(initialContracts.NewCertisTokenAddress, address(_Admin), initialContracts.NewCertisTokenData);
+        _PrivatePoolFactory = new TransparentUpgradeableProxy(initialContracts.NewPrivatePoolFactoryAddress, address(_Admin), initialContracts.NewPrivatePoolFactoryData);
+        _PrivateCertificatePoolBeacon = new UpgradeableBeacon(initialContracts.NewPrivatePoolAddress);
+        _ProviderFactory = new TransparentUpgradeableProxy(initialContracts.NewProviderFactoryAddress, address(_Admin), initialContracts.NewProviderFactoryData);
+        _ProviderBeacon = new UpgradeableBeacon(initialContracts.NewProviderAddress);
     }
 
     function upgradeContractsImplementations() private
     {
-        if(address(0) != _ProposedContracts.NewPublicPoolAddress){
-            if(0 < _ProposedContracts.NewPublicPoolData.length)_PublicCertificatesPool.upgradeToAndCall(_ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewPublicPoolData);
-            else _PublicCertificatesPool.upgradeTo(_ProposedContracts.NewPublicPoolAddress);
-        }
-        if(address(0) != _ProposedContracts.NewTreasuryAddress){
-            if(0 < _ProposedContracts.NewTreasuryData.length)_Treasury.upgradeToAndCall(_ProposedContracts.NewTreasuryAddress, _ProposedContracts.NewTreasuryData);
-            else _Treasury.upgradeTo(_ProposedContracts.NewTreasuryAddress);
-        }
-        if(address(0) != _ProposedContracts.NewCertisTokenAddress){
-            if(0 < _ProposedContracts.NewCertisTokenData.length)_CertisToken.upgradeToAndCall(_ProposedContracts.NewCertisTokenAddress, _ProposedContracts.NewCertisTokenData);
-            else _CertisToken.upgradeTo(_ProposedContracts.NewCertisTokenAddress);
-        }
-        if(address(0) != _ProposedContracts.NewPrivatePoolFactoryAddress){
-            if(0 < _ProposedContracts.NewPrivatePoolFactoryData.length)_PrivatePoolFactory.upgradeToAndCall(_ProposedContracts.NewPrivatePoolFactoryAddress, _ProposedContracts.NewPrivatePoolFactoryData);
-            else _PrivatePoolFactory.upgradeTo(_ProposedContracts.NewPrivatePoolFactoryAddress);
-        }
-        if(address(0) != _ProposedContracts.NewProviderFactoryAddress){
-            if(0 < _ProposedContracts.NewProviderFactoryData.length)_ProviderFactory.upgradeToAndCall(_ProposedContracts.NewProviderFactoryAddress, _ProposedContracts.NewProviderFactoryData);
-            else _ProviderFactory.upgradeTo(_ProposedContracts.NewProviderFactoryAddress);
-        }
+        upgradeContractImplementation(_PublicCertificatesPool, _ProposedContracts.NewPublicPoolAddress, _ProposedContracts.NewPublicPoolData);
+        upgradeContractImplementation(_Treasury, _ProposedContracts.NewTreasuryAddress, _ProposedContracts.NewTreasuryData);
+        upgradeContractImplementation(_CertisToken, _ProposedContracts.NewCertisTokenAddress, _ProposedContracts.NewCertisTokenData);
+        upgradeContractImplementation(_PrivatePoolFactory, _ProposedContracts.NewPrivatePoolFactoryAddress, _ProposedContracts.NewPrivatePoolFactoryData);
+        upgradeContractImplementation(_ProviderFactory, _ProposedContracts.NewProviderFactoryAddress, _ProposedContracts.NewProviderFactoryData);
+
         if(address(0) != _ProposedContracts.NewPrivatePoolAddress)_PrivateCertificatePoolBeacon.upgradeTo(_ProposedContracts.NewPrivatePoolAddress);
         if(address(0) != _ProposedContracts.NewProviderAddress)_ProviderBeacon.upgradeTo(_ProposedContracts.NewProviderAddress);
 
-        emit _NewContracts(internalRetrievePublicCertificatePool(), internalRetrieveTreasury(), internalRetrieveCertisToken(), internalRetrievePrivatePoolFactory(), internalRetrievePrivatePool(), internalRetrieveProviderFactory(), internalRetrieveProvider());
+        emit _NewContracts(internalRetrieveImpl(_PublicCertificatesPool), internalRetrieveImpl(_Treasury), 
+        internalRetrieveImpl(_CertisToken), internalRetrieveImpl(_PrivatePoolFactory), 
+        internalRetrievePrivatePool(), internalRetrieveImpl(_ProviderFactory), internalRetrieveProvider());
+    }
+
+    function upgradeContractImplementation(TransparentUpgradeableProxy proxy, address NewImpl, bytes memory Data) private{
+        if(address(0) != NewImpl){
+            if(0 < Data.length)_Admin.upgradeAndCall(proxy, NewImpl, Data);
+            else _Admin.upgrade(proxy, NewImpl);
+        }
+    }
+
+    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal override
+    {
+        super.InternalonTokenBalanceChanged(from, to, amount);
     }
 
     // configuration Proxies
@@ -186,19 +191,19 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     // configuration implementations
     function retrievePublicCertificatePool() external override view returns (address) {
-        return internalRetrievePublicCertificatePool();
+        return internalRetrieveImpl(_PublicCertificatesPool);
     }
 
     function retrieveTreasury() external override view returns (address) {
-        return internalRetrieveTreasury();
+        return internalRetrieveImpl(_Treasury);
     }
 
     function retrieveCertisToken() external override view returns (address) {
-        return internalRetrieveCertisToken();
+        return internalRetrieveImpl(_CertisToken);
     }
 
     function retrievePrivatePoolFactory() external override view returns (address) {
-        return internalRetrievePrivatePoolFactory();
+        return internalRetrieveImpl(_PrivatePoolFactory);
     }
 
     function retrievePrivatePool() external override view returns (address) {
@@ -206,40 +211,28 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     }
 
     function retrieveProviderFactory() external override view returns (address) {
-        return internalRetrieveProviderFactory();
+        return internalRetrieveImpl(_ProviderFactory);
     }
 
     function retrieveProvider() external override view returns (address) {
         return internalRetrieveProvider();
     }
 
+    function isInitialized() external override view returns(bool){
+        return _init;
+    }
+
     // internal
-    function internalRetrievePublicCertificatePool() internal view returns (address) {
-        return _PublicCertificatesPool.retrieveImplementation();
-    }
-
-    function internalRetrieveTreasury() internal view returns (address) {
-        return _Treasury.retrieveImplementation();
-    }
-
-    function internalRetrieveCertisToken() internal view returns (address) {
-        return _CertisToken.retrieveImplementation();
-    }
-
-    function internalRetrievePrivatePoolFactory() internal view returns (address) {
-        return _PrivatePoolFactory.retrieveImplementation();
+    function internalRetrieveImpl(TransparentUpgradeableProxy proxy) internal view returns (address){
+        return _Admin.getProxyImplementation(proxy);
     }
 
     function internalRetrievePrivatePool() internal view returns (address) {
         return _PrivateCertificatePoolBeacon.implementation();
     }
 
-    function internalRetrieveProviderFactory() internal view returns (address) {
-        return _ProviderFactory.retrieveImplementation();
-    }
-
     function internalRetrieveProvider() internal view returns (address) {
         return _ProviderBeacon.implementation();
     }
-    
+  
 }

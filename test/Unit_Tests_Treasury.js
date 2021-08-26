@@ -54,21 +54,14 @@ contract("Testing Treasury",function(accounts){
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     const hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     // test constants
-    const NotEnoughFunds = new RegExp("EC2");
-    const WrongSender = new RegExp("EC8");
-    const NotEnoughBalance = new RegExp("EC20");
-    const Unauthorized = new RegExp("EC22");
-    const WrongConfig = new RegExp("EC21");
-    const NoPropositionActivated = new RegExp("EC25");
-    const PropositionAlreadyInProgress = new RegExp("EC24");
-    const CanNotVote = new RegExp("EC23");
-    const AlreadyVoted = new RegExp("EC5");
-    const MustBeActivated = new RegExp("EC7");
-    const MinNumberRequired = new RegExp("EC19");
-    const NotAProvider = new RegExp("EC12");
-    const NotEmpty = new RegExp("EC11");
-    const CertificateAlreadyExists = new RegExp("EC15");
-    const NotAllowedToRemoveCertificate = new RegExp("EC14");
+    const NotEnoughFunds = new RegExp("EC2-");
+    const WrongSender = new RegExp("EC8-");
+    const NotEnoughBalance = new RegExp("EC20-");
+    const Unauthorized = new RegExp("EC22-");
+    const WrongConfig = new RegExp("EC21-");
+    const NoPropositionActivated = new RegExp("EC25-");
+    const PropositionAlreadyInProgress = new RegExp("EC24-");
+    const CanNotVote = new RegExp("EC23-");
 
 
     beforeEach(async function(){
@@ -215,7 +208,7 @@ contract("Testing Treasury",function(accounts){
         }
         // assert
         catch(error){
-            expect(error.message).to.match(AlreadyVoted);
+            expect(error.message).to.match(CanNotVote);
         }
         // act
         try{
@@ -236,7 +229,6 @@ contract("Testing Treasury",function(accounts){
         await SplitTokenSupply(certisTokenProxy);
 
         // Rejected 
-
         await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
         await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
@@ -247,7 +239,6 @@ contract("Testing Treasury",function(accounts){
         await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
 
         // Cancelled
-
         await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
         await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
@@ -258,7 +249,6 @@ contract("Testing Treasury",function(accounts){
         await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
 
         // Validated
-
         await Treasury.methods.updatePrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1).send({from: chairPerson, gas: Gas}, function(error, result){});
         await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
@@ -269,7 +259,6 @@ contract("Testing Treasury",function(accounts){
         await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
 
         // Validated again
-
         await Treasury.methods.updatePrices(PublicPriceWei + 2, PrivatePriceWei + 2, ProviderPriceWei + 2, CertificatePriceWei + 2, OwnerRefundPriceWei + 2).send({from: chairPerson, gas: Gas}, function(error, result){});
         await checkPrices(PublicPriceWei + 1, PrivatePriceWei + 1, ProviderPriceWei + 1, CertificatePriceWei + 1, OwnerRefundPriceWei + 1);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner_1, gas: Gas}, function(error, result){});
@@ -307,7 +296,7 @@ contract("Testing Treasury",function(accounts){
          await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
          await Treasury.methods.cancelProposition().send({from: tokenOwner_3, gas: Gas}, function(error, result){});
          await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
- 
+
 
          // Validated
          await Treasury.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner_3, gas: Gas}, function(error, result){});
@@ -334,7 +323,7 @@ contract("Testing Treasury",function(accounts){
 
     // ****** TESTING Paying ***************************************************************** //
 
-     it("Pay New Proposal & New Pool & New Certificate & New Provider WRONG",async function(){
+    it("Pay New Proposal & New Pool & New Certificate & New Provider WRONG",async function(){
         // act
         try{
             await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei - 1}, function(error, result){});
@@ -373,7 +362,8 @@ contract("Testing Treasury",function(accounts){
         }
         // act
         try{
-            await Treasury.methods.pay(4).send({from: user_1, value: 1000000000000}, function(error, result){});
+            var Amount = 100 * (PublicPriceWei + PrivatePriceWei + CertificatePriceWei + ProviderPriceWei);
+            await Treasury.methods.pay(4).send({from: user_1, value: Amount}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -400,7 +390,13 @@ contract("Testing Treasury",function(accounts){
         var Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
         var Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
         expect(Balance1).to.be.equal(Balance2);
-        expect(Balance1).to.be.greaterThan(0);
+        expect(Balance1).to.be.equal(0);
+
+        await certisTokenProxy.methods.transfer(user_1, CertisTokenBalance.toNumber()).send({from: chairPerson, gas: Gas}, function(error, result){});
+        Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
+        Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
+        expect(Balance1).to.be.equal(Balance2);
+        expect(Balance2).to.be.greaterThan(0);
     });
 
     // ****** TESTING Owners Refunding ***************************************************************** //
@@ -423,6 +419,7 @@ contract("Testing Treasury",function(accounts){
         // asert
         var BalanceOwners = 0;
         for(var i=0; i < PublicOwners.length; i++){
+            await Treasury.methods.AssignDividends().send({from: PublicOwners[i], gas: Gas}, function(error, result){});
             BalanceOwners += parseInt(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
         }
         expect(BalanceOwners).to.be.equal(2 * OwnerRefundPriceWei);
@@ -448,10 +445,11 @@ contract("Testing Treasury",function(accounts){
         // assert
         let TreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         for(let i=0; i < PublicOwners.length; i++){
+            await Treasury.methods.AssignDividends().send({from: PublicOwners[i], gas: Gas}, function(error, result){});
             let balance = new BigNumber(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
             TreasuryBalance -= balance.toNumber();
             let initialBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
-            let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gasPrice: 1}, function(error, result){});
+            let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gas: Gas, gasPrice: 1}, function(error, result){});
             // assert that money has been transfered
             let finalBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
             expect(finalBalance.minus(initialBalance.minus(request.gasUsed).plus(balance)).toString()).to.be.equal("0");
@@ -462,5 +460,35 @@ contract("Testing Treasury",function(accounts){
         let FinalTreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         expect(FinalTreasuryBalance).to.be.equal(TreasuryBalance);
     });
+
+    // ****** TESTING Owners Refunding ***************************************************************** //
+
+    it("AssignDividends CORRECT",async function(){
+        // act
+        await SendingNewProviders();
+        var total_1 = 0;
+        var total_2 = 0;
+        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
+
+        for(let i=0; i < accounts.length; i++){
+            let balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
+            total_1 += balanceEnd;
+        }
+
+        for(let i=0; i < accounts.length; i++){
+            await Treasury.methods.AssignDividends().send({from: accounts[i], gas: Gas}, function(error, result){});
+            let balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
+            total_2 += balanceEnd;
+        }
+
+        var AggregatedAmount = parseInt(await Treasury.methods.retrieveAggregatedAmount().call({from: user_1}, function(error, result){}));
+        expect(AggregatedAmount).to.be.equal(5 * (PublicPriceWei - OwnerRefundPriceWei));
+        expect(total_2).to.be.equal((5 * PublicPriceWei) - (3 * OwnerRefundPriceWei));
+        expect(total_1).to.be.equal(2 * OwnerRefundPriceWei);
+        
+    });
+
 
 });

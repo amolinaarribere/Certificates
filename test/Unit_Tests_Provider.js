@@ -38,17 +38,17 @@ contract("Testing Provider",function(accounts){
     const user_1 = accounts[7];
     const holder_1 = accounts[8];
     const holder_2 = accounts[9];
+    const extra_owner = accounts[1];
     // providers info
     const provider_1_Info = "Provider 1 Info";
     const pool_Info = "Public Pool";
     // certificates
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     // test constants
-    const NotAnOwner = new RegExp("EC9");
-    const OwnerAlreadyvoted = new RegExp("EC5");
-    const MustBeActivated = new RegExp("EC7");
-    const NotAllowedToRemoveCertificate = new RegExp("EC14");
-    const NotEnoughFunds = new RegExp("EC2");
+    const NotEnoughFunds = new RegExp("EC2-");
+    const NotAnOwner = new RegExp("EC9-");
+    const OwnerAlreadyvoted = new RegExp("EC5-");
+    const MustBeActivated = new RegExp("EC7-");
 
     beforeEach(async function(){
         // Public Pool creation and provider subscription
@@ -75,7 +75,7 @@ contract("Testing Provider",function(accounts){
     }
 
     async function SubscribingToPublicPool(validateOrreject){
-        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
         if(validateOrreject){
             await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[1], gas: Gas}, function(error, result){}); 
             await ValidateProvider();
@@ -115,7 +115,7 @@ contract("Testing Provider",function(accounts){
             expect(_AddCertificatePrice.toString()).to.be.equal(CertificatePriceWei.toString());
             expect(_SubscriptionPrice.toString()).to.be.equal(subscriptionPriceForPool.toString());
             expect(_Total).to.equal(1);
-            expect(_Pools[0]).to.equal(publicCertPoolAddress);
+            expect(_Pools[0]).to.equal(pool_common.AddressToBytes32(publicCertPoolAddress));
         }
         else{
             expect(_PoolInfo).to.equal("");
@@ -127,12 +127,26 @@ contract("Testing Provider",function(accounts){
         
     }
 
+    // ****** TESTING Adding Owners ***************************************************************** //
+
+    it("Add Owner WRONG",async function(){
+        await pool_common.AddOwnerWrong(provider, ProviderOwners, extra_owner, user_1);
+    });
+
+    it("Add Owner CORRECT 1",async function(){
+        await pool_common.AddOwnerCorrect(provider, ProviderOwners, extra_owner, user_1);
+    });
+
+    it("Add Owner CORRECT 2",async function(){
+        await pool_common.AddOwnerCorrect2(provider, ProviderOwners, extra_owner, user_1);
+    });
+
     // ****** TESTING Subscribing Pool ***************************************************************** //
 
     it("Subscribe Pool WRONG 1",async function(){
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: user_1, gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -141,7 +155,7 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
             await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
@@ -154,8 +168,8 @@ contract("Testing Provider",function(accounts){
     it("Subscribe Pool WRONG 2",async function(){
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei).send({from: ProviderOwners[2], gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1, true).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
+            await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[2], gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -170,6 +184,11 @@ contract("Testing Provider",function(accounts){
         await SubscribingToPublicPool(true);
         let FinalBalance = parseInt(await web3.eth.getBalance(provider._address));
         // assert
+        let result = await publicPoolProxy.methods.retrieveProvider(provider._address).call({from: user_1});
+        let providerInfo = result[0];
+        let exists = result[1];
+        expect(exists).to.be.true;
+        expect(providerInfo).to.equal(provider_1_Info);
         await CheckPool(true, PublicPriceWei);
         expect(InitBalance - PublicPriceWei).to.equal(FinalBalance);
     });
@@ -186,36 +205,15 @@ contract("Testing Provider",function(accounts){
 
     // ****** TESTING Adding Pool ***************************************************************** //
 
-    it("Add Pool WRONG",async function(){
-        // act
-        try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0).send({from: user_1}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotAnOwner);
-        }
-        // act
-        try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
-            await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(OwnerAlreadyvoted);
-        }
-    });
-
     it("Add Pool CORRECT",async function(){
         // act
         AddProvider();
-        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0, false).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
         await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
         // assert
         await CheckPool(true, 0);
     });
+
 
     // ****** TESTING Removing Pool ***************************************************************** //
 
@@ -322,6 +320,20 @@ contract("Testing Provider",function(accounts){
 
     it("on Item Rejected WRONG",async function(){
         await pool_common.onItemRejectedWrong(provider, user_1);
+    });
+
+    // ****** TESTING Updating Min Owners ***************************************************************** //
+
+    it("Update Min Owner WRONG",async function(){
+        await pool_common.UpdateMinOwnersWrong(provider, ProviderOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 1",async function(){
+        await pool_common.UpdateMinOwnersCorrect(provider, ProviderOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 2",async function(){
+        await pool_common.UpdateMinOwnersCorrect2(provider, ProviderOwners, user_1);
     });
  
 

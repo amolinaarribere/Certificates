@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 /**
  * @title Storage
@@ -11,6 +11,7 @@ import "../Interfaces/ITreasury.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 
 contract Treasury is ITreasury, TokenGovernanceBaseContract{
@@ -19,8 +20,9 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     // EVENTS /////////////////////////////////////////
     event _NewPrices(uint, uint, uint, uint, uint);
-    event _Pay(address indexed, uint);
-    event _Refund(address indexed, uint);
+    event _Pay(address indexed, uint, uint);
+    event _Refund(address indexed, uint, uint);
+    event _AssignDividend(address indexed, uint, uint);
     event _Withdraw(address indexed, uint);
 
     // DATA /////////////////////////////////////////
@@ -30,7 +32,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         uint NewCertificatePriceWei;
         uint NewPrivatePriceWei;
         uint NewProviderPriceWei;
-        uint NewOwnerRefundPriceWei;
+        uint NewOwnerRefundFeeWei;
     }
 
     ProposedPricesStruct private _ProposedPrices;
@@ -40,7 +42,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     uint private _CertificatePriceWei;
     uint private _PrivatePriceWei;
     uint private _ProviderPriceWei;
-    uint private _OwnerRefundPriceWei;
+    uint private _OwnerRefundFeeWei;
+
+    // last amount at which dividends where assigned for each token owner
+    uint private _AggregatedDividendAmount;
+    mapping(address => uint) private _lastAssigned;
 
     // dividends per token owner
     struct _BalanceStruct{
@@ -59,49 +65,47 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         else if(Library.Prices.NewCertificate == price) minPrice = _CertificatePriceWei;
         else minPrice = _ProviderPriceWei;
 
-        require(msg.value >= minPrice, "EC2");
+        require(msg.value >= minPrice, "EC2-");
         _;
     }
 
     modifier isBalanceEnough(uint amount){
-        require(checkBalance(msg.sender) >= amount, "EC20");
+        require(checkBalance(msg.sender) >= amount, "EC20-");
         _;
     }
 
     modifier isFromPublicPool(){
-        require(true == Library.ItIsSomeone(_managerContract.retrievePublicCertificatePoolProxy()), "EC8");
+        require(true == Library.ItIsSomeone(_managerContract.retrievePublicCertificatePoolProxy()), "EC8-");
         _;
     }
 
-    modifier isPriceOK(uint256 PublicPriceWei, uint256 OwnerRefundPriceWei){
-        require(PublicPriceWei >= OwnerRefundPriceWei, "EC21");
+    modifier isPriceOK(uint256 PublicPriceWei, uint256 OwnerRefundFeeWei){
+        require(PublicPriceWei >= OwnerRefundFeeWei, "EC21-");
         _;
     }
-
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, address managerContractAddress, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
+    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, managerContractAddress);
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, true);
+        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress);
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, true);
     }
-
 
     // GOVERNANCE /////////////////////////////////////////
-    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external override
+    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei) external override
     {
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei, false);
+        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, false);
     }
 
-    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei, bool fromConstructor) internal
-        isPriceOK(PublicPriceWei, OwnerRefundPriceWei)
+    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei, bool fromConstructor) internal
+        isPriceOK(PublicPriceWei, OwnerRefundFeeWei)
     {
         if(fromConstructor){
             _PublicPriceWei = PublicPriceWei;
             _PrivatePriceWei = PrivatePriceWei;
             _ProviderPriceWei = ProviderPriceWei;
             _CertificatePriceWei = CertificatePriceWei;
-            _OwnerRefundPriceWei = OwnerRefundPriceWei;
+            _OwnerRefundFeeWei = OwnerRefundFeeWei;
         }
         else{
             addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
@@ -109,7 +113,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
             _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
             _ProposedPrices.NewProviderPriceWei = ProviderPriceWei;
-            _ProposedPrices.NewOwnerRefundPriceWei = OwnerRefundPriceWei;
+            _ProposedPrices.NewOwnerRefundFeeWei = OwnerRefundFeeWei;
         }
         
     }
@@ -120,11 +124,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
         _ProviderPriceWei = _ProposedPrices.NewProviderPriceWei;
         _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
-        _OwnerRefundPriceWei = _ProposedPrices.NewOwnerRefundPriceWei;
+        _OwnerRefundFeeWei = _ProposedPrices.NewOwnerRefundFeeWei;
         
         removeProposition();
 
-        emit _NewPrices(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
+        emit _NewPrices(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundFeeWei);
     }
 
     function propositionRejected() internal override
@@ -149,7 +153,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         proposition[1] = UintLibrary.UintToBytes32(_ProposedPrices.NewPrivatePriceWei);
         proposition[2] = UintLibrary.UintToBytes32(_ProposedPrices.NewProviderPriceWei);
         proposition[3] = UintLibrary.UintToBytes32(_ProposedPrices.NewCertificatePriceWei);
-        proposition[4] = UintLibrary.UintToBytes32(_ProposedPrices.NewOwnerRefundPriceWei);
+        proposition[4] = UintLibrary.UintToBytes32(_ProposedPrices.NewOwnerRefundFeeWei);
         return proposition;
     }
 
@@ -159,30 +163,42 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     override payable
     {
         uint256 amount = msg.value;
-        if(price == Library.Prices.NewProvider) amount -= _OwnerRefundPriceWei;
-        AssignDividends(amount);
+        if(price == Library.Prices.NewProvider) amount -= _OwnerRefundFeeWei;
+        _AggregatedDividendAmount += amount;
 
-        emit _Pay(msg.sender, msg.value);
+        emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);
     }
 
-    function AssignDividends(uint256 amount) internal
+    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal override
     {
-        (address[] memory DividendsRecipients, uint256[] memory DividendsRecipientsTokens) = GetTokenOwners();
-        uint256 TotalTokenSupply = totalSupply();
+        super.InternalonTokenBalanceChanged(from, to, amount);
+        if(address(0) != from) InternalAssignDividends(from);
+        if(address(0) != to) InternalAssignDividends(to);
+    }
 
-        for(uint i=0; i < DividendsRecipients.length; i++){
-            addBalance(DividendsRecipients[i], DividendsRecipientsTokens[i] * amount, TotalTokenSupply);
+    function AssignDividends() external override
+    {
+       InternalAssignDividends(msg.sender);
+    }
+
+    function InternalAssignDividends(address recipient) internal
+    {
+        if(_lastAssigned[recipient] < _AggregatedDividendAmount){
+           uint amountToSplit = _AggregatedDividendAmount - _lastAssigned[recipient];
+           _lastAssigned[recipient] = _AggregatedDividendAmount;
+           addBalance(recipient, amountToSplit * GetTokensBalance(recipient), totalSupply());
+           
+           emit _AssignDividend(recipient, amountToSplit * GetTokensBalance(recipient), totalSupply());
         }
-
     }
 
     function getRefund(address addr, uint numberOfOwners) external 
         isFromPublicPool()
     override
     {
-        addBalance(addr, _OwnerRefundPriceWei, numberOfOwners);
+        addBalance(addr, _OwnerRefundFeeWei, numberOfOwners);
 
-        emit _Refund(addr, numberOfOwners);
+        emit _Refund(addr, _OwnerRefundFeeWei, numberOfOwners);
     }
 
     function withdraw(uint amount) external 
@@ -190,22 +206,19 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     override
     {
         uint[] memory f = returnFactors(msg.sender);
-        uint total = 0;
-        uint i = 0;
+        (uint total, uint commonDividend) = sumUpTotal(msg.sender);
+        uint remainder =  total - (amount * commonDividend);
 
-        while ((total < amount) && (i < f.length)){
-            uint amountForFactor = returnBalanceForFactor(msg.sender, f[i]) / f[i];
-            if(amountForFactor > (amount - total)) amountForFactor = amount - total;
-            total += amountForFactor;
-            substractBalance(msg.sender, amountForFactor * f[i], f[i]);
-            i++;
+        for(uint i=0; i < f.length; i++){
+            substractBalance(msg.sender, returnBalanceForFactor(msg.sender, f[i]), f[i]);
         }
 
-        require(total == amount, "UnExpected problem calculating the amount to withdraw");
+        addBalance(msg.sender, remainder, commonDividend);
 
-        payable(msg.sender).transfer(total);
+        (bool success, bytes memory data) = msg.sender.call{value: amount}("");
+        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
 
-        emit _Withdraw(msg.sender, total);
+        emit _Withdraw(msg.sender, amount);
     }
 
     function retrieveBalance(address addr) external override view returns(uint)
@@ -215,48 +228,60 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     function retrievePrices() external override view returns(uint, uint, uint, uint, uint)
     {
-        return(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundPriceWei);
+        return(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundFeeWei);
+    }
+
+    function retrieveAggregatedAmount() external override view returns(uint){
+        return _AggregatedDividendAmount;
     }
 
     function checkBalance(address addr) internal view returns(uint){
+        (uint total, uint commonDividend) = sumUpTotal(addr);
+
+        return total / commonDividend;
+    }
+
+    function sumUpTotal(address addr) internal view returns (uint, uint)
+    {
         uint[] memory f = returnFactors(addr);
+        uint CommonDividend = UintLibrary.ProductOfFactors(f);
         uint total = 0;
 
         for(uint i=0; i < f.length; i++){
-            total += returnBalanceForFactor(addr, f[i]) / f[i];
+            total += returnBalanceForFactor(addr, f[i]) * CommonDividend / f[i];
         }
 
-        return total;
+        return (total, CommonDividend);
     }
 
-    function returnFactors(address addr) public view returns(uint[] memory){
+    function returnFactors(address addr) internal view returns(uint[] memory){
         return _balances[addr]._factors;
     }
 
-    function returnBalanceForFactor(address addr, uint factor) public view returns(uint){
+    function returnBalanceForFactor(address addr, uint factor) internal view returns(uint){
         return _balances[addr]._balance[factor];
     }
 
-    function addBalance(address addr, uint amount, uint factor) private
+    function addBalance(address addr, uint amount, uint factor) internal
     {
-        if(0 == _balances[addr]._balance[factor]){
-             _balances[addr]._factors.push(factor);
+        if(amount > 0){
+            if(0 == _balances[addr]._balance[factor])
+            {
+                _balances[addr]._factors.push(factor);
+            }
+            _balances[addr]._balance[factor] += amount;
         }
-
-        uint newFactorBalance = _balances[addr]._balance[factor] + amount;
-        require(newFactorBalance >= _balances[addr]._balance[factor], "uint overflow adding");
-
-       _balances[addr]._balance[factor] = newFactorBalance;
     }
 
-    function substractBalance(address addr, uint amount, uint factor) private
+    function substractBalance(address addr, uint amount, uint factor) internal
     {
         require(_balances[addr]._balance[factor] >= amount, "Not enough balance for this factor");
 
         _balances[addr]._balance[factor] -= amount;
 
-        if(0 == _balances[addr]._balance[factor]){
-            _balances[addr]._factors = UintLibrary.UintArrayRemoveResize(UintLibrary.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
+        if(0 == _balances[addr]._balance[factor])
+        {
+            UintLibrary.UintArrayRemoveResize(UintLibrary.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors);
         }
         
     }

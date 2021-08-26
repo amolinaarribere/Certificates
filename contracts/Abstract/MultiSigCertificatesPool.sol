@@ -39,22 +39,22 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
 
     // MODIFIERS /////////////////////////////////////////
     modifier isAProvider(){
-        require(true == isProvider(msg.sender), "EC12");
+        require(true == isProvider(msg.sender), "EC12-");
         _;
     }
 
     modifier isTheProvider(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC13");
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC13-");
         _;
     }
 
     modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "EC14");
+        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "EC14-");
         _;
     }
     
     modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){
-        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC15");
+        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC15-");
         _;
     }
     
@@ -95,17 +95,17 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         return (retrieveEntity(provider, _providerId));
     }
 
-    function retrieveAllProviders() external override view returns (address[] memory)
+    function retrieveAllProviders() external override view returns (bytes32[] memory)
     {
         return(retrieveAllEntities(_providerId));
     }
 
-    function isProvider(address provider) public view returns (bool)
+    function isProvider(address provider) internal view returns (bool)
     {
         return(isEntity(provider, _providerId));
     }
 
-    function retrievePendingProviders(bool addedORremove) external override view returns (address[] memory, string[] memory)
+    function retrievePendingProviders(bool addedORremove) external override view returns (bytes32[] memory, string[] memory)
     {
         return(retrievePendingEntities(addedORremove, _providerId));
     }

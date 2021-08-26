@@ -13,7 +13,6 @@ interface IFactory {
     function create(address[] memory owners,  uint256 minOwners, string memory ElementName) external payable;
 
     function retrieve(uint Id) external view returns (address, address);
-
     function retrieveTotal() external view returns (uint);
 
 }

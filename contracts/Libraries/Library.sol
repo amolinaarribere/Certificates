@@ -14,7 +14,7 @@ library Library{
 
     // modifier
     modifier isIdCorrect(uint Id, uint length){
-        require(true == IdCorrect(Id, length), "EC1");
+        require(true == IdCorrect(Id, length), "EC1-");
         _;
     }
 
@@ -35,14 +35,11 @@ library Library{
         bytes NewProviderFactoryData;
     }
 
-    struct InitialContractsStruct{
-        address payable PublicPoolProxyAddress;
-        address payable TreasuryProxyAddress;
-        address payable CertisTokenProxyAddress;
-        address payable PrivatePoolFactoryProxyAddress;
-        address PrivateCertificatePoolImplAddress;
-        address payable ProviderFactoryProxyAddress;
-        address ProviderImplAddress;
+    // Pending Certificates
+    struct _pendingCertificatesStruct{
+        address pool;
+        address holder;
+        bytes32 certificate;
     }
 
     // auxiliary functions
@@ -55,26 +52,11 @@ library Library{
         return false;
     }
 
-    function FindPosition(bytes32 data, bytes32[] memory list) public pure returns (uint){
-        for(uint i=0; i < list.length; i++){
-            if(data == list[i]) return i;
-        }
-
-        return list.length + 1;
-    }
-
-    function ArrayRemoveResize(uint index, bytes32[] memory array) public 
-        isIdCorrect(index, array.length)
-    pure returns(bytes32[] memory) 
+    function ArrayRemoveResize(uint index, bytes32[] storage array) public 
+        isIdCorrect(index, array.length) 
     {
-        bytes32[] memory newArray = new bytes32[](array.length - 1);
         array[index] = array[array.length - 1];
-        
-        for(uint i=0; i < newArray.length; i++){
-            newArray[i] = array[i];
-        }
-        
-        return newArray;
+        array.pop();
     }
 
     function Bytes32ArrayToString(bytes32[] memory element) internal pure returns(string memory){

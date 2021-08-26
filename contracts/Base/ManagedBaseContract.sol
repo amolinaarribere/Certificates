@@ -19,7 +19,7 @@ contract ManagedBaseContract is Initializable{
 
     // MODIFIERS /////////////////////////////////////////
      modifier isFromManagerContract(){
-        require(true == Library.ItIsSomeone(address(_managerContract)), "EC8");
+        require(true == Library.ItIsSomeone(address(_managerContract)), "EC8-");
         _;
     }
 

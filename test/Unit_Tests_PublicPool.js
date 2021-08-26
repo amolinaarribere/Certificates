@@ -43,18 +43,7 @@ contract("Testing Public Pool",function(accounts){
     // certificates
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     const hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
-    // test constants
-    const WrongSender = new RegExp("EC8");
-    const NotAnOwner = new RegExp("EC9");
-    const OwnerAlreadyvoted = new RegExp("EC5");
-    const NotSubmittedByCreator = new RegExp("EC4");
-    const NotAllowedRemoveEntity = new RegExp("EC10");
-    const MustBeActivated = new RegExp("EC7");
-    const MinNumberRequired = new RegExp("EC19");
-    const NotAProvider = new RegExp("EC12");
-    const NotEmpty = new RegExp("EC11");
-    const CertificateAlreadyExists = new RegExp("EC15");
-    const NotAllowedToRemoveCertificate = new RegExp("EC14");
+
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
@@ -64,7 +53,7 @@ contract("Testing Public Pool",function(accounts){
         await publicCertPool.methods.addProvider(provider_2, provider_2_Info).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
     });
 
-     // ****** TESTING Adding Owners ***************************************************************** //
+    // ****** TESTING Adding Owners ***************************************************************** //
 
      it("Add Owner WRONG",async function(){
         await pool_common.AddOwnerWrong(publicCertPool, PublicOwners, extra_owner, user_1);
@@ -140,6 +129,20 @@ contract("Testing Public Pool",function(accounts){
 
     it("on Item Rejected WRONG",async function(){
         await pool_common.onItemRejectedWrong(publicCertPool, user_1);
+    });
+
+    // ****** TESTING Updating Min Owners ***************************************************************** //
+
+    it("Update Min Owner WRONG",async function(){
+        await pool_common.UpdateMinOwnersWrong(publicCertPool, PublicOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 1",async function(){
+        await pool_common.UpdateMinOwnersCorrect(publicCertPool, PublicOwners, user_1);
+    });
+
+    it("Update Min Owner CORRECT 2",async function(){
+        await pool_common.UpdateMinOwnersCorrect2(publicCertPool, PublicOwners, user_1);
     });
 
 });

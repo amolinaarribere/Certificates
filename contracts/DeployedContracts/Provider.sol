@@ -32,6 +32,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
     mapping(address => uint256) private _AddCertificatePricePerPool;
     mapping(address => uint256) private _SubscriptionPricePerPool;
+    mapping(address => bool) private _mustSubscribe;
     mapping(address => bool) private _submited;
 
 
@@ -47,6 +48,8 @@ pragma solidity >=0.7.0 <0.9.0;
    
     mapping(address => _CertificatesPerHolderStruct) private _CertificatesPerPool;
     
+    Library._pendingCertificatesStruct[] private _pendingCertificates;
+
     // Provider
     string private _ProviderInfo;
 
@@ -57,33 +60,19 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     modifier isCertificateActivated(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == isCertificate(pool, cert, holder), "EC6");
-        else require(true == isCertificate(pool, cert, holder), "EC7");
-        _;
-    }
-
-    modifier isCertificatePending(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder) && 
-                                    false == isCertificatePendingToRemoved(pool, cert, holder), "EC27");
-        else require(true == isCertificatePendingToAdded(pool, cert, holder) || 
-                    true == isCertificatePendingToRemoved(pool, cert, holder), "EC28");
+        if(false == YesOrNo) require(false == internalisCertificate(pool, cert, holder), "EC6-");
+        else require(true == internalisCertificate(pool, cert, holder), "EC7-");
         _;
     }
 
     modifier isCertificatePendingToAdd(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder), "EC27");
-        else require(true == isCertificatePendingToAdded(pool, cert, holder), "EC28");
-        _;
-    }
-
-    modifier isCertificatePendingToRemove(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == isCertificatePendingToRemoved(pool, cert, holder), "EC27");
-        else require(true == isCertificatePendingToRemoved(pool, cert, holder), "EC28");
+        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder), "EC27-");
+        else require(true == isCertificatePendingToAdded(pool, cert, holder), "EC28-");
         _;
     }
 
     modifier HasNotAlreadyVotedForCertificate(bytes32 cert, address pool, address holder){
-        require(false == ItemsLibrary.hasVoted(msg.sender, cert, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]), "EC5");
+        require(false == ItemsLibrary.hasVoted(msg.sender, cert, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]), "EC5-");
         _;
     }
 
@@ -99,13 +88,14 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice) external override{
-        addEntity(pool, poolInfo, _poolId);
-        if(false == _submited[pool]){
+    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice, bool mustSubscribe) external override{
+         if(false == _submited[pool]){
             _AddCertificatePricePerPool[pool] = AddCertificatePrice;
             _SubscriptionPricePerPool[pool] = SubscriptionPrice;
+            _mustSubscribe[pool] = mustSubscribe;
             _submited[pool] = true;
         }
+        addEntity(pool, poolInfo, _poolId);
     }
 
     function removePool(address pool) external override
@@ -126,17 +116,18 @@ pragma solidity >=0.7.0 <0.9.0;
     function removePricesForPool(address pool) internal
     {
         delete(_submited[pool]);
+        delete(_mustSubscribe[pool]);
         delete(_AddCertificatePricePerPool[pool]);
         delete(_SubscriptionPricePerPool[pool]);
     }
     
-    function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256)
+    function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256, bool)
     {
         string memory poolInfo;
         bool isActivated;
 
         (poolInfo, isActivated) = InternalRetrievePool(pool);
-        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool], _SubscriptionPricePerPool[pool]);
+        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool], _SubscriptionPricePerPool[pool], _mustSubscribe[pool]);
     }
     
     function InternalRetrievePool(address pool) internal view returns (string memory, bool)
@@ -144,23 +135,40 @@ pragma solidity >=0.7.0 <0.9.0;
         return retrieveEntity(pool, _poolId);
     }
 
-    function retrieveAllPools() external override view returns (address[] memory)
+    function retrieveAllPools() external override view returns (bytes32[] memory)
     {
         return retrieveAllEntities(_poolId);
     }
 
-    function isPool(address pool) public view returns (bool)
+    function retrievePendingPools(bool addedORremove) external override view returns (bytes32[] memory, string[] memory)
+    {
+        return(retrievePendingEntities(addedORremove, _poolId));
+    }
+
+    function isPool(address pool) internal view returns (bool)
     {
         return(isEntity(pool, _poolId));
     }
-    
     // Certificates management
-    function extractCertIds(address pool, address holder) internal pure returns(uint[] memory)
+    function extractCertIds(address pool, bytes32 CertificateHash, address holder) internal returns(uint[] memory)
     {
-        uint[] memory certIdIdArray = new uint[](3);
+        uint otherId;
+        uint[] memory certIdIdArray = new uint[](4);
         certIdIdArray[0] = _certId;
         certIdIdArray[1] = AddressLibrary.AddressToUint(pool);
         certIdIdArray[2] = AddressLibrary.AddressToUint(holder);
+
+        Library._pendingCertificatesStruct memory pCS = Library._pendingCertificatesStruct(pool, holder, CertificateHash);
+
+        if(!isCertificatePendingToAdded(pool, CertificateHash, holder)){
+            _pendingCertificates.push(pCS);
+            otherId = _pendingCertificates.length - 1;
+        }
+        else{
+            otherId = PositionInArray(pCS, _pendingCertificates);
+        }
+
+        certIdIdArray[3] = otherId;
 
         return(certIdIdArray);
     }
@@ -171,8 +179,9 @@ pragma solidity >=0.7.0 <0.9.0;
         isCertificateActivated(false, CertificateHash, pool, holder) 
         isCertificatePendingToAdd(false, CertificateHash, pool, holder)
      {
+       
         _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
-        uint[] memory certIdIdArray = extractCertIds(pool, holder);
+        uint[] memory certIdIdArray = extractCertIds(pool, CertificateHash, holder);
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
         ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
         ItemsLibrary.addItem(manipulateItemStruct,itemsstruct, address(this));
@@ -181,11 +190,11 @@ pragma solidity >=0.7.0 <0.9.0;
      function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
-        isCertificatePending(true, CertificateHash, pool, holder)
+        isCertificatePendingToAdd(true, CertificateHash, pool, holder)
         HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
      {
         _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
-        uint[] memory certIdIdArray = extractCertIds(pool, holder);
+        uint[] memory certIdIdArray = extractCertIds(pool, CertificateHash, holder);
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
         ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
         ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct, address(this));
@@ -194,11 +203,11 @@ pragma solidity >=0.7.0 <0.9.0;
      function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
-        isCertificatePending(true, CertificateHash, pool, holder)
+        isCertificatePendingToAdd(true, CertificateHash, pool, holder)
         HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
      {
         _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
-        uint[] memory certIdIdArray = extractCertIds(pool, holder);
+        uint[] memory certIdIdArray = extractCertIds(pool, CertificateHash, holder);
         ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
         ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
         ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct, address(this));
@@ -213,11 +222,21 @@ pragma solidity >=0.7.0 <0.9.0;
 
         ItemsLibrary._ItemsStruct storage itemStruct = _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
 
-        itemStruct._activatedItems = Library.ArrayRemoveResize(Library.FindPosition(CertificateHash, itemStruct._activatedItems), itemStruct._activatedItems);
+        ItemsLibrary.RemoveResizeActivated(CertificateHash, itemStruct);
         delete(itemStruct._items[CertificateHash]);   
     }
 
-    function isCertificate(address pool, bytes32 CertificateHash, address holder) public view returns(bool)
+    function retrievePendingCertificates() external override view returns (Library._pendingCertificatesStruct[] memory)
+    {
+        return(_pendingCertificates);
+    }
+
+    function isCertificate(address pool, bytes32 CertificateHash, address holder) external override view returns(bool)
+    {
+        return internalisCertificate(pool, CertificateHash, holder);
+    }
+
+    function internalisCertificate(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
     {
         IPool poolToCheck = IPool(pool);
         address provider = poolToCheck.retrieveCertificateProvider(CertificateHash, holder);
@@ -230,9 +249,21 @@ pragma solidity >=0.7.0 <0.9.0;
         return ItemsLibrary.isItemPendingToAdded(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
     }
 
-    function isCertificatePendingToRemoved(address pool, bytes32 CertificateHash, address holder) internal view returns(bool)
+    function RemoveResizeCertificatesStructArray(Library._pendingCertificatesStruct[] storage array, uint index) internal
     {
-        return ItemsLibrary.isItemPendingToRemoved(CertificateHash, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]);
+        array[index] = array[array.length - 1];
+        array.pop();
+    }
+
+    function PositionInArray(Library._pendingCertificatesStruct memory value, Library._pendingCertificatesStruct[] memory array) internal pure returns(uint)
+    {
+         for(uint i=0; i < array.length; i++){
+            if(value.pool == array[i].pool && 
+                value.holder == array[i].holder && 
+                value.certificate == array[i].certificate) return i;
+        }
+
+        return array.length + 1;
     }
 
     receive() external override payable{}
@@ -246,13 +277,14 @@ pragma solidity >=0.7.0 <0.9.0;
             address pool = AddressLibrary.Bytes32ToAddress(item);
 
             if(false == addOrRemove)removePricesForPool(pool);
-            else{
+            else if(true == _mustSubscribe[pool]){
                 IPool poolToSubscribe = IPool(pool);
                 poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
             }
         }
         else if(ids[0] == _certId){
             manipulateCertificate(AddressLibrary.UintToAddress(ids[1]), item, AddressLibrary.UintToAddress(ids[2]));
+            RemoveResizeCertificatesStructArray(_pendingCertificates, ids[3]);
         }
     }
 
@@ -265,6 +297,9 @@ pragma solidity >=0.7.0 <0.9.0;
 
             if(true == addOrRemove)removePricesForPool(pool);
         } 
+        else if(ids[0] == _certId){
+            RemoveResizeCertificatesStructArray(_pendingCertificates, ids[3]);
+        }
     }
     
  }
