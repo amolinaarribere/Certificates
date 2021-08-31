@@ -9,9 +9,13 @@ pragma solidity >=0.8.0 <0.9.0;
 
 
 contract MockChainLinkFeedRegistry {
-    int256 constant factor = 1000;
+    int256 factor;
 
-    function latestRoundData(address base,address quote)external pure
+    constructor(int256 _factor){
+        factor = _factor;
+    }
+
+    function latestRoundData(address base,address quote)external view
     returns (
       uint80 roundId,
       int256 answer,
