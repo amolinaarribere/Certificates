@@ -8,6 +8,7 @@ pragma solidity >=0.8.0 <0.9.0;
  */
 
 import "../Interfaces/ITreasury.sol";
+import "../Interfaces/IPriceConverter.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
@@ -44,13 +45,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     uint private _ProviderPriceUSD;
     uint private _OwnerRefundFeeUSD;
 
-    // prices parameters eth
-    uint private _PublicPriceWei;
-    uint private _CertificatePriceWei;
-    uint private _PrivatePriceWei;
-    uint private _ProviderPriceWei;
-    uint private _OwnerRefundFeeWei;
-
     // last amount at which dividends where assigned for each token owner
     uint private _AggregatedDividendAmount;
     mapping(address => uint) private _lastAssigned;
@@ -65,14 +59,16 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     // MODIFIERS /////////////////////////////////////////
     modifier areFundsEnough(Library.Prices price){
-        uint256 minPrice = 2**256 - 1;
+        uint256 minPriceUSD = 2**256 - 1;
 
-        if(Library.Prices.NewProvider == price) minPrice = _PublicPriceWei;
-        else if(Library.Prices.NewPool == price) minPrice = _PrivatePriceWei;
-        else if(Library.Prices.NewCertificate == price) minPrice = _CertificatePriceWei;
-        else minPrice = _ProviderPriceWei;
+        if(Library.Prices.NewProvider == price) minPriceUSD = _PublicPriceUSD;
+        else if(Library.Prices.NewPool == price) minPriceUSD = _PrivatePriceUSD;
+        else if(Library.Prices.NewCertificate == price) minPriceUSD = _CertificatePriceUSD;
+        else minPriceUSD = _ProviderPriceUSD;
 
-        require(msg.value >= minPrice, "EC2-");
+        uint256 minPriceETH = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(minPriceUSD);
+
+        require(msg.value >= minPriceETH, "EC2-");
         _;
     }
 
@@ -170,7 +166,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     override payable
     {
         uint256 amount = msg.value;
-        if(price == Library.Prices.NewProvider) amount -= _OwnerRefundFeeWei;
+        if(price == Library.Prices.NewProvider) amount -= IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(_OwnerRefundFeeUSD);
         _AggregatedDividendAmount += amount;
 
         emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);
@@ -203,9 +199,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         isFromPublicPool()
     override
     {
-        addBalance(addr, _OwnerRefundFeeWei, numberOfOwners);
+        uint OwnerRefundFeeWei = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(_OwnerRefundFeeUSD);
+        addBalance(addr, OwnerRefundFeeWei, numberOfOwners);
 
-        emit _Refund(addr, _OwnerRefundFeeWei, numberOfOwners);
+        emit _Refund(addr, OwnerRefundFeeWei, numberOfOwners);
     }
 
     function withdraw(uint amount) external 
