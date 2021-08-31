@@ -28,16 +28,23 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     // DATA /////////////////////////////////////////
     // proposition to change prices
     struct ProposedPricesStruct{
-        uint NewPublicPriceWei;
-        uint NewCertificatePriceWei;
-        uint NewPrivatePriceWei;
-        uint NewProviderPriceWei;
-        uint NewOwnerRefundFeeWei;
+        uint NewPublicPriceUSD;
+        uint NewCertificatePriceUSD;
+        uint NewPrivatePriceUSD;
+        uint NewProviderPriceUSD;
+        uint NewOwnerRefundFeeUSD;
     }
 
     ProposedPricesStruct private _ProposedPrices;
 
-    // parameters
+    // prices parameters usd
+    uint private _PublicPriceUSD;
+    uint private _CertificatePriceUSD;
+    uint private _PrivatePriceUSD;
+    uint private _ProviderPriceUSD;
+    uint private _OwnerRefundFeeUSD;
+
+    // prices parameters eth
     uint private _PublicPriceWei;
     uint private _CertificatePriceWei;
     uint private _PrivatePriceWei;
@@ -79,56 +86,56 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         _;
     }
 
-    modifier isPriceOK(uint256 PublicPriceWei, uint256 OwnerRefundFeeWei){
-        require(PublicPriceWei >= OwnerRefundFeeWei, "EC21-");
+    modifier isPriceOK(uint256 PublicPriceUSD, uint256 OwnerRefundFeeUSD){
+        require(PublicPriceUSD >= OwnerRefundFeeUSD, "EC21-");
         _;
     }
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function Treasury_init(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
+    function Treasury_init(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
     {
         super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress);
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, true);
+        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, true);
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei) external override
+    function updatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD) external override
     {
-        InternalupdatePrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, false);
+        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, false);
     }
 
-    function InternalupdatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundFeeWei, bool fromConstructor) internal
-        isPriceOK(PublicPriceWei, OwnerRefundFeeWei)
+    function InternalupdatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, bool fromConstructor) internal
+        isPriceOK(PublicPriceUSD, OwnerRefundFeeUSD)
     {
         if(fromConstructor){
-            _PublicPriceWei = PublicPriceWei;
-            _PrivatePriceWei = PrivatePriceWei;
-            _ProviderPriceWei = ProviderPriceWei;
-            _CertificatePriceWei = CertificatePriceWei;
-            _OwnerRefundFeeWei = OwnerRefundFeeWei;
+            _PublicPriceUSD = PublicPriceUSD;
+            _PrivatePriceUSD = PrivatePriceUSD;
+            _ProviderPriceUSD = ProviderPriceUSD;
+            _CertificatePriceUSD = CertificatePriceUSD;
+            _OwnerRefundFeeUSD = OwnerRefundFeeUSD;
         }
         else{
             addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
-            _ProposedPrices.NewPublicPriceWei = PublicPriceWei;
-            _ProposedPrices.NewCertificatePriceWei = CertificatePriceWei;
-            _ProposedPrices.NewPrivatePriceWei = PrivatePriceWei;
-            _ProposedPrices.NewProviderPriceWei = ProviderPriceWei;
-            _ProposedPrices.NewOwnerRefundFeeWei = OwnerRefundFeeWei;
+            _ProposedPrices.NewPublicPriceUSD = PublicPriceUSD;
+            _ProposedPrices.NewCertificatePriceUSD = CertificatePriceUSD;
+            _ProposedPrices.NewPrivatePriceUSD = PrivatePriceUSD;
+            _ProposedPrices.NewProviderPriceUSD = ProviderPriceUSD;
+            _ProposedPrices.NewOwnerRefundFeeUSD = OwnerRefundFeeUSD;
         }
         
     }
 
     function propositionApproved() internal override
     {
-        _PublicPriceWei = _ProposedPrices.NewPublicPriceWei;
-        _PrivatePriceWei = _ProposedPrices.NewPrivatePriceWei;
-        _ProviderPriceWei = _ProposedPrices.NewProviderPriceWei;
-        _CertificatePriceWei = _ProposedPrices.NewCertificatePriceWei;
-        _OwnerRefundFeeWei = _ProposedPrices.NewOwnerRefundFeeWei;
+        _PublicPriceUSD = _ProposedPrices.NewPublicPriceUSD;
+        _PrivatePriceUSD = _ProposedPrices.NewPrivatePriceUSD;
+        _ProviderPriceUSD = _ProposedPrices.NewProviderPriceUSD;
+        _CertificatePriceUSD = _ProposedPrices.NewCertificatePriceUSD;
+        _OwnerRefundFeeUSD = _ProposedPrices.NewOwnerRefundFeeUSD;
         
         removeProposition();
 
-        emit _NewPrices(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundFeeWei);
+        emit _NewPrices(_PublicPriceUSD, _PrivatePriceUSD, _ProviderPriceUSD, _CertificatePriceUSD, _OwnerRefundFeeUSD);
     }
 
     function propositionRejected() internal override
@@ -149,11 +156,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     function retrieveProposition() external override view returns(bytes32[] memory)
     {
         bytes32[] memory proposition = new bytes32[](5);
-        proposition[0] = UintLibrary.UintToBytes32(_ProposedPrices.NewPublicPriceWei);
-        proposition[1] = UintLibrary.UintToBytes32(_ProposedPrices.NewPrivatePriceWei);
-        proposition[2] = UintLibrary.UintToBytes32(_ProposedPrices.NewProviderPriceWei);
-        proposition[3] = UintLibrary.UintToBytes32(_ProposedPrices.NewCertificatePriceWei);
-        proposition[4] = UintLibrary.UintToBytes32(_ProposedPrices.NewOwnerRefundFeeWei);
+        proposition[0] = UintLibrary.UintToBytes32(_ProposedPrices.NewPublicPriceUSD);
+        proposition[1] = UintLibrary.UintToBytes32(_ProposedPrices.NewPrivatePriceUSD);
+        proposition[2] = UintLibrary.UintToBytes32(_ProposedPrices.NewProviderPriceUSD);
+        proposition[3] = UintLibrary.UintToBytes32(_ProposedPrices.NewCertificatePriceUSD);
+        proposition[4] = UintLibrary.UintToBytes32(_ProposedPrices.NewOwnerRefundFeeUSD);
         return proposition;
     }
 
@@ -228,7 +235,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     function retrievePrices() external override view returns(uint, uint, uint, uint, uint)
     {
-        return(_PublicPriceWei, _PrivatePriceWei, _ProviderPriceWei, _CertificatePriceWei, _OwnerRefundFeeWei);
+        return(_PublicPriceUSD, _PrivatePriceUSD, _ProviderPriceUSD, _CertificatePriceUSD, _OwnerRefundFeeUSD);
     }
 
     function retrieveAggregatedAmount() external override view returns(uint){
