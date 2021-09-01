@@ -124,8 +124,8 @@ contract("Testing Certificate Pool Manager",function(accounts){
     }
 
     async function checkProposition( _ppa, _ta, _ca, _ppfa, _prpa, _pfa, _pra, _pco){
-        var proposition = await certPoolManager.retrieveProposition({from: user_1});
-        let {0: _publicAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolFactoryAddress, 4: _privatePoolAddress, 5: _providerFactoryAddress, 6: _providerAddress, 7: _priceConverterAddress} = proposition;
+        var propositionResult = await certPoolManager.retrieveProposition({from: user_1});
+        let {0: _publicAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolFactoryAddress, 4: _privatePoolAddress, 5: _providerFactoryAddress, 6: _providerAddress, 7: _priceConverterAddress} = propositionResult;
 
         expect(proposition.AddressToBytes32(_ppa)).to.equal(_publicAddress);
         expect(proposition.AddressToBytes32(_ta)).to.equal(_treasuryAddress);

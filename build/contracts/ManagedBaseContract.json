@@ -10,18 +10,18 @@
   "sourceMap": "309:615:0:-:0;;;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "309:615:0:-:0;;;;;",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\nimport \"../Libraries/Library.sol\";\r\nimport \"../Interfaces/IProxyManager.sol\";\r\nimport \"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\";\r\n\r\ncontract ManagedBaseContract is Initializable{\r\n    using Library for *;\r\n\r\n    // DATA /////////////////////////////////////////\r\n    IProxyManager internal _managerContract;\r\n\r\n    // MODIFIERS /////////////////////////////////////////\r\n     modifier isFromManagerContract(){\r\n        require(true == Library.ItIsSomeone(address(_managerContract)), \"EC8-\");\r\n        _;\r\n    }\r\n\r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function ManagedBaseContract_init(address managerContractAddress) internal initializer {\r\n        _managerContract = IProxyManager(managerContractAddress);\r\n    }\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Base\\ManagedBaseContract.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Base/ManagedBaseContract.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/ManagedBaseContract.sol",
     "exportedSymbols": {
       "IProxyManager": [
-        1320
+        165
       ],
       "Initializable": [
-        3176
+        572
       ],
       "Library": [
-        2647
+        526
       ],
       "ManagedBaseContract": [
         43
@@ -52,7 +52,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 44,
-        "sourceUnit": 2648,
+        "sourceUnit": 527,
         "src": "151:34:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -64,7 +64,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 44,
-        "sourceUnit": 1321,
+        "sourceUnit": 166,
         "src": "187:41:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -76,7 +76,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 44,
-        "sourceUnit": 3177,
+        "sourceUnit": 573,
         "src": "230:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -89,7 +89,7 @@
               "id": 5,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3176,
+              "referencedDeclaration": 572,
               "src": "341:13:0"
             },
             "id": 6,
@@ -103,7 +103,7 @@
         "id": 43,
         "linearizedBaseContracts": [
           43,
-          3176
+          572
         ],
         "name": "ManagedBaseContract",
         "nameLocation": "318:19:0",
@@ -115,7 +115,7 @@
               "id": 7,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 2647,
+              "referencedDeclaration": 526,
               "src": "367:7:0"
             },
             "nodeType": "UsingForDirective",
@@ -133,7 +133,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IProxyManager_$1320",
+              "typeIdentifier": "t_contract$_IProxyManager_$165",
               "typeString": "contract IProxyManager"
             },
             "typeName": {
@@ -143,13 +143,13 @@
                 "id": 9,
                 "name": "IProxyManager",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 1320,
+                "referencedDeclaration": 165,
                 "src": "444:13:0"
               },
-              "referencedDeclaration": 1320,
+              "referencedDeclaration": 165,
               "src": "444:13:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                "typeIdentifier": "t_contract$_IProxyManager_$165",
                 "typeString": "contract IProxyManager"
               }
             },
@@ -204,7 +204,7 @@
                                   "referencedDeclaration": 11,
                                   "src": "640:16:0",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$165",
                                     "typeString": "contract IProxyManager"
                                   }
                                 }
@@ -212,7 +212,7 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$165",
                                     "typeString": "contract IProxyManager"
                                   }
                                 ],
@@ -263,10 +263,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 2647,
+                              "referencedDeclaration": 526,
                               "src": "612:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$2647_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$526_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -277,7 +277,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 2528,
+                            "referencedDeclaration": 407,
                             "src": "612:19:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -408,7 +408,7 @@
                       "referencedDeclaration": 11,
                       "src": "855:16:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                        "typeIdentifier": "t_contract$_IProxyManager_$165",
                         "typeString": "contract IProxyManager"
                       }
                     },
@@ -440,10 +440,10 @@
                         "name": "IProxyManager",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1320,
+                        "referencedDeclaration": 165,
                         "src": "874:13:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IProxyManager_$1320_$",
+                          "typeIdentifier": "t_type$_t_contract$_IProxyManager_$165_$",
                           "typeString": "type(contract IProxyManager)"
                         }
                       },
@@ -458,13 +458,13 @@
                       "src": "874:37:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                        "typeIdentifier": "t_contract$_IProxyManager_$165",
                         "typeString": "contract IProxyManager"
                       }
                     },
                     "src": "855:56:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                      "typeIdentifier": "t_contract$_IProxyManager_$165",
                       "typeString": "contract IProxyManager"
                     }
                   },
@@ -485,7 +485,7 @@
                   "id": 32,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 3175,
+                  "referencedDeclaration": 571,
                   "src": "832:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -554,13 +554,13 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/ManagedBaseContract.sol",
     "exportedSymbols": {
       "IProxyManager": [
-        1320
+        165
       ],
       "Initializable": [
-        3176
+        572
       ],
       "Library": [
-        2647
+        526
       ],
       "ManagedBaseContract": [
         43
@@ -591,7 +591,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 44,
-        "sourceUnit": 2648,
+        "sourceUnit": 527,
         "src": "151:34:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -603,7 +603,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 44,
-        "sourceUnit": 1321,
+        "sourceUnit": 166,
         "src": "187:41:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -615,7 +615,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 44,
-        "sourceUnit": 3177,
+        "sourceUnit": 573,
         "src": "230:75:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -628,7 +628,7 @@
               "id": 5,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3176,
+              "referencedDeclaration": 572,
               "src": "341:13:0"
             },
             "id": 6,
@@ -642,7 +642,7 @@
         "id": 43,
         "linearizedBaseContracts": [
           43,
-          3176
+          572
         ],
         "name": "ManagedBaseContract",
         "nameLocation": "318:19:0",
@@ -654,7 +654,7 @@
               "id": 7,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 2647,
+              "referencedDeclaration": 526,
               "src": "367:7:0"
             },
             "nodeType": "UsingForDirective",
@@ -672,7 +672,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IProxyManager_$1320",
+              "typeIdentifier": "t_contract$_IProxyManager_$165",
               "typeString": "contract IProxyManager"
             },
             "typeName": {
@@ -682,13 +682,13 @@
                 "id": 9,
                 "name": "IProxyManager",
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 1320,
+                "referencedDeclaration": 165,
                 "src": "444:13:0"
               },
-              "referencedDeclaration": 1320,
+              "referencedDeclaration": 165,
               "src": "444:13:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                "typeIdentifier": "t_contract$_IProxyManager_$165",
                 "typeString": "contract IProxyManager"
               }
             },
@@ -743,7 +743,7 @@
                                   "referencedDeclaration": 11,
                                   "src": "640:16:0",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$165",
                                     "typeString": "contract IProxyManager"
                                   }
                                 }
@@ -751,7 +751,7 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$165",
                                     "typeString": "contract IProxyManager"
                                   }
                                 ],
@@ -802,10 +802,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 2647,
+                              "referencedDeclaration": 526,
                               "src": "612:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$2647_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$526_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -816,7 +816,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 2528,
+                            "referencedDeclaration": 407,
                             "src": "612:19:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -947,7 +947,7 @@
                       "referencedDeclaration": 11,
                       "src": "855:16:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                        "typeIdentifier": "t_contract$_IProxyManager_$165",
                         "typeString": "contract IProxyManager"
                       }
                     },
@@ -979,10 +979,10 @@
                         "name": "IProxyManager",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1320,
+                        "referencedDeclaration": 165,
                         "src": "874:13:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IProxyManager_$1320_$",
+                          "typeIdentifier": "t_type$_t_contract$_IProxyManager_$165_$",
                           "typeString": "type(contract IProxyManager)"
                         }
                       },
@@ -997,13 +997,13 @@
                       "src": "874:37:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                        "typeIdentifier": "t_contract$_IProxyManager_$165",
                         "typeString": "contract IProxyManager"
                       }
                     },
                     "src": "855:56:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IProxyManager_$1320",
+                      "typeIdentifier": "t_contract$_IProxyManager_$165",
                       "typeString": "contract IProxyManager"
                     }
                   },
@@ -1024,7 +1024,7 @@
                   "id": 32,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 3175,
+                  "referencedDeclaration": 571,
                   "src": "832:11:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1095,7 +1095,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-09-01T07:51:27.609Z",
+  "updatedAt": "2021-09-01T09:16:09.538Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

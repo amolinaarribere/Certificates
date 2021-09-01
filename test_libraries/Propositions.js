@@ -13,6 +13,10 @@ const NoPropositionActivated = new RegExp("EC25-");
 const PropositionAlreadyInProgress = new RegExp("EC24-");
 const CanNotVote = new RegExp("EC23-");
 
+function AddressToBytes32(address){
+    return (address.substring(0,2) + "000000000000000000000000" +  address.substring(2,address.length));
+}
+
 async function SplitTokenSupply(CT, tokenOwner, chairPerson){
     await CT.methods.transfer(tokenOwner[0], (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
     await CT.methods.transfer(tokenOwner[1], (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
@@ -26,10 +30,6 @@ async function checkProp(_plt, _ptp, _mp, user_1, contractAddress){
     expect(parseInt(plt)).to.be.equal(_plt);
     expect(parseInt(ptp)).to.be.equal(_ptp);
     expect(parseInt(mp)).to.be.equal(_mp);
-}
-
-function AddressToBytes32(address){
-    return (address.substring(0,2) + "000000000000000000000000" +  address.substring(2,address.length));
 }
 
 async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson){
@@ -180,7 +180,7 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
     
 };
 
+exports.AddressToBytes32 = AddressToBytes32;
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;
 exports.Config_Proposition_Correct = Config_Proposition_Correct;
 exports.SplitTokenSupply = SplitTokenSupply;
-exports.AddressToBytes32 = AddressToBytes32;

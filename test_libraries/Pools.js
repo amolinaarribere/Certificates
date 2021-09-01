@@ -9,8 +9,8 @@ var PublicCertificatesAbi = PublicCertificates.abi;
 const Library = artifacts.require("./Libraries/Library");
 const constants = require("../test_libraries/constants.js");
 
-const PublicPriceWei = constants.PublicPriceWei;
-const CertificatePriceWei = constants.CertificatePriceWei;
+const PublicPriceWei = constants.PublicPriceUSD * constants.factor;
+const CertificatePriceWei = constants.CertificatePriceUSD * constants.factor;
 const Gas = constants.Gas;
 const minOwners = 2;
 // providers info

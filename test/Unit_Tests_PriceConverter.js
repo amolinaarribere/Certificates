@@ -26,7 +26,7 @@ const Gas = constants.Gas;
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
-contract("Testing Certificate Pool Manager",function(accounts){
+contract("Testing Price Converter",function(accounts){
     var certPoolManager;
     var certisTokenProxy;
     var priceConverterProxy;
@@ -61,14 +61,23 @@ contract("Testing Certificate Pool Manager",function(accounts){
         expect(_address).to.equal(_registryAddress);
     }
 
-    async function checkProposition( _address){
-        var proposition = await priceConverterProxy.methods.retrieveProposition().call({from: user_1}, function(error, result){});
-        let _registryAddressProposed = proposition[0];
+    async function checkProposition(_address){
+        var propositionResult = await priceConverterProxy.methods.retrieveProposition().call({from: user_1}, function(error, result){});
+        let _registryAddressProposed = propositionResult[0];
 
         expect(proposition.AddressToBytes32(_address)).to.equal(_registryAddressProposed);
     }
 
     // ****** TESTING Retrieves ***************************************************************** //
+
+    it("Retrieve Exchange Rate ETH - USD",async function(){
+        // act
+        let amount = 12;
+        let result = await priceConverterProxy.methods.fromUSDToETH(amount).call({from: user_1, gas: Gas}, function(error, result){});
+        // assert
+        expect(parseInt(result)).to.equal(amount * constants.factor);
+        
+    });
 
     it("Retrieve Proposals Details",async function(){
         // act
