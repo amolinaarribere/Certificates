@@ -1,4 +1,4 @@
-import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATEFACTORY_ABI, PROVIDERFACTORY_ABI, TREASURY_ABI, CERTIS_ABI } from '../config'
+import { CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS, PUBLIC_ABI, PRIVATEFACTORY_ABI, PROVIDERFACTORY_ABI, TREASURY_ABI, CERTIS_ABI, PRICECONVERTER_ABI } from '../config'
 
 const ProviderPoolFunc = require("./ProviderPoolFunctions.js");
 const OwnersFunc = require("./OwnerFunctions.js");
@@ -19,6 +19,8 @@ export async function LoadBlockchain() {
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
   Aux.setAccount(accounts[0]);
 
+  ProviderPoolFunc.ReadKeys();
+
   Contracts.setCertificatePoolManager(await new Aux.web3.eth.Contract(CERTIFICATE_POOL_MANAGER_ABI, CERTIFICATE_POOL_MANAGER_ADDRESS))
   await ManagerFunc.RetrieveContractsAddresses();
   await ManagerFunc.RetrievePendingContractsAddresses();
@@ -28,6 +30,7 @@ export async function LoadBlockchain() {
   Contracts.setProviderFactory(await new Aux.web3.eth.Contract(PROVIDERFACTORY_ABI, ManagerFunc.providerFactoryAddressProxy))
   Contracts.setTreasury(await new Aux.web3.eth.Contract(TREASURY_ABI, ManagerFunc.TreasuryAddressProxy))
   Contracts.setCertisToken(await new Aux.web3.eth.Contract(CERTIS_ABI, ManagerFunc.CertisTokenAddressProxy))
+  Contracts.setPriceConverter(await new Aux.web3.eth.Contract(PRICECONVERTER_ABI, ManagerFunc.PriceConverterAddressProxy))
 
   await ProviderPoolFunc.RetrieveProviderPool(1);
   await OwnersFunc.RetrieveOwners(1);
@@ -40,7 +43,7 @@ export async function LoadBlockchain() {
   await PropositionFunc.RetrievePendingProposition(2);
   await CertisFunc.totalSupply();
   await CertisFunc.balanceOf(Aux.account);
-  await CertisFunc.RetrieveBalance(Aux.account);
+  await TreasuryFunc.RetrieveBalance(Aux.account);
   await TreasuryFunc.RetrieveTreasuryBalance();
 }
 

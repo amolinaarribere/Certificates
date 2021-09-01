@@ -2,10 +2,17 @@
 const Contracts = require("./Contracts.js");
 const Aux = require("./AuxiliaryFunctions.js");
 const Manager = require("./ManagerFunctions.js");
+const PriceConverter = require("./PriceConverter.js");
 
 export var accountBalance = "";
 export var TreasuryBalance = "";
 export var TreasuryAggregatedBalance = "";
+
+export var PublicPriceUSD = "";
+export var PrivatePriceUSD = "";
+export var CertificatePriceUSD = "";
+export var ProviderPriceUSD = "";
+export var OwnerRefundFeeUSD = "";
 
 export var PublicPriceWei = "";
 export var PrivatePriceWei = "";
@@ -13,34 +20,39 @@ export var CertificatePriceWei = "";
 export var ProviderPriceWei = "";
 export var OwnerRefundFeeWei = "";
 
-export var PendingPublicPriceWei = "";
-export var PendingPrivatePriceWei = "";
-export var PendingCertificatePriceWei = "";
-export var PendingProviderPriceWei = "";
-export var PendingOwnerRefundFeeWei = "";
+export var PendingPublicPriceUSD = "";
+export var PendingPrivatePriceUSD = "";
+export var PendingCertificatePriceUSD = "";
+export var PendingProviderPriceUSD = "";
+export var PendingOwnerRefundFeeUSD = "";
 
   export async function RetrievePricesTreasury(){
     let response = await Contracts.Treasury.methods.retrievePrices().call();
-
-    PublicPriceWei = response[0];
-    PrivatePriceWei = response[1];
-    ProviderPriceWei = response[2];
-    CertificatePriceWei = response[3];
-    OwnerRefundFeeWei = response[4];
+    PublicPriceUSD = response[0];
+    PrivatePriceUSD = response[1];
+    ProviderPriceUSD = response[2];
+    CertificatePriceUSD = response[3];
+    OwnerRefundFeeUSD = response[4];
+    
+    PublicPriceWei = await PriceConverter.USDToEther(PublicPriceUSD);
+    PrivatePriceWei = await PriceConverter.USDToEther(PrivatePriceUSD);
+    ProviderPriceWei = await PriceConverter.USDToEther(ProviderPriceUSD);
+    CertificatePriceWei = await PriceConverter.USDToEther(CertificatePriceUSD);
+    OwnerRefundFeeWei = await PriceConverter.USDToEther(OwnerRefundFeeUSD);
   }
 
   export async function RetrievePendingPricesTreasury(){
     let response = await Contracts.Treasury.methods.retrieveProposition().call();
-    PendingPublicPriceWei = Number(response[0]);
-    PendingPrivatePriceWei = Number(response[1]);
-    PendingProviderPriceWei = Number(response[2]);
-    PendingCertificatePriceWei = Number(response[3]);
-    PendingOwnerRefundFeeWei = Number(response[4]);
+    PendingPublicPriceUSD = Number(response[0]);
+    PendingPrivatePriceUSD = Number(response[1]);
+    PendingProviderPriceUSD = Number(response[2]);
+    PendingCertificatePriceUSD = Number(response[3]);
+    PendingOwnerRefundFeeUSD = Number(response[4]);
   }
     
 
-  export async function UpgradePricesTreasury(NewPublicPriceWei, NewPrivatePriceWei, NewProviderPriceWei, NewCertificatePriceWei, NewOwnerRefundFeeWei){
-    await Aux.CallBackFrame(Contracts.Treasury.methods.updatePrices(NewPublicPriceWei, NewPrivatePriceWei, NewProviderPriceWei, NewCertificatePriceWei, NewOwnerRefundFeeWei).send({from: Aux.account }));
+  export async function UpgradePricesTreasury(NewPublicPriceUSD, NewPrivatePriceUSD, NewProviderPriceUSD, NewCertificatePriceUSD, NewOwnerRefundFeeUSD){
+    await Aux.CallBackFrame(Contracts.Treasury.methods.updatePrices(NewPublicPriceUSD, NewPrivatePriceUSD, NewProviderPriceUSD, NewCertificatePriceUSD, NewOwnerRefundFeeUSD).send({from: Aux.account }));
   }
 
   export async function RetrieveBalance(address){

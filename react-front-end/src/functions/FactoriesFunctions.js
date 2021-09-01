@@ -1,8 +1,15 @@
  // Factories
  const Contracts = require("./Contracts.js");
+ const Aux = require("./AuxiliaryFunctions.js");
+ const Treasury = require("./TreasuryFunctions.js");
 
  export var privatePoolAddresses = []
  export var providerAddresses = []
+
+ export async function CreatenewPoolProvider(min, list, name, contractType){
+  if(2 == contractType) await Aux.CallBackFrame(Contracts.privatePoolFactory.methods.create(list, min, name).send({from: Aux.account , value: Treasury.PrivatePriceWei}));
+  else await Aux.CallBackFrame(Contracts.providerFactory.methods.create(list, min, name).send({from: Aux.account , value: Treasury.ProviderPriceWei}));
+}
 
  export async function RetrieveFactories(){
     let privateTotalPool = await Contracts.privatePoolFactory.methods.retrieveTotal().call()

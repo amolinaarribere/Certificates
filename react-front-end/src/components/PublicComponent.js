@@ -21,7 +21,7 @@ class PublicComponent extends React.Component {
   
     handleNewProposal = async (event) => {
         event.preventDefault();
-      await ProviderPoolFunc.AddProviderPool(this.state.newProvider, this.state.newProviderInfo, 0, 0, this.state.contractType)
+      await ProviderPoolFunc.AddProviderPool(this.state.newProvider, this.state.newProviderInfo, 0, 0, false, this.state.contractType)
       this.setState({ newProvider: "" })
       this.setState({ newProviderInfo: "" })
     };

@@ -1,6 +1,4 @@
  // Certis Tokens
-/*import Contracts from './Contracts.js';
-import Aux from './AuxiliaryFunctions.js';*/
 const Contracts = require("./Contracts.js");
 const Aux = require("./AuxiliaryFunctions.js");
 

@@ -1,6 +1,4 @@
 // Manager
-/*import Contracts from './Contracts.js';
-import Aux from './AuxiliaryFunctions.js';*/
 const Contracts = require("./Contracts.js");
 const Aux = require("./AuxiliaryFunctions.js");
 
@@ -25,6 +23,8 @@ export var PendingProviderFactoryAddress = ""
 export var PendingProviderImplAddress = "";
 export var PendingTreasuryAddress = ""
 export var PendingCertisTokenAddress = ""
+export var PriceConverterAddress = ""
+export var PriceConverterAddressProxy = ""
 
 export async function RetrieveContractsAddresses(){
     publicPoolAddressProxy = await Contracts.certificatePoolManager.methods.retrievePublicCertificatePoolProxy().call();
@@ -32,6 +32,7 @@ export async function RetrieveContractsAddresses(){
     providerFactoryAddressProxy = await Contracts.certificatePoolManager.methods.retrieveProviderFactoryProxy().call();
     TreasuryAddressProxy = await Contracts.certificatePoolManager.methods.retrieveTreasuryProxy().call();
     CertisTokenAddressProxy = await Contracts.certificatePoolManager.methods.retrieveCertisTokenProxy().call();
+    PriceConverterAddressProxy = await Contracts.certificatePoolManager.methods.retrievePriceConverterProxy().call();
   
     publicPoolAddress = await Contracts.certificatePoolManager.methods.retrievePublicCertificatePool().call();
     privatePoolFactoryAddress = await Contracts.certificatePoolManager.methods.retrievePrivatePoolFactory().call();
@@ -40,9 +41,10 @@ export async function RetrieveContractsAddresses(){
     providerImplAddress = await Contracts.certificatePoolManager.methods.retrieveProvider().call();
     TreasuryAddress = await Contracts.certificatePoolManager.methods.retrieveTreasury().call();
     CertisTokenAddress = await Contracts.certificatePoolManager.methods.retrieveCertisToken().call();
+    PriceConverterAddress = await Contracts.certificatePoolManager.methods.retrievePriceConverter().call();
   }
   
-  export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress, NewCertisTokenAddress, NewPrivatePoolFactoryAddress, NewPrivatePoolAddress, NewProviderFactoryAddress, NewProviderAddress){
+  export async function UpgradeContracts(NewPublicPoolAddress, NewTreasuryAddress, NewCertisTokenAddress, NewPrivatePoolFactoryAddress, NewPrivatePoolAddress, NewProviderFactoryAddress, NewProviderAddress, NewPriceConverterAddress){
     await Aux.CallBackFrame(Contracts.certificatePoolManager.methods.upgradeContracts({
                 "NewPublicPoolAddress": NewPublicPoolAddress,
                 "NewTreasuryAddress": NewTreasuryAddress,
@@ -51,11 +53,13 @@ export async function RetrieveContractsAddresses(){
                 "NewPrivatePoolAddress": NewPrivatePoolAddress,
                 "NewProviderFactoryAddress": NewProviderFactoryAddress,
                 "NewProviderAddress": NewProviderAddress,
+                "NewPriceConverterAddress": NewPriceConverterAddress,
                 "NewPublicPoolData": "0x",
                 "NewTreasuryData":  "0x",
                 "NewCertisTokenData": "0x",
                 "NewPrivatePoolFactoryData": "0x",
-                "NewProviderFactoryData":  "0x"
+                "NewProviderFactoryData":  "0x",
+                "NewPriceConverterData":  "0x"
             }).send({from: Aux.account }));
   
   }

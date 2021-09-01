@@ -31,7 +31,7 @@ class PrivateComponent extends React.Component {
           <CreatePoolIssuer contractType={this.state.contractType}/>
           <br />
           <br />
-          <ListPoolsIssuers contractType={this.state.contractType} Key={func.privatePoolKey}/>
+          <ListPoolsIssuers contractType={this.state.contractType} Key={ProviderPoolFunc.privatePoolKey}/>
           <br />
           <CertificateComponent contractType={this.state.contractType} privateEnv={this.state.privateEnv}/>
           <br />
