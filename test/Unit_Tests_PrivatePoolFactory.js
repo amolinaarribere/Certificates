@@ -8,7 +8,7 @@ const constants = require("../test_libraries/constants.js");
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 
-const PrivatePriceWei = constants.PrivatePriceWei;
+const PrivatePriceWei = constants.PrivatePriceUSD * constants.factor;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------

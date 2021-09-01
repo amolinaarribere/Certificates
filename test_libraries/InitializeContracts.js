@@ -28,8 +28,33 @@ const PriceConverterProxyInitializerMethod = {
   "inputs": [
     {
       "internalType": "address",
-      "name": "_registry",
+      "name": "registry",
       "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "managerContractAddress",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "chairPerson",
+      "type": "address"
+    },
+    {
+      "internalType": "uint256",
+      "name": "PropositionLifeTime",
+      "type": "uint256"
+    },
+    {
+      "internalType": "uint8",
+      "name": "PropositionThresholdPercentage",
+      "type": "uint8"
+    },
+    {
+      "internalType": "uint8",
+      "name": "minWeightToProposePercentage",
+      "type": "uint8"
     }
   ],
   "name": "PriceConverter_init",
@@ -231,7 +256,7 @@ function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPers
   let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD, certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose]);
   let PrivatePoolFactoryProxyData = getProxyData(PrivatePoolFactoryProxyInitializerMethod, [certPoolManager]);
   let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
-  let PriceConverterProxyData = getProxyData(PriceConverterProxyInitializerMethod, mockChainLinkFeedRegistry);
+  let PriceConverterProxyData = getProxyData(PriceConverterProxyInitializerMethod, [mockChainLinkFeedRegistry, certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose]);
 
   return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData, PriceConverterProxyData];
 }

@@ -89,6 +89,12 @@ module.exports = async function(deployer, network, accounts){
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
 
   // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, PriceConverter);
+  console.log("Library linked to Price Converter");
+
+  await deployer.link(AddressLibrary, PriceConverter);
+  console.log("AddressLibrary linked to Price Converter");
+
   await deployer.deploy(PriceConverter);
   PriceConverterInstance = await PriceConverter.deployed();
   console.log("PriceConverter deployed : " + PriceConverterInstance.address);
@@ -97,8 +103,33 @@ module.exports = async function(deployer, network, accounts){
     "inputs": [
       {
         "internalType": "address",
-        "name": "_registry",
+        "name": "registry",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "PropositionLifeTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "PropositionThresholdPercentage",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "minWeightToProposePercentage",
+        "type": "uint8"
       }
     ],
     "name": "PriceConverter_init",
@@ -106,7 +137,7 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var PriceConverterProxyInitializerParameters = [ChainLinkRegistryAddress];
+  var PriceConverterProxyInitializerParameters = [ChainLinkRegistryAddress, CertificatesPoolManagerInstance.address, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
   var PriceConverterProxyData = web3.eth.abi.encodeFunctionCall(PriceConverterProxyInitializerMethod, PriceConverterProxyInitializerParameters);
 
   // Certis Token -----------------------------------------------------------------------------------------------------------------------------------------------------------------

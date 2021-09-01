@@ -13,9 +13,9 @@ const CertisToken = artifacts.require("CertisToken");
 const ProviderFactory = artifacts.require("ProviderFactory");
 const ProviderFactoryAbi = ProviderFactory.abi;
 
-const PublicPriceWei = constants.PublicPriceWei;
-const ProviderPriceWei = constants.ProviderPriceWei;
-const CertificatePriceWei = constants.CertificatePriceWei;
+const PublicPriceWei = constants.PublicPriceUSD * constants.factor;
+const ProviderPriceWei = constants.ProviderPriceUSD * constants.factor;
+const CertificatePriceWei = constants.CertificatePriceUSD * constants.factor;
 const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------

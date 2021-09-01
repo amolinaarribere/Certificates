@@ -8,7 +8,7 @@ const constants = require("../test_libraries/constants.js");
 const ProviderFactory = artifacts.require("ProviderFactory");
 const ProviderFactoryAbi = ProviderFactory.abi;
 
-const ProviderPriceWei = constants.ProviderPriceWei;
+const ProviderPriceWei = constants.ProviderPriceUSD * constants.factor;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------

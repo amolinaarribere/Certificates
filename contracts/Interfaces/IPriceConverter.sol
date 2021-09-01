@@ -11,4 +11,8 @@ pragma solidity >=0.8.0 <0.9.0;
 
     function fromUSDToETH(uint) external view returns(uint);
 
+    function updateRegistryAddress(address NewRegistryAddress) external;
+
+    function retrieveRegistryAddress() external view returns(address);
+
 }
