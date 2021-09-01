@@ -13,8 +13,6 @@ import IssuerComponent from './components/IssuerComponent.js';
 import TreasuryComponent from './components/TreasuryComponent.js';
 import ManagerComponent from './components/ManagerComponent.js';
 
-const func = require("./Functions.js");
-
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

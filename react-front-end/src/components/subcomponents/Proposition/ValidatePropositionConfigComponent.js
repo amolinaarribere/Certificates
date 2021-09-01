@@ -1,5 +1,5 @@
 import React from 'react';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/PropositionFunctions.js");
 
 class ValidatePropositionConfigComponent extends React.Component{
 

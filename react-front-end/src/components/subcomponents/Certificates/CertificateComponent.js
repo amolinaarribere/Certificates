@@ -2,7 +2,8 @@ import React from 'react';
 import ListPendingCertificatesComponent from './ListPendingCertificatesComponent';
 import ValidateCertificateComponent from './ValidateCertificateComponent';
 import RejectCertificateComponent from './RejectCertificateComponent';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/CertificateFunctions.js");
+const Loadfunc = require("../../../functions/LoadFunctions.js");
 
 
 class CertificateComponent extends React.Component{
@@ -24,7 +25,7 @@ class CertificateComponent extends React.Component{
   
     convertToBuffer = async (reader) => {
       const buffer = await Buffer.from(reader.result);
-      this.setState({certificateHash: func.web3.utils.keccak256(buffer)});
+      this.setState({certificateHash: Loadfunc.web3.utils.keccak256(buffer)});
     };
   
     handleAddCertificate = async (event) => {

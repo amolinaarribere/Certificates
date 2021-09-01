@@ -1,5 +1,5 @@
 import React from 'react';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/OwnerFunctions.js");
 
 class ListOwnersComponent extends React.Component{
     render(){

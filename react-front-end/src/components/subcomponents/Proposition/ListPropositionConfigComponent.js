@@ -1,5 +1,5 @@
 import React from 'react';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/PropositionFunctions.js");
 
 class ListPropositionConfigComponent extends React.Component{
        render(){

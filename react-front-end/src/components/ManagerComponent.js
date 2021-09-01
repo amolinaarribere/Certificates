@@ -2,12 +2,13 @@ import React from 'react';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import AddressPropositionComponent from './subcomponents/Manager/AddressPropositionComponent.js';
 import PropositionConfigComponent from './subcomponents/Proposition/PropositionConfigComponent.js';
-const func = require("../Functions.js");
+const func = require("../functions/LoadFunctions.js");
+//const Certificatefunc = require("../functions/CertificateFunctions.js");
 
 class ManagerComponent extends React.Component {
     componentWillMount() {
       func.LoadBlockchain()
-      func.SwitchContext()
+      //Certificatefunc.SwitchContext()
    }
    state = {
      contractType : 1

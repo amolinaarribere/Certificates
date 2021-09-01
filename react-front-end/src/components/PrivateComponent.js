@@ -5,14 +5,16 @@ import OwnerComponent from './subcomponents/Owners/OwnerComponent.js';
 import ProviderPoolComponent from './subcomponents/ProvidersPools/ProviderPoolComponent.js';
 import ListPoolsIssuers from './subcomponents/Factory/ListPoolsIssuers.js';
 import CreatePoolIssuer from './subcomponents/Factory/CreatePoolIssuer.js';
-const func = require("../Functions.js");
+const func = require("../functions/LoadFunctions.js");
+const ProviderPoolFunc = require("../functions/ProviderPoolFunctions.js");
+const Certificatefunc = require("../functions/CertificateFunctions.js");
 
 class PrivateComponent extends React.Component {
     componentWillMount() {
       func.LoadBlockchain()
-      func.SwitchContext()
-      if(func.privatePoolAddress != null && func.privatePoolAddress !== "" && func.privatePoolAddress !== "undefined"){
-        func.SelectProviderPool(func.privatePoolAddress, this.state.contractType);
+      Certificatefunc.SwitchContext()
+      if(ProviderPoolFunc.privatePoolAddress != null && ProviderPoolFunc.privatePoolAddress !== "" && ProviderPoolFunc.privatePoolAddress !== "undefined"){
+        ProviderPoolFunc.SelectProviderPool(ProviderPoolFunc.privatePoolAddress, this.state.contractType);
       }
    }
     state = {

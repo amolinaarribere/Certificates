@@ -3,12 +3,12 @@ import PropositionConfigComponent from './subcomponents/Proposition/PropositionC
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import PricePropositionComponent from './subcomponents/Treasury/PricePropositionComponent.js';
 import AssignWithdrawComponent from './subcomponents/Treasury/AssignWithdrawComponent.js';
-const func = require("../Functions.js");
+const func = require("../functions/LoadFunctions.js");
 
 class TreasuryComponent extends React.Component {
     componentWillMount() {
       func.LoadBlockchain()
-      func.SwitchContext()
+      //func.SwitchContext()
    }
     state = {
       contractType : 2
