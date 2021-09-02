@@ -24,11 +24,11 @@ class PricePropositionComponent extends React.Component {
     render(){
       return (
         <div>
-          <p><b>Submit New Provider to Public Pool Price :</b> {func.PublicPriceWei}</p>
-          <p><b>Create New Private Pool Price :</b> {func.PrivatePriceWei}</p>
-          <p><b>Create New Provider Price :</b> {func.ProviderPriceWei}</p>
-          <p><b>Send Certificate to Public Pool Price :</b> {func.CertificatePriceWei}</p>
-          <p><b>Refund Fee :</b> {func.OwnerRefundFeeWei}</p>
+          <p><b>Submit New Provider to Public Pool Price :</b> {func.PublicPriceUSD} USD ({func.PublicPriceWei} wei)</p>
+          <p><b>Create New Private Pool Price :</b> {func.PrivatePriceUSD} USD ({func.PrivatePriceWei} wei)</p>
+          <p><b>Create New Provider Price :</b> {func.ProviderPriceUSD} USD ({func.ProviderPriceWei} wei)</p>
+          <p><b>Send Certificate to Public Pool Price :</b> {func.CertificatePriceUSD} USD ({func.CertificatePriceWei} wei)</p>
+          <p><b>Refund Fee :</b> {func.OwnerRefundFeeUSD} USD ({func.OwnerRefundFeeWei} wei)</p>
           <br />
           <form onSubmit={this.handleUpgradePrices}>
             <p>

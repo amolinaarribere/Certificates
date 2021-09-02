@@ -23,10 +23,10 @@ export var PendingTreasuryProp = "";
 
 export async function UpgradeProposition(NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage, contractType){
     if(contractType == 1){
-      await Aux.CallBackFrame(Contracts.certificatePoolManager.methods.updateProp({NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage}).send({from: Aux.account }));
+      await Aux.CallBackFrame(Contracts.certificatePoolManager.methods.updateProp(NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage).send({from: Aux.account }));
     }
     else{
-      await Aux.CallBackFrame(Contracts.Treasury.methods.updateProp({NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage}).send({from: Aux.account }));
+      await Aux.CallBackFrame(Contracts.Treasury.methods.updateProp(NewPropositionLifeTime, NewPropositionThresholdPercentage, NewMinWeightToProposePercentage).send({from: Aux.account }));
     }
   }
   

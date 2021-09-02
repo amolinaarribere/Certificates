@@ -7,15 +7,16 @@ export var publicPoolAddressProxy = ""
 export var privatePoolFactoryAddress = ""
 export var privatePoolFactoryAddressProxy = ""
 export var privatePoolImplAddress = "";
-
 export var providerFactoryAddress = ""
 export var providerFactoryAddressProxy = ""
 export var providerImplAddress = "";
-
 export var TreasuryAddress = ""
 export var TreasuryAddressProxy = ""
 export var CertisTokenAddress = ""
 export var CertisTokenAddressProxy = ""
+export var PriceConverterAddress = ""
+export var PriceConverterAddressProxy = ""
+
 export var PendingPublicPoolAddress = ""
 export var PendingPrivatePoolFactoryAddress = ""
 export var PendingPrivatePoolImplAddress = "";
@@ -23,8 +24,8 @@ export var PendingProviderFactoryAddress = ""
 export var PendingProviderImplAddress = "";
 export var PendingTreasuryAddress = ""
 export var PendingCertisTokenAddress = ""
-export var PriceConverterAddress = ""
-export var PriceConverterAddressProxy = ""
+export var PendingPriceConverterAddress = ""
+
 
 export async function RetrieveContractsAddresses(){
     publicPoolAddressProxy = await Contracts.certificatePoolManager.methods.retrievePublicCertificatePoolProxy().call();
@@ -61,7 +62,6 @@ export async function RetrieveContractsAddresses(){
                 "NewProviderFactoryData":  "0x",
                 "NewPriceConverterData":  "0x"
             }).send({from: Aux.account }));
-  
   }
   
   export async function RetrievePendingContractsAddresses(){
@@ -71,5 +71,6 @@ export async function RetrieveContractsAddresses(){
       PendingPrivatePoolFactoryAddress,
       PendingPrivatePoolImplAddress,
       PendingProviderFactoryAddress,
-      PendingProviderImplAddress] = await Contracts.certificatePoolManager.methods.retrieveProposition().call({from: Aux.account });
+      PendingProviderImplAddress,
+      PendingPriceConverterAddress] = await Contracts.certificatePoolManager.methods.retrieveProposition().call({from: Aux.account });
   }

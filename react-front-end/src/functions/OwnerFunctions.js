@@ -51,7 +51,7 @@ export async function AddOwner(address, info, contractType){
     if(1 == contractType){
       publicMinOwners = await Contracts.publicPool.methods.retrieveMinOwners().call()
       publicOwners = await Contracts.publicPool.methods.retrieveAllOwners().call()
-      publicTotalOwners = privateOwners.length
+      publicTotalOwners = publicOwners.length
 
       pendingPublicOwnersAdd = await Aux.RetrievePendings(Contracts.publicPool.methods.retrievePendingOwners(true).call());
       pendingPublicOwnersRemove = await Aux.RetrievePendings(Contracts.publicPool.methods.retrievePendingOwners(false).call());
