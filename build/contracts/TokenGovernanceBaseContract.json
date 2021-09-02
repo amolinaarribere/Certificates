@@ -348,27 +348,27 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity >=0.7.0 <0.9.0;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n import \"@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol\";\r\n import \"../Interfaces/ITokenEventSubscriber.sol\";\r\n import \"../Libraries/AddressLibrary.sol\";\r\n import \"../Libraries/Library.sol\";\r\n import \"./ManagedBaseContract.sol\";\r\n import \"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\";\r\n\r\nabstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initializable, ManagedBaseContract {\r\n    using Library for *;\r\n    using AddressLibrary for *; \r\n\r\n    // EVENTS /////////////////////////////////////////\r\n    event _AddedProposition(uint256, address indexed, uint256, uint256);\r\n    event _CancelledProposition(uint256, address indexed);\r\n    event _PropositionVote(uint256, address indexed, bool, uint256);\r\n    event _PropositionApproved(uint256, address indexed, uint256, uint256);\r\n    event _PropositionRejected(uint256, address indexed, uint256, uint256);\r\n    event _UsedTokensTransfered(uint256 indexed, address, address, uint256);\r\n\r\n    // DATA /////////////////////////////////////////\r\n    // chair person\r\n    address internal _chairperson;\r\n\r\n    // Proposition Structure\r\n    struct PropositionStruct{\r\n        uint256 PropID;\r\n        address Proposer;\r\n        uint256 DeadLine;\r\n        uint256 validationThreshold;\r\n        uint256 VotesFor;\r\n        uint256 VotesAgainst;\r\n    }\r\n\r\n    PropositionStruct internal _Proposition;\r\n\r\n    uint256 internal _nextPropID;\r\n\r\n    mapping(uint => mapping(address => uint)) internal _votersPerProp;\r\n\r\n    uint internal _PropositionLifeTime;\r\n    uint8 internal _PropositionThresholdPercentage;\r\n    uint8 internal _minWeightToProposePercentage;\r\n\r\n    // Proposition to change Prop parameters\r\n    bool internal _currentPropisProp;\r\n\r\n    struct ProposedPropositionStruct{\r\n        uint256 NewPropositionLifeTime;\r\n        uint8 NewPropositionThresholdPercentage;\r\n        uint8 NewMinWeightToProposePercentage;\r\n    }\r\n\r\n    ProposedPropositionStruct internal _ProposedProposition;\r\n\r\n    // MODIFIERS /////////////////////////////////////////\r\n    modifier isFromChairPerson(){\r\n        require(true == Library.ItIsSomeone(_chairperson), \"EC8-\");\r\n        _;\r\n    }\r\n\r\n    modifier isAuthorizedToPropose(){\r\n        require(true == AuthorizedToPropose(msg.sender), \"EC22-\");\r\n        _;\r\n    }\r\n\r\n    modifier isAuthorizedToCancel(){\r\n        require(true == Library.ItIsSomeone(_Proposition.Proposer), \"EC22-\");\r\n        _;\r\n    }\r\n\r\n    modifier canVote(){\r\n        require(true == AuthorizedToVote(msg.sender, _Proposition.PropID), \"EC23-\");\r\n         _;\r\n    }\r\n\r\n    modifier PropositionInProgress(bool yesOrno){\r\n        if(yesOrno) require(true == CheckIfPropositionActive(), \"EC25-\");\r\n        else require(false == CheckIfPropositionActive(), \"EC24-\");\r\n        _;\r\n    }\r\n\r\n    modifier isFromTokenContract(){\r\n        require(true == Library.ItIsSomeone(_managerContract.retrieveCertisTokenProxy()), \"EC8-\");\r\n        _;\r\n    }\r\n\r\n    modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){\r\n        require(100 >= PropositionThresholdPercentage, \"EC21-\");\r\n        require(100 >= minWeightToProposePercentage, \"EC21-\");\r\n        _;\r\n    }\r\n\r\n    // auxiliairy function\r\n    function AuthorizedToPropose(address addr) internal view returns(bool) {\r\n        if(addr == _chairperson) return true;\r\n        else \r\n        {\r\n            uint numberOfTokens = GetTokensBalance(addr);\r\n            if(numberOfTokens > (_minWeightToProposePercentage * totalSupply() / 100)) return true;\r\n            return false;\r\n        }\r\n    }\r\n\r\n    function AuthorizedToVote(address addr, uint256 id) internal view returns(bool) {\r\n        uint votingTokens = GetVotingTokens(addr, id);\r\n        return (votingTokens > 0);\r\n    }\r\n\r\n    function totalSupply() internal view returns(uint256){\r\n        return IERC20Upgradeable(_managerContract.retrieveCertisTokenProxy()).totalSupply();\r\n    }\r\n\r\n    function GetTokensBalance(address add) internal view returns(uint256){\r\n        return IERC20Upgradeable(_managerContract.retrieveCertisTokenProxy()).balanceOf(add);\r\n    }\r\n\r\n    function GetVotingTokens(address addr, uint id) internal view returns(uint256){\r\n        return (GetTokensBalance(addr) - _votersPerProp[id][addr]);\r\n    }\r\n\r\n    function CheckIfPropositionActive() internal returns(bool){\r\n        if(block.timestamp < _Proposition.DeadLine)\r\n        {\r\n            return true;\r\n        }\r\n        else \r\n        {\r\n            if(address(0) != _Proposition.Proposer){\r\n                propositionExpired();\r\n                InternalCancelProposition();\r\n            } \r\n            return false;\r\n        }\r\n    }\r\n\r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {\r\n        super.ManagedBaseContract_init(managerContractAddress);\r\n        _chairperson = chairperson;\r\n        _nextPropID = 0; \r\n        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);\r\n    }\r\n    \r\n    // Manage Prop Parameters\r\n    function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external\r\n    {\r\n        InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);\r\n    }\r\n\r\n    function InternalupdateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc, bool fromConstructor) internal\r\n        isPropOK(PropThresholdPerc, minWeightToPropPerc)\r\n    {\r\n        if(fromConstructor){\r\n            _PropositionLifeTime = PropLifeTime;\r\n            _PropositionThresholdPercentage = PropThresholdPerc;\r\n            _minWeightToProposePercentage = minWeightToPropPerc;\r\n        }\r\n        else{\r\n            _ProposedProposition.NewPropositionLifeTime = PropLifeTime;\r\n            _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;\r\n            _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;\r\n            _currentPropisProp = true;\r\n            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);\r\n        }   \r\n    }\r\n\r\n    function retrievePropConfig() external view returns(uint, uint8, uint8)\r\n    {\r\n        return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);\r\n    }\r\n\r\n    function retrievePendingPropConfig() external view returns(uint, uint8, uint8, bool)\r\n    {\r\n        if(_currentPropisProp && (block.timestamp < _Proposition.DeadLine)){\r\n            return (_ProposedProposition.NewPropositionLifeTime,\r\n                _ProposedProposition.NewPropositionThresholdPercentage,\r\n                _ProposedProposition.NewMinWeightToProposePercentage,\r\n                true);\r\n        }\r\n        return (0,0,0,false);\r\n    }\r\n\r\n    // FUNCTIONALITY /////////////////////////////////////////\r\n    function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal\r\n        PropositionInProgress(false)\r\n        isAuthorizedToPropose()\r\n    {\r\n        _Proposition.Proposer = msg.sender;\r\n        _Proposition.DeadLine = _DeadLine;\r\n        _Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;\r\n        _Proposition.PropID = _nextPropID;\r\n        _nextPropID++;\r\n\r\n        emit _AddedProposition(_Proposition.PropID, _Proposition.Proposer, _Proposition.DeadLine, _Proposition.validationThreshold);\r\n    }\r\n\r\n    function cancelProposition() external\r\n        PropositionInProgress(true)\r\n        isAuthorizedToCancel()\r\n    {\r\n        InternalCancelProposition();\r\n        emit _CancelledProposition(_Proposition.PropID, _Proposition.Proposer);\r\n    }\r\n\r\n    function voteProposition(bool vote) external\r\n        PropositionInProgress(true)\r\n        canVote()\r\n    {\r\n        uint VotingTokens = GetVotingTokens(msg.sender, _Proposition.PropID);\r\n\r\n        if(vote)\r\n        {\r\n            _Proposition.VotesFor += VotingTokens;\r\n        }\r\n        else\r\n        {\r\n            _Proposition.VotesAgainst += VotingTokens;\r\n        }\r\n\r\n        Voted(_Proposition.PropID, msg.sender,VotingTokens);\r\n\r\n        emit _PropositionVote(_Proposition.PropID, msg.sender, vote, VotingTokens);\r\n\r\n        checkProposition();\r\n    }\r\n\r\n    function onTokenBalanceChanged(address from, address to, uint256 amount) external\r\n        isFromTokenContract()\r\n    override\r\n    {\r\n        InternalonTokenBalanceChanged(from, to, amount);\r\n    }\r\n\r\n    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal virtual\r\n    {\r\n        if(true == CheckIfPropositionActive()) transferVoting(from, to, amount);\r\n    }\r\n\r\n    function transferVoting(address from, address to, uint256 amount) internal \r\n    {\r\n        if(address(0) != from && _votersPerProp[_Proposition.PropID][from] > 0)\r\n        {\r\n            uint256 usedTokenToTransfer = amount;\r\n            if(amount > _votersPerProp[_Proposition.PropID][from]) usedTokenToTransfer = _votersPerProp[_Proposition.PropID][from];\r\n\r\n            _votersPerProp[_Proposition.PropID][from] -= usedTokenToTransfer;\r\n\r\n            if(address(0) != to)  _votersPerProp[_Proposition.PropID][to] += usedTokenToTransfer;\r\n\r\n            emit _UsedTokensTransfered(_Proposition.PropID, from, to, usedTokenToTransfer);\r\n        }\r\n    }\r\n\r\n    function Voted(uint256 id, address voter, uint256 votingTokens) internal\r\n    {\r\n        _votersPerProp[id][voter] += votingTokens;\r\n    }\r\n\r\n    function checkProposition() internal\r\n    {\r\n        if(_Proposition.VotesFor > _Proposition.validationThreshold) \r\n        {\r\n            if(_currentPropisProp){\r\n                _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;\r\n                _PropositionThresholdPercentage = _ProposedProposition.NewPropositionThresholdPercentage;\r\n                _minWeightToProposePercentage = _ProposedProposition.NewMinWeightToProposePercentage;\r\n                removePropositionProp();\r\n            }\r\n            else{\r\n                propositionApproved();\r\n            }\r\n            InternalCancelProposition();\r\n            emit _PropositionApproved(_Proposition.PropID, _Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst);\r\n        }\r\n        else if(_Proposition.VotesAgainst > _Proposition.validationThreshold)\r\n        {\r\n            if(_currentPropisProp){\r\n                removePropositionProp();\r\n            }\r\n            else{\r\n                propositionRejected();\r\n            }\r\n            InternalCancelProposition();\r\n            emit _PropositionRejected(_Proposition.PropID, _Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst);\r\n        } \r\n    }\r\n\r\n    function removePropositionProp() internal\r\n    {\r\n        delete(_ProposedProposition);\r\n        _currentPropisProp = false;\r\n    }\r\n\r\n    function InternalCancelProposition() internal\r\n    {\r\n        delete(_Proposition);\r\n    }\r\n\r\n    function retrievePropositionStatus() external view returns(address, uint256, uint256, uint256, uint256){\r\n        return (_Proposition.Proposer,\r\n            _Proposition.DeadLine,\r\n            _Proposition.validationThreshold,\r\n            _Proposition.VotesFor,\r\n            _Proposition.VotesAgainst\r\n        );\r\n    }\r\n\r\n    function retrieveProposition() external virtual view returns(bytes32[] memory){}\r\n\r\n    function propositionApproved() internal virtual{}\r\n\r\n    function propositionRejected() internal virtual{}\r\n\r\n    function propositionExpired() internal virtual{}\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Base\\TokenGovernanceBaseContract.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Base/TokenGovernanceBaseContract.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/TokenGovernanceBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        7483
+        3644
       ],
       "IERC20Upgradeable": [
-        10046
+        5077
       ],
       "IProxyManager": [
-        7272
+        3433
       ],
       "ITokenEventSubscriber": [
-        7285
+        3446
       ],
       "Initializable": [
-        9395
+        4999
       ],
       "Library": [
-        8662
+        4823
       ],
       "ManagedBaseContract": [
         2041
@@ -402,7 +402,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 10047,
+        "sourceUnit": 5078,
         "src": "152:79:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -414,7 +414,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 7286,
+        "sourceUnit": 3447,
         "src": "234:49:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -426,7 +426,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 7484,
+        "sourceUnit": 3645,
         "src": "286:41:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -438,7 +438,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 8663,
+        "sourceUnit": 4824,
         "src": "330:34:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -462,7 +462,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 9396,
+        "sourceUnit": 5000,
         "src": "405:75:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -475,7 +475,7 @@
               "id": 2050,
               "name": "ITokenEventSubscriber",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7285,
+              "referencedDeclaration": 3446,
               "src": "533:21:5"
             },
             "id": 2051,
@@ -487,7 +487,7 @@
               "id": 2052,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 9395,
+              "referencedDeclaration": 4999,
               "src": "556:13:5"
             },
             "id": 2053,
@@ -514,8 +514,8 @@
         "linearizedBaseContracts": [
           3009,
           2041,
-          9395,
-          7285
+          4999,
+          3446
         ],
         "name": "TokenGovernanceBaseContract",
         "nameLocation": "502:27:5",
@@ -527,7 +527,7 @@
               "id": 2056,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8662,
+              "referencedDeclaration": 4823,
               "src": "604:7:5"
             },
             "nodeType": "UsingForDirective",
@@ -539,7 +539,7 @@
               "id": 2058,
               "name": "AddressLibrary",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7483,
+              "referencedDeclaration": 3644,
               "src": "630:14:5"
             },
             "nodeType": "UsingForDirective",
@@ -1886,10 +1886,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 8662,
+                              "referencedDeclaration": 4823,
                               "src": "2273:7:5",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$8662_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$4823_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -1900,7 +1900,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 8543,
+                            "referencedDeclaration": 4704,
                             "src": "2273:19:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -2276,10 +2276,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 8662,
+                              "referencedDeclaration": 4823,
                               "src": "2529:7:5",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$8662_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$4823_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -2290,7 +2290,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 8543,
+                            "referencedDeclaration": 4704,
                             "src": "2529:19:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -2997,7 +2997,7 @@
                                   "referencedDeclaration": 2009,
                                   "src": "3035:16:5",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$7272",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$3433",
                                     "typeString": "contract IProxyManager"
                                   }
                                 },
@@ -3008,7 +3008,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveCertisTokenProxy",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 7201,
+                                "referencedDeclaration": 3362,
                                 "src": "3035:41:5",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -3043,10 +3043,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 8662,
+                              "referencedDeclaration": 4823,
                               "src": "3015:7:5",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$8662_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$4823_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -3057,7 +3057,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 8543,
+                            "referencedDeclaration": 4704,
                             "src": "3015:19:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -4220,7 +4220,7 @@
                                 "referencedDeclaration": 2009,
                                 "src": "4028:16:5",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IProxyManager_$7272",
+                                  "typeIdentifier": "t_contract$_IProxyManager_$3433",
                                   "typeString": "contract IProxyManager"
                                 }
                               },
@@ -4231,7 +4231,7 @@
                               "lValueRequested": false,
                               "memberName": "retrieveCertisTokenProxy",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 7201,
+                              "referencedDeclaration": 3362,
                               "src": "4028:41:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -4265,10 +4265,10 @@
                           "name": "IERC20Upgradeable",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 10046,
+                          "referencedDeclaration": 5077,
                           "src": "4010:17:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$10046_$",
+                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$5077_$",
                             "typeString": "type(contract IERC20Upgradeable)"
                           }
                         },
@@ -4283,7 +4283,7 @@
                         "src": "4010:62:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$10046",
+                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$5077",
                           "typeString": "contract IERC20Upgradeable"
                         }
                       },
@@ -4294,7 +4294,7 @@
                       "lValueRequested": false,
                       "memberName": "totalSupply",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 9977,
+                      "referencedDeclaration": 5008,
                       "src": "4010:74:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$__$returns$_t_uint256_$",
@@ -4419,7 +4419,7 @@
                                 "referencedDeclaration": 2009,
                                 "src": "4207:16:5",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IProxyManager_$7272",
+                                  "typeIdentifier": "t_contract$_IProxyManager_$3433",
                                   "typeString": "contract IProxyManager"
                                 }
                               },
@@ -4430,7 +4430,7 @@
                               "lValueRequested": false,
                               "memberName": "retrieveCertisTokenProxy",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 7201,
+                              "referencedDeclaration": 3362,
                               "src": "4207:41:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -4464,10 +4464,10 @@
                           "name": "IERC20Upgradeable",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 10046,
+                          "referencedDeclaration": 5077,
                           "src": "4189:17:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$10046_$",
+                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$5077_$",
                             "typeString": "type(contract IERC20Upgradeable)"
                           }
                         },
@@ -4482,7 +4482,7 @@
                         "src": "4189:62:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$10046",
+                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$5077",
                           "typeString": "contract IERC20Upgradeable"
                         }
                       },
@@ -4493,7 +4493,7 @@
                       "lValueRequested": false,
                       "memberName": "balanceOf",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 9985,
+                      "referencedDeclaration": 5016,
                       "src": "4189:72:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
@@ -5535,7 +5535,7 @@
                   "id": 2434,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 9394,
+                  "referencedDeclaration": 4998,
                   "src": "5104:11:5"
                 },
                 "nodeType": "ModifierInvocation",
@@ -8784,7 +8784,7 @@
           },
           {
             "baseFunctions": [
-              7284
+              3445
             ],
             "body": {
               "id": 2740,
@@ -12217,22 +12217,22 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/TokenGovernanceBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        7483
+        3644
       ],
       "IERC20Upgradeable": [
-        10046
+        5077
       ],
       "IProxyManager": [
-        7272
+        3433
       ],
       "ITokenEventSubscriber": [
-        7285
+        3446
       ],
       "Initializable": [
-        9395
+        4999
       ],
       "Library": [
-        8662
+        4823
       ],
       "ManagedBaseContract": [
         2041
@@ -12266,7 +12266,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 10047,
+        "sourceUnit": 5078,
         "src": "152:79:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12278,7 +12278,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 7286,
+        "sourceUnit": 3447,
         "src": "234:49:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12290,7 +12290,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 7484,
+        "sourceUnit": 3645,
         "src": "286:41:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12302,7 +12302,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 8663,
+        "sourceUnit": 4824,
         "src": "330:34:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12326,7 +12326,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 3010,
-        "sourceUnit": 9396,
+        "sourceUnit": 5000,
         "src": "405:75:5",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12339,7 +12339,7 @@
               "id": 2050,
               "name": "ITokenEventSubscriber",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7285,
+              "referencedDeclaration": 3446,
               "src": "533:21:5"
             },
             "id": 2051,
@@ -12351,7 +12351,7 @@
               "id": 2052,
               "name": "Initializable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 9395,
+              "referencedDeclaration": 4999,
               "src": "556:13:5"
             },
             "id": 2053,
@@ -12378,8 +12378,8 @@
         "linearizedBaseContracts": [
           3009,
           2041,
-          9395,
-          7285
+          4999,
+          3446
         ],
         "name": "TokenGovernanceBaseContract",
         "nameLocation": "502:27:5",
@@ -12391,7 +12391,7 @@
               "id": 2056,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8662,
+              "referencedDeclaration": 4823,
               "src": "604:7:5"
             },
             "nodeType": "UsingForDirective",
@@ -12403,7 +12403,7 @@
               "id": 2058,
               "name": "AddressLibrary",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7483,
+              "referencedDeclaration": 3644,
               "src": "630:14:5"
             },
             "nodeType": "UsingForDirective",
@@ -13750,10 +13750,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 8662,
+                              "referencedDeclaration": 4823,
                               "src": "2273:7:5",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$8662_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$4823_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -13764,7 +13764,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 8543,
+                            "referencedDeclaration": 4704,
                             "src": "2273:19:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -14140,10 +14140,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 8662,
+                              "referencedDeclaration": 4823,
                               "src": "2529:7:5",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$8662_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$4823_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -14154,7 +14154,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 8543,
+                            "referencedDeclaration": 4704,
                             "src": "2529:19:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -14861,7 +14861,7 @@
                                   "referencedDeclaration": 2009,
                                   "src": "3035:16:5",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IProxyManager_$7272",
+                                    "typeIdentifier": "t_contract$_IProxyManager_$3433",
                                     "typeString": "contract IProxyManager"
                                   }
                                 },
@@ -14872,7 +14872,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveCertisTokenProxy",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 7201,
+                                "referencedDeclaration": 3362,
                                 "src": "3035:41:5",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -14907,10 +14907,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 8662,
+                              "referencedDeclaration": 4823,
                               "src": "3015:7:5",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$8662_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$4823_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -14921,7 +14921,7 @@
                             "lValueRequested": false,
                             "memberName": "ItIsSomeone",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 8543,
+                            "referencedDeclaration": 4704,
                             "src": "3015:19:5",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_view$_t_address_$returns$_t_bool_$",
@@ -16084,7 +16084,7 @@
                                 "referencedDeclaration": 2009,
                                 "src": "4028:16:5",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IProxyManager_$7272",
+                                  "typeIdentifier": "t_contract$_IProxyManager_$3433",
                                   "typeString": "contract IProxyManager"
                                 }
                               },
@@ -16095,7 +16095,7 @@
                               "lValueRequested": false,
                               "memberName": "retrieveCertisTokenProxy",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 7201,
+                              "referencedDeclaration": 3362,
                               "src": "4028:41:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -16129,10 +16129,10 @@
                           "name": "IERC20Upgradeable",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 10046,
+                          "referencedDeclaration": 5077,
                           "src": "4010:17:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$10046_$",
+                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$5077_$",
                             "typeString": "type(contract IERC20Upgradeable)"
                           }
                         },
@@ -16147,7 +16147,7 @@
                         "src": "4010:62:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$10046",
+                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$5077",
                           "typeString": "contract IERC20Upgradeable"
                         }
                       },
@@ -16158,7 +16158,7 @@
                       "lValueRequested": false,
                       "memberName": "totalSupply",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 9977,
+                      "referencedDeclaration": 5008,
                       "src": "4010:74:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$__$returns$_t_uint256_$",
@@ -16283,7 +16283,7 @@
                                 "referencedDeclaration": 2009,
                                 "src": "4207:16:5",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IProxyManager_$7272",
+                                  "typeIdentifier": "t_contract$_IProxyManager_$3433",
                                   "typeString": "contract IProxyManager"
                                 }
                               },
@@ -16294,7 +16294,7 @@
                               "lValueRequested": false,
                               "memberName": "retrieveCertisTokenProxy",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 7201,
+                              "referencedDeclaration": 3362,
                               "src": "4207:41:5",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_view$__$returns$_t_address_$",
@@ -16328,10 +16328,10 @@
                           "name": "IERC20Upgradeable",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 10046,
+                          "referencedDeclaration": 5077,
                           "src": "4189:17:5",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$10046_$",
+                            "typeIdentifier": "t_type$_t_contract$_IERC20Upgradeable_$5077_$",
                             "typeString": "type(contract IERC20Upgradeable)"
                           }
                         },
@@ -16346,7 +16346,7 @@
                         "src": "4189:62:5",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$10046",
+                          "typeIdentifier": "t_contract$_IERC20Upgradeable_$5077",
                           "typeString": "contract IERC20Upgradeable"
                         }
                       },
@@ -16357,7 +16357,7 @@
                       "lValueRequested": false,
                       "memberName": "balanceOf",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 9985,
+                      "referencedDeclaration": 5016,
                       "src": "4189:72:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
@@ -17399,7 +17399,7 @@
                   "id": 2434,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 9394,
+                  "referencedDeclaration": 4998,
                   "src": "5104:11:5"
                 },
                 "nodeType": "ModifierInvocation",
@@ -20648,7 +20648,7 @@
           },
           {
             "baseFunctions": [
-              7284
+              3445
             ],
             "body": {
               "id": 2740,
@@ -24083,7 +24083,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-09-02T12:48:40.638Z",
+  "updatedAt": "2021-09-02T12:54:05.480Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

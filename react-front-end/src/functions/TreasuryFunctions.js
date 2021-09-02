@@ -4,7 +4,7 @@ const Aux = require("./AuxiliaryFunctions.js");
 const Manager = require("./ManagerFunctions.js");
 const PriceConverter = require("./PriceConverter.js");
 
-export var accountBalance = "";
+export var AccountBalance = "";
 export var TreasuryBalance = "";
 export var TreasuryAggregatedBalance = "";
 
@@ -56,7 +56,7 @@ export var PendingOwnerRefundFeeUSD = "";
   }
 
   export async function RetrieveBalance(address){
-    accountBalance = await Contracts.Treasury.methods.retrieveBalance(address).call();
+    AccountBalance = await Contracts.Treasury.methods.retrieveBalance(address).call();
   }
 
   export async function RetrieveTreasuryBalance(){
