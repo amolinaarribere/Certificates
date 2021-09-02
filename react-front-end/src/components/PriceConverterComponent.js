@@ -2,6 +2,7 @@ import React from 'react';
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import PropositionConfigComponent from './subcomponents/Proposition/PropositionConfigComponent.js';
 import AddressPropositionComponent from './subcomponents/PriceConverter/AddressPropositionComponent.js';
+import PriceConvertToWeiComponent from './subcomponents/PriceConverter/PriceConvertToWeiComponent.js';
 const func = require("../functions/LoadFunctions.js");
 
 class PriceConverterComponent extends React.Component {
@@ -17,6 +18,8 @@ class PriceConverterComponent extends React.Component {
       return (
         <div>
          <CurrentAddressComponent />
+          <br />
+          <PriceConvertToWeiComponent />
           <br />
           <AddressPropositionComponent />
           <br />

@@ -1,5 +1,4 @@
 import React from 'react';
-import { CERTIFICATE_POOL_MANAGER_ADDRESS} from '../../../config';
 const func = require("../../../functions/PriceConverterFunctions.js");
 const Aux = require("../../../functions/AuxiliaryFunctions.js");
 const address_0 = "0x0000000000000000000000000000000000000000";
