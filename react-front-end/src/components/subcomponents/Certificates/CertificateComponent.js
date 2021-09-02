@@ -3,7 +3,7 @@ import ListPendingCertificatesComponent from './ListPendingCertificatesComponent
 import ValidateCertificateComponent from './ValidateCertificateComponent';
 import RejectCertificateComponent from './RejectCertificateComponent';
 const func = require("../../../functions/CertificateFunctions.js");
-const Loadfunc = require("../../../functions/LoadFunctions.js");
+const Aux = require("../../../functions/AuxiliaryFunctions.js");
 
 
 class CertificateComponent extends React.Component{
@@ -25,19 +25,19 @@ class CertificateComponent extends React.Component{
   
     convertToBuffer = async (reader) => {
       const buffer = await Buffer.from(reader.result);
-      this.setState({certificateHash: Loadfunc.web3.utils.keccak256(buffer)});
+      this.setState({certificateHash: Aux.web3.utils.keccak256(buffer)});
     };
   
     handleAddCertificate = async (event) => {
         event.preventDefault();
       await func.AddCertificate(this.state.certificateHash, this.state.holderAddress, this.props.privateEnv, this.props.contractType, this.state.poolAddress);
-      this.setState({ certificateHash: "",  holderAddress: ""})
+      this.setState({ certificateHash: "",  holderAddress: "", poolAddress: ""})
     };
   
     handleCheckCertificate = async (event) => {
         event.preventDefault();
       await func.CheckCertificate(this.state.certificateHash, this.state.holderAddress, this.props.privateEnv);
-      this.setState({ certificateHash: "",  holderAddress: ""})
+      this.setState({ certificateHash: "",  holderAddress: "", poolAddress: ""})
     };
   
     handleRetrieveByHolder = async (event) => {
@@ -106,9 +106,6 @@ class CertificateComponent extends React.Component{
             <br />
             <RejectCertificateComponent />
             <br />
-            <p>{func.certificateProvider}</p>
-            <br />
-            <br/>
             <ListPendingCertificatesComponent />
           </div>
         );

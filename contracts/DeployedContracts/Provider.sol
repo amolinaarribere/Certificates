@@ -31,11 +31,8 @@ pragma solidity >=0.7.0 <0.9.0;
     uint256 constant _poolId = 1;
     string constant _poolLabel = "Pool";
 
-    //mapping(address => uint256) private _AddCertificatePricePerPoolUSD;
-    //mapping(address => uint256) private _SubscriptionPricePerPoolUSD;
     mapping(address => bool) private _mustSubscribe;
     mapping(address => bool) private _submited;
-
 
     // Certificates
     uint256 constant _certId = 2;
@@ -89,16 +86,6 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    /*function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePriceUSD, uint256 SubscriptionPriceUSD, bool mustSubscribe) external override{
-         if(false == _submited[pool]){
-            _AddCertificatePricePerPoolUSD[pool] = AddCertificatePrice;
-            _SubscriptionPricePerPoolUSD[pool] = SubscriptionPrice;
-            _mustSubscribe[pool] = mustSubscribe;
-            _submited[pool] = true;
-        }
-        addEntity(pool, poolInfo, _poolId);
-    }*/
-
     function addPool(address pool, string calldata poolInfo, bool mustSubscribe) external override{
          if(false == _submited[pool]){
             _mustSubscribe[pool] = mustSubscribe;
@@ -122,22 +109,11 @@ pragma solidity >=0.7.0 <0.9.0;
         rejectEntity(pool, _poolId);
     }
 
-    function removePricesForPool(address pool) internal
+    function removeConfigForPool(address pool) internal
     {
         delete(_submited[pool]);
         delete(_mustSubscribe[pool]);
-        //delete(_AddCertificatePricePerPoolUSD[pool]);
-        //delete(_SubscriptionPricePerPoolUSD[pool]);
     }
-    
-    /*function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256, bool)
-    {
-        string memory poolInfo;
-        bool isActivated;
-
-        (poolInfo, isActivated) = InternalRetrievePool(pool);
-        return (poolInfo, isActivated, _AddCertificatePricePerPoolUSD[pool], _SubscriptionPricePerPoolUSD[pool], _mustSubscribe[pool]);
-    }*/
 
     function retrievePool(address pool) external override view returns (string memory, bool, bool)
     {
@@ -191,7 +167,7 @@ pragma solidity >=0.7.0 <0.9.0;
         return(certIdIdArray);
     }
 
-     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
+    function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
         isCertificateActivated(false, CertificateHash, pool, holder) 
@@ -205,7 +181,7 @@ pragma solidity >=0.7.0 <0.9.0;
         ItemsLibrary.addItem(manipulateItemStruct,itemsstruct, address(this));
      }
 
-     function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
+    function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
         isCertificatePendingToAdd(true, CertificateHash, pool, holder)
@@ -243,7 +219,7 @@ pragma solidity >=0.7.0 <0.9.0;
         ItemsLibrary._ItemsStruct storage itemStruct = _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
 
         ItemsLibrary.RemoveResizeActivated(CertificateHash, itemStruct);
-        delete(itemStruct._items[CertificateHash]);   
+        delete(itemStruct._items[CertificateHash]);
     }
 
     function retrievePendingCertificates() external override view returns (Library._pendingCertificatesStruct[] memory)
@@ -296,7 +272,7 @@ pragma solidity >=0.7.0 <0.9.0;
         if(ids[0] == _poolId){
             address pool = AddressLibrary.Bytes32ToAddress(item);
 
-            if(false == addOrRemove)removePricesForPool(pool);
+            if(false == addOrRemove)removeConfigForPool(pool);
             else if(true == _mustSubscribe[pool]){
                 IPool poolToSubscribe = IPool(pool);
                 uint SubscriptionPrice = poolToSubscribe.retrieveSubscriptionPriceWei();
@@ -316,7 +292,7 @@ pragma solidity >=0.7.0 <0.9.0;
         if(ids[0] == _poolId){
             address pool = AddressLibrary.Bytes32ToAddress(item);
 
-            if(true == addOrRemove)removePricesForPool(pool);
+            if(true == addOrRemove)removeConfigForPool(pool);
         } 
         else if(ids[0] == _certId){
             RemoveResizeCertificatesStructArray(_pendingCertificates, ids[3]);

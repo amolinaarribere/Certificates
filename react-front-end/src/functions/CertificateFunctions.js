@@ -35,6 +35,7 @@ export async function AddCertificate(hash, holder, isPrivate, contractType, pool
   }
 
   export async function RetrievePendingCertificates(){
+    pendingCertificates = []
     let pendingCerts = await ProviderPool.provider.methods.retrievePendingCertificates().call({from: Aux.account });
     for (let i = 0; i < pendingCerts.length; i++) {
       pendingCertificates[i] = [pendingCerts[i][0], pendingCerts[i][1], pendingCerts[i][2]]

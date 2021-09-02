@@ -5,15 +5,13 @@ class AddProviderPoolComponent extends React.Component{
     state = {
       addProviderPool : "",
       addProviderPoolInfo : "",
-      subscriptionPrice : "",
-      certificatePrice : "",
       subscribe : false
     };
 
     handleAddProvider = async (event) => {
         event.preventDefault();
-      await func.AddProviderPool(this.state.addProviderPool, this.state.addProviderPoolInfo, this.state.subscriptionPrice, this.state.certificatePrice, this.state.subscribe, this.props.contractType)
-      this.setState({ addProviderPoolInfo: "", addProviderPool: "",  subscriptionPrice : 0, certificatePrice : 0, subscribe: false})
+      await func.AddProviderPool(this.state.addProviderPool, this.state.addProviderPoolInfo, this.state.subscribe, this.props.contractType)
+      this.setState({ addProviderPoolInfo: "", addProviderPool: "", subscribe: false})
     };
   
     render(){
@@ -42,12 +40,6 @@ class AddProviderPoolComponent extends React.Component{
                 <input type="text" name="addProviderInfo" placeholder="Info" 
                     value={this.state.addProviderPoolInfo}
                     onChange={event => this.setState({ addProviderPoolInfo: event.target.value })}/>
-                <input type="integer" name="subscriptionPrice" placeholder="subscriptionPrice" 
-                  value={this.state.subscriptionPrice}
-                  onChange={event => this.setState({ subscriptionPrice: event.target.value })}/>
-                <input type="integer" name="certificatePrice" placeholder="certificatePrice" 
-                  value={this.state.certificatePrice}
-                  onChange={event => this.setState({ certificatePrice: event.target.value })}/>
                 <input type="checkbox" name="subscribe"
                   checked={this.state.subscribe}
                   onChange={event => this.setState({ subscribe: event.target.checked })} />

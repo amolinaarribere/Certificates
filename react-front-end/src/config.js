@@ -1,4 +1,4 @@
-export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x9Ac51529a2B6A70647d8c78676eb51A6975eaB01'
+export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0xF3F105D42E68f900488BfB5613709704a0b15525'
 
 export const CERTIFICATE_POOL_MANAGER_ABI = [
   {
@@ -1327,6 +1327,32 @@ export const PUBLIC_ABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "retrieveAddCertificatePriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "retrieveSubscriptionPriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -2615,7 +2641,7 @@ export const CERTIS_ABI = [
   }
 ]
 
-export const PRIVATE_ABI = [
+export const PRIVATE_ABI =  [
   {
     "anonymous": false,
     "inputs": [
@@ -2866,6 +2892,19 @@ export const PRIVATE_ABI = [
   },
   {
     "inputs": [],
+    "name": "retrieveAddCertificatePriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "retrieveAllOwners",
     "outputs": [
       {
@@ -3066,6 +3105,19 @@ export const PRIVATE_ABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "retrieveSubscriptionPriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -3137,7 +3189,7 @@ export const PRIVATE_ABI = [
   }
 ]
 
-export const PROVIDER_ABI = [
+export const PROVIDER_ABI =  [
   {
     "inputs": [
       {
@@ -3246,8 +3298,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3260,8 +3311,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3285,8 +3335,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3299,8 +3348,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3324,8 +3372,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3349,8 +3396,7 @@ export const PROVIDER_ABI = [
   },
   {
     "stateMutability": "payable",
-    "type": "receive",
-    "payable": true
+    "type": "receive"
   },
   {
     "inputs": [
@@ -3386,16 +3432,6 @@ export const PROVIDER_ABI = [
         "internalType": "string",
         "name": "poolInfo",
         "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "AddCertificatePrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "SubscriptionPrice",
-        "type": "uint256"
       },
       {
         "internalType": "bool",
@@ -3468,24 +3504,13 @@ export const PROVIDER_ABI = [
         "type": "bool"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "bool",
         "name": "",
         "type": "bool"
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3498,8 +3523,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3523,8 +3547,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3623,8 +3646,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3653,8 +3675,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [

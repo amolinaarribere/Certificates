@@ -32,10 +32,10 @@ export var privateProviders = []
 export var providerTotalPools = ""
 export var providerPools = []
 
-export async function AddProviderPool(address, Info, subsprice, certprice, subscribe, contractType){
+export async function AddProviderPool(address, Info, subscribe, contractType){
     if(1 == contractType)await Aux.CallBackFrame(Contracts.publicPool.methods.addProvider(address, Info).send({from: Aux.account , value: Treasury.PublicPriceWei}));
     else if(2 == contractType)await Aux.CallBackFrame(privatePool.methods.addProvider(address, Info).send({from: Aux.account }));
-    else await Aux.CallBackFrame(provider.methods.addPool(address, Info, certprice, subsprice, subscribe).send({from: Aux.account }));
+    else await Aux.CallBackFrame(provider.methods.addPool(address, Info, subscribe).send({from: Aux.account }));
   }
   
   export async function RemoveProviderPool(address, contractType){
