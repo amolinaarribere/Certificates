@@ -13,6 +13,9 @@ pragma solidity >=0.7.0 <0.9.0;
     function retrieveTotalCertificatesByHolder(address holder) external view returns (uint256);
     function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external view returns (bytes32[] memory);
 
+    function retrieveAddCertificatePriceWei() external view returns(uint256);
+    function retrieveSubscriptionPriceWei() external view returns(uint256);
+
     function addProvider(address provider, string calldata providerInfo) external payable;
     function removeProvider(address provider) external;
     function validateProvider(address provider) external;

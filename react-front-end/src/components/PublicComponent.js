@@ -3,12 +3,14 @@ import CertificateComponent from './subcomponents/Certificates/CertificateCompon
 import CurrentAddressComponent from './subcomponents/CurrentAddressComponent.js';
 import OwnerComponent from './subcomponents/Owners/OwnerComponent.js';
 import ProviderPoolComponent from './subcomponents/ProvidersPools/ProviderPoolComponent.js';
-const func = require("../Functions.js");
+const func = require("../functions/LoadFunctions.js");
+const ProviderPoolFunc = require("../functions/ProviderPoolFunctions.js");
+const Certificatefunc = require("../functions/CertificateFunctions.js");
 
 class PublicComponent extends React.Component {
     componentWillMount() {
       func.LoadBlockchain()
-      func.SwitchContext()
+      Certificatefunc.SwitchContext()
    }
     state = {
       newProvider : "",
@@ -19,7 +21,7 @@ class PublicComponent extends React.Component {
   
     handleNewProposal = async (event) => {
         event.preventDefault();
-      await func.AddProviderPool(this.state.newProvider, this.state.newProviderInfo, 0, 0, this.state.contractType)
+      await ProviderPoolFunc.AddProviderPool(this.state.newProvider, this.state.newProviderInfo, 0, 0, false, this.state.contractType)
       this.setState({ newProvider: "" })
       this.setState({ newProviderInfo: "" })
     };

@@ -6,6 +6,11 @@ let PrivateCertificatesPool = artifacts.require("./DeployedContracts/PrivateCert
 let CertisToken = artifacts.require("./DeployedContracts/CertisToken");
 let PrivatePoolFactory = artifacts.require("./DeployedContracts/PrivatePoolFactory");
 let ProviderFactory = artifacts.require("./DeployedContracts/ProviderFactory");
+let PriceConverter = artifacts.require("./DeployedContracts/PriceConverter");
+let ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+// only for testing
+let MockChainLinkFeedRegistry = artifacts.require("./DeployedContracts/Mock/MockChainLinkFeedRegistry");
+
 
 const obj = require("../test_libraries/objects.js");
 
@@ -21,15 +26,30 @@ const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const PublicPriceWei = 10000;
-const PrivatePriceWei = 200;
-const ProviderPriceWei = 250;
-const CertificatePriceWei = 1000;
-const OwnerRefundFeeWei = 2000;
+const PublicPriceUSD = 10000;
+const PrivatePriceUSD = 200;
+const ProviderPriceUSD = 250;
+const CertificatePriceUSD = 1000;
+const OwnerRefundFeeUSD = 2000;
+const factor = 1000;
 const PublicMinOwners = 1;
 
 
 module.exports = async function(deployer, network, accounts){
+
+  if("development" == network || 
+  "ganache" == network )
+  {
+    await deployer.deploy(MockChainLinkFeedRegistry, factor);
+    MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
+    console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
+    ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
+  }
+  else if("Kovan" == network)
+  {
+    ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
+  }
+
   const PublicOwners = [accounts[0]];
 
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +87,58 @@ module.exports = async function(deployer, network, accounts){
   await deployer.deploy(CertificatesPoolManager, PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage);
   CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
+
+  // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, PriceConverter);
+  console.log("Library linked to Price Converter");
+
+  await deployer.link(AddressLibrary, PriceConverter);
+  console.log("AddressLibrary linked to Price Converter");
+
+  await deployer.deploy(PriceConverter);
+  PriceConverterInstance = await PriceConverter.deployed();
+  console.log("PriceConverter deployed : " + PriceConverterInstance.address);
+
+  var PriceConverterProxyInitializerMethod = {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "PropositionLifeTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "PropositionThresholdPercentage",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "minWeightToProposePercentage",
+        "type": "uint8"
+      }
+    ],
+    "name": "PriceConverter_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  };
+  var PriceConverterProxyInitializerParameters = [ChainLinkRegistryAddress, CertificatesPoolManagerInstance.address, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
+  var PriceConverterProxyData = web3.eth.abi.encodeFunctionCall(PriceConverterProxyInitializerMethod, PriceConverterProxyInitializerParameters);
 
   // Certis Token -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, CertisToken);
@@ -138,27 +210,27 @@ module.exports = async function(deployer, network, accounts){
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "PublicPriceWei",
+        "name": "PublicPriceUSD",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "PrivatePriceWei",
+        "name": "PrivatePriceUSD",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "ProviderPriceWei",
+        "name": "ProviderPriceUSD",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "CertificatePriceWei",
+        "name": "CertificatePriceUSD",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "OwnerRefundPriceWei",
+        "name": "OwnerRefundFeeUSD",
         "type": "uint256"
       },
       {
@@ -193,7 +265,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var TreasuryProxyInitializerParameters = [PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundFeeWei, CertificatesPoolManagerInstance.address, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
+  var TreasuryProxyInitializerParameters = [PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, CertificatesPoolManagerInstance.address, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage];
   var TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
 
   // Private Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -316,8 +388,18 @@ module.exports = async function(deployer, network, accounts){
   await CertificatesPoolManagerInstance.InitializeContracts(
     obj.returnUpgradeObject(PublicCertificatesPoolInstance.address,
        TreasuryInstance.address,
-        CertisTokenInstance.address, PrivatePoolFactoryInstance.address, PrivateCertificatesPoolInstance.address, ProviderFactoryInstance.address, ProviderInstance.address, 
-      PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData));
+        CertisTokenInstance.address, 
+        PrivatePoolFactoryInstance.address, 
+        PrivateCertificatesPoolInstance.address, 
+        ProviderFactoryInstance.address, 
+        ProviderInstance.address, 
+        PriceConverterInstance.address,
+        PublicCertificatesPoolProxyData, 
+        TreasuryProxyData, 
+        CertisProxyData, 
+        PrivatePoolFactoryProxyData, 
+        ProviderFactoryProxyData, 
+        PriceConverterProxyData));
   console.log("CertificatesPoolManager initialized");
     
 }

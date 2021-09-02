@@ -28,11 +28,13 @@ library Library{
         address NewPrivatePoolAddress;
         address NewProviderFactoryAddress;
         address NewProviderAddress;
+        address NewPriceConverterAddress;
         bytes NewPublicPoolData;
         bytes NewTreasuryData;
         bytes NewCertisTokenData;
         bytes NewPrivatePoolFactoryData;
         bytes NewProviderFactoryData;
+        bytes NewPriceConverterData;
     }
 
     // Pending Certificates

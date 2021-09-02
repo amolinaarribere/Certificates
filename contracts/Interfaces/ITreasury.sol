@@ -13,7 +13,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
     function pay(Library.Prices price) external payable;
     
-    function updatePrices(uint256 PublicPriceWei, uint256 PrivatePriceWei, uint256 ProviderPriceWei, uint256 CertificatePriceWei, uint256 OwnerRefundPriceWei) external;
+    function updatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundPriceUSD) external;
     
     function getRefund(address addr, uint numberOfOwners) external;
     function AssignDividends() external;

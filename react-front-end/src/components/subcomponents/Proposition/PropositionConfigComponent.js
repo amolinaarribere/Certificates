@@ -4,7 +4,6 @@ import UpgradePropositionConfigComponent from './UpgradePropositionConfigCompone
 import ListPendingPropositionConfigComponent from './ListPendingPropositionConfigComponent.js';
 import ValidatePropositionConfigComponent from './ValidatePropositionConfigComponent.js';
 import RejectPropositionConfigComponent from './RejectPropositionConfigComponent.js';
-const func = require("../../../Functions.js");
 
 class PropositionConfigComponent extends React.Component{
        render(){

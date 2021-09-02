@@ -13,6 +13,7 @@ pragma solidity >=0.7.0 <0.9.0;
  import "../Base/ManagedBaseContract.sol";
  import "../Libraries/AddressLibrary.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+ import "../Interfaces/IPriceConverter.sol";
 
  contract PublicCertificatesPool is Initializable, MultiSigCertificatesPool, ManagedBaseContract {
     using Library for *;
@@ -55,6 +56,18 @@ pragma solidity >=0.7.0 <0.9.0;
     {
         ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewCertificate);
         addCertificateInternal(CertificateHash, holder);
+    }
+
+    function retrieveAddCertificatePriceWei() external override view returns(uint256)
+    {
+        (, , , uint Price, ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrievePrices();
+        return IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(Price);
+    }
+
+    function retrieveSubscriptionPriceWei() external override virtual view returns(uint256)
+    {
+        (uint Price, , , , ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrievePrices();
+        return IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(Price);
     }
 
     // Callback functions

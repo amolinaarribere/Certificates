@@ -1,4 +1,4 @@
-export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x89DcD0AE2c78cA3E05C2736d8CD650240784d054'
+export const CERTIFICATE_POOL_MANAGER_ADDRESS = '0x5c4A0Df21c88871738Aa9e160A3397eDc1a3fb88'
 
 export const CERTIFICATE_POOL_MANAGER_ABI = [
   {
@@ -75,6 +75,12 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
   {
     "anonymous": false,
     "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
       {
         "indexed": false,
         "internalType": "address",
@@ -301,7 +307,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -324,7 +331,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -357,7 +365,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -435,6 +444,11 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
             "type": "address"
           },
           {
+            "internalType": "address",
+            "name": "NewPriceConverterAddress",
+            "type": "address"
+          },
+          {
             "internalType": "bytes",
             "name": "NewPublicPoolData",
             "type": "bytes"
@@ -457,6 +471,11 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
           {
             "internalType": "bytes",
             "name": "NewProviderFactoryData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "NewPriceConverterData",
             "type": "bytes"
           }
         ],
@@ -510,6 +529,11 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
             "type": "address"
           },
           {
+            "internalType": "address",
+            "name": "NewPriceConverterAddress",
+            "type": "address"
+          },
+          {
             "internalType": "bytes",
             "name": "NewPublicPoolData",
             "type": "bytes"
@@ -532,6 +556,11 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
           {
             "internalType": "bytes",
             "name": "NewProviderFactoryData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "NewPriceConverterData",
             "type": "bytes"
           }
         ],
@@ -556,7 +585,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -569,7 +599,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -582,7 +613,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -595,7 +627,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -608,7 +641,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -621,7 +655,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -634,7 +669,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -647,7 +683,22 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "retrievePriceConverterProxy",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -660,7 +711,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -673,7 +725,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -686,7 +739,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -699,7 +753,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -712,7 +767,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -725,7 +781,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -738,7 +795,22 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "retrievePriceConverter",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -751,7 +823,8 @@ export const CERTIFICATE_POOL_MANAGER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   }
 ]
 
@@ -1251,6 +1324,32 @@ export const PUBLIC_ABI = [
     "name": "addCertificate",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "retrieveAddCertificatePriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "retrieveSubscriptionPriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -2542,7 +2641,7 @@ export const CERTIS_ABI = [
   }
 ]
 
-export const PRIVATE_ABI = [
+export const PRIVATE_ABI =  [
   {
     "anonymous": false,
     "inputs": [
@@ -2793,6 +2892,19 @@ export const PRIVATE_ABI = [
   },
   {
     "inputs": [],
+    "name": "retrieveAddCertificatePriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "retrieveAllOwners",
     "outputs": [
       {
@@ -2993,6 +3105,19 @@ export const PRIVATE_ABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "retrieveSubscriptionPriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -3064,7 +3189,7 @@ export const PRIVATE_ABI = [
   }
 ]
 
-export const PROVIDER_ABI = [
+export const PROVIDER_ABI =  [
   {
     "inputs": [
       {
@@ -3173,8 +3298,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3187,8 +3311,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3212,8 +3335,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3226,8 +3348,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3251,8 +3372,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3276,8 +3396,7 @@ export const PROVIDER_ABI = [
   },
   {
     "stateMutability": "payable",
-    "type": "receive",
-    "payable": true
+    "type": "receive"
   },
   {
     "inputs": [
@@ -3313,16 +3432,6 @@ export const PROVIDER_ABI = [
         "internalType": "string",
         "name": "poolInfo",
         "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "AddCertificatePrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "SubscriptionPrice",
-        "type": "uint256"
       },
       {
         "internalType": "bool",
@@ -3395,24 +3504,13 @@ export const PROVIDER_ABI = [
         "type": "bool"
       },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "bool",
         "name": "",
         "type": "bool"
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -3425,8 +3523,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3450,8 +3547,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3550,8 +3646,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3580,8 +3675,7 @@ export const PROVIDER_ABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -3628,5 +3722,447 @@ export const PROVIDER_ABI = [
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  }
+]
+
+export const PRICECONVERTER_ABI = [
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_AddedProposition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "_CancelledProposition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "_NewRegistryAddress",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_PropositionApproved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_PropositionRejected",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_PropositionVote",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_UsedTokensTransfered",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "cancelProposition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "onTokenBalanceChanged",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "retrievePendingPropConfig",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "retrievePropConfig",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "retrievePropositionStatus",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "PropLifeTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "PropThresholdPerc",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "minWeightToPropPerc",
+        "type": "uint8"
+      }
+    ],
+    "name": "updateProp",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "vote",
+        "type": "bool"
+      }
+    ],
+    "name": "voteProposition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "PropositionLifeTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "PropositionThresholdPercentage",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "minWeightToProposePercentage",
+        "type": "uint8"
+      }
+    ],
+    "name": "PriceConverter_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "NewRegistryAddress",
+        "type": "address"
+      }
+    ],
+    "name": "updateRegistryAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "retrieveProposition",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_USDamount",
+        "type": "uint256"
+      }
+    ],
+    "name": "fromUSDToETH",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "retrieveRegistryAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
   }
 ]

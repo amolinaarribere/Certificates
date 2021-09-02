@@ -1,5 +1,5 @@
 import React from 'react';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/TreasuryFunctions.js");
 
 class AssignWithdrawComponent extends React.Component {
     state = {

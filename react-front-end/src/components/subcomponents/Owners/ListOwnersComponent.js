@@ -1,5 +1,6 @@
 import React from 'react';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/OwnerFunctions.js");
+const Aux = require("../../../functions/AuxiliaryFunctions.js");
 
 class ListOwnersComponent extends React.Component{
     render(){
@@ -11,7 +12,7 @@ class ListOwnersComponent extends React.Component{
             <p><b>Public Owners :</b>
               <ol>
                 {func.publicOwners.map(publicOwner => (
-                <li key={publicOwner}>{func.Bytes32ToAddress(publicOwner)}</li>
+                <li key={publicOwner}>{Aux.Bytes32ToAddress(publicOwner)}</li>
                 ))}
               </ol>
             </p>
@@ -26,7 +27,7 @@ class ListOwnersComponent extends React.Component{
             <p><b>Private Owners :</b>
               <ol>
                 {func.privateOwners.map(privateOwner => (
-                <li key={privateOwner}>{func.Bytes32ToAddress(privateOwner)}</li>
+                <li key={privateOwner}>{Aux.Bytes32ToAddress(privateOwner)}</li>
                 ))}
               </ol>
             </p>
@@ -41,7 +42,7 @@ class ListOwnersComponent extends React.Component{
             <p><b>Provider Owners :</b>
               <ol>
                 {func.providerOwners.map(providerOwner => (
-                <li key={providerOwner}>{func.Bytes32ToAddress(providerOwner)}</li>
+                <li key={providerOwner}>{Aux.Bytes32ToAddress(providerOwner)}</li>
                 ))}
               </ol>
             </p>

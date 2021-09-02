@@ -12,10 +12,7 @@ const CertisToken = artifacts.require("CertisToken");
 var CertisTokenAbi = CertisToken.abi;
 const Library = artifacts.require("./Libraries/Library");
 
-const PublicPriceWei = constants.PublicPriceWei;
-const PrivatePriceWei = constants.PrivatePriceWei;
-const CertificatePriceWei = constants.CertificatePriceWei;
-const OwnerRefundPriceWei = constants.OwnerRefundPriceWei;
+const PublicPriceWei = constants.PublicPriceUSD * constants.factor;
 const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------

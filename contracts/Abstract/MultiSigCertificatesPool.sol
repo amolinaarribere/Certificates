@@ -169,6 +169,14 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         return (ListOfCertificatesByHolder);
     }
 
+    function retrieveAddCertificatePriceWei() external override virtual view returns(uint256)
+    {
+        return 0;
+    }
 
+    function retrieveSubscriptionPriceWei() external override virtual view returns(uint256)
+    {
+        return 0;
+    }
 
 }

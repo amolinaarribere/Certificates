@@ -1,5 +1,5 @@
 import React from 'react';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/PropositionFunctions.js");
 
 class RejectPropositionConfigComponent extends React.Component{
 
@@ -12,7 +12,7 @@ class RejectPropositionConfigComponent extends React.Component{
       return(
         <div>
           <form onSubmit={this.handleRejectPropConfig}>
-              <button>Reject Proposition Configuratio</button>
+              <button>Reject Proposition Configuration</button>
           </form>
         </div>
       );

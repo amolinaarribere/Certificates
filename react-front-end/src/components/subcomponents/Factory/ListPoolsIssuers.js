@@ -1,5 +1,6 @@
 import React from 'react';
-const func = require("../../../Functions.js");
+const func = require("../../../functions/FactoriesFunctions.js");
+const ProviderPoolFunctions = require("../../../functions/ProviderPoolFunctions.js");
 
 class FundProviderComponent extends React.Component{
     state = {
@@ -8,7 +9,7 @@ class FundProviderComponent extends React.Component{
   
     handleFundProvider = async (event) => {
       event.preventDefault();
-      await func.FundProvider(this.state.Amount);
+      await ProviderPoolFunctions.FundProvider(this.state.Amount);
       this.setState({ Amount: 0 })
     };
     
@@ -34,7 +35,8 @@ class SelectPoolIssuerComponent extends React.Component{
       handleSelectProviderPool = async (event) => {
         event.preventDefault();
         sessionStorage.setItem(this.props.Key, this.state.ProviderPool, { path: '/' });
-        await func.SelectProviderPool(this.state.ProviderPool, this.props.contractType);
+
+        await ProviderPoolFunctions.SelectProviderPool(this.state.ProviderPool, this.props.contractType);
         this.setState({ ProviderPool: "" })
       };
       
@@ -70,7 +72,7 @@ class ListPoolsIssuers extends React.Component {
                     <br />
                     <SelectPoolIssuerComponent contractType={this.props.contractType} Key={this.props.Key}/>
                     <br />
-                    <h4> Selected Private Pool : {func.privatePoolAddress}</h4>
+                    <h4> Selected Private Pool : {ProviderPoolFunctions.privatePoolAddress}</h4>
                 </div>
             );
         }
@@ -88,9 +90,9 @@ class ListPoolsIssuers extends React.Component {
                     <br />
                     <SelectPoolIssuerComponent contractType={this.props.contractType} Key={this.props.Key}/>
                     <br />
-                    <h4> Selected Provider : {func.providerAddress}</h4>
+                    <h4> Selected Provider : {ProviderPoolFunctions.providerAddress}</h4>
                     <br />
-                    <p><b>Contract Balance :</b> {func.providerBalance}</p>
+                    <p><b>Contract Balance :</b> {ProviderPoolFunctions.providerBalance}</p>
                     <br />
                     <FundProviderComponent />
                 </div>
