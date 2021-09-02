@@ -12,7 +12,7 @@ class ListPropositionConfigComponent extends React.Component{
             </div>
           );
          }
-         else{
+         else if (this.props.contractType == 2){
           return (
             <div>
                <p><b>Proposition Life Time :</b> {func.TreasuryPropositionLifeTime}</p>
@@ -21,7 +21,15 @@ class ListPropositionConfigComponent extends React.Component{
             </div>
           );
          }
-         
+         else if (this.props.contractType == 3){
+          return (
+            <div>
+               <p><b>Proposition Life Time :</b> {func.PCPropositionLifeTime}</p>
+               <p><b>Proposition Threshold Percentage :</b> {func.PCPropositionThresholdPercentage}</p>
+               <p><b>Min Weight To Propose Percentage :</b> {func.PCMinWeightToProposePercentage}</p>
+            </div>
+          );
+         }
        }
   }
 

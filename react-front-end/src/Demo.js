@@ -12,6 +12,7 @@ import CertisTokensComponent from './components/CertisTokensComponent.js';
 import IssuerComponent from './components/IssuerComponent.js';
 import TreasuryComponent from './components/TreasuryComponent.js';
 import ManagerComponent from './components/ManagerComponent.js';
+import PriceConverterComponent from './components/PriceConverterComponent.js';
 
 
 function TabPanel(props) {
@@ -68,6 +69,7 @@ class Demo extends React.Component {
             <Tab label="Provider" {...a11yProps(3)} />
             <Tab label="Treasury" {...a11yProps(4)} />
             <Tab label="Certis Tokens" {...a11yProps(5)} />
+            <Tab label="Price Converter" {...a11yProps(6)} />
           </Tabs>
         </AppBar>
         <TabPanel value={this.state.value} index={0}>
@@ -87,6 +89,9 @@ class Demo extends React.Component {
         </TabPanel>
         <TabPanel value={this.state.value} index={5}>
           <CertisTokensComponent />
+        </TabPanel>
+        <TabPanel value={this.state.value} index={6}>
+          <PriceConverterComponent />
         </TabPanel>
       </div>
     );

@@ -2,7 +2,7 @@
 const Contracts = require("./Contracts.js");
 const Aux = require("./AuxiliaryFunctions.js");
 const Manager = require("./ManagerFunctions.js");
-const PriceConverter = require("./PriceConverter.js");
+const PriceConverter = require("./PriceConverterFunctions.js");
 
 export var AccountBalance = "";
 export var TreasuryBalance = "";

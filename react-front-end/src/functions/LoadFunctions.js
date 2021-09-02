@@ -8,6 +8,7 @@ const PropositionFunc = require("./PropositionFunctions.js");
 const CertisFunc = require("./CertisFunctions.js");
 const Contracts = require("./Contracts.js");
 const ManagerFunc = require("./ManagerFunctions.js");
+const PriceConverterFunc = require("./PriceConverterFunctions.js");
 const Aux = require("./AuxiliaryFunctions.js");
 
 export var chairPerson = ""
@@ -39,12 +40,16 @@ export async function LoadBlockchain() {
   await TreasuryFunc.RetrievePendingPricesTreasury();
   await PropositionFunc.RetrieveProposition(1);
   await PropositionFunc.RetrieveProposition(2);
+  await PropositionFunc.RetrieveProposition(3);
   await PropositionFunc.RetrievePendingProposition(1);
   await PropositionFunc.RetrievePendingProposition(2);
+  await PropositionFunc.RetrievePendingProposition(3);
   await CertisFunc.totalSupply();
   await CertisFunc.balanceOf(Aux.account);
   await TreasuryFunc.RetrieveBalance(Aux.account);
   await TreasuryFunc.RetrieveTreasuryBalance();
+  await PriceConverterFunc.RetrieveRegistryAddress();
+  await PriceConverterFunc.RetrievePendingRegistryAddress();
 }
 
 
