@@ -75,7 +75,7 @@ contract("Testing Provider",function(accounts){
     }
 
     async function SubscribingToPublicPool(validateOrreject){
-        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+        await provider.methods.addPool(publicCertPoolAddress, pool_Info, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
         if(validateOrreject){
             await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[1], gas: Gas}, function(error, result){}); 
             await ValidateProvider();
@@ -106,22 +106,18 @@ contract("Testing Provider",function(accounts){
     }
 
     async function CheckPool(validateOrreject, subscriptionPriceForPool){
-        let {0:_PoolInfo,1:_isPool,2:_AddCertificatePrice,3:_SubscriptionPrice} = await provider.methods.retrievePool(publicCertPoolAddress).call({from: user_1}, function(error, result){});
+        let {0:_PoolInfo,1:_isPool} = await provider.methods.retrievePool(publicCertPoolAddress).call({from: user_1}, function(error, result){});
         let _Pools = await provider.methods.retrieveAllPools().call({from: user_1}, function(error, result){});
         let _Total = _Pools.length;
         if(validateOrreject){
             expect(_PoolInfo).to.equal(pool_Info);
             expect(_isPool).to.be.true;
-            expect(_AddCertificatePrice.toString()).to.be.equal(CertificatePriceWei.toString());
-            expect(_SubscriptionPrice.toString()).to.be.equal(subscriptionPriceForPool.toString());
             expect(_Total).to.equal(1);
             expect(_Pools[0]).to.equal(pool_common.AddressToBytes32(publicCertPoolAddress));
         }
         else{
             expect(_PoolInfo).to.equal("");
             expect(_isPool).to.be.false;
-            expect(_AddCertificatePrice.toString()).to.be.equal("0");
-            expect(_SubscriptionPrice.toString()).to.be.equal("0");
             expect(_Total).to.equal(0);
         }
         
@@ -143,10 +139,10 @@ contract("Testing Provider",function(accounts){
 
     // ****** TESTING Subscribing Pool ***************************************************************** //
 
-    it("Subscribe Pool WRONG 1",async function(){
+    it("Subscribe Pool WRONG",async function(){
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: user_1, gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, true).send({from: user_1, gas: Gas}, function(error, result){});
             expect.fail();
         }
         // assert
@@ -155,7 +151,7 @@ contract("Testing Provider",function(accounts){
         }
         // act
         try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+            await provider.methods.addPool(publicCertPoolAddress, pool_Info, true).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
             await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
             expect.fail();
         }
@@ -165,18 +161,6 @@ contract("Testing Provider",function(accounts){
         }
     });
 
-    it("Subscribe Pool WRONG 2",async function(){
-        // act
-        try{
-            await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, PublicPriceWei - 1, true).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
-            await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[2], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughFunds);
-        }
-    });
 
     it("Subscribe Pool CORRECT 1",async function(){
         // act
@@ -208,7 +192,7 @@ contract("Testing Provider",function(accounts){
     it("Add Pool CORRECT",async function(){
         // act
         AddProvider();
-        await provider.methods.addPool(publicCertPoolAddress, pool_Info, CertificatePriceWei, 0, false).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
+        await provider.methods.addPool(publicCertPoolAddress, pool_Info, false).send({from: ProviderOwners[0], gas: Gas}, function(error, result){});
         await provider.methods.validatePool(publicCertPoolAddress).send({from: ProviderOwners[1], gas: Gas}, function(error, result){});
         // assert
         await CheckPool(true, 0);

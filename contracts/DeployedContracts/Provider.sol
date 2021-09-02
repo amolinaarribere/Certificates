@@ -13,6 +13,7 @@ pragma solidity >=0.7.0 <0.9.0;
  import "../Libraries/ItemsLibrary.sol";
  import "../Libraries/AddressLibrary.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+ import "../Interfaces/IPriceConverter.sol";
 
  contract Provider is IProvider, Initializable, MultiSigContract {
     using Library for *;
@@ -30,8 +31,8 @@ pragma solidity >=0.7.0 <0.9.0;
     uint256 constant _poolId = 1;
     string constant _poolLabel = "Pool";
 
-    mapping(address => uint256) private _AddCertificatePricePerPool;
-    mapping(address => uint256) private _SubscriptionPricePerPool;
+    //mapping(address => uint256) private _AddCertificatePricePerPoolUSD;
+    //mapping(address => uint256) private _SubscriptionPricePerPoolUSD;
     mapping(address => bool) private _mustSubscribe;
     mapping(address => bool) private _submited;
 
@@ -88,10 +89,18 @@ pragma solidity >=0.7.0 <0.9.0;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice, bool mustSubscribe) external override{
+    /*function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePriceUSD, uint256 SubscriptionPriceUSD, bool mustSubscribe) external override{
          if(false == _submited[pool]){
-            _AddCertificatePricePerPool[pool] = AddCertificatePrice;
-            _SubscriptionPricePerPool[pool] = SubscriptionPrice;
+            _AddCertificatePricePerPoolUSD[pool] = AddCertificatePrice;
+            _SubscriptionPricePerPoolUSD[pool] = SubscriptionPrice;
+            _mustSubscribe[pool] = mustSubscribe;
+            _submited[pool] = true;
+        }
+        addEntity(pool, poolInfo, _poolId);
+    }*/
+
+    function addPool(address pool, string calldata poolInfo, bool mustSubscribe) external override{
+         if(false == _submited[pool]){
             _mustSubscribe[pool] = mustSubscribe;
             _submited[pool] = true;
         }
@@ -117,17 +126,26 @@ pragma solidity >=0.7.0 <0.9.0;
     {
         delete(_submited[pool]);
         delete(_mustSubscribe[pool]);
-        delete(_AddCertificatePricePerPool[pool]);
-        delete(_SubscriptionPricePerPool[pool]);
+        //delete(_AddCertificatePricePerPoolUSD[pool]);
+        //delete(_SubscriptionPricePerPoolUSD[pool]);
     }
     
-    function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256, bool)
+    /*function retrievePool(address pool) external override view returns (string memory, bool, uint256, uint256, bool)
     {
         string memory poolInfo;
         bool isActivated;
 
         (poolInfo, isActivated) = InternalRetrievePool(pool);
-        return (poolInfo, isActivated, _AddCertificatePricePerPool[pool], _SubscriptionPricePerPool[pool], _mustSubscribe[pool]);
+        return (poolInfo, isActivated, _AddCertificatePricePerPoolUSD[pool], _SubscriptionPricePerPoolUSD[pool], _mustSubscribe[pool]);
+    }*/
+
+    function retrievePool(address pool) external override view returns (string memory, bool, bool)
+    {
+        string memory poolInfo;
+        bool isActivated;
+
+        (poolInfo, isActivated) = InternalRetrievePool(pool);
+        return (poolInfo, isActivated, _mustSubscribe[pool]);
     }
     
     function InternalRetrievePool(address pool) internal view returns (string memory, bool)
@@ -218,7 +236,9 @@ pragma solidity >=0.7.0 <0.9.0;
     {
         IPool poolToSend = IPool(pool);
 
-        poolToSend.addCertificate{value:_AddCertificatePricePerPool[pool]}(CertificateHash, holder);
+        uint AddCertificatePriceWei = poolToSend.retrieveAddCertificatePriceWei();
+
+        poolToSend.addCertificate{value:AddCertificatePriceWei}(CertificateHash, holder);
 
         ItemsLibrary._ItemsStruct storage itemStruct = _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
 
@@ -279,7 +299,8 @@ pragma solidity >=0.7.0 <0.9.0;
             if(false == addOrRemove)removePricesForPool(pool);
             else if(true == _mustSubscribe[pool]){
                 IPool poolToSubscribe = IPool(pool);
-                poolToSubscribe.addProvider{value:_SubscriptionPricePerPool[pool]}(address(this), _ProviderInfo);
+                uint SubscriptionPrice = poolToSubscribe.retrieveSubscriptionPriceWei();
+                poolToSubscribe.addProvider{value:SubscriptionPrice}(address(this), _ProviderInfo);
             }
         }
         else if(ids[0] == _certId){
