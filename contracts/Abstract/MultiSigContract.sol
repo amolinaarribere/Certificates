@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  MultiSig Contract.
+    Inherits from EntitesBaseCOntract and simply defines CRUD operations for Owners with spepcific security checks
  */
 
  import "../Interfaces/IMultiSigContract.sol";
  import "../Base/EntitiesBaseContract.sol";
- import "../Libraries/AddressLibrary.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, Initializable{
-    using AddressLibrary for *;
 
     // DATA /////////////////////////////////////////
     // proposal for new min owners
@@ -42,7 +40,6 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         require(false == AddressLibrary.FindAddress(msg.sender, _newMinOwnersVoters), "EC5-");
        _;
     }
-
     
     modifier NewMinOwnerInProgress(bool YesOrNo){
         if(YesOrNo) require(0 != _newMinOwners, "EC31-");

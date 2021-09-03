@@ -1,26 +1,35 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  Public Certificate Pools offer the default MultiSig Certificate Pool functionality
+  except for Providers Creation and Certificate Issuing since payments must be made
+  Besides Public Certificate Pool is a managed contract
  */
 
  import "../Abstract/MultiSigCertificatesPool.sol";
  import "../Interfaces/ITreasury.sol";
- import "../Libraries/Library.sol";
  import "../Base/ManagedBaseContract.sol";
- import "../Libraries/AddressLibrary.sol";
- import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  import "../Interfaces/IPriceConverter.sol";
 
- contract PublicCertificatesPool is Initializable, MultiSigCertificatesPool, ManagedBaseContract {
-    using Library for *;
-    using AddressLibrary for *;
+ contract PublicCertificatesPool is MultiSigCertificatesPool, ManagedBaseContract {
 
     // EVENTS /////////////////////////////////////////
     event _NewProposal(address indexed,  string indexed);
+
+    // MODIFIERS /////////////////////////////////////////
+    modifier ProviderisNotActivated(address entity){
+        require(false == isEntity(entity, _providerId), "EC6-");
+        _;
+    }
+
+    modifier ProviderisNotPending(address entity){
+        bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
+        require(false == ItemsLibrary.isItemPendingToAdded(entityInBytes, _Entities[_providerId]) && 
+                false == ItemsLibrary.isItemPendingToRemoved(entityInBytes, _Entities[_providerId]), "EC27-");
+        _;
+    }
 
     // CONSTRUCTOR /////////////////////////////////////////
     function PublicCertPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
@@ -30,8 +39,8 @@ pragma solidity >=0.7.0 <0.9.0;
 
     // FUNCTIONALITY /////////////////////////////////////////
     function addProvider(address provider, string memory providerInfo) external 
-        isEntityActivated(false, provider, _providerId) 
-        isEntityPendingToAdd(false, provider, _providerId)
+        ProviderisNotActivated(provider) 
+        ProviderisNotPending(provider)
     override payable
     {
         ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProvider);

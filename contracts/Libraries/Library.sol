@@ -1,22 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
- */
+/*
+Common functionality for all contracts and libraries
+*/
 
 library Library{
 
+    // DATA /////////////////////////////////////////
     // enum
     enum Prices{NewProvider, NewPool, NewCertificate, NewProviderContract}
-
-    // modifier
-    modifier isIdCorrect(uint Id, uint length){
-        require(true == IdCorrect(Id, length), "EC1-");
-        _;
-    }
 
     // Structures
     // Certificate Manager
@@ -44,7 +38,13 @@ library Library{
         bytes32 certificate;
     }
 
-    // auxiliary functions
+    // MODIFIERS /////////////////////////////////////////
+    modifier isIdCorrect(uint Id, uint length){
+        require(true == IdCorrect(Id, length), "EC1-");
+        _;
+    }
+
+    // FUNCTIONALITY /////////////////////////////////////////
     function IdCorrect(uint Id, uint length) public pure returns (bool){
         return (length > Id);
     }
@@ -61,11 +61,11 @@ library Library{
         array.pop();
     }
 
-    function Bytes32ArrayToString(bytes32[] memory element) internal pure returns(string memory){
+    function Bytes32ArrayToString(bytes32[] memory element) public pure returns(string memory){
         return string(abi.encodePacked(element));
     }
 
-    function BytestoBytes32(bytes memory _b) private pure returns(bytes32[] memory){
+    function BytestoBytes32(bytes memory _b) public pure returns(bytes32[] memory){
         uint num = _b.length / 32;
         bytes32[] memory result = new bytes32[](num + 1);
         uint t = 0;

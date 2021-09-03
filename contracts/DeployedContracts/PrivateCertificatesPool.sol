@@ -1,16 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  Private Certificate Pools offer the default MultiSig Certificate Pool functionality
  */
 
  import "../Abstract/MultiSigCertificatesPool.sol";
- import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
- contract PrivateCertificatesPool is Initializable, MultiSigCertificatesPool {
+ contract PrivateCertificatesPool is MultiSigCertificatesPool {
 
     // CONSTRUCTOR & INIT /////////////////////////////////////////
     function PrivateCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 

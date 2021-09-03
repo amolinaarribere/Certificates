@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  MultiSig Certificate Pool Contract.
+    Inherits from MultiSig and simply defines CRUD operations for Providers as a second Entity next to Owners
+    Also allows for Certificates to be generated for specific holders
  */
 
 import "./MultiSigContract.sol";
 import "../Interfaces/IPool.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigContract {
+abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     
     // EVENTS /////////////////////////////////////////
     event _AddCertificate(address indexed, address indexed, bytes32);
