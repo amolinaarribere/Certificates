@@ -1,20 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  Provider Factory inherits from Factory.
+  Before creating a new Element a payment is made to Treasury.
+  Provider Elements are Beacon Proxy, the Beacon implementation address is stored in Manager contract.
  */
 
  import "../Interfaces/ITreasury.sol";
- import "../Libraries/Library.sol";
  import "../Abstract/Factory.sol";
  import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
- import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ProviderFactory is Initializable, Factory{
-    using Library for *;
+contract ProviderFactory is Factory{
     
     // CONSTRUCTOR /////////////////////////////////////////
     function ProviderFactory_init(address managerContractAddress) public initializer {

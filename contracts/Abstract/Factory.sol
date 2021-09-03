@@ -1,10 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  Factory abstract contracts :
+    Common functionality to Private Pool and Provider Factories contracts for
+    Building Elements (Private Pools / Providers) also known as clones :
+    - Creator (user address)
+    - Element (Beacon Proxy address)
+
+    Emits an event everytime an Element is created :
+    - Factory Name (Private Pool, Provider)
+    - Element id in the array
+    - Creator
+    - Element
+    - Element Name
+
+ Elements cannot be removed once created.
+
+ Factory is initializable (will be accessed via a Transparent Proxy)
+ Factory is Managed by main Manager contract
  */
 
  import '../Interfaces/IFactory.sol';
@@ -39,12 +54,12 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function internalCreate(address beaconProxyAddress, string memory eventLabel, string memory elementName) internal
+    function internalCreate(address beaconProxyAddress, string memory factoryName, string memory elementName) internal
     {
         _ElementStruct memory element = _ElementStruct(msg.sender, beaconProxyAddress);
         _Elements.push(element);
 
-        emit _NewElement(eventLabel, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
+        emit _NewElement(factoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
     }
 
     function retrieve(uint Id) external override
