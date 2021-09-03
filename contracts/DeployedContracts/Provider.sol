@@ -1,24 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+  Provider contract allows for registering pools (and optionally subscribing to them too).
+  Certificates can be latter delivered to those pools
  */
- import "../Libraries/Library.sol";
  import "../Interfaces/IProvider.sol";
  import "../Interfaces/IPool.sol";
  import "../Abstract/MultiSigContract.sol";
- import "../Libraries/ItemsLibrary.sol";
- import "../Libraries/AddressLibrary.sol";
- import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  import "../Interfaces/IPriceConverter.sol";
 
- contract Provider is IProvider, Initializable, MultiSigContract {
-    using Library for *;
-    using AddressLibrary for *;
-    using ItemsLibrary for *;
+ contract Provider is IProvider, MultiSigContract {
 
     // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;

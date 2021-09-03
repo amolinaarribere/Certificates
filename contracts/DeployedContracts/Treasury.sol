@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+ Treasury receives all the payments and assigns dividends to token holders.
+ Public Certificate Pool contract can ask for its owners to eb refunded even if they do not own tokens.
+
+ First dividends must be assigned to an account and then the account owner can withdraw the funds.
+ Both actions must be triggered by the account owner.
+
+  Events : 
+    - New Prices Added : list pf prices
+    - Payment recieved : payer, amount, new total aggregated contract amount
+    - Refund : who, amount, among how many
+    - Assign Dividends : who, amount (number of tokens), among how many (total supply)
+    - Withdraw : who, how much
  */
 
 import "../Interfaces/ITreasury.sol";
@@ -111,7 +121,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _OwnerRefundFeeUSD = OwnerRefundFeeUSD;
         }
         else{
-            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+            addProposition();
             _ProposedPrices.NewPublicPriceUSD = PublicPriceUSD;
             _ProposedPrices.NewCertificatePriceUSD = CertificatePriceUSD;
             _ProposedPrices.NewPrivatePriceUSD = PrivatePriceUSD;

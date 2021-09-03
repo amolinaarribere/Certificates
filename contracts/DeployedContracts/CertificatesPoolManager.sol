@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
  * @title Storage
@@ -87,7 +87,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     function upgradeContracts(Library.ProposedContractsStruct calldata UpgradeProposition) external override
     {
         _ProposedContracts = UpgradeProposition;
-        addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+        addProposition();
     }
 
     function propositionApproved() internal override
@@ -160,11 +160,6 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
             if(0 < Data.length)_Admin.upgradeAndCall(proxy, NewImpl, Data);
             else _Admin.upgrade(proxy, NewImpl);
         }
-    }
-
-    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal override
-    {
-        super.InternalonTokenBalanceChanged(from, to, amount);
     }
 
     // configuration Proxies
