@@ -19,6 +19,7 @@ pragma solidity 0.8.7;
     function AssignDividends() external;
     function withdraw(uint amount) external;
 
+    function retrieveLastAssigned(address addr) external view returns(uint);
     function retrieveBalance(address addr) external view returns(uint);
     function retrievePrices() external view returns(uint, uint, uint, uint, uint);
     function retrieveAggregatedAmount() external view returns(uint);

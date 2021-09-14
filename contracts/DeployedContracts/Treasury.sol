@@ -235,6 +235,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         emit _Withdraw(msg.sender, amount);
     }
 
+    function retrieveLastAssigned(address addr) external override view returns(uint)
+    {
+        return _lastAssigned[addr];
+    }
+
     function retrieveBalance(address addr) external override view returns(uint)
     {
         return checkBalance(addr);
