@@ -339,6 +339,18 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
         return (_votersPerProp[PropId][voter]);
     }
 
+    function retrieveChairPerson() external view returns(address){
+        return _chairperson;
+    }
+
+    function retrieveNextPropId() external view returns(uint256){
+        return _nextPropID;
+    }
+
+    function isCurrentPropositionProp() external view returns(bool){
+        return _currentPropisProp;
+    }
+
     function retrieveProposition() external virtual view returns(bytes32[] memory){}
 
     function propositionApproved() internal virtual{}

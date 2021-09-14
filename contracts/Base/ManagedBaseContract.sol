@@ -27,4 +27,9 @@ contract ManagedBaseContract is Initializable{
         _managerContract = IProxyManager(managerContractAddress);
     }
 
+    // FUNCTIONALITY /////////////////////////////////////////
+    function retrievemANAGERcONTRACT() external view returns(address){
+        return address(_managerContract);
+    }
+
 }
