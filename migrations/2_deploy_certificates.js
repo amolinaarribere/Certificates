@@ -45,7 +45,7 @@ module.exports = async function(deployer, network, accounts){
     console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
     ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
   }
-  else if("Kovan" == network)
+  else if("kovan" == network)
   {
     ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
   }

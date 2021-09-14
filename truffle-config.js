@@ -59,7 +59,7 @@ module.exports = {
       gas: 6721975
      }*/
     // Another network with more advanced options...
-    ropsten: {
+    kovan: {
       provider: () => new HDWalletProvider(mnemonic, `https://kovan.infura.io/v3/${projectId}`),
       network_id: 42,       // Ropsten's id
       gas: 6721975,        // Ropsten has a lower block limit than mainnet
