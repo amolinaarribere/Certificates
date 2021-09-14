@@ -99,7 +99,7 @@ abstract contract EntitiesBaseContract{
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
-    view returns (string memory, bool, uint, uint, address[] memory, address[] memory) 
+    view returns (ItemsLibrary._itemIdentity memory) 
     {
         bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.retrieveItem(entityInBytes, _Entities[listId]);

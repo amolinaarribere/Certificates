@@ -91,7 +91,7 @@ pragma solidity 0.8.7;
         delete(_mustSubscribe[pool]);
     }
 
-    function retrievePool(address pool) external override view returns (string memory, bool, uint, uint, address[] memory, address[] memory)
+    function retrievePool(address pool) external override view returns (ItemsLibrary._itemIdentity memory)
     {
         return retrieveEntity(pool, _poolId);
     }

@@ -298,9 +298,9 @@ library ItemsLibrary{
         return Items;
     }
 
-    function retrieveItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns (string memory, bool, uint, uint, address[] memory, address[] memory) 
+    function retrieveItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns (_itemIdentity memory) 
     {
-        return (itemStruct._items[item]._Info, isItem(item, itemStruct), itemStruct._items[item]._id, itemStruct._items[item]._pendingId, itemStruct._items[item]._Validations, itemStruct._items[item]._Rejections);
+        return (itemStruct._items[item]);
     }
 
     function retrieveAllItems(_ItemsStruct storage itemStruct) public view returns (bytes32[] memory) 

@@ -90,7 +90,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         rejectEntity(provider, _providerId);
     }
     
-    function retrieveProvider(address provider) external override view returns (string memory, bool, uint, uint, address[] memory, address[] memory)
+    function retrieveProvider(address provider) external override view returns (ItemsLibrary._itemIdentity memory)
     {
         return (retrieveEntity(provider, _providerId));
     }

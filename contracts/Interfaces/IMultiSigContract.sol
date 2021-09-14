@@ -6,7 +6,7 @@ pragma solidity 0.8.7;
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
-
+import "../Libraries/ItemsLibrary.sol";
 
  interface IMultiSigContract  {
     function addOwner(address owner, string calldata ownerInfo) external;
@@ -18,7 +18,7 @@ pragma solidity 0.8.7;
     function validateMinOwners() external;
     function rejectMinOwners() external;
 
-    function retrieveOwner(address owner) external view returns (string memory, bool, uint, uint, address[] memory, address[] memory);
+    function retrieveOwner(address owner) external view returns (ItemsLibrary._itemIdentity memory);
     function retrieveAllOwners() external view returns (bytes32[] memory);
     function retrieveMinOwners() external view returns (uint);
     function retrievePendingOwners(bool addedORremove) external view returns (bytes32[] memory);

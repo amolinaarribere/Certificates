@@ -94,7 +94,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         rejectEntity(owner, _ownerId);
     }
     
-    function retrieveOwner(address owner) external override view returns (string memory, bool, uint, uint, address[] memory, address[] memory){
+    function retrieveOwner(address owner) external override view returns (ItemsLibrary._itemIdentity memory){
         return (retrieveEntity(owner, _ownerId));
     }
 
