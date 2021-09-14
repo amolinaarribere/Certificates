@@ -18,10 +18,10 @@ pragma solidity 0.8.7;
     function validateMinOwners() external;
     function rejectMinOwners() external;
 
-    function retrieveOwner(address owner) external view returns (string memory, bool);
+    function retrieveOwner(address owner) external view returns (string memory, bool, uint, uint, address[] memory, address[] memory);
     function retrieveAllOwners() external view returns (bytes32[] memory);
     function retrieveMinOwners() external view returns (uint);
-    function retrievePendingOwners(bool addedORremove) external view returns (bytes32[] memory, string[] memory);
+    function retrievePendingOwners(bool addedORremove) external view returns (bytes32[] memory);
     function retrievePendingMinOwners() external view returns (uint);
     function retrievePendingMinOwnersStatus() external view returns (uint, uint, address[] memory);
 

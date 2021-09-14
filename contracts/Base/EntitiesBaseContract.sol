@@ -99,7 +99,7 @@ abstract contract EntitiesBaseContract{
 
     function retrieveEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length)
-    view returns (string memory, bool) 
+    view returns (string memory, bool, uint, uint, address[] memory, address[] memory) 
     {
         bytes32 entityInBytes = AddressLibrary.AddressToBytes32(entity);
         return ItemsLibrary.retrieveItem(entityInBytes, _Entities[listId]);
@@ -130,12 +130,11 @@ abstract contract EntitiesBaseContract{
 
     function retrievePendingEntities(bool addORemove, uint listId) internal 
          isIdCorrect(listId, _Entities.length)
-    view returns (bytes32[] memory, string[] memory)
+    view returns (bytes32[] memory)
     {
         bytes32[] memory EntitiesInBytes;
-        string[] memory EntitiesInfo;
-        (EntitiesInBytes, EntitiesInfo) = ItemsLibrary.retrievePendingItems(addORemove, _Entities[listId]);
-        return(EntitiesInBytes, EntitiesInfo);
+        (EntitiesInBytes) = ItemsLibrary.retrievePendingItems(addORemove, _Entities[listId]);
+        return EntitiesInBytes;
     }
 
     // CALLBACKS /////////////////////////////////////////

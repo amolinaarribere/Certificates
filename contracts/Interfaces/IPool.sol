@@ -20,8 +20,8 @@ pragma solidity 0.8.7;
     function removeProvider(address provider) external;
     function validateProvider(address provider) external;
     function rejectProvider(address provider) external;
-    function retrieveProvider(address provider) external view returns (string memory, bool);
+    function retrieveProvider(address provider) external view returns (string memory, bool, uint, uint, address[] memory, address[] memory);
     function retrieveAllProviders() external view returns (bytes32[] memory);
-    function retrievePendingProviders(bool addedORremove) external view returns (bytes32[] memory, string[] memory);
+    function retrievePendingProviders(bool addedORremove) external view returns (bytes32[] memory);
     
 }

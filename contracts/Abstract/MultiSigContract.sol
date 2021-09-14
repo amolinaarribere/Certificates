@@ -94,7 +94,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         rejectEntity(owner, _ownerId);
     }
     
-    function retrieveOwner(address owner) external override view returns (string memory, bool){
+    function retrieveOwner(address owner) external override view returns (string memory, bool, uint, uint, address[] memory, address[] memory){
         return (retrieveEntity(owner, _ownerId));
     }
 
@@ -110,7 +110,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         return(isEntity(owner, _ownerId));
     }
 
-    function retrievePendingOwners(bool addedORremove) external override view returns (bytes32[] memory, string[] memory){
+    function retrievePendingOwners(bool addedORremove) external override view returns (bytes32[] memory){
         return(retrievePendingEntities(addedORremove, _ownerId));
     }
 

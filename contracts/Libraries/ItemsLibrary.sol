@@ -272,7 +272,7 @@ library ItemsLibrary{
         return false;
     }
 
-    function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory, string[] memory)
+    /*function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory, string[] memory)
     {
         bytes32[] memory Items;
 
@@ -282,15 +282,25 @@ library ItemsLibrary{
         string[] memory Items_Info = new string[](Items.length);
 
         for(uint i=0; i < Items.length; i++){
-            (Items_Info[i],) = retrieveItem(Items[i], itemStruct);
+            (Items_Info[i],,,,,) = retrieveItem(Items[i], itemStruct);
         }
         
         return(Items, Items_Info);
+    }*/
+
+    function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory)
+    {
+        bytes32[] memory Items;
+
+        if(addORemove) Items = itemStruct._pendingItemsAdd;
+        else Items = itemStruct._pendingItemsRemove;
+        
+        return Items;
     }
 
-    function retrieveItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns (string memory, bool) 
+    function retrieveItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns (string memory, bool, uint, uint, address[] memory, address[] memory) 
     {
-        return (itemStruct._items[item]._Info, isItem(item, itemStruct));
+        return (itemStruct._items[item]._Info, isItem(item, itemStruct), itemStruct._items[item]._id, itemStruct._items[item]._pendingId, itemStruct._items[item]._Validations, itemStruct._items[item]._Rejections);
     }
 
     function retrieveAllItems(_ItemsStruct storage itemStruct) public view returns (bytes32[] memory) 

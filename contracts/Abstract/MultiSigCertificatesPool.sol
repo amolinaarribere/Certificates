@@ -90,7 +90,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         rejectEntity(provider, _providerId);
     }
     
-    function retrieveProvider(address provider) external override view returns (string memory, bool)
+    function retrieveProvider(address provider) external override view returns (string memory, bool, uint, uint, address[] memory, address[] memory)
     {
         return (retrieveEntity(provider, _providerId));
     }
@@ -105,7 +105,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         return(isEntity(provider, _providerId));
     }
 
-    function retrievePendingProviders(bool addedORremove) external override view returns (bytes32[] memory, string[] memory)
+    function retrievePendingProviders(bool addedORremove) external override view returns (bytes32[] memory)
     {
         return(retrievePendingEntities(addedORremove, _providerId));
     }

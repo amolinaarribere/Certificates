@@ -91,18 +91,14 @@ pragma solidity 0.8.7;
         delete(_mustSubscribe[pool]);
     }
 
-    function retrievePool(address pool) external override view returns (string memory, bool, bool)
-    {
-        string memory poolInfo;
-        bool isActivated;
-
-        (poolInfo, isActivated) = InternalRetrievePool(pool);
-        return (poolInfo, isActivated, _mustSubscribe[pool]);
-    }
-    
-    function InternalRetrievePool(address pool) internal view returns (string memory, bool)
+    function retrievePool(address pool) external override view returns (string memory, bool, uint, uint, address[] memory, address[] memory)
     {
         return retrieveEntity(pool, _poolId);
+    }
+
+    function retrievePoolConfg(address pool) external override view returns (bool, bool)
+    {
+        return (_mustSubscribe[pool], _submited[pool]);
     }
 
     function retrieveAllPools() external override view returns (bytes32[] memory)
@@ -110,7 +106,7 @@ pragma solidity 0.8.7;
         return retrieveAllEntities(_poolId);
     }
 
-    function retrievePendingPools(bool addedORremove) external override view returns (bytes32[] memory, string[] memory)
+    function retrievePendingPools(bool addedORremove) external override view returns (bytes32[] memory)
     {
         return(retrievePendingEntities(addedORremove, _poolId));
     }

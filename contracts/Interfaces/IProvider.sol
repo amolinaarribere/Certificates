@@ -15,15 +15,14 @@ import "../Libraries/Library.sol";
     function isCertificate(address pool, bytes32 CertificateHash, address holder) external view returns(bool);
     function retrievePendingCertificates() external view returns (Library._pendingCertificatesStruct[] memory);
 
-    //function addPool(address pool, string calldata poolInfo, uint256 AddCertificatePrice, uint256 SubscriptionPrice, bool mustSubscribe) external;
     function addPool(address pool, string calldata poolInfo, bool mustSubscribe) external;
     function removePool(address pool) external;
     function validatePool(address pool) external;
     function rejectPool(address pool) external;
-    //function retrievePool(address pool) external view returns (string memory, bool, uint256, uint256, bool);
-    function retrievePool(address pool) external view returns (string memory, bool, bool);
+    function retrievePool(address pool) external view returns (string memory, bool, uint, uint, address[] memory, address[] memory);
+    function retrievePoolConfg(address pool) external view returns (bool, bool);
     function retrieveAllPools() external view returns (bytes32[] memory);
-    function retrievePendingPools(bool addedORremove) external view returns (bytes32[] memory, string[] memory);
+    function retrievePendingPools(bool addedORremove) external view returns (bytes32[] memory);
     
     receive() external payable;
     
