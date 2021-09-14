@@ -18,6 +18,7 @@ let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
 let AddressLibrary = artifacts.require("./Libraries/AddressLibrary");
 let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
+let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominations.sol");
 
 const PropositionLifeTime = 604800;
 const PropositionThresholdPercentage = 50;
@@ -32,6 +33,7 @@ const ProviderPriceUSD = 250;
 const CertificatePriceUSD = 1000;
 const OwnerRefundFeeUSD = 2000;
 const factor = 1000;
+const MockDecimals = 8;
 const PublicMinOwners = 1;
 
 
@@ -40,7 +42,7 @@ module.exports = async function(deployer, network, accounts){
   if("development" == network || 
   "ganache" == network )
   {
-    await deployer.deploy(MockChainLinkFeedRegistry, factor);
+    await deployer.deploy(MockChainLinkFeedRegistry, factor, MockDecimals);
     MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
     console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
     ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
@@ -77,6 +79,9 @@ module.exports = async function(deployer, network, accounts){
   await deployer.deploy(ItemsLibrary);
   console.log("ItemsLibrary deployed");
 
+  await deployer.deploy(Denominations);
+  console.log("Denominations deployed");
+
   // Certificate Pool Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, CertificatesPoolManager);
   console.log("Library linked to Certificate Pool Manager");
@@ -94,6 +99,9 @@ module.exports = async function(deployer, network, accounts){
 
   await deployer.link(AddressLibrary, PriceConverter);
   console.log("AddressLibrary linked to Price Converter");
+
+  await deployer.link(Denominations, PriceConverter);
+  console.log("Denominations linked to Price Converter");
 
   await deployer.deploy(PriceConverter);
   PriceConverterInstance = await PriceConverter.deployed();

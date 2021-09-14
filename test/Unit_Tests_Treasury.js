@@ -16,11 +16,12 @@ const CertisToken = artifacts.require("CertisToken");
 var CertisTokenAbi = CertisToken.abi;
 const UintLibrary = artifacts.require("./Libraries/UintLibrary");
 
-const PublicPriceWei = constants.PublicPriceUSD * constants.factor;
-const PrivatePriceWei = constants.PrivatePriceUSD * constants.factor;
-const ProviderPriceWei = constants.ProviderPriceUSD * constants.factor;
-const CertificatePriceWei = constants.CertificatePriceUSD * constants.factor;
-const OwnerRefundPriceWei = constants.OwnerRefundPriceUSD * constants.factor;
+const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals) / constants.factor;
+const PublicPriceWei = constants.PublicPriceUSD * FactorUSDtoETH;
+const PrivatePriceWei = constants.PrivatePriceUSD * FactorUSDtoETH;
+const ProviderPriceWei = constants.ProviderPriceUSD * FactorUSDtoETH;
+const CertificatePriceWei = constants.CertificatePriceUSD * FactorUSDtoETH;
+const OwnerRefundPriceWei = constants.OwnerRefundPriceUSD * FactorUSDtoETH;
 
 const PublicPriceUSD = constants.PublicPriceUSD;
 const PrivatePriceUSD = constants.PrivatePriceUSD;
@@ -80,10 +81,10 @@ contract("Testing Treasury",function(accounts){
 
     async function checkPrices(_pp, _prp, _cp, _orp){
         const{0:pp,1:prp,2:cp,3:orp} = await Treasury.methods.retrievePrices().call({from: user_1}, function(error, result){});
-        expect(parseInt(pp) * constants.factor).to.be.equal(_pp);
-        expect(parseInt(prp) * constants.factor).to.be.equal(_prp);
-        expect(parseInt(cp) * constants.factor).to.be.equal(_cp);
-        expect(parseInt(orp) * constants.factor).to.be.equal(_orp);
+        expect(parseInt(pp) * FactorUSDtoETH).to.be.equal(_pp);
+        expect(parseInt(prp) * FactorUSDtoETH).to.be.equal(_prp);
+        expect(parseInt(cp) * FactorUSDtoETH).to.be.equal(_cp);
+        expect(parseInt(orp) * FactorUSDtoETH).to.be.equal(_orp);
     }
 
     // ****** TESTING Price Config ***************************************************************** //
@@ -140,21 +141,21 @@ contract("Testing Treasury",function(accounts){
         await Treasury.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
         await checkPrices(PublicPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, OwnerRefundPriceWei);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + constants.factor, PrivatePriceWei + constants.factor, ProviderPriceWei + constants.factor, CertificatePriceWei + constants.factor, OwnerRefundPriceWei + constants.factor);
+        await checkPrices(PublicPriceWei + FactorUSDtoETH, PrivatePriceWei + FactorUSDtoETH, ProviderPriceWei + FactorUSDtoETH, CertificatePriceWei + FactorUSDtoETH, OwnerRefundPriceWei + FactorUSDtoETH);
 
         // Validated again
         await Treasury.methods.updatePrices(PublicPriceUSD + 2, PrivatePriceUSD + 2, ProviderPriceUSD + 2, CertificatePriceUSD + 2, OwnerRefundPriceUSD + 2).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + constants.factor, PrivatePriceWei + constants.factor, ProviderPriceWei + constants.factor, CertificatePriceWei + constants.factor, OwnerRefundPriceWei + constants.factor);
+        await checkPrices(PublicPriceWei + FactorUSDtoETH, PrivatePriceWei + FactorUSDtoETH, ProviderPriceWei + FactorUSDtoETH, CertificatePriceWei + FactorUSDtoETH, OwnerRefundPriceWei + FactorUSDtoETH);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + constants.factor, PrivatePriceWei + constants.factor, ProviderPriceWei + constants.factor, CertificatePriceWei + constants.factor, OwnerRefundPriceWei + constants.factor);
+        await checkPrices(PublicPriceWei + FactorUSDtoETH, PrivatePriceWei + FactorUSDtoETH, ProviderPriceWei + FactorUSDtoETH, CertificatePriceWei + FactorUSDtoETH, OwnerRefundPriceWei + FactorUSDtoETH);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + constants.factor, PrivatePriceWei + constants.factor, ProviderPriceWei + constants.factor, CertificatePriceWei + constants.factor, OwnerRefundPriceWei + constants.factor);
+        await checkPrices(PublicPriceWei + FactorUSDtoETH, PrivatePriceWei + FactorUSDtoETH, ProviderPriceWei + FactorUSDtoETH, CertificatePriceWei + FactorUSDtoETH, OwnerRefundPriceWei + FactorUSDtoETH);
         await Treasury.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + constants.factor, PrivatePriceWei + constants.factor, ProviderPriceWei + constants.factor, CertificatePriceWei + constants.factor, OwnerRefundPriceWei + constants.factor);
+        await checkPrices(PublicPriceWei + FactorUSDtoETH, PrivatePriceWei + FactorUSDtoETH, ProviderPriceWei + FactorUSDtoETH, CertificatePriceWei + FactorUSDtoETH, OwnerRefundPriceWei + FactorUSDtoETH);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + constants.factor, PrivatePriceWei + constants.factor, ProviderPriceWei + constants.factor, CertificatePriceWei + constants.factor, OwnerRefundPriceWei + constants.factor);
+        await checkPrices(PublicPriceWei + FactorUSDtoETH, PrivatePriceWei + FactorUSDtoETH, ProviderPriceWei + FactorUSDtoETH, CertificatePriceWei + FactorUSDtoETH, OwnerRefundPriceWei + FactorUSDtoETH);
         await Treasury.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
-        await checkPrices(PublicPriceWei + 2 * constants.factor, PrivatePriceWei + 2 * constants.factor, ProviderPriceWei + 2 * constants.factor, CertificatePriceWei + 2 * constants.factor, OwnerRefundPriceWei + 2 * constants.factor);
+        await checkPrices(PublicPriceWei + 2 * FactorUSDtoETH, PrivatePriceWei + 2 * FactorUSDtoETH, ProviderPriceWei + 2 * FactorUSDtoETH, CertificatePriceWei + 2 * FactorUSDtoETH, OwnerRefundPriceWei + 2 * FactorUSDtoETH);
     });
 
     it("Vote/Propose/cancel Price Configuration WRONG",async function(){

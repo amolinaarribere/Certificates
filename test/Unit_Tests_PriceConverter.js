@@ -23,6 +23,8 @@ const proposition = require("../test_libraries/Propositions.js");
 
 const Gas = constants.Gas;
 
+const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals) / constants.factor;
+
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +77,7 @@ contract("Testing Price Converter",function(accounts){
         let amount = 12;
         let result = await priceConverterProxy.methods.fromUSDToETH(amount).call({from: user_1, gas: Gas}, function(error, result){});
         // assert
-        expect(parseInt(result)).to.equal(amount * constants.factor);
+        expect(parseInt(result)).to.equal(amount * FactorUSDtoETH);
         
     });
 
