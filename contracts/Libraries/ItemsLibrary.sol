@@ -76,8 +76,8 @@ library ItemsLibrary{
     
     // DATA /////////////////////////////////////////
     struct _itemIdentity{
-        bool _activated;
         string _Info;
+        bool _activated;
         uint _id;
         uint _pendingId;
         address[] _Validations;
@@ -271,22 +271,6 @@ library ItemsLibrary{
         }
         return false;
     }
-
-    /*function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory, string[] memory)
-    {
-        bytes32[] memory Items;
-
-        if(addORemove) Items = itemStruct._pendingItemsAdd;
-        else Items = itemStruct._pendingItemsRemove;
-
-        string[] memory Items_Info = new string[](Items.length);
-
-        for(uint i=0; i < Items.length; i++){
-            (Items_Info[i],,,,,) = retrieveItem(Items[i], itemStruct);
-        }
-        
-        return(Items, Items_Info);
-    }*/
 
     function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory)
     {
