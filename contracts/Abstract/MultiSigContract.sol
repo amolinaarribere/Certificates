@@ -178,4 +178,9 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         return _newMinOwners;
     }
 
+    function retrievePendingMinOwnersStatus() external override view returns (uint, uint, address[] memory)
+    {
+        return (_newMinOwnersVotesFor, _newMinOwnersVotesAgainst, _newMinOwnersVoters);
+    }
+
 }
