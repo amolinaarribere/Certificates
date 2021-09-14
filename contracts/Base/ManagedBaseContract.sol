@@ -28,7 +28,7 @@ contract ManagedBaseContract is Initializable{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function retrievemANAGERcONTRACT() external view returns(address){
+    function retrieveManagerContract() external view returns(address){
         return address(_managerContract);
     }
 
