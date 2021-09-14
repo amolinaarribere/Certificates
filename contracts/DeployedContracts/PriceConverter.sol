@@ -69,7 +69,8 @@ contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
 
     // FUNCTIONALITY /////////////////////////////////////////
     function fromUSDToETH(uint _USDamount) external override view returns (uint) {
-        (,int price,,,) = _registry.latestRoundData(Denominations.USD, Denominations.ETH);
+        //(,int price,,,) = _registry.latestRoundData(Denominations.USD, Denominations.ETH);
+        int price = 1;
         return uint(price) * _USDamount;
     }
 
