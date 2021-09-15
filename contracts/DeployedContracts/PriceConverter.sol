@@ -19,6 +19,8 @@ contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
 
     // DATA /////////////////////////////////////////
     FeedRegistryInterface internal _registry;
+    uint8 constant _ETHDecimals = 18;
+    uint8 constant _USDDecimals = 2;
 
     address internal _ProposedRegistryAddress;
 
@@ -71,7 +73,7 @@ contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
     function fromUSDToETH(uint _USDamount) external override view returns (uint) {
         uint8 decimals = _registry.decimals(Denominations.ETH, Denominations.USD);
         (,int price,,,) = _registry.latestRoundData(Denominations.ETH, Denominations.USD);
-        return (10**18 * 10**decimals * _USDamount) / uint(price);
+        return (10**(decimals + _ETHDecimals - _USDDecimals) * _USDamount / uint(price));
     }
 
     function retrieveRegistryAddress() external override view returns(address){

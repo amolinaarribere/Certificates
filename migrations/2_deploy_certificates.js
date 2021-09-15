@@ -27,12 +27,12 @@ const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const PublicPriceUSD = 10000;
-const PrivatePriceUSD = 200;
-const ProviderPriceUSD = 250;
-const CertificatePriceUSD = 1000;
-const OwnerRefundFeeUSD = 2000;
-const factor = 1000;
+const PublicPriceUSD = 1000000;
+const PrivatePriceUSD = 20000;
+const ProviderPriceUSD = 25000;
+const CertificatePriceUSD = 100000;
+const OwnerRefundFeeUSD = 200000;
+const rate = 338495835524;
 const MockDecimals = 8;
 const PublicMinOwners = 1;
 
@@ -42,7 +42,7 @@ module.exports = async function(deployer, network, accounts){
   if("development" == network || 
   "ganache" == network )
   {
-    await deployer.deploy(MockChainLinkFeedRegistry, factor, MockDecimals);
+    await deployer.deploy(MockChainLinkFeedRegistry, rate, MockDecimals);
     MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
     console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
     ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address

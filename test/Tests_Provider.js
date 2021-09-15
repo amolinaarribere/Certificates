@@ -17,9 +17,11 @@ const ProviderFactoryAbi = ProviderFactory.abi;
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 
-const PublicPriceWei = constants.PublicPriceUSD * constants.factor;
-const ProviderPriceWei = constants.ProviderPriceUSD * constants.factor;
-const CertificatePriceWei = constants.CertificatePriceUSD * constants.factor;
+const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals - 2) / constants.rate;
+const PublicPriceWei = constants.PublicPriceUSD * FactorUSDtoETH;
+const ProviderPriceWei = constants.ProviderPriceUSD * FactorUSDtoETH;
+const PrivatePriceWei = constants.PrivatePriceUSD * FactorUSDtoETH;
+const CertificatePriceWei = constants.CertificatePriceUSD * FactorUSDtoETH;
 const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +53,6 @@ contract("Testing Provider",function(accounts){
     const pool_Info = "Public Pool";
     // certificates
     const hash_1 = "0x3fd54831f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
-    const PrivatePriceWei = constants.PrivatePriceUSD * constants.factor;
     // test constants
     const NotEnoughFunds = new RegExp("EC2-");
     const NotAnOwner = new RegExp("EC9-");

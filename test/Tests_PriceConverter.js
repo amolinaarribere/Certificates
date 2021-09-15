@@ -23,7 +23,7 @@ const proposition = require("../test_libraries/Propositions.js");
 
 const Gas = constants.Gas;
 
-const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals) / constants.factor;
+const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals - 2) / constants.rate;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------

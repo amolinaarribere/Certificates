@@ -16,7 +16,7 @@ const CertisToken = artifacts.require("CertisToken");
 var CertisTokenAbi = CertisToken.abi;
 const UintLibrary = artifacts.require("./Libraries/UintLibrary");
 
-const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals) / constants.factor;
+const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals - 2) / constants.rate;
 const PublicPriceWei = constants.PublicPriceUSD * FactorUSDtoETH;
 const PrivatePriceWei = constants.PrivatePriceUSD * FactorUSDtoETH;
 const ProviderPriceWei = constants.ProviderPriceUSD * FactorUSDtoETH;
