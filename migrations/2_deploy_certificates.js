@@ -39,17 +39,21 @@ const PublicMinOwners = 1;
 
 module.exports = async function(deployer, network, accounts){
 
-  if("development" == network || 
-  "ganache" == network )
+  if("kovan" == network)
+  {
+    ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
+  }
+  else if("mainnet" == network)
+  {
+    ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+  }
+
+  else
   {
     await deployer.deploy(MockChainLinkFeedRegistry, rate, MockDecimals);
     MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
     console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
     ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
-  }
-  else if("kovan" == network)
-  {
-    ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
   }
 
   const PublicOwners = [accounts[0]];
