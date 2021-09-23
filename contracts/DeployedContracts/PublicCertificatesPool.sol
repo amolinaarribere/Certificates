@@ -16,7 +16,7 @@ pragma solidity 0.8.7;
  contract PublicCertificatesPool is MultiSigCertificatesPool, ManagedBaseContract {
 
     // EVENTS /////////////////////////////////////////
-    event _NewProposal(address indexed Provider,  string indexed Info);
+    event _NewProposal(address indexed Provider, string Info);
 
     // MODIFIERS /////////////////////////////////////////
     modifier ProviderisNotActivated(address entity){

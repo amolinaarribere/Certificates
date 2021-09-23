@@ -31,7 +31,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     using Library for *;
 
      // EVENTS /////////////////////////////////////////
-    event _NewElement(string indexed Factory, uint256 Id, address indexed Creator, address Element, string indexed Name);
+    event _NewElement(string Factory, uint256 Id, address indexed Creator, address Element, string Name);
 
     // DATA /////////////////////////////////////////
     // Private Certificates Pool structure

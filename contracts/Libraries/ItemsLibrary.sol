@@ -41,10 +41,10 @@ library ItemsLibrary{
     using Library for *;
 
     // EVENTS /////////////////////////////////////////
-    event _AddItemValidation(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
-    event _RemoveItemValidation(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
-    event _AddItemRejection(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
-    event _RemoveItemRejection( string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
+    event _AddItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
+    event _RemoveItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
+    event _AddItemRejection(string ItemType,  bytes32 indexed Item,  string Info);
+    event _RemoveItemRejection( string ItemType,  bytes32 indexed Item,  string Info);
 
     // MODIFIERS /////////////////////////////////////////
     modifier ItemNotActivated(bytes32 item, _ItemsStruct storage itemStruct){
