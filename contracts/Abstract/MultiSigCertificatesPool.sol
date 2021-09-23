@@ -14,7 +14,7 @@ import "../Interfaces/IPool.sol";
 abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     
     // EVENTS /////////////////////////////////////////
-    event _AddCertificate(address indexed, address indexed, bytes32);
+    event _AddCertificate(address indexed Provider, address indexed Holder, bytes32 Certificate);
 
     // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;

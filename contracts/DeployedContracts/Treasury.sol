@@ -10,7 +10,7 @@ pragma solidity 0.8.7;
  Both actions must be triggered by the account owner.
 
   Events : 
-    - New Prices Added : list pf prices
+    - New Prices Added : list of prices
     - Payment recieved : payer, amount, new total aggregated contract amount
     - Refund : who, amount, among how many
     - Assign Dividends : who, amount (number of tokens), among how many (total supply)
@@ -30,11 +30,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using UintLibrary for *;
 
     // EVENTS /////////////////////////////////////////
-    event _NewPrices(uint, uint, uint, uint, uint);
-    event _Pay(address indexed, uint, uint);
-    event _Refund(address indexed, uint, uint);
-    event _AssignDividend(address indexed, uint, uint);
-    event _Withdraw(address indexed, uint);
+    event _NewPrices(uint Public, uint Private, uint Provider, uint Certificate, uint OwnerRefund);
+    event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount);
+    event _Refund(address indexed Owner, uint Amount, uint TotalOwners);
+    event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply);
+    event _Withdraw(address indexed Recipient, uint Amount);
 
     // DATA /////////////////////////////////////////
     // proposition to change prices

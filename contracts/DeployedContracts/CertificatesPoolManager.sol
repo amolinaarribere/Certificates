@@ -22,7 +22,8 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     using Library for *;
 
     // EVENTS /////////////////////////////////////////
-    event _NewContracts(address, address, address, address, address, address, address, address);
+    event _NewContracts(address Public, address Treasury, address Certis, address PrivateFactory, 
+    address Private, address ProviderFactory, address Provider, address PriceConverter);
 
     // DATA /////////////////////////////////////////
     // Admin Proxy to manage all the TransparentUpgradeableProxies

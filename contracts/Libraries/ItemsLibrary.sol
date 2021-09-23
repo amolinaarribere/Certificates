@@ -41,10 +41,10 @@ library ItemsLibrary{
     using Library for *;
 
     // EVENTS /////////////////////////////////////////
-    event _AddItemValidation(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemValidation(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _AddItemRejection(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemRejection(bool, string indexed,  bytes32 indexed,  string indexed);
+    event _AddItemValidation(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
+    event _RemoveItemValidation(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
+    event _AddItemRejection(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
+    event _RemoveItemRejection( string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
 
     // MODIFIERS /////////////////////////////////////////
     modifier ItemNotActivated(bytes32 item, _ItemsStruct storage itemStruct){
@@ -199,7 +199,7 @@ library ItemsLibrary{
                 require(success, string(data));
                 
                 deleteVoters(item, itemStruct);
-                emit _AddItemValidation(success, ItemTypeLabel, item, itemStruct._items[item]._Info);
+                emit _AddItemValidation(ItemTypeLabel, item, itemStruct._items[item]._Info);
             }
             else{
                 RemoveResizeActivated(item, itemStruct);
@@ -208,7 +208,7 @@ library ItemsLibrary{
                 (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));
                 require(success, string(data));
 
-                emit _RemoveItemValidation(success, ItemTypeLabel, item, itemStruct._items[item]._Info);
+                emit _RemoveItemValidation(ItemTypeLabel, item, itemStruct._items[item]._Info);
                 delete(itemStruct._items[item]);
             }   
         }
@@ -232,7 +232,7 @@ library ItemsLibrary{
                 (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true)); 
                 require(success, string(data));
 
-                emit _AddItemRejection(success, ItemTypeLabel, item, itemStruct._items[item]._Info);
+                emit _AddItemRejection(ItemTypeLabel, item, itemStruct._items[item]._Info);
                 delete(itemStruct._items[item]);
             }
             else
@@ -243,7 +243,7 @@ library ItemsLibrary{
                 require(success, string(data));
 
                 deleteVoters(item, itemStruct);
-                emit _RemoveItemRejection(success, ItemTypeLabel, item, itemStruct._items[item]._Info);
+                emit _RemoveItemRejection(ItemTypeLabel, item, itemStruct._items[item]._Info);
             }
                 
         }

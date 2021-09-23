@@ -15,7 +15,7 @@ import "@chainlink/contracts/src/v0.8/Denominations.sol";
 contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
 
      // EVENTS /////////////////////////////////////////
-    event _NewRegistryAddress(address);
+    event _NewRegistryAddress(address Registry);
 
     // DATA /////////////////////////////////////////
     FeedRegistryInterface internal _registry;

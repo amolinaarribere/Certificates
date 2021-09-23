@@ -27,7 +27,7 @@ Functionality (with basic security check)
     - Prop voted : id, voter, vote, tokens used
     - Prop approved : id, proposer, votes For, votes Against
     - Prop rejected : id, proposer, votes For, votes Against
-    - PRop used tokens trtansfered : id, from, to, tokes used
+    - PRop used tokens transfered : id, from, to, tokes used
   
  */
 
@@ -40,12 +40,12 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     using AddressLibrary for *; 
 
     // EVENTS /////////////////////////////////////////
-    event _AddedProposition(uint256, address indexed, uint256, uint256);
-    event _CancelledProposition(uint256, address indexed);
-    event _PropositionVote(uint256, address indexed, bool, uint256);
-    event _PropositionApproved(uint256, address indexed, uint256, uint256);
-    event _PropositionRejected(uint256, address indexed, uint256, uint256);
-    event _UsedTokensTransfered(uint256 indexed, address, address, uint256);
+    event _AddedProposition(uint256 Id, address indexed Proposer, uint256 Deadline, uint256 Threshold);
+    event _CancelledProposition(uint256 Id, address indexed Proposer);
+    event _PropositionVote(uint256 Id, address indexed Voter, bool Vote, uint256 AmountTokens);
+    event _PropositionApproved(uint256 Id, address indexed Proposer, uint256 VotesFor, uint256 VotesAgainst);
+    event _PropositionRejected(uint256 Id, address indexed Proposer, uint256 VotesFor, uint256 VotesAgainst);
+    event _UsedTokensTransfered(uint256 indexed Id, address From, address To, uint256 Amount);
 
     // DATA /////////////////////////////////////////
     // chair person

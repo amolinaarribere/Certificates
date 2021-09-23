@@ -8,6 +8,8 @@ pragma solidity 0.8.7;
     Entities -> Owners & Providers & Pools : will be used by Certificate Pools and Providers
 
 Defines a list of entities types where the first one is "Owners" and control the CRUD operations of all the others
+
+EVENTS are copied from ItemLibrary so that they are included in the contracts ABI, otherwise they can be very tricky to retrieve from web3
   
  */
 
@@ -19,6 +21,13 @@ abstract contract EntitiesBaseContract{
     using Library for *;
     using AddressLibrary for *;
     using ItemsLibrary for *;
+
+    // EVENTS /////////////////////////////////////////
+    // copied from ItemLibrary.......
+    event _AddItemValidation(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
+    event _RemoveItemValidation(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
+    event _AddItemRejection(string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
+    event _RemoveItemRejection( string indexed ItemType,  bytes32 indexed Item,  string indexed Info);
 
     // DATA /////////////////////////////////////////
     // owners
