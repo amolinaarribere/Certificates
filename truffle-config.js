@@ -57,16 +57,16 @@ module.exports = {
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "5777",       // Any network (default: none)
       gas: 6721975
-     }
+     },
     // Another network with more advanced options...
-    /*kovan: {
+    kovan: {
       provider: () => new HDWalletProvider(mnemonic, `https://kovan.infura.io/v3/${projectId}`),
       network_id: 42,       // Ropsten's id
       gas: 6721975,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    }*/
+    }
     /* rinkeby: {
       port: 8777,             // Custom port
       network_id: 1342,       // Custom network
