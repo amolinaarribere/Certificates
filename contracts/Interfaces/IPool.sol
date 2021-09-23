@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
  * @title Storage
  * @dev Store & retrieve value in a variable
  */
+ import "../Libraries/ItemsLibrary.sol";
 
  interface IPool  {
     function addCertificate(bytes32 CertificateHash, address holder) external payable;
@@ -20,8 +21,8 @@ pragma solidity >=0.7.0 <0.9.0;
     function removeProvider(address provider) external;
     function validateProvider(address provider) external;
     function rejectProvider(address provider) external;
-    function retrieveProvider(address provider) external view returns (string memory, bool);
+    function retrieveProvider(address provider) external view returns (ItemsLibrary._itemIdentity memory);
     function retrieveAllProviders() external view returns (bytes32[] memory);
-    function retrievePendingProviders(bool addedORremove) external view returns (bytes32[] memory, string[] memory);
+    function retrievePendingProviders(bool addedORremove) external view returns (bytes32[] memory);
     
 }

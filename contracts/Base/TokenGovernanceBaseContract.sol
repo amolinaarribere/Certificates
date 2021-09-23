@@ -1,30 +1,51 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+Common functionality for all Contracts which configuration must be managed by Tokens owners
+  - Proposition can be added only by token owners with a minimum number of token or the chair person
+  - Proposition can be voted for or against only by token owners
+  - Proposition have a deadline
+  - Proposition that reach the threshold are validated/cancelled
+  - Proposition can be cancelled by the creator if not yet validated or cancelled by voters
+
+Proposition LifeTime, minimum number of tokens to propose and threshold percentages are common to all proposition and can be changed as well.
+
+Only one proposition can run at a time.
+
+If tokens are transfered after voting, the new owner cannot use them to vote again.
+
+Functionality (with basic security check)
+    - Add Proposition
+    - Vote on Proposition
+    - Cancel Proposition
+  
+  Events : 
+    - Prop added : id, proposer, deadline, threshold
+    - Prop cancelled : id, proposer
+    - Prop voted : id, voter, vote, tokens used
+    - Prop approved : id, proposer, votes For, votes Against
+    - Prop rejected : id, proposer, votes For, votes Against
+    - PRop used tokens transfered : id, from, to, tokes used
+  
  */
 
  import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
  import "../Interfaces/ITokenEventSubscriber.sol";
  import "../Libraries/AddressLibrary.sol";
- import "../Libraries/Library.sol";
  import "./ManagedBaseContract.sol";
- import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initializable, ManagedBaseContract {
-    using Library for *;
+abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedBaseContract {
     using AddressLibrary for *; 
 
     // EVENTS /////////////////////////////////////////
-    event _AddedProposition(uint256, address indexed, uint256, uint256);
-    event _CancelledProposition(uint256, address indexed);
-    event _PropositionVote(uint256, address indexed, bool, uint256);
-    event _PropositionApproved(uint256, address indexed, uint256, uint256);
-    event _PropositionRejected(uint256, address indexed, uint256, uint256);
-    event _UsedTokensTransfered(uint256 indexed, address, address, uint256);
+    event _AddedProposition(uint256 Id, address indexed Proposer, uint256 Deadline, uint256 Threshold);
+    event _CancelledProposition(uint256 Id, address indexed Proposer);
+    event _PropositionVote(uint256 Id, address indexed Voter, bool Vote, uint256 AmountTokens);
+    event _PropositionApproved(uint256 Id, address indexed Proposer, uint256 VotesFor, uint256 VotesAgainst);
+    event _PropositionRejected(uint256 Id, address indexed Proposer, uint256 VotesFor, uint256 VotesAgainst);
+    event _UsedTokensTransfered(uint256 indexed Id, address From, address To, uint256 Amount);
 
     // DATA /////////////////////////////////////////
     // chair person
@@ -169,7 +190,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
             _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;
             _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;
             _currentPropisProp = true;
-            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+            addProposition();
         }   
     }
 
@@ -190,13 +211,13 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function addProposition(uint256 _DeadLine, uint8 _validationThresholdPercentage) internal
+    function addProposition() internal
         PropositionInProgress(false)
         isAuthorizedToPropose()
     {
         _Proposition.Proposer = msg.sender;
-        _Proposition.DeadLine = _DeadLine;
-        _Proposition.validationThreshold = totalSupply() * _validationThresholdPercentage / 100;
+        _Proposition.DeadLine = block.timestamp + _PropositionLifeTime;
+        _Proposition.validationThreshold = totalSupply() * _PropositionThresholdPercentage / 100;
         _Proposition.PropID = _nextPropID;
         _nextPropID++;
 
@@ -267,7 +288,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
 
     function checkProposition() internal
     {
-        if(_Proposition.VotesFor > _Proposition.validationThreshold) 
+        if(_Proposition.VotesFor >= _Proposition.validationThreshold) 
         {
             if(_currentPropisProp){
                 _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;
@@ -281,7 +302,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
             InternalCancelProposition();
             emit _PropositionApproved(_Proposition.PropID, _Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst);
         }
-        else if(_Proposition.VotesAgainst > _Proposition.validationThreshold)
+        else if(_Proposition.VotesAgainst >= _Proposition.validationThreshold)
         {
             if(_currentPropisProp){
                 removePropositionProp();
@@ -312,6 +333,22 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Initiali
             _Proposition.VotesFor,
             _Proposition.VotesAgainst
         );
+    }
+
+    function retrieveVotesForVoter(uint256 PropId, address voter) external view returns(uint256){
+        return (_votersPerProp[PropId][voter]);
+    }
+
+    function retrieveChairPerson() external view returns(address){
+        return _chairperson;
+    }
+
+    function retrieveNextPropId() external view returns(uint256){
+        return _nextPropID;
+    }
+
+    function isCurrentPropositionProp() external view returns(bool){
+        return _currentPropisProp;
     }
 
     function retrieveProposition() external virtual view returns(bytes32[] memory){}

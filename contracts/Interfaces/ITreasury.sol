@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
  * @title Storage
@@ -19,6 +19,7 @@ pragma solidity >=0.7.0 <0.9.0;
     function AssignDividends() external;
     function withdraw(uint amount) external;
 
+    function retrieveLastAssigned(address addr) external view returns(uint);
     function retrieveBalance(address addr) external view returns(uint);
     function retrievePrices() external view returns(uint, uint, uint, uint, uint);
     function retrieveAggregatedAmount() external view returns(uint);

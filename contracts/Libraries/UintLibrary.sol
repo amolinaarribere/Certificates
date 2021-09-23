@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+ Uint data type common functionality
  */
 
 import "./Library.sol";
@@ -12,8 +11,7 @@ import "./Library.sol";
 library UintLibrary{
     using Library for *;
 
-    // auxiliary functions
-
+    // AUX FUNCTIONALITY /////////////////////////////////////////
     function FindUintPosition(uint value, uint[] memory list) public pure returns (uint)
     {
         for(uint i=0; i < list.length; i++){

@@ -17,7 +17,8 @@ const PrivatePriceUSD = constants.PrivatePriceUSD;
 const ProviderPriceUSD = constants.ProviderPriceUSD;
 const CertificatePriceUSD = constants.CertificatePriceUSD;
 const OwnerRefundPriceUSD = constants.OwnerRefundPriceUSD;
-const factor = constants.factor; // mock
+const rate = constants.rate; // mock
+const decimals = constants.decimals; // mock
 const PropositionLifeTime = constants.PropositionLifeTime;
 const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
 const minPercentageToPropose = constants.minPercentageToPropose;
@@ -230,7 +231,7 @@ async function deployImplementations(user_1){
     let providerFactory = await ProviderFactory.new({from: user_1});
     let provider = await Provider.new({from: user_1});
     let priceConverter = await PriceConverter.new({from: user_1});
-    let mockChainLinkFeedRegistry = await MockChainLinkFeedRegistry.new(factor, {from: user_1}); // Mock
+    let mockChainLinkFeedRegistry = await MockChainLinkFeedRegistry.new(rate, decimals, {from: user_1}); // Mock
 
     return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address];
 }

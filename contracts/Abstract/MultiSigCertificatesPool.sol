@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  MultiSig Certificate Pool Contract.
+    Inherits from MultiSig and simply defines CRUD operations for Providers as a second Entity next to Owners
+    Also allows for Certificates to be generated for specific holders
  */
 
 import "./MultiSigContract.sol";
 import "../Interfaces/IPool.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigContract {
+abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     
     // EVENTS /////////////////////////////////////////
-    event _AddCertificate(address indexed, address indexed, bytes32);
+    event _AddCertificate(address indexed Provider, address indexed Holder, bytes32 Certificate);
 
     // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;
@@ -90,7 +90,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         rejectEntity(provider, _providerId);
     }
     
-    function retrieveProvider(address provider) external override view returns (string memory, bool)
+    function retrieveProvider(address provider) external override view returns (ItemsLibrary._itemIdentity memory)
     {
         return (retrieveEntity(provider, _providerId));
     }
@@ -105,7 +105,7 @@ abstract contract MultiSigCertificatesPool is IPool, Initializable, MultiSigCont
         return(isEntity(provider, _providerId));
     }
 
-    function retrievePendingProviders(bool addedORremove) external override view returns (bytes32[] memory, string[] memory)
+    function retrievePendingProviders(bool addedORremove) external override view returns (bytes32[] memory)
     {
         return(retrievePendingEntities(addedORremove, _providerId));
     }

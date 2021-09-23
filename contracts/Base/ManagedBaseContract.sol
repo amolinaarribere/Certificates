@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  Manager Contract is a Base contract that simply adds a manager contract as a reference for multiple operations
  */
 
 import "../Libraries/Library.sol";
@@ -26,6 +25,11 @@ contract ManagedBaseContract is Initializable{
     // CONSTRUCTOR /////////////////////////////////////////
     function ManagedBaseContract_init(address managerContractAddress) internal initializer {
         _managerContract = IProxyManager(managerContractAddress);
+    }
+
+    // FUNCTIONALITY /////////////////////////////////////////
+    function retrieveManagerContract() external view returns(address){
+        return address(_managerContract);
     }
 
 }

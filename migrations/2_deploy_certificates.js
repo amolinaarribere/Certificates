@@ -18,6 +18,7 @@ let Library = artifacts.require("./Libraries/Library");
 let UintLibrary = artifacts.require("./Libraries/UintLibrary");
 let AddressLibrary = artifacts.require("./Libraries/AddressLibrary");
 let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
+let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominations.sol");
 
 const PropositionLifeTime = 604800;
 const PropositionThresholdPercentage = 50;
@@ -26,28 +27,33 @@ const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const PublicPriceUSD = 10000;
-const PrivatePriceUSD = 200;
-const ProviderPriceUSD = 250;
-const CertificatePriceUSD = 1000;
-const OwnerRefundFeeUSD = 2000;
-const factor = 1000;
+const PublicPriceUSD = 1000000;
+const PrivatePriceUSD = 20000;
+const ProviderPriceUSD = 25000;
+const CertificatePriceUSD = 100000;
+const OwnerRefundFeeUSD = 200000;
+const rate = 338495835524;
+const MockDecimals = 8;
 const PublicMinOwners = 1;
 
 
 module.exports = async function(deployer, network, accounts){
 
-  if("development" == network || 
-  "ganache" == network )
+  if("kovan" == network)
   {
-    await deployer.deploy(MockChainLinkFeedRegistry, factor);
+    ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
+  }
+  else if("mainnet" == network)
+  {
+    ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+  }
+
+  else
+  {
+    await deployer.deploy(MockChainLinkFeedRegistry, rate, MockDecimals);
     MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
     console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
     ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
-  }
-  else if("Kovan" == network)
-  {
-    ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
   }
 
   const PublicOwners = [accounts[0]];
@@ -77,6 +83,9 @@ module.exports = async function(deployer, network, accounts){
   await deployer.deploy(ItemsLibrary);
   console.log("ItemsLibrary deployed");
 
+  await deployer.deploy(Denominations);
+  console.log("Denominations deployed");
+
   // Certificate Pool Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, CertificatesPoolManager);
   console.log("Library linked to Certificate Pool Manager");
@@ -94,6 +103,9 @@ module.exports = async function(deployer, network, accounts){
 
   await deployer.link(AddressLibrary, PriceConverter);
   console.log("AddressLibrary linked to Price Converter");
+
+  await deployer.link(Denominations, PriceConverter);
+  console.log("Denominations linked to Price Converter");
 
   await deployer.deploy(PriceConverter);
   PriceConverterInstance = await PriceConverter.deployed();

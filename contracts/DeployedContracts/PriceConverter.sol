@@ -1,28 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+ Price Converter is an interface to the Chain Link Price Registry for USD to ETH exchange
  */
 
 import "../Interfaces/IPriceConverter.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
-import "../Libraries/AddressLibrary.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/FeedRegistryInterface.sol";
 import "@chainlink/contracts/src/v0.8/Denominations.sol";
 
 
 contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
-    using AddressLibrary for *;
 
      // EVENTS /////////////////////////////////////////
-    event _NewRegistryAddress(address);
+    event _NewRegistryAddress(address Registry);
 
     // DATA /////////////////////////////////////////
     FeedRegistryInterface internal _registry;
+    uint8 constant _ETHDecimals = 18;
+    uint8 constant _USDDecimals = 2;
 
     address internal _ProposedRegistryAddress;
 
@@ -36,7 +34,7 @@ contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
     // GOVERNANCE /////////////////////////////////////////
     function updateRegistryAddress(address NewRegistryAddress) external override
     {
-        addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+        addProposition();
         _ProposedRegistryAddress = NewRegistryAddress;
     }
 
@@ -73,8 +71,15 @@ contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
 
     // FUNCTIONALITY /////////////////////////////////////////
     function fromUSDToETH(uint _USDamount) external override view returns (uint) {
-        (,int price,,,) = _registry.latestRoundData(Denominations.USD, Denominations.ETH);
-        return uint(price) * _USDamount;
+        uint8 decimals = _registry.decimals(Denominations.ETH, Denominations.USD);
+        (,int price,,,) = _registry.latestRoundData(Denominations.ETH, Denominations.USD);
+
+        uint256 amount = 10**(decimals + _ETHDecimals - _USDDecimals) * _USDamount / uint(price);
+        uint256 remainder = 10**(decimals + _ETHDecimals - _USDDecimals) * _USDamount % uint(price);
+
+        if(remainder > 0) amount += 1;
+
+        return amount;
     }
 
     function retrieveRegistryAddress() external override view returns(address){

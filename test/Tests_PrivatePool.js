@@ -11,7 +11,8 @@ const CertisToken = artifacts.require("CertisToken");
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 
-const PrivatePriceWei = constants.PrivatePriceUSD * constants.factor;
+const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals - 2) / constants.rate;
+const PrivatePriceWei = constants.PrivatePriceUSD * FactorUSDtoETH;
 const Gas = constants.Gas;
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------

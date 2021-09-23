@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+ Treasury receives all the payments and assigns dividends to token holders.
+ Public Certificate Pool contract can ask for its owners to eb refunded even if they do not own tokens.
+
+ First dividends must be assigned to an account and then the account owner can withdraw the funds.
+ Both actions must be triggered by the account owner.
+
+  Events : 
+    - New Prices Added : list of prices
+    - Payment recieved : payer, amount, new total aggregated contract amount
+    - Refund : who, amount, among how many
+    - Assign Dividends : who, amount (number of tokens), among how many (total supply)
+    - Withdraw : who, how much
  */
 
 import "../Interfaces/ITreasury.sol";
@@ -20,11 +30,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     using UintLibrary for *;
 
     // EVENTS /////////////////////////////////////////
-    event _NewPrices(uint, uint, uint, uint, uint);
-    event _Pay(address indexed, uint, uint);
-    event _Refund(address indexed, uint, uint);
-    event _AssignDividend(address indexed, uint, uint);
-    event _Withdraw(address indexed, uint);
+    event _NewPrices(uint Public, uint Private, uint Provider, uint Certificate, uint OwnerRefund);
+    event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount);
+    event _Refund(address indexed Owner, uint Amount, uint TotalOwners);
+    event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply);
+    event _Withdraw(address indexed Recipient, uint Amount);
 
     // DATA /////////////////////////////////////////
     // proposition to change prices
@@ -111,7 +121,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
             _OwnerRefundFeeUSD = OwnerRefundFeeUSD;
         }
         else{
-            addProposition(block.timestamp + _PropositionLifeTime, _PropositionThresholdPercentage);
+            addProposition();
             _ProposedPrices.NewPublicPriceUSD = PublicPriceUSD;
             _ProposedPrices.NewCertificatePriceUSD = CertificatePriceUSD;
             _ProposedPrices.NewPrivatePriceUSD = PrivatePriceUSD;
@@ -223,6 +233,11 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         require(success, string(abi.encodePacked("Error transfering funds to address : ", data)));
 
         emit _Withdraw(msg.sender, amount);
+    }
+
+    function retrieveLastAssigned(address addr) external override view returns(uint)
+    {
+        return _lastAssigned[addr];
     }
 
     function retrieveBalance(address addr) external override view returns(uint)

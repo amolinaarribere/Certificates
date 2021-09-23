@@ -1,10 +1,36 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+Common functionality for all Items
+  Items -> Certificate & Entities(Owners & Providers & Pools)
+    Item Identity : 
+       - activated : Item is activated (true/false)
+       - info : Item info
+       - id : Item id (only is item is activated)
+       - pendingId : Item id in activation/deletion pending list (only if item is been added or removed)
+       - validations[] : List of address that validated the item (accepted its activation or deletion)
+       - rejections[] : List of address that rejected the item (rejected its activation or deletion)
+    Items structure:
+        - mapping bytes32 to Item identity
+        - List of currently activated items (id -> to reference from item identity)
+        - List of currently pending Items to be activated (pendingId -> to reference from item identity)
+        - List of currently pending Items to be deleted (pendingId -> to reference from item identity)
+
+Functionality (with basic security check)
+    - Add Item
+    - Remove Item
+    - Validate Item creation/removal
+    - Reject Item creation/removal
+  
+  Events : 
+  Item Type(string) - Item(bytes32) - Item info(string)
+    - Item activation validated
+    - Item activation rejected
+    - Item deletion validated
+    - Item deletion rejected
+  
  */
 
 import "./Library.sol";
@@ -14,16 +40,44 @@ library ItemsLibrary{
     using AddressLibrary for *;
     using Library for *;
 
-    //events
-    event _AddItemValidation(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemValidation(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _AddItemRejection(bool, string indexed,  bytes32 indexed,  string indexed);
-    event _RemoveItemRejection(bool, string indexed,  bytes32 indexed,  string indexed);
+    // EVENTS /////////////////////////////////////////
+    event _AddItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
+    event _RemoveItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
+    event _AddItemRejection(string ItemType,  bytes32 indexed Item,  string Info);
+    event _RemoveItemRejection( string ItemType,  bytes32 indexed Item,  string Info);
+
+    // MODIFIERS /////////////////////////////////////////
+    modifier ItemNotActivated(bytes32 item, _ItemsStruct storage itemStruct){
+        require(false == isItem(item, itemStruct), "EC6-");
+        _;
+    }
+
+    modifier ItemActivated(bytes32 item, _ItemsStruct storage itemStruct){
+        require(true == isItem(item, itemStruct), "EC7-");
+        _;
+    }
+
+    modifier ItemNotPending(bytes32 item, _ItemsStruct storage itemStruct){
+        require(false == isItemPendingToAdded(item, itemStruct) && 
+                false == isItemPendingToRemoved(item, itemStruct), "EC27-");
+        _;
+    }
+
+    modifier ItemPending(bytes32 item, _ItemsStruct storage itemStruct){
+        require(true == isItemPendingToAdded(item, itemStruct) ||
+                true == isItemPendingToRemoved(item, itemStruct), "EC28-");
+        _;
+    }
+
+    modifier HasNotAlreadyVoted(bytes32 item, _ItemsStruct storage itemStruct){
+        require(false == hasVoted(msg.sender, item, itemStruct), "EC5-");
+        _;
+    }
     
-    // Data structure
+    // DATA /////////////////////////////////////////
     struct _itemIdentity{
-        bool _activated;
         string _Info;
+        bool _activated;
         uint _id;
         uint _pendingId;
         address[] _Validations;
@@ -37,28 +91,41 @@ library ItemsLibrary{
         bytes32[] _pendingItemsRemove;
     }
 
+    // structured used as input parameter for CRUD functions
     struct _manipulateItemStruct{
         bytes32 item;
         string info;
         uint256 _minSignatures;
-        string label;
-        uint[] ids;
-        bool emitEvent;
+        string ItemTypeLabel; // Certificate, owner, provider, pool
+        uint[] ids; // Ids that will be returned to callback when item activation/deletion has been validated/rejected 
     }
 
-    // Auxiliary functions
+    
+    // AUX FUNCTIONALITY /////////////////////////////////////////
     function CheckValidations(uint256 signatures, uint256 minSignatures) public pure returns(bool){
         if(signatures < minSignatures) return false;
         return true;
     }
 
+    function ReturnManipulateStructContent(_manipulateItemStruct memory manipulateItemstruct) public pure returns(bytes32, uint, string memory, uint[] memory)
+    {
+        return(manipulateItemstruct.item,
+         manipulateItemstruct._minSignatures,
+         manipulateItemstruct.ItemTypeLabel,
+         manipulateItemstruct.ids);
+    }
+
+    function deleteVoters(bytes32 item, _ItemsStruct storage itemStruct) public{
+        delete(itemStruct._items[item]._Rejections);
+        delete(itemStruct._items[item]._Validations);
+        itemStruct._items[item]._pendingId = 0;
+    }
+
+    // Remove Item from array and resize (not keeping order) it reindexing the item that was moved
     function RemoveResizePending(bool addOrRemove, bytes32 item, _ItemsStruct storage itemStruct) public
     {
-        bytes32[] storage arrayToRemoveResize;
+        bytes32[] storage arrayToRemoveResize = (addOrRemove)? itemStruct._pendingItemsAdd : itemStruct._pendingItemsRemove;
         uint position = itemStruct._items[item]._pendingId;
-
-        if(addOrRemove)arrayToRemoveResize = itemStruct._pendingItemsAdd;
-        else arrayToRemoveResize = itemStruct._pendingItemsRemove;
 
         Library.ArrayRemoveResize(position, arrayToRemoveResize);
 
@@ -83,8 +150,10 @@ library ItemsLibrary{
 
     }
 
-    // ADD and REMOVE Functionality
-    function addItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
+    // MAIN FUNCTIONALITY /////////////////////////////////////////
+    function addItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
+        ItemNotActivated(manipulateItemstruct.item, itemStruct)
+        ItemNotPending(manipulateItemstruct.item, itemStruct)
     {
         bytes32 item = manipulateItemstruct.item;
         string memory info = manipulateItemstruct.info;
@@ -93,97 +162,93 @@ library ItemsLibrary{
         itemStruct._pendingItemsAdd.push(item);
         itemStruct._items[item]._pendingId = itemStruct._pendingItemsAdd.length - 1;
         
-        validateItem(manipulateItemstruct, itemStruct, c);
+        validateItem(manipulateItemstruct, itemStruct, callerContract);
     }
      
-    function removeItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
+    function removeItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
+        ItemActivated(manipulateItemstruct.item, itemStruct)
+        ItemNotPending(manipulateItemstruct.item, itemStruct)
     {
         bytes32 item = manipulateItemstruct.item;
 
         itemStruct._pendingItemsRemove.push(item);
         itemStruct._items[item]._pendingId = itemStruct._pendingItemsRemove.length - 1;
 
-        validateItem(manipulateItemstruct, itemStruct, c);
+        validateItem(manipulateItemstruct, itemStruct, callerContract);
     }
 
-    function validateItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
+    function validateItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
+        ItemPending(manipulateItemstruct.item, itemStruct)
+        HasNotAlreadyVoted(manipulateItemstruct.item, itemStruct)
     {
-        bytes32 item = manipulateItemstruct.item;
-        uint _minSignatures = manipulateItemstruct._minSignatures;
-        string memory label = manipulateItemstruct.label;
-        uint[] memory ids = manipulateItemstruct.ids;
-        bool emitEvent = manipulateItemstruct.emitEvent;
+        (bytes32 item, uint _minSignatures, string memory ItemTypeLabel, uint[] memory ids) = ReturnManipulateStructContent(manipulateItemstruct);
 
         itemStruct._items[item]._Validations.push(msg.sender);
 
         if(CheckValidations(itemStruct._items[item]._Validations.length, _minSignatures))
         {
-            if(isItemPendingToAdded(item, itemStruct)){
+            if(isItemPendingToAdded(item, itemStruct))
+            {
                 itemStruct._items[item]._activated = true; 
                 itemStruct._activatedItems.push(item);
                 itemStruct._items[item]._id = itemStruct._activatedItems.length - 1;
 
                 RemoveResizePending(true, item, itemStruct);
 
-                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, true));
+                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, true));
                 require(success, string(data));
                 
-
                 deleteVoters(item, itemStruct);
-                if(emitEvent) emit _AddItemValidation(success, label, item, itemStruct._items[item]._Info);
+                emit _AddItemValidation(ItemTypeLabel, item, itemStruct._items[item]._Info);
             }
             else{
                 RemoveResizeActivated(item, itemStruct);
                 RemoveResizePending(false, item, itemStruct);
 
-                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));
+                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));
                 require(success, string(data));
 
-                if(emitEvent) emit _RemoveItemValidation(success, label, item, itemStruct._items[item]._Info);
+                emit _RemoveItemValidation(ItemTypeLabel, item, itemStruct._items[item]._Info);
                 delete(itemStruct._items[item]);
             }   
         }
     }
 
-    function rejectItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address c) public
+    function rejectItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
+        ItemPending(manipulateItemstruct.item, itemStruct)
+        HasNotAlreadyVoted(manipulateItemstruct.item, itemStruct)
     {
-        bytes32 item = manipulateItemstruct.item;
-        uint _minSignatures = manipulateItemstruct._minSignatures;
-        string memory label = manipulateItemstruct.label;
-        uint[] memory ids = manipulateItemstruct.ids;
-        bool emitEvent = manipulateItemstruct.emitEvent;
+        (bytes32 item, uint _minSignatures, string memory ItemTypeLabel, uint[] memory ids) = ReturnManipulateStructContent(manipulateItemstruct);
 
         itemStruct._items[item]._Rejections.push(msg.sender);
 
-        if(CheckValidations(itemStruct._items[item]._Rejections.length, _minSignatures)){
+        if(CheckValidations(itemStruct._items[item]._Rejections.length, _minSignatures))
+        {
 
-            if(isItemPendingToAdded(item, itemStruct)){
+            if(isItemPendingToAdded(item, itemStruct))
+            {
                 RemoveResizePending(true, item, itemStruct);
 
-                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true)); 
+                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true)); 
                 require(success, string(data));
 
-                if(emitEvent) emit _AddItemRejection(success, label, item, itemStruct._items[item]._Info);
+                emit _AddItemRejection(ItemTypeLabel, item, itemStruct._items[item]._Info);
                 delete(itemStruct._items[item]);
             }
-            else{
+            else
+            {
                 RemoveResizePending(false, item, itemStruct);
 
-                (bool success, bytes memory data) = c.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, false));
+                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, false));
                 require(success, string(data));
 
                 deleteVoters(item, itemStruct);
-                if(emitEvent) emit _RemoveItemRejection(success, label, item, itemStruct._items[item]._Info);
+                emit _RemoveItemRejection(ItemTypeLabel, item, itemStruct._items[item]._Info);
             }
                 
         }
     }
 
-    function deleteVoters(bytes32 item, _ItemsStruct storage itemStruct) public{
-        delete(itemStruct._items[item]._Rejections);
-        delete(itemStruct._items[item]._Validations);
-        itemStruct._items[item]._pendingId = 0;
-    }
 
     // READ Data
 
@@ -207,25 +272,19 @@ library ItemsLibrary{
         return false;
     }
 
-    function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory, string[] memory)
+    function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory)
     {
         bytes32[] memory Items;
 
         if(addORemove) Items = itemStruct._pendingItemsAdd;
         else Items = itemStruct._pendingItemsRemove;
-
-        string[] memory Items_Info = new string[](Items.length);
-
-        for(uint i=0; i < Items.length; i++){
-            (Items_Info[i],) = retrieveItem(Items[i], itemStruct);
-        }
         
-        return(Items, Items_Info);
+        return Items;
     }
 
-    function retrieveItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns (string memory, bool) 
+    function retrieveItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns (_itemIdentity memory) 
     {
-        return (itemStruct._items[item]._Info, isItem(item, itemStruct));
+        return (itemStruct._items[item]);
     }
 
     function retrieveAllItems(_ItemsStruct storage itemStruct) public view returns (bytes32[] memory) 

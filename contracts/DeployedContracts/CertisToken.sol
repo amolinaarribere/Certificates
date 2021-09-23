@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.7;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+ Certis Token is an ERC20 Token that grants its holder the right to:
+   - Vote on all the systems propositions (changing system configuraiton etc...)
+   - Receive Dividends for all the payments forwarded to the Treasury contract
+
+Before every token transfer we contact the token gouvernance Base contracts so that the can update the tokens used for voting if needed
+
  */
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -39,6 +43,7 @@ import "../Base/ManagedBaseContract.sol";
     {
         if(_managerContract.isInitialized()){
             ITokenEventSubscriber(_managerContract.retrieveTreasuryProxy()).onTokenBalanceChanged(from, to, amount);
+            ITokenEventSubscriber(_managerContract.retrievePriceConverterProxy()).onTokenBalanceChanged(from, to, amount);
             ITokenEventSubscriber(address(_managerContract)).onTokenBalanceChanged(from, to, amount);
         } 
     }

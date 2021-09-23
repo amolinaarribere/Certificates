@@ -1,24 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
 /**
- * @title Storage
- * @dev Store & retrieve value in a variable
+  Provider contract allows for registering pools (and optionally subscribing to them too).
+  Certificates can be latter delivered to those pools
  */
- import "../Libraries/Library.sol";
  import "../Interfaces/IProvider.sol";
  import "../Interfaces/IPool.sol";
  import "../Abstract/MultiSigContract.sol";
- import "../Libraries/ItemsLibrary.sol";
- import "../Libraries/AddressLibrary.sol";
- import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  import "../Interfaces/IPriceConverter.sol";
 
- contract Provider is IProvider, Initializable, MultiSigContract {
-    using Library for *;
-    using AddressLibrary for *;
-    using ItemsLibrary for *;
+ contract Provider is IProvider, MultiSigContract {
 
     // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;
@@ -54,23 +47,6 @@ pragma solidity >=0.7.0 <0.9.0;
     // MODIFIERS /////////////////////////////////////////
     modifier isAPool(address pool){
         require(true == isPool(pool));
-        _;
-    }
-
-    modifier isCertificateActivated(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == internalisCertificate(pool, cert, holder), "EC6-");
-        else require(true == internalisCertificate(pool, cert, holder), "EC7-");
-        _;
-    }
-
-    modifier isCertificatePendingToAdd(bool YesOrNo, bytes32 cert, address pool, address holder){
-        if(false == YesOrNo) require(false == isCertificatePendingToAdded(pool, cert, holder), "EC27-");
-        else require(true == isCertificatePendingToAdded(pool, cert, holder), "EC28-");
-        _;
-    }
-
-    modifier HasNotAlreadyVotedForCertificate(bytes32 cert, address pool, address holder){
-        require(false == ItemsLibrary.hasVoted(msg.sender, cert, _CertificatesPerPool[pool]._CertificatesPerHolder[holder]), "EC5-");
         _;
     }
 
@@ -115,18 +91,14 @@ pragma solidity >=0.7.0 <0.9.0;
         delete(_mustSubscribe[pool]);
     }
 
-    function retrievePool(address pool) external override view returns (string memory, bool, bool)
-    {
-        string memory poolInfo;
-        bool isActivated;
-
-        (poolInfo, isActivated) = InternalRetrievePool(pool);
-        return (poolInfo, isActivated, _mustSubscribe[pool]);
-    }
-    
-    function InternalRetrievePool(address pool) internal view returns (string memory, bool)
+    function retrievePool(address pool) external override view returns (ItemsLibrary._itemIdentity memory)
     {
         return retrieveEntity(pool, _poolId);
+    }
+
+    function retrievePoolConfg(address pool) external override view returns (bool, bool)
+    {
+        return (_mustSubscribe[pool], _submited[pool]);
     }
 
     function retrieveAllPools() external override view returns (bytes32[] memory)
@@ -134,7 +106,7 @@ pragma solidity >=0.7.0 <0.9.0;
         return retrieveAllEntities(_poolId);
     }
 
-    function retrievePendingPools(bool addedORremove) external override view returns (bytes32[] memory, string[] memory)
+    function retrievePendingPools(bool addedORremove) external override view returns (bytes32[] memory)
     {
         return(retrievePendingEntities(addedORremove, _poolId));
     }
@@ -170,42 +142,41 @@ pragma solidity >=0.7.0 <0.9.0;
     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
-        isCertificateActivated(false, CertificateHash, pool, holder) 
-        isCertificatePendingToAdd(false, CertificateHash, pool, holder)
      {
-       
-        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
-        uint[] memory certIdIdArray = extractCertIds(pool, CertificateHash, holder);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
+        (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
+            ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsCert(pool, CertificateHash, holder);
+
         ItemsLibrary.addItem(manipulateItemStruct,itemsstruct, address(this));
      }
 
     function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
-        isCertificatePendingToAdd(true, CertificateHash, pool, holder)
-        HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
      {
-        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
-        uint[] memory certIdIdArray = extractCertIds(pool, CertificateHash, holder);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
+        (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
+            ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsCert(pool, CertificateHash, holder);
+
         ItemsLibrary.validateItem(manipulateItemStruct, itemsstruct, address(this));
      }
 
-     function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external override
+    function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
         isAnOwner
-        isCertificatePendingToAdd(true, CertificateHash, pool, holder)
-        HasNotAlreadyVotedForCertificate(CertificateHash, pool, holder)
-     {
-        _CertificatesPerHolderStruct storage hs = _CertificatesPerPool[pool];
-        uint[] memory certIdIdArray = extractCertIds(pool, CertificateHash, holder);
-        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray, false);
-        ItemsLibrary._ItemsStruct storage itemsstruct =  hs._CertificatesPerHolder[holder];
+    {
+        (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
+            ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsCert(pool, CertificateHash, holder);
+
         ItemsLibrary.rejectItem(manipulateItemStruct, itemsstruct, address(this));
-     }
+    }
+
+    function GenerateStructsCert(address pool, bytes32 CertificateHash, address holder) internal
+        returns(ItemsLibrary._manipulateItemStruct memory, ItemsLibrary._ItemsStruct storage)
+    {
+        uint[] memory certIdIdArray = extractCertIds(pool, CertificateHash, holder);
+        ItemsLibrary._manipulateItemStruct memory manipulateItemStruct = ItemsLibrary._manipulateItemStruct(CertificateHash, "", _minOwners, _certLabel, certIdIdArray);
+        ItemsLibrary._ItemsStruct storage itemsstruct =  _CertificatesPerPool[pool]._CertificatesPerHolder[holder];
+        return (manipulateItemStruct, itemsstruct);
+    }
  
     function manipulateCertificate(address pool, bytes32 CertificateHash, address holder) internal
         isAPool(pool)

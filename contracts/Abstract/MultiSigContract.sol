@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity 0.8.7;
 
-/**
- * @title Storage
- * @dev Store & retrieve value in a variable
+/*
+  MultiSig Contract.
+    Inherits from EntitesBaseCOntract and simply defines CRUD operations for Owners with spepcific security checks
  */
 
  import "../Interfaces/IMultiSigContract.sol";
  import "../Base/EntitiesBaseContract.sol";
- import "../Libraries/AddressLibrary.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, Initializable{
-    using AddressLibrary for *;
 
     // DATA /////////////////////////////////////////
     // proposal for new min owners
@@ -42,7 +40,6 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         require(false == AddressLibrary.FindAddress(msg.sender, _newMinOwnersVoters), "EC5-");
        _;
     }
-
     
     modifier NewMinOwnerInProgress(bool YesOrNo){
         if(YesOrNo) require(0 != _newMinOwners, "EC31-");
@@ -97,7 +94,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         rejectEntity(owner, _ownerId);
     }
     
-    function retrieveOwner(address owner) external override view returns (string memory, bool){
+    function retrieveOwner(address owner) external override view returns (ItemsLibrary._itemIdentity memory){
         return (retrieveEntity(owner, _ownerId));
     }
 
@@ -113,7 +110,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         return(isEntity(owner, _ownerId));
     }
 
-    function retrievePendingOwners(bool addedORremove) external override view returns (bytes32[] memory, string[] memory){
+    function retrievePendingOwners(bool addedORremove) external override view returns (bytes32[] memory){
         return(retrievePendingEntities(addedORremove, _ownerId));
     }
 
@@ -179,6 +176,11 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
     function retrievePendingMinOwners() external override view returns (uint)
     {
         return _newMinOwners;
+    }
+
+    function retrievePendingMinOwnersStatus() external override view returns (uint, uint, address[] memory)
+    {
+        return (_newMinOwnersVotesFor, _newMinOwnersVotesAgainst, _newMinOwnersVoters);
     }
 
 }
