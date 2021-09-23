@@ -705,30 +705,30 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/*\r\n  MultiSig Certificate Pool Contract.\r\n    Inherits from MultiSig and simply defines CRUD operations for Providers as a second Entity next to Owners\r\n    Also allows for Certificates to be generated for specific holders\r\n */\r\n\r\nimport \"./MultiSigContract.sol\";\r\nimport \"../Interfaces/IPool.sol\";\r\n\r\nabstract contract MultiSigCertificatesPool is IPool, MultiSigContract {\r\n    \r\n    // EVENTS /////////////////////////////////////////\r\n    event _AddCertificate(address indexed Provider, address indexed Holder, bytes32 Certificate);\r\n\r\n    // DATA /////////////////////////////////////////\r\n    uint256 constant _TotalEntities = 2;\r\n\r\n    // Owners\r\n    uint256 constant _ownerIdCertificates = 0;\r\n    string constant _ownerLabel = \"Owner\";\r\n\r\n    // Providers\r\n    uint256 constant _providerId = 1;\r\n    string constant _providerLabel = \"Provider\";\r\n\r\n    string[] internal _Label;\r\n\r\n    // Holders\r\n    struct _CertificatePerHolder{\r\n        mapping(bytes32 => address) _CertificateFromProvider;\r\n        bytes32[] _ListOfCertificates;\r\n    }\r\n    \r\n    mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;\r\n\r\n    // MODIFIERS /////////////////////////////////////////\r\n    modifier isAProvider(){\r\n        require(true == isProvider(msg.sender), \"EC12-\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProvider(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC13-\");\r\n        _;\r\n    }\r\n\r\n    modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){\r\n        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, \"EC14-\");\r\n        _;\r\n    }\r\n    \r\n    modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){\r\n        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], \"EC15-\");\r\n        _;\r\n    }\r\n    \r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer \r\n    {\r\n        _Label = new string[](2);\r\n        _Label[0] = _ownerLabel;\r\n        _Label[1] = _providerLabel;\r\n\r\n        super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); \r\n    }\r\n\r\n    // FUNCTIONALITY /////////////////////////////////////////\r\n    // Providers CRUD Operations\r\n    function addProvider(address provider, string calldata providerInfo) external override payable virtual\r\n    {\r\n        addEntity(provider, providerInfo, _providerId);\r\n    }\r\n\r\n    function removeProvider(address provider) external override\r\n    {\r\n       removeEntity(provider, _providerId); \r\n    }   \r\n\r\n    function validateProvider(address provider) external override\r\n    {\r\n        validateEntity(provider, _providerId);\r\n    }\r\n\r\n    function rejectProvider(address provider) external override\r\n    {\r\n        rejectEntity(provider, _providerId);\r\n    }\r\n    \r\n    function retrieveProvider(address provider) external override view returns (ItemsLibrary._itemIdentity memory)\r\n    {\r\n        return (retrieveEntity(provider, _providerId));\r\n    }\r\n\r\n    function retrieveAllProviders() external override view returns (bytes32[] memory)\r\n    {\r\n        return(retrieveAllEntities(_providerId));\r\n    }\r\n\r\n    function isProvider(address provider) internal view returns (bool)\r\n    {\r\n        return(isEntity(provider, _providerId));\r\n    }\r\n\r\n    function retrievePendingProviders(bool addedORremove) external override view returns (bytes32[] memory)\r\n    {\r\n        return(retrievePendingEntities(addedORremove, _providerId));\r\n    }\r\n    \r\n    // Certificates CRUD Operations\r\n    function addCertificate(bytes32 CertificateHash, address holder) external override payable virtual\r\n    {\r\n        addCertificateInternal(CertificateHash, holder);\r\n    }\r\n\r\n    function addCertificateInternal(bytes32 CertificateHash, address holder) internal\r\n        isAProvider \r\n        NotEmpty(CertificateHash)\r\n        CertificateDoesNotExist(holder, CertificateHash)\r\n    {\r\n        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;\r\n        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);\r\n\r\n        emit _AddCertificate(msg.sender, holder, CertificateHash);\r\n    }\r\n\r\n    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override\r\n    view returns (address)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);\r\n    }\r\n\r\n    function retrieveTotalCertificatesByHolder(address holder) public override \r\n    view returns (uint256)\r\n    {\r\n        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);\r\n    }\r\n\r\n    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override\r\n    view returns (bytes32[] memory)\r\n    {\r\n        if(retrieveTotalCertificatesByHolder(holder) <= skipFirst){\r\n            return (new bytes32[](0));\r\n        }\r\n\r\n        uint maxSize = max;\r\n        if(retrieveTotalCertificatesByHolder(holder) - skipFirst < max){\r\n            maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst;\r\n        }\r\n        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](maxSize);\r\n        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;\r\n        uint count = 0;\r\n        uint skipped = 0;\r\n        \r\n        for(uint i=0; i < listOfCert.length; i++){\r\n            if(count >= max) break;\r\n            if(skipFirst > skipped){\r\n                    skipped += 1;\r\n            }\r\n            else{\r\n                ListOfCertificatesByHolder[count] = listOfCert[i];\r\n                count += 1;\r\n            }             \r\n        }\r\n\r\n        return (ListOfCertificatesByHolder);\r\n    }\r\n\r\n    function retrieveAddCertificatePriceWei() external override virtual view returns(uint256)\r\n    {\r\n        return 0;\r\n    }\r\n\r\n    function retrieveSubscriptionPriceWei() external override virtual view returns(uint256)\r\n    {\r\n        return 0;\r\n    }\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Abstract\\MultiSigCertificatesPool.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        7102
+        3396
       ],
       "EntitiesBaseContract": [
         1696
       ],
       "IMultiSigContract": [
-        6561
+        2855
       ],
       "IPool": [
-        6654
+        2948
       ],
       "Initializable": [
-        9105
+        4822
       ],
       "ItemsLibrary": [
-        8140
+        4434
       ],
       "Library": [
-        8352
+        4646
       ],
       "MultiSigCertificatesPool": [
         655
@@ -770,7 +770,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 656,
-        "sourceUnit": 6655,
+        "sourceUnit": 2949,
         "src": "331:33:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -783,7 +783,7 @@
               "id": 147,
               "name": "IPool",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 6654,
+              "referencedDeclaration": 2948,
               "src": "414:5:1"
             },
             "id": 148,
@@ -810,10 +810,10 @@
         "linearizedBaseContracts": [
           655,
           1179,
-          9105,
+          4822,
           1696,
-          6561,
-          6654
+          2855,
+          2948
         ],
         "name": "MultiSigCertificatesPool",
         "nameLocation": "386:24:1",
@@ -2817,7 +2817,7 @@
                   "id": 280,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 9104,
+                  "referencedDeclaration": 4821,
                   "src": "2190:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2912,7 +2912,7 @@
           },
           {
             "baseFunctions": [
-              6616
+              2910
             ],
             "body": {
               "id": 328,
@@ -3096,7 +3096,7 @@
           },
           {
             "baseFunctions": [
-              6621
+              2915
             ],
             "body": {
               "id": 340,
@@ -3237,7 +3237,7 @@
           },
           {
             "baseFunctions": [
-              6626
+              2920
             ],
             "body": {
               "id": 352,
@@ -3378,7 +3378,7 @@
           },
           {
             "baseFunctions": [
-              6631
+              2925
             ],
             "body": {
               "id": 364,
@@ -3519,7 +3519,7 @@
           },
           {
             "baseFunctions": [
-              6639
+              2933
             ],
             "body": {
               "id": 380,
@@ -3574,7 +3574,7 @@
                           "referencedDeclaration": 1545,
                           "src": "3242:14:1",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_struct$__itemIdentity_$7268_memory_ptr_$",
+                            "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_struct$__itemIdentity_$3562_memory_ptr_$",
                             "typeString": "function (address,uint256) view returns (struct ItemsLibrary._itemIdentity memory)"
                           }
                         },
@@ -3589,7 +3589,7 @@
                         "src": "3242:37:1",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$__itemIdentity_$7268_memory_ptr",
+                          "typeIdentifier": "t_struct$__itemIdentity_$3562_memory_ptr",
                           "typeString": "struct ItemsLibrary._itemIdentity memory"
                         }
                       }
@@ -3603,7 +3603,7 @@
                     "nodeType": "TupleExpression",
                     "src": "3241:39:1",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$__itemIdentity_$7268_memory_ptr",
+                      "typeIdentifier": "t_struct$__itemIdentity_$3562_memory_ptr",
                       "typeString": "struct ItemsLibrary._itemIdentity memory"
                     }
                   },
@@ -3679,7 +3679,7 @@
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$__itemIdentity_$7268_memory_ptr",
+                    "typeIdentifier": "t_struct$__itemIdentity_$3562_memory_ptr",
                     "typeString": "struct ItemsLibrary._itemIdentity"
                   },
                   "typeName": {
@@ -3689,13 +3689,13 @@
                       "id": 370,
                       "name": "ItemsLibrary._itemIdentity",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 7268,
+                      "referencedDeclaration": 3562,
                       "src": "3183:26:1"
                     },
-                    "referencedDeclaration": 7268,
+                    "referencedDeclaration": 3562,
                     "src": "3183:26:1",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$__itemIdentity_$7268_storage_ptr",
+                      "typeIdentifier": "t_struct$__itemIdentity_$3562_storage_ptr",
                       "typeString": "struct ItemsLibrary._itemIdentity"
                     }
                   },
@@ -3712,7 +3712,7 @@
           },
           {
             "baseFunctions": [
-              6645
+              2939
             ],
             "body": {
               "id": 393,
@@ -4038,7 +4038,7 @@
           },
           {
             "baseFunctions": [
-              6653
+              2947
             ],
             "body": {
               "id": 423,
@@ -4232,7 +4232,7 @@
           },
           {
             "baseFunctions": [
-              6571
+              2865
             ],
             "body": {
               "id": 437,
@@ -4897,7 +4897,7 @@
           },
           {
             "baseFunctions": [
-              6580
+              2874
             ],
             "body": {
               "id": 498,
@@ -5124,7 +5124,7 @@
           },
           {
             "baseFunctions": [
-              6587
+              2881
             ],
             "body": {
               "id": 514,
@@ -5312,7 +5312,7 @@
           },
           {
             "baseFunctions": [
-              6599
+              2893
             ],
             "body": {
               "id": 635,
@@ -6742,7 +6742,7 @@
           },
           {
             "baseFunctions": [
-              6604
+              2898
             ],
             "body": {
               "id": 644,
@@ -6835,7 +6835,7 @@
           },
           {
             "baseFunctions": [
-              6609
+              2903
             ],
             "body": {
               "id": 653,
@@ -6938,25 +6938,25 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Abstract/MultiSigCertificatesPool.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        7102
+        3396
       ],
       "EntitiesBaseContract": [
         1696
       ],
       "IMultiSigContract": [
-        6561
+        2855
       ],
       "IPool": [
-        6654
+        2948
       ],
       "Initializable": [
-        9105
+        4822
       ],
       "ItemsLibrary": [
-        8140
+        4434
       ],
       "Library": [
-        8352
+        4646
       ],
       "MultiSigCertificatesPool": [
         655
@@ -6998,7 +6998,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 656,
-        "sourceUnit": 6655,
+        "sourceUnit": 2949,
         "src": "331:33:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7011,7 +7011,7 @@
               "id": 147,
               "name": "IPool",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 6654,
+              "referencedDeclaration": 2948,
               "src": "414:5:1"
             },
             "id": 148,
@@ -7038,10 +7038,10 @@
         "linearizedBaseContracts": [
           655,
           1179,
-          9105,
+          4822,
           1696,
-          6561,
-          6654
+          2855,
+          2948
         ],
         "name": "MultiSigCertificatesPool",
         "nameLocation": "386:24:1",
@@ -9045,7 +9045,7 @@
                   "id": 280,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 9104,
+                  "referencedDeclaration": 4821,
                   "src": "2190:11:1"
                 },
                 "nodeType": "ModifierInvocation",
@@ -9140,7 +9140,7 @@
           },
           {
             "baseFunctions": [
-              6616
+              2910
             ],
             "body": {
               "id": 328,
@@ -9324,7 +9324,7 @@
           },
           {
             "baseFunctions": [
-              6621
+              2915
             ],
             "body": {
               "id": 340,
@@ -9465,7 +9465,7 @@
           },
           {
             "baseFunctions": [
-              6626
+              2920
             ],
             "body": {
               "id": 352,
@@ -9606,7 +9606,7 @@
           },
           {
             "baseFunctions": [
-              6631
+              2925
             ],
             "body": {
               "id": 364,
@@ -9747,7 +9747,7 @@
           },
           {
             "baseFunctions": [
-              6639
+              2933
             ],
             "body": {
               "id": 380,
@@ -9802,7 +9802,7 @@
                           "referencedDeclaration": 1545,
                           "src": "3242:14:1",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_struct$__itemIdentity_$7268_memory_ptr_$",
+                            "typeIdentifier": "t_function_internal_view$_t_address_$_t_uint256_$returns$_t_struct$__itemIdentity_$3562_memory_ptr_$",
                             "typeString": "function (address,uint256) view returns (struct ItemsLibrary._itemIdentity memory)"
                           }
                         },
@@ -9817,7 +9817,7 @@
                         "src": "3242:37:1",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$__itemIdentity_$7268_memory_ptr",
+                          "typeIdentifier": "t_struct$__itemIdentity_$3562_memory_ptr",
                           "typeString": "struct ItemsLibrary._itemIdentity memory"
                         }
                       }
@@ -9831,7 +9831,7 @@
                     "nodeType": "TupleExpression",
                     "src": "3241:39:1",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$__itemIdentity_$7268_memory_ptr",
+                      "typeIdentifier": "t_struct$__itemIdentity_$3562_memory_ptr",
                       "typeString": "struct ItemsLibrary._itemIdentity memory"
                     }
                   },
@@ -9907,7 +9907,7 @@
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$__itemIdentity_$7268_memory_ptr",
+                    "typeIdentifier": "t_struct$__itemIdentity_$3562_memory_ptr",
                     "typeString": "struct ItemsLibrary._itemIdentity"
                   },
                   "typeName": {
@@ -9917,13 +9917,13 @@
                       "id": 370,
                       "name": "ItemsLibrary._itemIdentity",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 7268,
+                      "referencedDeclaration": 3562,
                       "src": "3183:26:1"
                     },
-                    "referencedDeclaration": 7268,
+                    "referencedDeclaration": 3562,
                     "src": "3183:26:1",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$__itemIdentity_$7268_storage_ptr",
+                      "typeIdentifier": "t_struct$__itemIdentity_$3562_storage_ptr",
                       "typeString": "struct ItemsLibrary._itemIdentity"
                     }
                   },
@@ -9940,7 +9940,7 @@
           },
           {
             "baseFunctions": [
-              6645
+              2939
             ],
             "body": {
               "id": 393,
@@ -10266,7 +10266,7 @@
           },
           {
             "baseFunctions": [
-              6653
+              2947
             ],
             "body": {
               "id": 423,
@@ -10460,7 +10460,7 @@
           },
           {
             "baseFunctions": [
-              6571
+              2865
             ],
             "body": {
               "id": 437,
@@ -11125,7 +11125,7 @@
           },
           {
             "baseFunctions": [
-              6580
+              2874
             ],
             "body": {
               "id": 498,
@@ -11352,7 +11352,7 @@
           },
           {
             "baseFunctions": [
-              6587
+              2881
             ],
             "body": {
               "id": 514,
@@ -11540,7 +11540,7 @@
           },
           {
             "baseFunctions": [
-              6599
+              2893
             ],
             "body": {
               "id": 635,
@@ -12970,7 +12970,7 @@
           },
           {
             "baseFunctions": [
-              6604
+              2898
             ],
             "body": {
               "id": 644,
@@ -13063,7 +13063,7 @@
           },
           {
             "baseFunctions": [
-              6609
+              2903
             ],
             "body": {
               "id": 653,
@@ -13168,7 +13168,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-09-23T09:58:59.311Z",
+  "updatedAt": "2021-09-23T10:04:03.539Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
