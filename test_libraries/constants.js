@@ -10,9 +10,9 @@ const PropositionLifeTime = 604800;
 const PropositionThresholdPercentage = 50;
 const minPercentageToPropose = 5;
 const Gas = 6721975;
-const PublicPoolContractName = "Public Pool";
+const PublicPoolContractName = "Public Certificate Pool";
 const PublicPoolContractVersion = "1.0";
-const PrivatePoolContractName = "Private Pool";
+const PrivatePoolContractName = "Private Certificate Pool";
 const PrivatePoolContractVersion = "1.0";
 
 exports.PublicPriceUSD = PublicPriceUSD;

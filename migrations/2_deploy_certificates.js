@@ -36,9 +36,9 @@ const OwnerRefundFeeUSD = 200000;
 const rate = 338495835524;
 const MockDecimals = 8;
 const PublicMinOwners = 1;
-const PublicPoolContractName = "Public Pool";
+const PublicPoolContractName = "Public Certificate Pool";
 const PublicPoolContractVersion = "1.0";
-const PrivatePoolContractName = "Private Pool";
+const PrivatePoolContractName = "Private Certificate Pool";
 const PrivatePoolContractVersion = "1.0";
 
 
