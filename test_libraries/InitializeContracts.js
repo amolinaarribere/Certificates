@@ -24,6 +24,10 @@ const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
 const minPercentageToPropose = constants.minPercentageToPropose;
 const TotalTokenSupply = constants.TotalTokenSupply;
 const Gas = constants.Gas;
+const PublicPoolContractName = constants.PublicPoolContractName;
+const PublicPoolContractVersion = constants.PublicPoolContractVersion;
+const PrivatePoolContractName = constants.PrivatePoolContractName;
+const PrivatePoolContractVersion = constants.PrivatePoolContractVersion;
 
 const PriceConverterProxyInitializerMethod = {
   "inputs": [
@@ -201,6 +205,16 @@ const PublicCertificatesPoolProxyInitializerMethod = {
         "internalType": "address",
         "name": "managerContractAddress",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "contractName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "contractVersion",
+        "type": "string"
       }
     ],
     "name": "PublicCertPool_init",
@@ -215,7 +229,7 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
   let ProxyData = returnProxyInitData(PublicOwners, minOwners, certPoolManager.address, chairPerson, implementations[8]);
 
   await certPoolManager.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6], implementations[7],
-    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5]), {from: chairPerson});
+    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5], PrivatePoolContractName, PrivatePoolContractVersion), {from: chairPerson});
 
   let proxies = await retrieveProxies(certPoolManager, user_1);
 
@@ -253,7 +267,7 @@ function getProxyData(method, parameters){
 
 function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPerson, mockChainLinkFeedRegistry){
   let CertisProxyData = getProxyData(CertisTokenProxyInitializerMethod, ["Certis Token for Test", "CERT", TotalTokenSupply, certPoolManager, 0, chairPerson]);
-  let PublicCertificatesPoolProxyData = getProxyData(PublicCertificatesPoolProxyInitializerMethod, [PublicOwners, minOwners, certPoolManager]);
+  let PublicCertificatesPoolProxyData = getProxyData(PublicCertificatesPoolProxyInitializerMethod, [PublicOwners, minOwners, certPoolManager, PublicPoolContractName, PublicPoolContractVersion]);
   let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD, certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose]);
   let PrivatePoolFactoryProxyData = getProxyData(PrivatePoolFactoryProxyInitializerMethod, [certPoolManager]);
   let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
