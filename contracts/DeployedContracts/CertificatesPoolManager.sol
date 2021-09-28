@@ -8,6 +8,7 @@ pragma solidity 0.8.7;
  */
 
 import "../Interfaces/IProxyManager.sol";
+import "../Interfaces/IFactory.sol";
 import "../Base/TokenGovernanceBaseContract.sol";
 import "../Libraries/AddressLibrary.sol";
 import "../Libraries/Library.sol";
@@ -136,6 +137,9 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         _ProviderFactory = new TransparentUpgradeableProxy(initialContracts.NewProviderFactoryAddress, address(_Admin), initialContracts.NewProviderFactoryData);
         _ProviderBeacon = new UpgradeableBeacon(initialContracts.NewProviderAddress);
         _PriceConverter = new TransparentUpgradeableProxy(initialContracts.NewPriceConverterAddress, address(_Admin), initialContracts.NewPriceConverterData);
+
+        IFactory(address(_PrivatePoolFactory)).updateContractName(initialContracts.NewPrivatePoolContractName);
+        IFactory(address(_PrivatePoolFactory)).updateContractVersion(initialContracts.NewPrivatePoolContractVersion);
     }
 
     function upgradeContractsImplementations() private
@@ -150,13 +154,20 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         if(address(0) != _ProposedContracts.NewPrivatePoolAddress)_PrivateCertificatePoolBeacon.upgradeTo(_ProposedContracts.NewPrivatePoolAddress);
         if(address(0) != _ProposedContracts.NewProviderAddress)_ProviderBeacon.upgradeTo(_ProposedContracts.NewProviderAddress);
 
+        if(0 < bytes(_ProposedContracts.NewPrivatePoolContractName).length)
+            IFactory(address(_PrivatePoolFactory)).updateContractName(_ProposedContracts.NewPrivatePoolContractName);
+
+        if(0 < bytes(_ProposedContracts.NewPrivatePoolContractVersion).length)
+            IFactory(address(_PrivatePoolFactory)).updateContractVersion(_ProposedContracts.NewPrivatePoolContractVersion);
+        
         emit _NewContracts(internalRetrieveImpl(_PublicCertificatesPool), internalRetrieveImpl(_Treasury), 
         internalRetrieveImpl(_CertisToken), internalRetrieveImpl(_PrivatePoolFactory), 
         internalRetrievePrivatePool(), internalRetrieveImpl(_ProviderFactory), internalRetrieveProvider(),
         internalRetrieveImpl(_PriceConverter));
     }
 
-    function upgradeContractImplementation(TransparentUpgradeableProxy proxy, address NewImpl, bytes memory Data) private{
+    function upgradeContractImplementation(TransparentUpgradeableProxy proxy, address NewImpl, bytes memory Data) private
+    {
         if(address(0) != NewImpl){
             if(0 < Data.length)_Admin.upgradeAndCall(proxy, NewImpl, Data);
             else _Admin.upgrade(proxy, NewImpl);

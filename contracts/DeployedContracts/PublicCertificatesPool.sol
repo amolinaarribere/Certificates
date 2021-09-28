@@ -32,8 +32,8 @@ pragma solidity 0.8.7;
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function PublicCertPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress) public initializer {
-        super.MultiSigCertPool_init(owners, minOwners); 
+    function PublicCertPool_init(address[] memory owners,  uint256 minOwners, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer {
+        super.MultiSigCertPool_init(owners, minOwners, contractName, contractVersion); 
         super.ManagedBaseContract_init(managerContractAddress); 
     }
 
@@ -61,10 +61,9 @@ pragma solidity 0.8.7;
         }
     }
 
-    function addCertificate(bytes32 CertificateHash, address holder) external override payable
+    function onBeforeAddCertificate() internal override 
     {
         ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewCertificate);
-        addCertificateInternal(CertificateHash, holder);
     }
 
     function retrieveAddCertificatePriceWei() external override view returns(uint256)

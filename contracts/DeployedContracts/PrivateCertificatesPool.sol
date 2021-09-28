@@ -11,9 +11,9 @@ pragma solidity 0.8.7;
  contract PrivateCertificatesPool is MultiSigCertificatesPool {
 
     // CONSTRUCTOR & INIT /////////////////////////////////////////
-    function PrivateCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 
+    function PrivateCertPool_init(address[] memory owners,  uint256 minOwners, string memory contractName, string memory contractVersion) public initializer 
     {
-      super.MultiSigCertPool_init(owners, minOwners);
+      super.MultiSigCertPool_init(owners, minOwners, contractName, contractVersion);
     }
 
   }

@@ -16,7 +16,7 @@ contract ProviderFactory is Factory{
     
     // CONSTRUCTOR /////////////////////////////////////////
     function ProviderFactory_init(address managerContractAddress) public initializer {
-        super.Factory_init(managerContractAddress);
+        super.Factory_init("Provider", managerContractAddress);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -25,7 +25,7 @@ contract ProviderFactory is Factory{
         ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProviderContract);
         bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string)", owners, minOwners, ElementName);
         BeaconProxy providerProxy = new BeaconProxy(_managerContract.retrieveProviderBeacon(), data);
-        internalCreate(address(providerProxy), "Provider", ElementName);
+        internalCreate(address(providerProxy), ElementName);
     }
 
 

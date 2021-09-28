@@ -29,6 +29,8 @@ library Library{
         bytes NewPrivatePoolFactoryData;
         bytes NewProviderFactoryData;
         bytes NewPriceConverterData;
+        string NewPrivatePoolContractName;
+        string NewPrivatePoolContractVersion;
     }
 
     // Pending Certificates
