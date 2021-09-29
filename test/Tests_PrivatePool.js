@@ -112,6 +112,16 @@ contract("Testing Private Pool",function(accounts){
         await pool_common.AddCertificateCorrect(privateCertPool, PrivateOwners, provider_1, provider_2, holder_1, holder_2, user_1, true);
     });
 
+    // ****** TESTING Adding Certificate on Behalf ***************************************************************** //
+
+    it("Adding Certificate On Behalf Of WRONG",async function(){
+        await pool_common.AddCertificateOnBehalfWrong(privateCertPool, PrivateOwners, provider_1, provider_2, holder_1, user_1, true);   
+    });
+
+    it("Adding Certificate On Behalf Of CORRECT",async function(){
+        //await pool_common.AddCertificateOnBehalfCorrect(privateCertPool, PrivateOwners, provider_1, provider_2, holder_1, holder_2, user_1, true);
+    });
+
     // ****** TESTING callbacks ***************************************************************** //
 
     it("on Item Validated WRONG",async function(){

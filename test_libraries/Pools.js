@@ -1,6 +1,8 @@
 // Chai library for testing
 // ERROR tests = First we test the error message then we test the action was not carried out
 
+const BigNumber = require('bignumber.js');
+
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PrivateCertificates = artifacts.require("PrivateCertificatesPool");
 var PrivateCertificatesAbi = PrivateCertificates.abi;
@@ -13,6 +15,10 @@ const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals - 2) / constants.rat
 const PublicPriceWei = constants.PublicPriceUSD * FactorUSDtoETH;
 const CertificatePriceWei = constants.CertificatePriceUSD * FactorUSDtoETH;
 const Gas = constants.Gas;
+const PublicPoolContractName = constants.PublicPoolContractName;
+const PublicPoolContractVersion = constants.PublicPoolContractVersion;
+const PrivatePoolContractName = constants.PrivatePoolContractName;
+const PrivatePoolContractVersion = constants.PrivatePoolContractVersion;
 const minOwners = 2;
 // providers info
 const provider_1_Info = "Provider 1 Info";
@@ -83,6 +89,48 @@ async function AddingCertificate(CertPool, provider_1, provider_2, holder_1, hol
     await CertPool.methods.addCertificate(hash_1, holder_2).send({from: provider_1, gas: Gas, value:value_To_Pay}, function(error, result){});
     await CertPool.methods.addCertificate(hash_2, holder_1).send({from: provider_2, gas: Gas, value:value_To_Pay}, function(error, result){});
     await CertPool.methods.addCertificate(hash_2, holder_2).send({from: provider_2, gas: Gas, value:value_To_Pay}, function(error, result){});
+}
+
+async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1){
+    let value_To_Pay = 0;
+    let deadline = Math.ceil(Date.now() / 1000) + 120;
+    let nonce_1 = 0;
+
+    // domain hash
+    let DomainHeader = web3.utils.soliditySha3("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+    let ContractName =  web3.utils.soliditySha3(web3.utils.stringToHex(PrivatePoolContractName));
+    let ContractVersion = web3.utils.soliditySha3(web3.utils.stringToHex(PrivatePoolContractVersion));
+    let chainId = await web3.eth.getChainId();
+    let ContractAddress = CertPool._address;
+
+    if(!isPrivate) {
+        value_To_Pay = CertificatePriceWei;
+        ContractName = web3.utils.soliditySha3(web3.utils.stringToHex(PublicPoolContractName));
+        ContractVersion = web3.utils.soliditySha3(web3.utils.stringToHex(PublicPoolContractVersion));
+    }
+
+    let domainHash = web3.eth.abi.encodeParameters(['bytes32','bytes32','bytes32','uint256','address']
+        ,[DomainHeader, ContractName, ContractVersion, chainId, ContractAddress])
+
+    // function hash
+    let FunctionHeader = web3.utils.soliditySha3("addCertificateOnBehalfOf(address provider,bytes32 CertificateHash,address holder,uint nonce,uint256 deadline)");
+
+    let functionHash_1 = web3.eth.abi.encodeParameters(['bytes32','address','bytes32','address','uint256','uint256']
+    ,[FunctionHeader, provider_1, hash_1, holder_1, nonce_1, deadline])
+
+    // header
+    let Header = "\x19Ethereum Signed Message:\n32";
+
+    // signature
+    let dataToSign_1 = web3.utils.soliditySha3(web3.eth.abi.encodeParameters(['string','bytes','bytes'],
+        [Header, domainHash, functionHash_1]));
+    signature_1 = await web3.eth.sign(dataToSign_1, provider_1);
+    signature_1 = signature_1.substr(0, 130) + (signature_1.substr(130) == "00" ? "1b" : "1c");
+    
+    await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, deadline, signature_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    /*await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_2, deadline, signature_2).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_1, deadline, signature_3).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_2, deadline, signature_4).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});*/
 }
 
 async function AddOwnerWrong(CertPool, Owners, extra_owner, user_1){
@@ -554,6 +602,50 @@ async function AddCertificateCorrect(CertPool, Owners, provider_1, provider_2, h
     expect(CertificatesHolder2b[0]).to.equal(hash_1);
 }
 
+async function AddCertificateOnBehalfWrong(CertPool, Owners, provider_1, provider_2, holder_1, user_1, isPrivate){
+    // act
+    await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
+    var value_To_Pay = 0;
+    let deadline = Math.ceil(Date.now() / 1000) + 120;
+    if(!isPrivate) value_To_Pay = CertificatePriceWei;
+
+    /*try{
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(NotAProvider);
+    }
+    // act
+    try{
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(CertificateAlreadyExists);
+    }*/
+    if(!isPrivate){
+        // act
+        try{
+            await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, deadline, "0x").send({from: user_1, gas: Gas, value:value_To_Pay - 1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughFunds);
+        }
+    }
+}
+
+async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
+    // act
+    await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
+    await AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1)
+}
+
 async function RemoveCertificateWrong(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
     // act
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
@@ -770,6 +862,8 @@ exports.RemoveProviderCorrect = RemoveProviderCorrect;
 exports.RemoveProviderCorrect2 = RemoveProviderCorrect2;
 exports.AddCertificateWrong = AddCertificateWrong;
 exports.AddCertificateCorrect = AddCertificateCorrect;
+exports.AddCertificateOnBehalfWrong = AddCertificateOnBehalfWrong;
+exports.AddCertificateOnBehalfCorrect = AddCertificateOnBehalfCorrect;
 exports.RemoveCertificateWrong = RemoveCertificateWrong;
 exports.RemoveCertificateCorrect = RemoveCertificateCorrect;
 exports.ValidatingProviders = ValidatingProviders;
