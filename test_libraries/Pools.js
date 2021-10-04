@@ -97,23 +97,23 @@ async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, hol
     let nonce_1 = 0;
 
     // domain hash
-    let DomainHeader = web3.utils.soliditySha3("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-    let ContractName =  web3.utils.soliditySha3(web3.utils.stringToHex(PrivatePoolContractName));
-    let ContractVersion = web3.utils.soliditySha3(web3.utils.stringToHex(PrivatePoolContractVersion));
+    let DomainHeader = web3.utils.keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+    let ContractName =  web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractName));
+    let ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractVersion));
     let chainId = await web3.eth.getChainId();
     let ContractAddress = CertPool._address;
 
     if(!isPrivate) {
         value_To_Pay = CertificatePriceWei;
-        ContractName = web3.utils.soliditySha3(web3.utils.stringToHex(PublicPoolContractName));
-        ContractVersion = web3.utils.soliditySha3(web3.utils.stringToHex(PublicPoolContractVersion));
+        ContractName = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractName));
+        ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractVersion));
     }
 
     let domainHash = web3.eth.abi.encodeParameters(['bytes32','bytes32','bytes32','uint256','address']
         ,[DomainHeader, ContractName, ContractVersion, chainId, ContractAddress])
 
     // function hash
-    let FunctionHeader = web3.utils.soliditySha3("addCertificateOnBehalfOf(address provider,bytes32 CertificateHash,address holder,uint nonce,uint256 deadline)");
+    let FunctionHeader = web3.utils.keccak256("addCertificateOnBehalfOf(address provider,bytes32 CertificateHash,address holder,uint nonce,uint256 deadline)");
 
     let functionHash_1 = web3.eth.abi.encodeParameters(['bytes32','address','bytes32','address','uint256','uint256']
     ,[FunctionHeader, provider_1, hash_1, holder_1, nonce_1, deadline])
@@ -122,7 +122,7 @@ async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, hol
     let Header = "\x19Ethereum Signed Message:\n32";
 
     // signature
-    let dataToSign_1 = web3.utils.soliditySha3(web3.eth.abi.encodeParameters(['string','bytes','bytes'],
+    let dataToSign_1 = web3.utils.keccak256(web3.eth.abi.encodeParameters(['string','bytes','bytes'],
         [Header, domainHash, functionHash_1]));
     signature_1 = await web3.eth.sign(dataToSign_1, provider_1);
     signature_1 = signature_1.substr(0, 130) + (signature_1.substr(130) == "00" ? "1b" : "1c");
