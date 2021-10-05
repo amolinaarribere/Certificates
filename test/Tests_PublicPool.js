@@ -122,11 +122,11 @@ contract("Testing Public Pool",function(accounts){
     // ****** TESTING Adding Certificate on Behalf ***************************************************************** //
 
     it("Adding Certificate On Behalf Of WRONG",async function(){
-        await pool_common.AddCertificateOnBehalfWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, user_1);   
+        await pool_common.AddCertificateOnBehalfWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);   
     });
 
     it("Adding Certificate On Behalf Of CORRECT",async function(){
-       // await pool_common.AddCertificateOnBehalfCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
+        await pool_common.AddCertificateOnBehalfCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
     });
 
     // ****** TESTING callbacks ***************************************************************** //

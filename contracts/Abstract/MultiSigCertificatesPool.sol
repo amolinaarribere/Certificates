@@ -34,7 +34,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
 
     string[] internal _Label;
 
-    mapping(address => uint) internal nonces;
+    mapping(address => mapping(uint256 => bool)) internal nonces;
 
     // Holders
     struct _CertificatePerHolder{
@@ -126,21 +126,21 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         addCertificateInternal(msg.sender, CertificateHash, holder);
     }
 
-    function addCertificateOnBehalfOf(address provider, bytes32 CertificateHash, address holder, uint256 deadline, bytes memory signature) external override payable virtual
+    function addCertificateOnBehalfOf(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) external override payable virtual
     {
         onBeforeAddCertificate();
-        checkSignature( provider, CertificateHash, holder, deadline, signature);
+        checkSignature(provider, CertificateHash, holder, nonce, deadline, signature);
         addCertificateInternal(provider, CertificateHash, holder);
     }
 
     function onBeforeAddCertificate() internal virtual {}
 
-    function checkSignature(address provider, bytes32 CertificateHash, address holder, uint256 deadline, bytes memory signature) internal
+    function checkSignature(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) internal
     {
         require(block.timestamp < deadline, "EC33-");
-        require(true == SignatureLibrary.verifyAddCertificate(provider, CertificateHash, holder, nonces[provider], deadline, signature, _ContractName, _ContractVersion)
-        , "EC32-");
-        nonces[provider]++;
+        require(false == nonces[provider][nonce], "EC34-");
+        require(true == SignatureLibrary.verifyAddCertificate(provider, CertificateHash, holder, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-");
+        nonces[provider][nonce] = true;
     }
 
     function addCertificateInternal(address provider, bytes32 CertificateHash, address holder) internal
@@ -211,9 +211,9 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         return(_ContractName, _ContractVersion);
     }
 
-    function retrieveNonce(address provider) external override view returns(uint256)
+    function retrieveNonce(address provider, uint256 nonce) external override view returns(bool)
     {
-        return nonces[provider];
+        return nonces[provider][nonce];
     } 
 
 }

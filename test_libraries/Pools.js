@@ -43,6 +43,12 @@ const AlreadySent = new RegExp("EC27-");
 const AtLeastOne = new RegExp("EC17-");
 const MinOwnerNotInProgress = new RegExp("EC31-");
 const MinOwnerAlreadyInProgress = new RegExp("EC30-");
+const SignatureExpired = new RegExp("EC33-");
+const NonceUsed = new RegExp("EC34-");
+const WrongSignature = new RegExp("EC32-");
+
+const Domain = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)";
+const DomainHeader = web3.utils.soliditySha3({type: "string", value: Domain});
 
 function AddressToBytes32(address){
     return ("0x000000000000000000000000" + address.substring(2, address.length)).toLowerCase();
@@ -91,17 +97,51 @@ async function AddingCertificate(CertPool, provider_1, provider_2, holder_1, hol
     await CertPool.methods.addCertificate(hash_2, holder_2).send({from: provider_2, gas: Gas, value:value_To_Pay}, function(error, result){});
 }
 
+function GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress){
+    return web3.utils.soliditySha3({type: "bytes32", value: DomainHeader},
+        {type: "bytes32", value: ContractName},
+        {type: "bytes32", value: ContractVersion},
+        {type: "uint256", value: chainId},
+        {type: "address", value: ContractAddress});
+}
+
+function GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline){
+    return  web3.utils.soliditySha3({type: "bytes32", value: addCertificateOnBehalfOfHeader},
+    {type: "address", value: provider},
+    {type: "bytes32", value: hash},
+    {type: "address", value: holder},
+    {type: "uint256", value: nonce},
+    {type: "uint256", value: deadline});
+}
+
+async function GetSignature(dataToSign, signer){
+    let signature = await web3.eth.sign(dataToSign, signer);
+    signature = signature.substr(0, 130) + (signature.substr(130) == "00" ? "1b" : "1c");
+    return signature
+}
+
+async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName, ContractVersion, deadline){
+    // general
+    const chainId = await web3.eth.getChainId();
+    let ContractAddress = CertPool._address;
+    // domain hash
+    const addCertificateOnBehalfOfType = "addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)"
+    let addCertificateOnBehalfOfHeader = web3.utils.soliditySha3({type: "string", value: addCertificateOnBehalfOfType});
+    let domainHash = GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress);
+    // function hash
+    let functionHash = GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline);
+    let dataToSign = web3.utils.soliditySha3({type: "bytes32", value: domainHash}, {type: "bytes32", value: functionHash});
+
+    return await GetSignature(dataToSign, provider);
+}
+
 async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1){
     let value_To_Pay = 0;
     let deadline = Math.ceil(Date.now() / 1000) + 120;
-    let nonce_1 = 0;
+    let nonce = 0;
 
-    // domain hash
-    let DomainHeader = web3.utils.keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
     let ContractName =  web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractName));
     let ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractVersion));
-    let chainId = await web3.eth.getChainId();
-    let ContractAddress = CertPool._address;
 
     if(!isPrivate) {
         value_To_Pay = CertificatePriceWei;
@@ -109,28 +149,16 @@ async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, hol
         ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractVersion));
     }
 
-    let domainHash = web3.eth.abi.encodeParameters(['bytes32','bytes32','bytes32','uint256','address']
-        ,[DomainHeader, ContractName, ContractVersion, chainId, ContractAddress])
-
-    // function hash
-    let FunctionHeader = web3.utils.keccak256("addCertificateOnBehalfOf(address provider,bytes32 CertificateHash,address holder,uint nonce,uint256 deadline)");
-
-    let functionHash_1 = web3.eth.abi.encodeParameters(['bytes32','address','bytes32','address','uint256','uint256']
-    ,[FunctionHeader, provider_1, hash_1, holder_1, nonce_1, deadline])
-
-    // header
-    let Header = "\x19Ethereum Signed Message:\n32";
-
     // signature
-    let dataToSign_1 = web3.utils.keccak256(web3.eth.abi.encodeParameters(['string','bytes','bytes'],
-        [Header, domainHash, functionHash_1]));
-    signature_1 = await web3.eth.sign(dataToSign_1, provider_1);
-    signature_1 = signature_1.substr(0, 130) + (signature_1.substr(130) == "00" ? "1b" : "1c");
-    
-    await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, deadline, signature_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-    /*await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_2, deadline, signature_2).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_1, deadline, signature_3).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_2, deadline, signature_4).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});*/
+    let signature_1 = await SignMessage(CertPool, provider_1, hash_1, holder_1, nonce, ContractName, ContractVersion, deadline);
+    let signature_2 = await SignMessage(CertPool, provider_1, hash_1, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
+    let signature_3 = await SignMessage(CertPool, provider_2, hash_2, holder_1, nonce, ContractName, ContractVersion, deadline);
+    let signature_4 = await SignMessage(CertPool, provider_2, hash_2, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
+
+    await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, nonce, deadline, signature_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_2, nonce + 1, deadline, signature_2).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_1, nonce, deadline, signature_3).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_2, nonce + 1, deadline, signature_4).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
 }
 
 async function AddOwnerWrong(CertPool, Owners, extra_owner, user_1){
@@ -577,6 +605,112 @@ async function AddCertificateCorrect(CertPool, Owners, provider_1, provider_2, h
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
     await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate);
     // assert
+    await CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
+}
+
+async function AddCertificateOnBehalfWrong(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
+    // act
+    await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
+    var value_To_Pay = 0;
+    let deadline = Math.ceil(Date.now() / 1000) + 120;
+    let ContractName =  web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractName));
+    let ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractVersion));
+
+    if(!isPrivate) {
+        value_To_Pay = CertificatePriceWei;
+        ContractName = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractName));
+        ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractVersion));
+    }
+
+    let signature = await SignMessage(CertPool, provider_1, hash_1, holder_1, 0, ContractName, ContractVersion, deadline);
+
+    try{
+        await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, 0, deadline - 2000, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(SignatureExpired);
+    }
+    // act
+    try{
+        await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_1, holder_1, 0, deadline, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongSignature);
+    }
+    // act
+    try{
+        await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_2, holder_1, 0, deadline, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongSignature);
+    }
+    // act
+    try{
+        await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_2, 0, deadline, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongSignature);
+    }
+    // act
+    try{
+        await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, 1000, deadline, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongSignature);
+    }
+    // act
+    try{
+        await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, 0, deadline + 1000, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongSignature);
+    }
+    // act
+    try{
+        await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, 0, deadline, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, 0, deadline, signature).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(NonceUsed);
+    }
+    // act
+    if(!isPrivate){
+        // act
+        try{
+            await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, 0, deadline, signature).send({from: user_1, gas: Gas, value:value_To_Pay - 1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(NotEnoughFunds);
+        }
+    }
+}
+
+async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
+    // act
+    await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
+    await AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1);
+    // assert
+    await CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
+}
+
+async function CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1){
+    // assert
     let Provider_1 = await CertPool.methods.retrieveCertificateProvider(hash_1, holder_1).call({from: user_1}, function(error, result){});
     let Provider_1b = await CertPool.methods.retrieveCertificateProvider(hash_1, holder_2).call({from: user_1}, function(error, result){});
     let Provider_2 = await CertPool.methods.retrieveCertificateProvider(hash_2, holder_1).call({from: user_1}, function(error, result){});
@@ -600,50 +734,6 @@ async function AddCertificateCorrect(CertPool, Owners, provider_1, provider_2, h
     expect(CertificatesHolder2[1]).to.equal(hash_2);
     expect(CertificatesHolder1b[0]).to.equal(hash_2);
     expect(CertificatesHolder2b[0]).to.equal(hash_1);
-}
-
-async function AddCertificateOnBehalfWrong(CertPool, Owners, provider_1, provider_2, holder_1, user_1, isPrivate){
-    // act
-    await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
-    var value_To_Pay = 0;
-    let deadline = Math.ceil(Date.now() / 1000) + 120;
-    if(!isPrivate) value_To_Pay = CertificatePriceWei;
-
-    /*try{
-        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, value:value_To_Pay}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(NotAProvider);
-    }
-    // act
-    try{
-        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(CertificateAlreadyExists);
-    }*/
-    if(!isPrivate){
-        // act
-        try{
-            await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, deadline, "0x").send({from: user_1, gas: Gas, value:value_To_Pay - 1}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NotEnoughFunds);
-        }
-    }
-}
-
-async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
-    // act
-    await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
-    await AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1)
 }
 
 async function RemoveCertificateWrong(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
