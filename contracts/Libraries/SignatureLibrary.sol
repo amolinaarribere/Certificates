@@ -9,61 +9,30 @@ pragma solidity 0.8.7;
 library SignatureLibrary{
 
     // DATA /////////////////////////////////////////
-    /*struct EIP712DomainStruct{
-        string name;
-        string version;
-        uint256 chainId,
-        address verifyingContract
-    }
-
-    struct addCertificateOnBehalfOfStruct{
-        address provider,
-        bytes32 CertificateHash,
-        address holder,
-        uint256 nonce,
-        uint256 deadline
-    }
-
-    struct votingStruct{
-        address voter,
-        uint256 nonce,
-        uint256 deadline
-    }*/
-    string private constant domain = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)";
-    bytes32 public constant domainTypeHash = keccak256(abi.encodePacked(domain));
-    string private constant addCertificateOnBehalfOfType = "addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)";
-    bytes32 public constant addCertificateOnBehalfOfTypeHash = keccak256(abi.encodePacked(addCertificateOnBehalfOfType));
-    string private constant votingType = "voting(address voter,uint256 nonce,uint256 deadline)";
-    bytes32 public constant votingTypeHash = keccak256(abi.encodePacked(votingType));
+    bytes32 public constant domainTypeHash = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+    bytes32 public constant addCertificateOnBehalfOfTypeHash = keccak256("addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)");
+    bytes32 public constant votingTypeHash = keccak256("voting(address voter,uint256 nonce,uint256 deadline)");
 
 
     // ADD CERTIFICATES FUNCTIONALITY /////////////////////////////////////////////////////////////
     function verifyAddCertificate(address provider, bytes32 certificateHash, address holder, uint nonce, uint256 deadline, bytes memory signature, string memory ContractName, string memory ContractVersion) public view returns (bool) 
     {
-        bytes32 functionHash = getMessageHashAddCertificate(provider, certificateHash, holder, nonce, deadline, ContractName, ContractVersion);
-        return verify(provider, functionHash, signature);
+        bytes32 domainHash = getDomainHash(ContractName, ContractVersion);
+        bytes32 functionHash = getMessageHashAddCertificate(provider, certificateHash, holder, nonce, deadline);
+        return verify(provider, domainHash, functionHash, signature);
     }
 
-    function getMessageHashAddCertificate(address provider, bytes32 certificateHash, address holder, uint nonce, uint256 deadline, string memory ContractName, string memory ContractVersion) public view returns (bytes32) 
+    function getMessageHashAddCertificate(address provider, bytes32 certificateHash, address holder, uint nonce, uint256 deadline) public pure returns (bytes32) 
     {
-        // first we create the part of the hash related to the contract name, version, network (prod, test, ...) and address
-        bytes32 eip712DomainHash = getDomainHash(ContractName, ContractVersion);
-
-        // then we create the part of the hash related to the function and parameters and we combine them both
-        bytes32 hashStruct = keccak256(
-             abi.encodePacked(
-                eip712DomainHash,
-                keccak256(abi.encodePacked(
-                        addCertificateOnBehalfOfTypeHash,
-                        provider,
-                        certificateHash,
-                        holder,
-                        nonce,
-                        deadline
-                    ))
+        return keccak256(
+                abi.encode(
+                    addCertificateOnBehalfOfTypeHash,
+                    provider,
+                    certificateHash,
+                    holder,
+                    nonce,
+                    deadline
             ));
-
-        return (hashStruct);
     }
 
     // VOTING FUNCTIONALITY /////////////////////////////////////////////////////////////
@@ -94,15 +63,16 @@ library SignatureLibrary{
     }*/
 
     // COMMON FUNCTIONALITY /////////////////////////////////////////////////////////////
-    function verify(address signer, bytes32 functionHash, bytes memory signature) internal pure returns (bool) 
+    function verify(address signer, bytes32 _domainHash, bytes32 _functionHash, bytes memory signature) internal pure returns (bool) 
     {
-        return (recoverSigner(functionHash, signature) == signer);
+        bytes32 prefixedHash = keccak256(abi.encodePacked('\x19\x01', _domainHash, _functionHash));
+        return (recoverSigner(prefixedHash, signature) == signer);
     }
 
     function getDomainHash(string memory ContractName, string memory ContractVersion) public view returns(bytes32)
     {
         return keccak256(
-            abi.encodePacked(
+            abi.encode(
                 domainTypeHash,
                 keccak256(bytes(ContractName)),
                 keccak256(bytes(ContractVersion)),
@@ -112,12 +82,10 @@ library SignatureLibrary{
       
     }
 
-    function recoverSigner(bytes32 _ethSignedMessageHash, bytes memory _signature) public pure returns (address)
+    function recoverSigner(bytes32 _prefixedHash, bytes memory _signature) public pure returns (address)
     {
         (bytes32 r, bytes32 s, uint8 v) = splitSignature(_signature);
-        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-        bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, _ethSignedMessageHash));
-        return ecrecover(prefixedHash, v, r, s);
+        return ecrecover(_prefixedHash, v, r, s);
     }
 
     function splitSignature(bytes memory sig) public pure returns (bytes32 r, bytes32 s, uint8 v)

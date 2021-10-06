@@ -114,9 +114,19 @@ function GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder,
     {type: "uint256", value: deadline});
 }
 
-async function GetSignature(dataToSign, signer){
-    let signature = await web3.eth.sign(dataToSign, signer);
-    signature = signature.substr(0, 130) + (signature.substr(130) == "00" ? "1b" : "1c");
+async function GetSignature(dataToSign, from){
+    //let signature = await web3.eth.sign(dataToSign, signer);
+    let params = [from, dataToSign];
+    let method = "eth_signTypedData_v3"
+
+    let signature = await web3.eth.currentProvider.send({method,params,from}, 
+        (err, result) => {
+          if (err) console.log("error " + err)
+          else if (result.error) console.log("result error " + JSON.stringify(result.error))
+          else return result.result
+        });
+    console.log(signature)
+    //signature = signature.substr(0, 130) + (signature.substr(130) == "00" ? "1b" : "1c");
     return signature
 }
 
@@ -125,12 +135,32 @@ async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName
     const chainId = await web3.eth.getChainId();
     let ContractAddress = CertPool._address;
     // domain hash
-    const addCertificateOnBehalfOfType = "addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)"
-    let addCertificateOnBehalfOfHeader = web3.utils.soliditySha3({type: "string", value: addCertificateOnBehalfOfType});
-    let domainHash = GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress);
+    //const addCertificateOnBehalfOfType = "addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)"
+    //let addCertificateOnBehalfOfHeader = web3.utils.soliditySha3({type: "string", value: addCertificateOnBehalfOfType});
+    //let domainHash = GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress);
     // function hash
-    let functionHash = GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline);
-    let dataToSign = web3.utils.soliditySha3({type: "bytes32", value: domainHash}, {type: "bytes32", value: functionHash});
+    //let functionHash = GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline);
+    //let dataToSign = web3.utils.soliditySha3({type: "bytes32", value: domainHash}, {type: "bytes32", value: functionHash});
+
+    let dataToSign = '{"domain":{"name":"'
+    + ContractName
+    +'","version":"'
+    + ContractVersion
+    +'","chainId":'
+    + chainId 
+    + ',"verifyingContract":"'
+    + ContractAddress
+    + '"},"message":{"provider":"'
+    + provider
+    +'","certificateHash":"'
+    + hash
+    +'","holder":"'
+    + holder
+    +'","nonce":'
+    + nonce
+    +',"deadline":'
+    + deadline
+    +'},"primaryType":"addCertificateOnBehalfOf","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"addCertificateOnBehalfOf":[{"name":"provider","type":"address"},{"name":"certificateHash","type":"bytes32"},{"name":"holder","type":"address"},{"name":"nonce","type":"uint256"},{"name":"deadline","type":"uint256"}]}}'
 
     return await GetSignature(dataToSign, provider);
 }
@@ -140,25 +170,30 @@ async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, hol
     let deadline = Math.ceil(Date.now() / 1000) + 120;
     let nonce = 0;
 
-    let ContractName =  web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractName));
-    let ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractVersion));
+    //let ContractName =  web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractName));
+    //let ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractVersion));
+    let ContractName =  PrivatePoolContractName;
+    let ContractVersion = PrivatePoolContractVersion;
 
     if(!isPrivate) {
         value_To_Pay = CertificatePriceWei;
-        ContractName = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractName));
-        ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractVersion));
+        //ContractName = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractName));
+        //ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractVersion));
+        ContractName =  PublicPoolContractName;
+        ContractVersion = PublicPoolContractVersion;
     }
 
     // signature
     let signature_1 = await SignMessage(CertPool, provider_1, hash_1, holder_1, nonce, ContractName, ContractVersion, deadline);
-    let signature_2 = await SignMessage(CertPool, provider_1, hash_1, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
-    let signature_3 = await SignMessage(CertPool, provider_2, hash_2, holder_1, nonce, ContractName, ContractVersion, deadline);
-    let signature_4 = await SignMessage(CertPool, provider_2, hash_2, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
+    //let signature_2 = await SignMessage(CertPool, provider_1, hash_1, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
+    //let signature_3 = await SignMessage(CertPool, provider_2, hash_2, holder_1, nonce, ContractName, ContractVersion, deadline);
+    //let signature_4 = await SignMessage(CertPool, provider_2, hash_2, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
 
     await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, nonce, deadline, signature_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-    await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_2, nonce + 1, deadline, signature_2).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_1, nonce, deadline, signature_3).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
-    await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_2, nonce + 1, deadline, signature_4).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    //await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_1, nonce, deadline, signature_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    //await CertPool.methods.addCertificateOnBehalfOf(provider_1, hash_1, holder_2, nonce + 1, deadline, signature_2).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    //await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_1, nonce, deadline, signature_3).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
+    //await CertPool.methods.addCertificateOnBehalfOf(provider_2, hash_2, holder_2, nonce + 1, deadline, signature_4).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
 }
 
 async function AddOwnerWrong(CertPool, Owners, extra_owner, user_1){
@@ -706,7 +741,7 @@ async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provi
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
     await AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1);
     // assert
-    await CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
+    //await CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
 }
 
 async function CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1){
