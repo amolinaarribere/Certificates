@@ -115,8 +115,8 @@ function GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder,
 }
 
 async function GetSignature(dataToSign, from){
-    //let signature = await web3.eth.sign(dataToSign, signer);
-    let params = [from, dataToSign];
+    let signature = await web3.eth.sign(dataToSign, signer);
+    /*let params = [from, dataToSign];
     let method = "eth_signTypedData_v3"
 
     let signature = await web3.eth.currentProvider.send({method,params,from}, 
@@ -125,7 +125,7 @@ async function GetSignature(dataToSign, from){
           else if (result.error) console.log("result error " + JSON.stringify(result.error))
           else return result.result
         });
-    console.log(signature)
+    console.log(signature)*/
     //signature = signature.substr(0, 130) + (signature.substr(130) == "00" ? "1b" : "1c");
     return signature
 }
@@ -137,12 +137,12 @@ async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName
     // domain hash
     //const addCertificateOnBehalfOfType = "addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)"
     //let addCertificateOnBehalfOfHeader = web3.utils.soliditySha3({type: "string", value: addCertificateOnBehalfOfType});
-    //let domainHash = GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress);
+    let domainHash = GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress);
     // function hash
-    //let functionHash = GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline);
+    let functionHash = GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline);
     //let dataToSign = web3.utils.soliditySha3({type: "bytes32", value: domainHash}, {type: "bytes32", value: functionHash});
 
-    let dataToSign = '{"domain":{"name":"'
+    /*let dataToSign = '{"domain":{"name":"'
     + ContractName
     +'","version":"'
     + ContractVersion
@@ -160,7 +160,7 @@ async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName
     + nonce
     +',"deadline":'
     + deadline
-    +'},"primaryType":"addCertificateOnBehalfOf","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"addCertificateOnBehalfOf":[{"name":"provider","type":"address"},{"name":"certificateHash","type":"bytes32"},{"name":"holder","type":"address"},{"name":"nonce","type":"uint256"},{"name":"deadline","type":"uint256"}]}}'
+    +'},"primaryType":"addCertificateOnBehalfOf","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"addCertificateOnBehalfOf":[{"name":"provider","type":"address"},{"name":"certificateHash","type":"bytes32"},{"name":"holder","type":"address"},{"name":"nonce","type":"uint256"},{"name":"deadline","type":"uint256"}]}}'*/
 
     return await GetSignature(dataToSign, provider);
 }

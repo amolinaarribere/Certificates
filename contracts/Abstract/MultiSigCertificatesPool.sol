@@ -10,19 +10,19 @@ pragma solidity 0.8.7;
 
 import "./MultiSigContract.sol";
 import "../Interfaces/IPool.sol";
+import "../Base/SignatureBaseContract.sol";
 import "../Libraries/SignatureLibrary.sol";
 
-abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
-    using SignatureLibrary for *; 
-    
+
+abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, MultiSigContract { 
+    using SignatureLibrary for *;
+
     // EVENTS /////////////////////////////////////////
     event _AddCertificate(address indexed Provider, address indexed Holder, bytes32 Certificate);
 
     // DATA /////////////////////////////////////////
     // Contract configuration
     uint256 constant _TotalEntities = 2;
-    string internal _ContractName;
-    string internal _ContractVersion;
 
     // Owners
     uint256 constant _ownerIdCertificates = 0;
@@ -33,9 +33,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     string constant _providerLabel = "Provider";
 
     string[] internal _Label;
-
-    mapping(address => mapping(uint256 => bool)) internal nonces;
-
     // Holders
     struct _CertificatePerHolder{
         mapping(bytes32 => address) _CertificateFromProvider;
@@ -71,9 +68,7 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
         _Label = new string[](2);
         _Label[0] = _ownerLabel;
         _Label[1] = _providerLabel;
-        _ContractName = contractName;
-        _ContractVersion = contractVersion;
-
+        setContractConfig(contractName, contractVersion);
         super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); 
     }
 
@@ -136,11 +131,11 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     function onBeforeAddCertificate() internal virtual {}
 
     function checkSignature(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) internal
+        isDeadlineOK(deadline)
+        isNonceOK(provider, nonce)
     {
-        require(block.timestamp < deadline, "EC33-");
-        require(false == nonces[provider][nonce], "EC34-");
         require(true == SignatureLibrary.verifyAddCertificate(provider, CertificateHash, holder, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-");
-        nonces[provider][nonce] = true;
+        validateNonce(provider, nonce);
     }
 
     function addCertificateInternal(address provider, bytes32 CertificateHash, address holder) internal
@@ -205,15 +200,5 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     {
         return 0;
     }
-
-    function retrieveContractConfig() external override view returns(string memory, string memory)
-    {
-        return(_ContractName, _ContractVersion);
-    }
-
-    function retrieveNonce(address provider, uint256 nonce) external override view returns(bool)
-    {
-        return nonces[provider][nonce];
-    } 
 
 }

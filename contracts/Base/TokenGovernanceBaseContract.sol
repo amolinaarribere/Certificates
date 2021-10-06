@@ -34,10 +34,13 @@ Functionality (with basic security check)
  import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
  import "../Interfaces/ITokenEventSubscriber.sol";
  import "../Libraries/AddressLibrary.sol";
+ import "./SignatureBaseContract.sol";
  import "./ManagedBaseContract.sol";
+ import "../Libraries/SignatureLibrary.sol";
 
-abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedBaseContract {
+abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, SignatureBaseContract, ManagedBaseContract {
     using AddressLibrary for *; 
+    using SignatureLibrary for *;
 
     // EVENTS /////////////////////////////////////////
     event _AddedProposition(uint256 Id, address indexed Proposer, uint256 Deadline, uint256 Threshold);
@@ -98,8 +101,8 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
         _;
     }
 
-    modifier canVote(){
-        require(true == AuthorizedToVote(msg.sender, _Proposition.PropID), "EC23-");
+    modifier canVote(address voter){
+        require(true == AuthorizedToVote(voter, _Proposition.PropID), "EC23-");
          _;
     }
 
@@ -164,10 +167,11 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {
+    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress, string memory contractName, string memory contractVersion) internal initializer {
         super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson;
         _nextPropID = 0; 
+        setContractConfig(contractName, contractVersion);
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
     
@@ -233,10 +237,21 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     }
 
     function voteProposition(bool vote) external
-        PropositionInProgress(true)
-        canVote()
     {
-        uint VotingTokens = GetVotingTokens(msg.sender, _Proposition.PropID);
+        votePropositionInternal(msg.sender, vote);
+    }
+
+    function votePropositionOnBehalfOf(address voter, uint256 propID, bool vote, uint256 nonce, uint256 deadline, bytes memory signature) external
+    {
+        checkSignature(voter, propID, vote, nonce, deadline, signature);
+        votePropositionInternal(voter, vote);
+    }
+
+    function votePropositionInternal(address voter, bool vote) internal
+        PropositionInProgress(true)
+        canVote(voter)
+    {
+        uint VotingTokens = GetVotingTokens(voter, _Proposition.PropID);
 
         if(vote)
         {
@@ -247,11 +262,20 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
             _Proposition.VotesAgainst += VotingTokens;
         }
 
-        Voted(_Proposition.PropID, msg.sender,VotingTokens);
+        Voted(_Proposition.PropID, voter, VotingTokens);
 
-        emit _PropositionVote(_Proposition.PropID, msg.sender, vote, VotingTokens);
+        emit _PropositionVote(_Proposition.PropID, voter, vote, VotingTokens);
 
         checkProposition();
+    }
+
+    function checkSignature(address voter, uint256 propID, bool vote, uint256 nonce, uint256 deadline, bytes memory signature) internal
+        isDeadlineOK(deadline)
+        isNonceOK(voter, nonce)
+    {
+        require(_Proposition.PropID == propID, "EC35-");
+        require(true == SignatureLibrary.verifyVoting(voter, propID, vote, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-");
+        validateNonce(voter, nonce);
     }
 
     function onTokenBalanceChanged(address from, address to, uint256 amount) external

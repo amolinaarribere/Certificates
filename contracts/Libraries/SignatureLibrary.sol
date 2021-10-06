@@ -11,15 +11,15 @@ library SignatureLibrary{
     // DATA /////////////////////////////////////////
     bytes32 public constant domainTypeHash = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
     bytes32 public constant addCertificateOnBehalfOfTypeHash = keccak256("addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)");
-    bytes32 public constant votingTypeHash = keccak256("voting(address voter,uint256 nonce,uint256 deadline)");
+    bytes32 public constant votingTypeHash = keccak256("voting(address voter,uint256 propID,bool vote,uint256 nonce,uint256 deadline)");
+    string public constant salt = '\x19\x01';
 
 
     // ADD CERTIFICATES FUNCTIONALITY /////////////////////////////////////////////////////////////
     function verifyAddCertificate(address provider, bytes32 certificateHash, address holder, uint nonce, uint256 deadline, bytes memory signature, string memory ContractName, string memory ContractVersion) public view returns (bool) 
     {
-        bytes32 domainHash = getDomainHash(ContractName, ContractVersion);
         bytes32 functionHash = getMessageHashAddCertificate(provider, certificateHash, holder, nonce, deadline);
-        return verify(provider, domainHash, functionHash, signature);
+        return verify(provider, functionHash, signature, ContractName, ContractVersion);
     }
 
     function getMessageHashAddCertificate(address provider, bytes32 certificateHash, address holder, uint nonce, uint256 deadline) public pure returns (bytes32) 
@@ -36,36 +36,30 @@ library SignatureLibrary{
     }
 
     // VOTING FUNCTIONALITY /////////////////////////////////////////////////////////////
-    /*function verifyVoting(address voter, uint nonce, uint256 deadline, bytes memory signature, string memory ContractName, string memory ContractVersion) public view returns (bool) 
+    function verifyVoting(address voter, uint256 propID, bool vote, uint nonce, uint256 deadline, bytes memory signature, string memory ContractName, string memory ContractVersion) public view returns (bool) 
     {
-        bytes32 functionHash = getMessageHashVoting(voter, nonce, deadline, ContractName, ContractVersion);
-        return verify(voter, functionHash, signature);
+        bytes32 functionHash = getMessageHashVoting(voter, propID, vote, nonce, deadline);
+        return verify(voter, functionHash, signature, ContractName, ContractVersion);
     }
 
-    function getMessageHashVoting(address voter, uint nonce, uint256 deadline, string memory ContractName, string memory ContractVersion) public view returns (bytes32) {
-        // first we create the part of the hash related to the contract name, version, network (prod, test, ...) and address
-        bytes32 eip712DomainHash = getDomainHash(ContractName, ContractVersion);
-
-        // then we create the part of the hash related to the function and parameters and we combine them both
-        bytes32 hashStruct = keccak256(
-             abi.encodePacked(
-                "\x19\x01",
-                eip712DomainHash,
-                keccak256(abi.encodePacked(
-                        votingTypeHash,
-                        voter,
-                        nonce,
-                        deadline
-                    ))
+    function getMessageHashVoting(address voter, uint256 propID, bool vote, uint nonce, uint256 deadline) public pure returns (bytes32) 
+    {
+        return keccak256(
+             abi.encode(
+                votingTypeHash,
+                voter,
+                propID,
+                vote,
+                nonce,
+                deadline
             ));
-
-        return (hashStruct);
-    }*/
+    }
 
     // COMMON FUNCTIONALITY /////////////////////////////////////////////////////////////
-    function verify(address signer, bytes32 _domainHash, bytes32 _functionHash, bytes memory signature) internal pure returns (bool) 
+    function verify(address signer, bytes32 _functionHash, bytes memory signature, string memory ContractName, string memory ContractVersion) internal view returns (bool) 
     {
-        bytes32 prefixedHash = keccak256(abi.encodePacked('\x19\x01', _domainHash, _functionHash));
+        bytes32 domainHash = getDomainHash(ContractName, ContractVersion);
+        bytes32 prefixedHash = keccak256(abi.encodePacked(salt, domainHash, _functionHash));
         return (recoverSigner(prefixedHash, signature) == signer);
     }
 

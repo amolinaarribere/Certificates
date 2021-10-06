@@ -17,8 +17,6 @@ pragma solidity 0.8.7;
 
     function retrieveAddCertificatePriceWei() external view returns(uint256);
     function retrieveSubscriptionPriceWei() external view returns(uint256);
-    function retrieveContractConfig() external view returns(string memory, string memory);
-    function retrieveNonce(address provider, uint256 nonce) external view returns(bool);
 
     function addProvider(address provider, string calldata providerInfo) external payable;
     function removeProvider(address provider) external;
