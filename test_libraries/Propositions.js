@@ -7,7 +7,8 @@ const TotalTokenSupply = constants.TotalTokenSupply;
 const Gas = constants.Gas;
 
 // test constants
-const Unauthorized = new RegExp("EC22-");
+const Unauthorized = new RegExp("EC8-");
+const CannotProposeChanges = new RegExp("EC22-");
 const WrongConfig = new RegExp("EC21-");
 const NoPropositionActivated = new RegExp("EC25-");
 const PropositionAlreadyInProgress = new RegExp("EC24-");
@@ -41,7 +42,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // assert
     catch(error){
-        expect(error.message).to.match(Unauthorized);
+        expect(error.message).to.match(CannotProposeChanges);
     }
     // act
     try{

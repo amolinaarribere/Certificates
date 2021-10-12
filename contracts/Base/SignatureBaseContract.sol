@@ -17,13 +17,21 @@ contract SignatureBaseContract is ISignatureBaseContract{
 
     // MODIFIERS /////////////////////////////////////////
     modifier isDeadlineOK(uint256 deadline){
-        require(block.timestamp < deadline, "EC33-");
+        isDeadlineOKFunc(deadline);
         _;
     }
 
+    function isDeadlineOKFunc(uint256 deadline) internal view {
+        require(block.timestamp < deadline, "EC33-");
+    }
+
     modifier isNonceOK(address addr, uint256 nonce){
-        require(false == nonces[addr][nonce], "EC34-");
+        isNonceOKFunc(addr, nonce);
         _;
+    }
+
+    function isNonceOKFunc(address addr, uint256 nonce) internal view {
+        require(false == nonces[addr][nonce], "EC34-");
     }
 
     // FUNCTIONALITY /////////////////////////////////////////

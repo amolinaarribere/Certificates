@@ -68,7 +68,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     mapping(address => _BalanceStruct) private _balances;
 
     // MODIFIERS /////////////////////////////////////////
-    modifier areFundsEnough(Library.Prices price){
+    modifier areFundsEnough(uint256 value, Library.Prices price){
         uint256 minPriceUSD = 2**256 - 1;
 
         if(Library.Prices.NewProvider == price) minPriceUSD = _PublicPriceUSD;
@@ -78,7 +78,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
         uint256 minPriceETH = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(minPriceUSD);
 
-        require(msg.value >= minPriceETH, "EC2-");
+        require(value >= minPriceETH, "EC2-");
         _;
     }
 
@@ -88,7 +88,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
     modifier isFromPublicPool(){
-        require(true == Library.ItIsSomeone(_managerContract.retrievePublicCertificatePoolProxy()), "EC8-");
+        Library.ItIsSomeone(msg.sender, _managerContract.retrievePublicCertificatePoolProxy());
         _;
     }
 
@@ -172,7 +172,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     // FUNCTIONALITY /////////////////////////////////////////
     function pay(Library.Prices price) external 
-        areFundsEnough(price)
+        areFundsEnough(msg.value, price)
     override payable
     {
         uint256 amount = msg.value;

@@ -17,8 +17,8 @@ contract ManagedBaseContract is Initializable{
     IProxyManager internal _managerContract;
 
     // MODIFIERS /////////////////////////////////////////
-     modifier isFromManagerContract(){
-        require(true == Library.ItIsSomeone(address(_managerContract)), "EC8-");
+     modifier isFromManagerContract(address addr){
+        Library.ItIsSomeone(addr, address(_managerContract));
         _;
     }
 

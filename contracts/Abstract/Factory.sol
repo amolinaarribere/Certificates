@@ -50,7 +50,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
 
     // MODIFIERS /////////////////////////////////////////
     modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "EC1-");
+        Library.IdCorrect(Id, length);
         _;
     }
 
@@ -72,14 +72,14 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     }
 
     function updateContractName(string memory contractName) external override
-        isFromManagerContract()
+        isFromManagerContract(msg.sender)
     {
         _ContractName = contractName;
         emit _NewContractName(_FactoryName, _ContractName);
     }
 
     function updateContractVersion(string memory contractVersion) external override
-        isFromManagerContract()
+        isFromManagerContract(msg.sender)
     {
         _ContractVersion = contractVersion;
         emit _NewContractVersion(_FactoryName, _ContractVersion);

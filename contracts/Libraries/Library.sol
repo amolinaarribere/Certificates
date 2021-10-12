@@ -40,25 +40,18 @@ library Library{
         bytes32 certificate;
     }
 
-    // MODIFIERS /////////////////////////////////////////
-    modifier isIdCorrect(uint Id, uint length){
-        require(true == IdCorrect(Id, length), "EC1-");
-        _;
-    }
-
     // FUNCTIONALITY /////////////////////////////////////////
-    function IdCorrect(uint Id, uint length) public pure returns (bool){
-        return (length > Id);
+    function IdCorrect(uint Id, uint length) public pure{
+        require(length > Id, "EC1-");
     }
 
-    function ItIsSomeone(address someone) public view returns(bool){
-        if(msg.sender == someone) return true;
-        return false;
+    function ItIsSomeone(address addr, address someone) public pure{
+        require(someone == addr, "EC8-");
     }
 
     function ArrayRemoveResize(uint index, bytes32[] storage array) public 
-        isIdCorrect(index, array.length) 
     {
+        IdCorrect(index, array.length);
         array[index] = array[array.length - 1];
         array.pop();
     }

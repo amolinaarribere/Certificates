@@ -27,30 +27,37 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
     }
     
     modifier minRequired(uint min, uint number){
+         minRequiredFunc(min, number);
+        _;
+    }
+
+    function minRequiredFunc(uint min, uint number) internal pure{
         require(min <= number, "EC19-");
-        _;
     }
 
-    modifier greaterThan(uint min, uint number){
-        require(number > min, "EC17-");
-        _;
-    }
-
-    modifier HasNotAlreadyVotedMinOwner(){
-        require(false == AddressLibrary.FindAddress(msg.sender, _newMinOwnersVoters), "EC5-");
+    modifier HasNotAlreadyVotedMinOwner(address voter){
+        HasNotAlreadyVotedMinOwnerFunc(voter);
        _;
+    }
+
+    function HasNotAlreadyVotedMinOwnerFunc(address voter) internal view {
+        require(false == AddressLibrary.FindAddress(voter, _newMinOwnersVoters), "EC5-");
     }
     
     modifier NewMinOwnerInProgress(bool YesOrNo){
+        NewMinOwnerInProgressFunc(YesOrNo);
+        _;
+    }
+
+    function NewMinOwnerInProgressFunc(bool YesOrNo) internal view{
         if(YesOrNo) require(0 != _newMinOwners, "EC31-");
         else require(0 == _newMinOwners, "EC30-");
-        _;
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
     function MultiSigContract_init(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) public initializer 
         minRequired(minOwners, owners.length)
-        greaterThan(0, minOwners)
+        minRequired(1, minOwners)
     {
         require(TotalEntities == labels.length, "EC18-");
 
@@ -116,27 +123,27 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
 
     // New min Owners proposal
     function changeMinOwners(uint newMinOwners) external override
-        isAnOwner
+        isAnOwner(msg.sender)
         NewMinOwnerInProgress(false)
         minRequired(newMinOwners, _Entities[_ownerId]._activatedItems.length)
-        greaterThan(0, newMinOwners)
+        minRequired(1, newMinOwners)
     {
         _newMinOwners = newMinOwners;
         voteNewMinOwners(true);
     }
 
     function validateMinOwners() external override
-        isAnOwner
+        isAnOwner(msg.sender)
         NewMinOwnerInProgress(true)
-        HasNotAlreadyVotedMinOwner
+        HasNotAlreadyVotedMinOwner(msg.sender)
     {
         voteNewMinOwners(true);
     }
     
     function rejectMinOwners() external override
-        isAnOwner
+        isAnOwner(msg.sender)
         NewMinOwnerInProgress(true)
-        HasNotAlreadyVotedMinOwner
+        HasNotAlreadyVotedMinOwner(msg.sender)
     {
         voteNewMinOwners(false);
     }
