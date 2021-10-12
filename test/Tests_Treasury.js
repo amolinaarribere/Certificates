@@ -56,9 +56,10 @@ contract("Testing Treasury",function(accounts){
     const hash_2 = "0x3fd54832f488a22b28398de0c567a3b064b937f54f81739ae9bd545967f3abab";
     // test constants
     const NotEnoughFunds = new RegExp("EC2-");
+    const Unauthorized = new RegExp("EC8-");
+    const CannotProposeChanges = new RegExp("EC22-");
     const WrongSender = new RegExp("EC8-");
     const NotEnoughBalance = new RegExp("EC20-");
-    const Unauthorized = new RegExp("EC22-");
     const WrongConfig = new RegExp("EC21-");
     const NoPropositionActivated = new RegExp("EC25-");
     const PropositionAlreadyInProgress = new RegExp("EC24-");
@@ -97,7 +98,7 @@ contract("Testing Treasury",function(accounts){
         }
         // assert
         catch(error){
-            expect(error.message).to.match(Unauthorized);
+            expect(error.message).to.match(CannotProposeChanges);
         }
         try{
             await Treasury.methods.updatePrices(OwnerRefundPriceWei, PrivatePriceWei, ProviderPriceWei, CertificatePriceWei, PublicPriceWei).send({from: chairPerson, gas: Gas}, function(error, result){});
