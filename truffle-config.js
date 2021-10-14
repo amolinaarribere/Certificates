@@ -52,7 +52,7 @@ module.exports = {
       network_id: "*" ,      // Any network (default: none)
       gas: 6721975           // gas Limit
      },
-    /*ganache: {
+    ganache: {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "5777",       // Any network (default: none)
@@ -66,7 +66,7 @@ module.exports = {
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    }*/
+    }
     /* rinkeby: {
       port: 8777,             // Custom port
       network_id: 1342,       // Custom network
