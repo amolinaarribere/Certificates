@@ -279,7 +279,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         isNonceOK(voter, nonce)
     {
         require(_Proposition.PropID == propID, "EC35-");
-        require(true == SignatureLibrary.verifyVoting(voter, propID, vote, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-");
+        require(true == SignatureLibrary.verifyVote(voter, propID, vote, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-");
         validateNonce(voter, nonce);
     }
 

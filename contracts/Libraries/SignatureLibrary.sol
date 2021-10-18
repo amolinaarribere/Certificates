@@ -11,7 +11,7 @@ library SignatureLibrary{
     // DATA /////////////////////////////////////////
     bytes32 public constant domainTypeHash = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
     bytes32 public constant addCertificateOnBehalfOfTypeHash = keccak256("addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)");
-    bytes32 public constant votingTypeHash = keccak256("voting(address voter,uint256 propID,bool vote,uint256 nonce,uint256 deadline)");
+    bytes32 public constant voteTypeHash = keccak256("voteOnBehalfOf(address voter,uint256 propID,bool vote,uint256 nonce,uint256 deadline)");
     string public constant salt = '\x19\x01';
 
 
@@ -35,18 +35,18 @@ library SignatureLibrary{
             ));
     }
 
-    // VOTING FUNCTIONALITY /////////////////////////////////////////////////////////////
-    function verifyVoting(address voter, uint256 propID, bool vote, uint nonce, uint256 deadline, bytes memory signature, string memory ContractName, string memory ContractVersion) public view returns (bool) 
+    // VOTE FUNCTIONALITY /////////////////////////////////////////////////////////////
+    function verifyVote(address voter, uint256 propID, bool vote, uint nonce, uint256 deadline, bytes memory signature, string memory ContractName, string memory ContractVersion) public view returns (bool) 
     {
-        bytes32 functionHash = getMessageHashVoting(voter, propID, vote, nonce, deadline);
+        bytes32 functionHash = getMessageHashVote(voter, propID, vote, nonce, deadline);
         return verify(voter, functionHash, signature, ContractName, ContractVersion);
     }
 
-    function getMessageHashVoting(address voter, uint256 propID, bool vote, uint nonce, uint256 deadline) public pure returns (bytes32) 
+    function getMessageHashVote(address voter, uint256 propID, bool vote, uint nonce, uint256 deadline) public pure returns (bytes32) 
     {
         return keccak256(
              abi.encode(
-                votingTypeHash,
+                voteTypeHash,
                 voter,
                 propID,
                 vote,
