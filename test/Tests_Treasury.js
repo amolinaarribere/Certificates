@@ -307,16 +307,10 @@ contract("Testing Treasury",function(accounts){
         // assert
         var balance = parseInt(await web3.eth.getBalance(Treasury._address));
         expect(balance).to.be.equal(PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + ProviderPriceWei + (ProviderPriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1));
-        var Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
-        var Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
+        var Balance1 = parseInt(await Treasury.methods.retrieveFullBalance(chairPerson).call({from: user_1}, function(error, result){}));
+        var Balance2 = parseInt(await Treasury.methods.retrieveFullBalance(user_1).call({from: user_1}, function(error, result){}));
         expect(Balance1).to.be.equal(Balance2);
-        expect(Balance1).to.be.equal(0);
-
-        await certisTokenProxy.methods.transfer(user_1, CertisTokenBalance.toNumber()).send({from: chairPerson, gas: Gas}, function(error, result){});
-        Balance1 = parseInt(await Treasury.methods.retrieveBalance(chairPerson).call({from: user_1}, function(error, result){}));
-        Balance2 = parseInt(await Treasury.methods.retrieveBalance(user_1).call({from: user_1}, function(error, result){}));
-        expect(Balance1).to.be.equal(Balance2);
-        expect(Balance2).to.be.greaterThan(0);
+        expect(Balance2).to.be.equal((balance - 2 * OwnerRefundPriceWei) / 2);
     });
 
     // ****** TESTING Owners Refunding ***************************************************************** //
@@ -339,8 +333,7 @@ contract("Testing Treasury",function(accounts){
         // asert
         var BalanceOwners = 0;
         for(var i=0; i < PublicOwners.length; i++){
-            await Treasury.methods.AssignDividends().send({from: PublicOwners[i], gas: Gas}, function(error, result){});
-            BalanceOwners += parseInt(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
+            BalanceOwners += parseInt(await Treasury.methods.retrieveFullBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
         }
         expect(BalanceOwners).to.be.equal(2 * OwnerRefundPriceWei);
     });
@@ -365,49 +358,23 @@ contract("Testing Treasury",function(accounts){
         // assert
         let TreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         for(let i=0; i < PublicOwners.length; i++){
-            await Treasury.methods.AssignDividends().send({from: PublicOwners[i], gas: Gas}, function(error, result){});
-            let balance = new BigNumber(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
+            let balance = new BigNumber(await Treasury.methods.retrieveFullBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
             TreasuryBalance -= balance.toNumber();
             let initialBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
-            let request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gas: Gas, gasPrice: 1}, function(error, result){});
+            let request = "";
+
+            if(i % 2 == 0) request = await Treasury.methods.withdraw(balance).send({from: PublicOwners[i], gas: Gas, gasPrice: 1}, function(error, result){});
+            else request = await Treasury.methods.withdrawAll().send({from: PublicOwners[i], gas: Gas, gasPrice: 1}, function(error, result){});
+            
             // assert that money has been transfered
             let finalBalance = new BigNumber(await web3.eth.getBalance(PublicOwners[i]));
             expect(finalBalance.minus(initialBalance.minus(request.gasUsed).plus(balance)).toString()).to.be.equal("0");
             // assert that account balance has been updated
-            balance = new BigNumber(await Treasury.methods.retrieveBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
+            balance = new BigNumber(await Treasury.methods.retrieveFullBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
             expect(balance.toString()).to.be.equal("0");
         }
         let FinalTreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
         expect(FinalTreasuryBalance).to.be.equal(TreasuryBalance);
-    });
-
-    // ****** TESTING Owners Refunding ***************************************************************** //
-
-    it("AssignDividends CORRECT",async function(){
-        // act
-        await SendingNewProviders();
-        var total_1 = 0;
-        var total_2 = 0;
-        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
-        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
-        await Treasury.methods.pay(0).send({from: user_1, value: PublicPriceWei, gas: Gas}, function(error, result){});
-
-        for(let i=0; i < accounts.length; i++){
-            let balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
-            total_1 += balanceEnd;
-        }
-
-        for(let i=0; i < accounts.length; i++){
-            await Treasury.methods.AssignDividends().send({from: accounts[i], gas: Gas}, function(error, result){});
-            let balanceEnd = parseInt(await Treasury.methods.retrieveBalance(accounts[i]).call({from: user_1}, function(error, result){}));
-            total_2 += balanceEnd;
-        }
-
-        var AggregatedAmount = parseInt(await Treasury.methods.retrieveAggregatedAmount().call({from: user_1}, function(error, result){}));
-        expect(AggregatedAmount).to.be.equal(5 * (PublicPriceWei - OwnerRefundPriceWei));
-        expect(total_2).to.be.equal((5 * PublicPriceWei) - (3 * OwnerRefundPriceWei));
-        expect(total_1).to.be.equal(2 * OwnerRefundPriceWei);
-        
     });
 
 
