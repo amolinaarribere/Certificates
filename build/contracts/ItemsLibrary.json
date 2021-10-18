@@ -123,7 +123,8 @@
         }
       ],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -184,7 +185,8 @@
         }
       ],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_AddItemRejection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_AddItemValidation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_RemoveItemRejection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_RemoveItemValidation\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"signatures\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"minSignatures\",\"type\":\"uint256\"}],\"name\":\"CheckValidations\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"item\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"info\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"_minSignatures\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"ItemTypeLabel\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"}],\"internalType\":\"struct ItemsLibrary._manipulateItemStruct\",\"name\":\"manipulateItemstruct\",\"type\":\"tuple\"}],\"name\":\"ReturnManipulateStructContent\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Libraries/ItemsLibrary.sol\":\"ItemsLibrary\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Libraries/AddressLibrary.sol\":{\"keccak256\":\"0x9b857d01af9584bd900e3cb3d3e6806911e1f44cb4c968064ecde6aaa053d020\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://bd2582fc1b0deedf784adc17c12d18574e191fac05ff677e535f47c0ac2dc5b9\",\"dweb:/ipfs/QmRy1tEoSVhDgVNqGBVVnVrDbhq6LPo2NnSFjhEM1txyTA\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Libraries/ItemsLibrary.sol\":{\"keccak256\":\"0xbd93ffc25084ebc1fa4b9245587f92193b8af1861a1ca85ae8cc632a9738a8db\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://a5c892d79557457c808db879a6cd4fc832d16253bb46c9afc0b1e2a8a0e95b73\",\"dweb:/ipfs/QmcaZ7qvmddLjM7WE7UjXbojLHPink5D7HXUEZ4EMP93J4\"]},\"/C/Users/d-aam/GitHub/Certificates/contracts/Libraries/Library.sol\":{\"keccak256\":\"0x6db3394e341e054ab4500cb92641eb5237b645b03c801b10e862c988c7293084\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://5c2c3490b4bd4afa8dc66ca15481c61d64b7354b8987ee7abd752dc4802002cb\",\"dweb:/ipfs/Qmby8FbCw8DZA3jxZWWnqmKhoWymZjQcZFJeVRGjr2wtYx\"]}},\"version\":1}",
@@ -39407,10 +39409,121 @@
       },
       "address": "0x491b85d16Ae80FB237eD388b6Aa42e14034cfC77",
       "transactionHash": "0x5e70fa4e3564787e3613e69fe1f7ae110146be112eb59735eb744b810907fd8b"
+    },
+    "5777": {
+      "events": {
+        "0x54b570d1f49da5a541163492680b5d458d7394bd913058973d58c83787e7b1af": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_AddItemRejection",
+          "type": "event"
+        },
+        "0x78affcbd9eae81f6f814ad113a0530fe7251494185b89753505ab3529e8f6971": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_AddItemValidation",
+          "type": "event"
+        },
+        "0xe89687f0c26a809a947b2c0e0df6af4f18066aab08e8c6a5c67bb816c3b250ca": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_RemoveItemRejection",
+          "type": "event"
+        },
+        "0xe3ca55e2b495b3586f7b93152cce47df5bebef16d327f330c0e28f9348d9e6b3": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_RemoveItemValidation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Library": "0xEB52bEc9De0115a93886eaa6e297D8974Fb18E76",
+        "AddressLibrary": "0x56fd46646fb48f2fe72A05C8cadAa2df7194C373"
+      },
+      "address": "0x351A62fa7bCD0d674b1D81F2f670Db6e1cf07507",
+      "transactionHash": "0x60f3dd0bda9b48878175bcac8987c35a876a8e49426ecdb32f68528e85025543"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-10-18T11:29:51.360Z",
+  "updatedAt": "2021-10-18T13:56:09.190Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},
