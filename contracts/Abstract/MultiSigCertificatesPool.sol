@@ -10,13 +10,18 @@ pragma solidity 0.8.7;
 
 import "./MultiSigContract.sol";
 import "../Interfaces/IPool.sol";
+import "../Base/SignatureBaseContract.sol";
+import "../Libraries/SignatureLibrary.sol";
 
-abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
-    
+
+abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, MultiSigContract { 
+    using SignatureLibrary for *;
+
     // EVENTS /////////////////////////////////////////
     event _AddCertificate(address indexed Provider, address indexed Holder, bytes32 Certificate);
 
     // DATA /////////////////////////////////////////
+    // Contract configuration
     uint256 constant _TotalEntities = 2;
 
     // Owners
@@ -28,7 +33,6 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     string constant _providerLabel = "Provider";
 
     string[] internal _Label;
-
     // Holders
     struct _CertificatePerHolder{
         mapping(bytes32 => address) _CertificateFromProvider;
@@ -38,18 +42,8 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     mapping(address => _CertificatePerHolder) private _CertificatesPerHolder;
 
     // MODIFIERS /////////////////////////////////////////
-    modifier isAProvider(){
-        require(true == isProvider(msg.sender), "EC12-");
-        _;
-    }
-
-    modifier isTheProvider(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC13-");
-        _;
-    }
-
-    modifier isTheProviderOrHimself(address holder, bytes32 CertificateHash){
-        require(msg.sender == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] || msg.sender == holder, "EC14-");
+    modifier isAProvider(address provider){
+        require(true == isProvider(provider), "EC12-");
         _;
     }
     
@@ -59,12 +53,12 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     }
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners) public initializer 
+    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners, string memory contractName, string memory contractVersion) public initializer 
     {
         _Label = new string[](2);
         _Label[0] = _ownerLabel;
         _Label[1] = _providerLabel;
-
+        setContractConfig(contractName, contractVersion);
         super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates); 
     }
 
@@ -113,18 +107,36 @@ abstract contract MultiSigCertificatesPool is IPool, MultiSigContract {
     // Certificates CRUD Operations
     function addCertificate(bytes32 CertificateHash, address holder) external override payable virtual
     {
-        addCertificateInternal(CertificateHash, holder);
+        onBeforeAddCertificate();
+        addCertificateInternal(msg.sender, CertificateHash, holder);
     }
 
-    function addCertificateInternal(bytes32 CertificateHash, address holder) internal
-        isAProvider 
+    function addCertificateOnBehalfOf(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) external override payable virtual
+    {
+        onBeforeAddCertificate();
+        checkSignature(provider, CertificateHash, holder, nonce, deadline, signature);
+        addCertificateInternal(provider, CertificateHash, holder);
+    }
+
+    function onBeforeAddCertificate() internal virtual {}
+
+    function checkSignature(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) internal
+        isDeadlineOK(deadline)
+        isNonceOK(provider, nonce)
+    {
+        require(true == SignatureLibrary.verifyAddCertificate(provider, CertificateHash, holder, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-");
+        validateNonce(provider, nonce);
+    }
+
+    function addCertificateInternal(address provider, bytes32 CertificateHash, address holder) internal
+        isAProvider(provider) 
         NotEmpty(CertificateHash)
         CertificateDoesNotExist(holder, CertificateHash)
     {
-        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = msg.sender;
+        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = provider;
         _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
 
-        emit _AddCertificate(msg.sender, holder, CertificateHash);
+        emit _AddCertificate(provider, holder, CertificateHash);
     }
 
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override

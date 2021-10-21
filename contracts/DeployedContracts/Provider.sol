@@ -46,8 +46,12 @@ pragma solidity 0.8.7;
 
     // MODIFIERS /////////////////////////////////////////
     modifier isAPool(address pool){
-        require(true == isPool(pool));
+        isAPoolFunc(pool);
         _;
+    }
+
+    function isAPoolFunc(address pool) internal view{
+        require(true == isPool(pool), "EC36-");
     }
 
      // CONSTRUCTOR /////////////////////////////////////////
@@ -141,7 +145,7 @@ pragma solidity 0.8.7;
 
     function addCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
-        isAnOwner
+        isAnOwner(msg.sender)
      {
         (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
             ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsCert(pool, CertificateHash, holder);
@@ -151,7 +155,7 @@ pragma solidity 0.8.7;
 
     function validateCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
-        isAnOwner
+        isAnOwner(msg.sender)
      {
         (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
             ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsCert(pool, CertificateHash, holder);
@@ -161,7 +165,7 @@ pragma solidity 0.8.7;
 
     function rejectCertificate(address pool, bytes32 CertificateHash, address holder) external override
         isAPool(pool)
-        isAnOwner
+        isAnOwner(msg.sender)
     {
         (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
             ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsCert(pool, CertificateHash, holder);

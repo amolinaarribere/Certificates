@@ -32,8 +32,14 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
 
      // EVENTS /////////////////////////////////////////
     event _NewElement(string Factory, uint256 Id, address indexed Creator, address Element, string Name);
+    event _NewContractName(string Factory, string Name);
+    event _NewContractVersion(string Factory, string Version);
 
     // DATA /////////////////////////////////////////
+    string internal _FactoryName;
+    string internal _ContractName;
+    string internal _ContractVersion;
+
     // Private Certificates Pool structure
     struct _ElementStruct{
         address _creator;
@@ -44,22 +50,39 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
 
     // MODIFIERS /////////////////////////////////////////
     modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "EC1-");
+        Library.IdCorrect(Id, length);
         _;
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function Factory_init(address managerContractAddress) public initializer {
+    function Factory_init(string memory factoryName, address managerContractAddress) public initializer {
         super.ManagedBaseContract_init(managerContractAddress);
+        _FactoryName = factoryName;
+        _ContractName = "";
+        _ContractVersion = "";
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function internalCreate(address beaconProxyAddress, string memory factoryName, string memory elementName) internal
+    function internalCreate(address beaconProxyAddress, string memory elementName) internal
     {
         _ElementStruct memory element = _ElementStruct(msg.sender, beaconProxyAddress);
         _Elements.push(element);
 
-        emit _NewElement(factoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
+        emit _NewElement(_FactoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
+    }
+
+    function updateContractName(string memory contractName) external override
+        isFromManagerContract(msg.sender)
+    {
+        _ContractName = contractName;
+        emit _NewContractName(_FactoryName, _ContractName);
+    }
+
+    function updateContractVersion(string memory contractVersion) external override
+        isFromManagerContract(msg.sender)
+    {
+        _ContractVersion = contractVersion;
+        emit _NewContractVersion(_FactoryName, _ContractVersion);
     }
 
     function retrieve(uint Id) external override
@@ -72,6 +95,11 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     function retrieveTotal() external override view returns (uint)
     {
         return(_Elements.length);
+    }
+
+    function retrieveConfig() external override view returns (string memory, string memory, string memory)
+    {
+        return(_FactoryName, _ContractName, _ContractVersion);
     }
 
 }

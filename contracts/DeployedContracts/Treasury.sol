@@ -68,7 +68,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     mapping(address => _BalanceStruct) private _balances;
 
     // MODIFIERS /////////////////////////////////////////
-    modifier areFundsEnough(Library.Prices price){
+    modifier areFundsEnough(uint256 value, Library.Prices price){
         uint256 minPriceUSD = 2**256 - 1;
 
         if(Library.Prices.NewProvider == price) minPriceUSD = _PublicPriceUSD;
@@ -78,17 +78,17 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
         uint256 minPriceETH = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(minPriceUSD);
 
-        require(msg.value >= minPriceETH, "EC2-");
+        require(value >= minPriceETH, "EC2-");
         _;
     }
 
-    modifier isBalanceEnough(uint amount){
-        require(checkBalance(msg.sender) >= amount, "EC20-");
+    modifier isBalanceEnough(uint amount, address addr){
+        require(checkFullBalance(addr) >= amount, "EC20-");
         _;
     }
 
-    modifier isFromPublicPool(){
-        require(true == Library.ItIsSomeone(_managerContract.retrievePublicCertificatePoolProxy()), "EC8-");
+    modifier isFromPublicPool(address addr){
+        Library.ItIsSomeone(addr, _managerContract.retrievePublicCertificatePoolProxy());
         _;
     }
 
@@ -98,9 +98,9 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function Treasury_init(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage) public initializer 
+    function Treasury_init(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, string memory contractName, string memory contractVersion) public initializer 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress);
+        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress, contractName, contractVersion);
         InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, true);
     }
 
@@ -172,7 +172,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
 
     // FUNCTIONALITY /////////////////////////////////////////
     function pay(Library.Prices price) external 
-        areFundsEnough(price)
+        areFundsEnough(msg.value, price)
     override payable
     {
         uint256 amount = msg.value;
@@ -189,24 +189,20 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         if(address(0) != to) InternalAssignDividends(to);
     }
 
-    function AssignDividends() external override
-    {
-       InternalAssignDividends(msg.sender);
-    }
-
     function InternalAssignDividends(address recipient) internal
     {
-        if(_lastAssigned[recipient] < _AggregatedDividendAmount){
-           uint amountToSplit = _AggregatedDividendAmount - _lastAssigned[recipient];
+        (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(recipient);
+
+        if(totalOffBalance > 0){
            _lastAssigned[recipient] = _AggregatedDividendAmount;
-           addBalance(recipient, amountToSplit * GetTokensBalance(recipient), totalSupply());
+           addBalance(recipient, totalOffBalance, DividendOffBalance);
            
-           emit _AssignDividend(recipient, amountToSplit * GetTokensBalance(recipient), totalSupply());
+           emit _AssignDividend(recipient, totalOffBalance, DividendOffBalance);
         }
     }
 
     function getRefund(address addr, uint numberOfOwners) external 
-        isFromPublicPool()
+        isFromPublicPool(msg.sender)
     override
     {
         uint OwnerRefundFeeWei = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(_OwnerRefundFeeUSD);
@@ -216,11 +212,23 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
     function withdraw(uint amount) external 
-        isBalanceEnough(amount)
     override
     {
+        InternalWithdraw(amount);
+    }
+
+    function withdrawAll() external override
+    {
+        uint All = checkFullBalance(msg.sender);
+        InternalWithdraw(All);
+    }
+
+    function InternalWithdraw(uint amount) internal 
+        isBalanceEnough(amount, msg.sender)
+    {
+        InternalAssignDividends(msg.sender);
         uint[] memory f = returnFactors(msg.sender);
-        (uint total, uint commonDividend) = sumUpTotal(msg.sender);
+        (uint total, uint commonDividend) = sumUpTotalOnBalance(msg.sender);
         uint remainder =  total - (amount * commonDividend);
 
         for(uint i=0; i < f.length; i++){
@@ -240,9 +248,9 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return _lastAssigned[addr];
     }
 
-    function retrieveBalance(address addr) external override view returns(uint)
+    function retrieveFullBalance(address addr) external override view returns(uint)
     {
-        return checkBalance(addr);
+        return checkFullBalance(addr);
     }
 
     function retrievePrices() external override view returns(uint, uint, uint, uint, uint)
@@ -254,13 +262,24 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return _AggregatedDividendAmount;
     }
 
-    function checkBalance(address addr) internal view returns(uint){
+    function checkFullBalance(address addr) internal view returns(uint){
         (uint total, uint commonDividend) = sumUpTotal(addr);
 
         return total / commonDividend;
     }
 
     function sumUpTotal(address addr) internal view returns (uint, uint)
+    {
+        (uint totalOnBalance, uint commonDividendOnBalance) = sumUpTotalOnBalance(addr);
+        (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(addr);
+
+        uint total = (totalOnBalance * DividendOffBalance) + (totalOffBalance * commonDividendOnBalance);
+        uint CommonDividend = commonDividendOnBalance * DividendOffBalance;
+
+        return (total, CommonDividend);
+    }
+
+    function sumUpTotalOnBalance(address addr) internal view returns (uint, uint)
     {
         uint[] memory f = returnFactors(addr);
         uint CommonDividend = UintLibrary.ProductOfFactors(f);
@@ -271,6 +290,18 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         }
 
         return (total, CommonDividend);
+    }
+
+    function sumUpTotalOffBalance(address addr) internal view returns (uint, uint)
+    {
+        uint total = 0;
+
+        if(_lastAssigned[addr] < _AggregatedDividendAmount)
+        {
+            total = (_AggregatedDividendAmount - _lastAssigned[addr]) * GetTokensBalance(addr);           
+        }
+
+        return (total, totalSupply());
     }
 
     function returnFactors(address addr) internal view returns(uint[] memory){

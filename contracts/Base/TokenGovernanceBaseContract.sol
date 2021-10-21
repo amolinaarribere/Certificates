@@ -34,10 +34,13 @@ Functionality (with basic security check)
  import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
  import "../Interfaces/ITokenEventSubscriber.sol";
  import "../Libraries/AddressLibrary.sol";
+ import "./SignatureBaseContract.sol";
  import "./ManagedBaseContract.sol";
+ import "../Libraries/SignatureLibrary.sol";
 
-abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedBaseContract {
+abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, SignatureBaseContract, ManagedBaseContract {
     using AddressLibrary for *; 
+    using SignatureLibrary for *;
 
     // EVENTS /////////////////////////////////////////
     event _AddedProposition(uint256 Id, address indexed Proposer, uint256 Deadline, uint256 Threshold);
@@ -83,34 +86,47 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     ProposedPropositionStruct internal _ProposedProposition;
 
     // MODIFIERS /////////////////////////////////////////
-    modifier isFromChairPerson(){
-        require(true == Library.ItIsSomeone(_chairperson), "EC8-");
+    modifier isFromChairPerson(address addr){
+        Library.ItIsSomeone(addr, _chairperson);
         _;
     }
 
-    modifier isAuthorizedToPropose(){
-        require(true == AuthorizedToPropose(msg.sender), "EC22-");
+    modifier isAuthorizedToPropose(address addr){
+        bool isAuthorized = false;
+        if(addr == _chairperson) isAuthorized = true;
+        else 
+        {
+            uint numberOfTokens = GetTokensBalance(addr);
+            if(numberOfTokens > (_minWeightToProposePercentage * totalSupply() / 100)) isAuthorized = true;
+        }
+
+        require(true == isAuthorized, "EC22-");
         _;
     }
 
-    modifier isAuthorizedToCancel(){
-        require(true == Library.ItIsSomeone(_Proposition.Proposer), "EC22-");
+    modifier isAuthorizedToCancel(address addr){
+        Library.ItIsSomeone(addr, _Proposition.Proposer);
         _;
     }
 
-    modifier canVote(){
-        require(true == AuthorizedToVote(msg.sender, _Proposition.PropID), "EC23-");
-         _;
+    modifier canVote(address voter, uint256 id){
+        uint votingTokens = GetVotingTokens(voter, id);
+        require(votingTokens > 0, "EC23-");
+        _;
     }
 
     modifier PropositionInProgress(bool yesOrno){
-        if(yesOrno) require(true == CheckIfPropositionActive(), "EC25-");
-        else require(false == CheckIfPropositionActive(), "EC24-");
+        PropositionInProgressFunc(yesOrno);
         _;
     }
 
-    modifier isFromTokenContract(){
-        require(true == Library.ItIsSomeone(_managerContract.retrieveCertisTokenProxy()), "EC8-");
+    function PropositionInProgressFunc(bool yesOrno) internal {
+        if(yesOrno) require(true == CheckIfPropositionActive(), "EC25-");
+        else require(false == CheckIfPropositionActive(), "EC24-");
+    }
+
+    modifier isFromTokenContract(address addr){
+        Library.ItIsSomeone(addr, _managerContract.retrieveCertisTokenProxy());
         _;
     }
 
@@ -121,15 +137,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     }
 
     // auxiliairy function
-    function AuthorizedToPropose(address addr) internal view returns(bool) {
-        if(addr == _chairperson) return true;
-        else 
-        {
-            uint numberOfTokens = GetTokensBalance(addr);
-            if(numberOfTokens > (_minWeightToProposePercentage * totalSupply() / 100)) return true;
-            return false;
-        }
-    }
+    
 
     function AuthorizedToVote(address addr, uint256 id) internal view returns(bool) {
         uint votingTokens = GetVotingTokens(addr, id);
@@ -164,10 +172,11 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress) internal initializer {
+    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress, string memory contractName, string memory contractVersion) internal initializer {
         super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson;
         _nextPropID = 0; 
+        setContractConfig(contractName, contractVersion);
         InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
     
@@ -213,7 +222,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
     // FUNCTIONALITY /////////////////////////////////////////
     function addProposition() internal
         PropositionInProgress(false)
-        isAuthorizedToPropose()
+        isAuthorizedToPropose(msg.sender)
     {
         _Proposition.Proposer = msg.sender;
         _Proposition.DeadLine = block.timestamp + _PropositionLifeTime;
@@ -226,17 +235,28 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
 
     function cancelProposition() external
         PropositionInProgress(true)
-        isAuthorizedToCancel()
+        isAuthorizedToCancel(msg.sender)
     {
         InternalCancelProposition();
         emit _CancelledProposition(_Proposition.PropID, _Proposition.Proposer);
     }
 
     function voteProposition(bool vote) external
-        PropositionInProgress(true)
-        canVote()
     {
-        uint VotingTokens = GetVotingTokens(msg.sender, _Proposition.PropID);
+        votePropositionInternal(msg.sender, vote);
+    }
+
+    function votePropositionOnBehalfOf(address voter, uint256 propID, bool vote, uint256 nonce, uint256 deadline, bytes memory signature) external
+    {
+        checkSignature(voter, propID, vote, nonce, deadline, signature);
+        votePropositionInternal(voter, vote);
+    }
+
+    function votePropositionInternal(address voter, bool vote) internal
+        PropositionInProgress(true)
+        canVote(voter, _Proposition.PropID)
+    {
+        uint VotingTokens = GetVotingTokens(voter, _Proposition.PropID);
 
         if(vote)
         {
@@ -247,15 +267,24 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, ManagedB
             _Proposition.VotesAgainst += VotingTokens;
         }
 
-        Voted(_Proposition.PropID, msg.sender,VotingTokens);
+        Voted(_Proposition.PropID, voter, VotingTokens);
 
-        emit _PropositionVote(_Proposition.PropID, msg.sender, vote, VotingTokens);
+        emit _PropositionVote(_Proposition.PropID, voter, vote, VotingTokens);
 
         checkProposition();
     }
 
+    function checkSignature(address voter, uint256 propID, bool vote, uint256 nonce, uint256 deadline, bytes memory signature) internal
+        isDeadlineOK(deadline)
+        isNonceOK(voter, nonce)
+    {
+        require(_Proposition.PropID == propID, "EC35-");
+        require(true == SignatureLibrary.verifyVote(voter, propID, vote, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-");
+        validateNonce(voter, nonce);
+    }
+
     function onTokenBalanceChanged(address from, address to, uint256 amount) external
-        isFromTokenContract()
+        isFromTokenContract(msg.sender)
     override
     {
         InternalonTokenBalanceChanged(from, to, amount);

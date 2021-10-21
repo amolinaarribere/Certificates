@@ -39,25 +39,29 @@ abstract contract EntitiesBaseContract{
     string[] internal _entitiesLabel;
 
     // MODIFIERS /////////////////////////////////////////
-    modifier isSomeoneSpecific(address someone){
-        require(true == Library.ItIsSomeone(someone), "EC8-");
+    modifier isSomeoneSpecific(address addr, address someone){
+        Library.ItIsSomeone(addr, someone);
         _;
     }
     
     modifier isIdCorrect(uint Id, uint length){
-        require(true == Library.IdCorrect(Id, length), "EC1-");
+        Library.IdCorrect(Id, length);
         _;
     }
 
-    modifier isAnOwner(){
-        require(true == isEntity(msg.sender, _ownerId), "EC9-");
+    modifier isAnOwner(address addr){
+        isAnOwnerFunc(addr);
         _;
+    }
+
+    function isAnOwnerFunc(address addr) internal view{
+        require(true == isEntity(addr, _ownerId), "EC9-");
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
     function addEntity(address entity, string calldata entityInfo, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
-        isAnOwner
+        isAnOwner(msg.sender)
     { 
         (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
             ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsEntity(entity, entityInfo, listId);
@@ -67,7 +71,7 @@ abstract contract EntitiesBaseContract{
 
     function removeEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
-        isAnOwner
+        isAnOwner(msg.sender)
     {
         (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
             ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsEntity(entity, "", listId);
@@ -77,7 +81,7 @@ abstract contract EntitiesBaseContract{
 
     function validateEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
-        isAnOwner 
+        isAnOwner(msg.sender)
     {
         (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
             ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsEntity(entity, "", listId);
@@ -87,7 +91,7 @@ abstract contract EntitiesBaseContract{
 
     function rejectEntity(address entity, uint listId) internal 
         isIdCorrect(listId, _Entities.length) 
-        isAnOwner 
+        isAnOwner(msg.sender) 
     {
         (ItemsLibrary._manipulateItemStruct memory manipulateItemStruct,
             ItemsLibrary._ItemsStruct storage itemsstruct) = GenerateStructsEntity(entity, "", listId);
@@ -148,11 +152,11 @@ abstract contract EntitiesBaseContract{
 
     // CALLBACKS /////////////////////////////////////////
     function onItemValidated(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
-        isSomeoneSpecific(address(this))
+        isSomeoneSpecific(msg.sender, address(this))
     {}
 
     function onItemRejected(bytes32 item, uint256[] calldata ids, bool addOrRemove) public virtual 
-        isSomeoneSpecific(address(this))
+        isSomeoneSpecific(msg.sender, address(this))
     {}
 
 }

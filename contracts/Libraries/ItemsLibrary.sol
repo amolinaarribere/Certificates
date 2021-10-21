@@ -46,32 +46,27 @@ library ItemsLibrary{
     event _AddItemRejection(string ItemType,  bytes32 indexed Item,  string Info);
     event _RemoveItemRejection( string ItemType,  bytes32 indexed Item,  string Info);
 
-    // MODIFIERS /////////////////////////////////////////
-    modifier ItemNotActivated(bytes32 item, _ItemsStruct storage itemStruct){
+    // FUNCTIONS for MODIFIERS /////////////////////////////////////////
+    function ItemNotActivated(bytes32 item, _ItemsStruct storage itemStruct) public view {
         require(false == isItem(item, itemStruct), "EC6-");
-        _;
     }
 
-    modifier ItemActivated(bytes32 item, _ItemsStruct storage itemStruct){
+    function ItemActivated(bytes32 item, _ItemsStruct storage itemStruct) public view {
         require(true == isItem(item, itemStruct), "EC7-");
-        _;
     }
 
-    modifier ItemNotPending(bytes32 item, _ItemsStruct storage itemStruct){
+    function ItemNotPending(bytes32 item, _ItemsStruct storage itemStruct) public view{
         require(false == isItemPendingToAdded(item, itemStruct) && 
                 false == isItemPendingToRemoved(item, itemStruct), "EC27-");
-        _;
     }
 
-    modifier ItemPending(bytes32 item, _ItemsStruct storage itemStruct){
+    function ItemPending(bytes32 item, _ItemsStruct storage itemStruct) public view{
         require(true == isItemPendingToAdded(item, itemStruct) ||
                 true == isItemPendingToRemoved(item, itemStruct), "EC28-");
-        _;
     }
 
-    modifier HasNotAlreadyVoted(bytes32 item, _ItemsStruct storage itemStruct){
-        require(false == hasVoted(msg.sender, item, itemStruct), "EC5-");
-        _;
+    function HasNotAlreadyVoted(address addr, bytes32 item, _ItemsStruct storage itemStruct) public view{
+        require(false == hasVoted(addr, item, itemStruct), "EC5-");
     }
     
     // DATA /////////////////////////////////////////
@@ -152,9 +147,10 @@ library ItemsLibrary{
 
     // MAIN FUNCTIONALITY /////////////////////////////////////////
     function addItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
-        ItemNotActivated(manipulateItemstruct.item, itemStruct)
-        ItemNotPending(manipulateItemstruct.item, itemStruct)
     {
+        ItemNotActivated(manipulateItemstruct.item, itemStruct);
+        ItemNotPending(manipulateItemstruct.item, itemStruct);
+
         bytes32 item = manipulateItemstruct.item;
         string memory info = manipulateItemstruct.info;
 
@@ -166,9 +162,10 @@ library ItemsLibrary{
     }
      
     function removeItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
-        ItemActivated(manipulateItemstruct.item, itemStruct)
-        ItemNotPending(manipulateItemstruct.item, itemStruct)
     {
+        ItemActivated(manipulateItemstruct.item, itemStruct);
+        ItemNotPending(manipulateItemstruct.item, itemStruct);
+
         bytes32 item = manipulateItemstruct.item;
 
         itemStruct._pendingItemsRemove.push(item);
@@ -178,9 +175,10 @@ library ItemsLibrary{
     }
 
     function validateItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
-        ItemPending(manipulateItemstruct.item, itemStruct)
-        HasNotAlreadyVoted(manipulateItemstruct.item, itemStruct)
     {
+        ItemPending(manipulateItemstruct.item, itemStruct);
+        HasNotAlreadyVoted(msg.sender, manipulateItemstruct.item, itemStruct);
+
         (bytes32 item, uint _minSignatures, string memory ItemTypeLabel, uint[] memory ids) = ReturnManipulateStructContent(manipulateItemstruct);
 
         itemStruct._items[item]._Validations.push(msg.sender);
@@ -215,9 +213,10 @@ library ItemsLibrary{
     }
 
     function rejectItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public
-        ItemPending(manipulateItemstruct.item, itemStruct)
-        HasNotAlreadyVoted(manipulateItemstruct.item, itemStruct)
     {
+        ItemPending(manipulateItemstruct.item, itemStruct);
+        HasNotAlreadyVoted(msg.sender, manipulateItemstruct.item, itemStruct);
+
         (bytes32 item, uint _minSignatures, string memory ItemTypeLabel, uint[] memory ids) = ReturnManipulateStructContent(manipulateItemstruct);
 
         itemStruct._items[item]._Rejections.push(msg.sender);
