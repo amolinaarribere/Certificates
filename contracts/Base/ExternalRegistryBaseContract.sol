@@ -19,9 +19,9 @@ abstract contract ExternalRegistryBaseContract is IExternalRegistryBaseContract,
     address internal _ProposedRegistryAddress;
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function ExternalRegistryBaseContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer 
+    function ExternalRegistryBaseContract_init(address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress, contractName, contractVersion);
+        super.TokenGovernanceContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
     }
 
     // GOVERNANCE /////////////////////////////////////////

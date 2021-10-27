@@ -21,9 +21,9 @@ contract ENS is IENS, ExternalRegistryBaseContract {
     IENSRegistry internal _ENS;
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function ENS_init(address ENSRegistry, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, string memory contractName, string memory contractVersion) public initializer 
+    function ENS_init(address ENSRegistry, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
-        super.ExternalRegistryBaseContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress, contractName, contractVersion);
+        super.ExternalRegistryBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         _ENS = IENSRegistry(ENSRegistry);
     }
 

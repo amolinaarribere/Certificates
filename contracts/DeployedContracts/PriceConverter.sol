@@ -20,9 +20,9 @@ contract PriceConverter is IPriceConverter, ExternalRegistryBaseContract {
     uint8 constant _USDDecimals = 2;
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function PriceConverter_init(address registry, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, string memory contractName, string memory contractVersion) public initializer 
+    function PriceConverter_init(address registry, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
-        super.ExternalRegistryBaseContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress, contractName, contractVersion);
+        super.ExternalRegistryBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         _registry = FeedRegistryInterface(registry);
     }
 

@@ -41,7 +41,7 @@ contract PropositionSettings is IPropositionSettings, TokenGovernanceBaseContrac
     // CONSTRUCTOR /////////////////////////////////////////
     function PropositionSettings_init(address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, string memory contractName, string memory contractVersion) public initializer 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress, contractName, contractVersion);
+        super.TokenGovernanceContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         InternalupdateSettings(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
     }
 

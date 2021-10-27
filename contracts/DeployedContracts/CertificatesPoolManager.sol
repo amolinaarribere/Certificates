@@ -70,9 +70,9 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     }
 
     // CONSTRUCTOR and INITIALIZATION /////////////////////////////////////////
-    constructor(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, string memory contractName, string memory contractVersion) 
+    constructor(string memory contractName, string memory contractVersion) 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, msg.sender, address(this), contractName, contractVersion);
+        super.TokenGovernanceContract_init(msg.sender, address(this), contractName, contractVersion);
         _Admin = new ProxyAdmin();
         _init = false;
     }
