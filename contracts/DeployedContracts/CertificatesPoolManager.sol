@@ -24,7 +24,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     // EVENTS /////////////////////////////////////////
     event _NewContracts(address Public, address Treasury, address Certis, address PrivateFactory, 
-    address Private, address ProviderFactory, address Provider, address PriceConverter);
+    address Private, address ProviderFactory, address Provider, address PriceConverter, address PropositionSettings);
 
     // DATA /////////////////////////////////////////
     // Admin Proxy to manage all the TransparentUpgradeableProxies
@@ -49,7 +49,6 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
     TransparentUpgradeableProxy private _PublicCertificatesPool;
 
     // Treasury
-    //GenericProxy private _Treasury;
     TransparentUpgradeableProxy private _Treasury;
 
     // Certis Token
@@ -57,6 +56,9 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     // Price Converter
     TransparentUpgradeableProxy private _PriceConverter;
+
+    // Proposition Settings
+    TransparentUpgradeableProxy private _PropositionSettings;
 
     // init
     bool private _init;
@@ -115,7 +117,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     function retrieveProposition() external override view returns(bytes32[] memory)
     {
-        bytes32[] memory proposition = new bytes32[](8);
+        bytes32[] memory proposition = new bytes32[](9);
         proposition[0] = AddressLibrary.AddressToBytes32(_ProposedContracts.NewPublicPoolAddress);
         proposition[1] = AddressLibrary.AddressToBytes32(_ProposedContracts.NewTreasuryAddress);
         proposition[2] = AddressLibrary.AddressToBytes32(_ProposedContracts.NewCertisTokenAddress);
@@ -124,6 +126,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         proposition[5] = AddressLibrary.AddressToBytes32(_ProposedContracts.NewProviderFactoryAddress);
         proposition[6] = AddressLibrary.AddressToBytes32(_ProposedContracts.NewProviderAddress);
         proposition[7] = AddressLibrary.AddressToBytes32(_ProposedContracts.NewPriceConverterAddress);
+        proposition[8] = AddressLibrary.AddressToBytes32(_ProposedContracts.NewPropositionSettingsAddress);
         return proposition;
     }
 
@@ -137,6 +140,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         _ProviderFactory = new TransparentUpgradeableProxy(initialContracts.NewProviderFactoryAddress, address(_Admin), initialContracts.NewProviderFactoryData);
         _ProviderBeacon = new UpgradeableBeacon(initialContracts.NewProviderAddress);
         _PriceConverter = new TransparentUpgradeableProxy(initialContracts.NewPriceConverterAddress, address(_Admin), initialContracts.NewPriceConverterData);
+        _PropositionSettings = new TransparentUpgradeableProxy(initialContracts.NewPropositionSettingsAddress, address(_Admin), initialContracts.NewPropositionSettingsData);
 
         IFactory(address(_PrivatePoolFactory)).updateContractName(initialContracts.NewPrivatePoolContractName);
         IFactory(address(_PrivatePoolFactory)).updateContractVersion(initialContracts.NewPrivatePoolContractVersion);
@@ -150,6 +154,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         upgradeContractImplementation(_PrivatePoolFactory, _ProposedContracts.NewPrivatePoolFactoryAddress, _ProposedContracts.NewPrivatePoolFactoryData);
         upgradeContractImplementation(_ProviderFactory, _ProposedContracts.NewProviderFactoryAddress, _ProposedContracts.NewProviderFactoryData);
         upgradeContractImplementation(_PriceConverter, _ProposedContracts.NewPriceConverterAddress, _ProposedContracts.NewPriceConverterData);
+        upgradeContractImplementation(_PropositionSettings, _ProposedContracts.NewPropositionSettingsAddress, _ProposedContracts.NewPropositionSettingsData);
 
         if(address(0) != _ProposedContracts.NewPrivatePoolAddress)_PrivateCertificatePoolBeacon.upgradeTo(_ProposedContracts.NewPrivatePoolAddress);
         if(address(0) != _ProposedContracts.NewProviderAddress)_ProviderBeacon.upgradeTo(_ProposedContracts.NewProviderAddress);
@@ -163,7 +168,7 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         emit _NewContracts(internalRetrieveImpl(_PublicCertificatesPool), internalRetrieveImpl(_Treasury), 
         internalRetrieveImpl(_CertisToken), internalRetrieveImpl(_PrivatePoolFactory), 
         internalRetrievePrivatePool(), internalRetrieveImpl(_ProviderFactory), internalRetrieveProvider(),
-        internalRetrieveImpl(_PriceConverter));
+        internalRetrieveImpl(_PriceConverter), internalRetrieveImpl(_PropositionSettings));
     }
 
     function upgradeContractImplementation(TransparentUpgradeableProxy proxy, address NewImpl, bytes memory Data) private
@@ -203,8 +208,12 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
         return (address(_ProviderBeacon));
     }
 
-     function retrievePriceConverterProxy() external override view returns (address) {
+    function retrievePriceConverterProxy() external override view returns (address) {
         return (address(_PriceConverter));
+    }
+
+    function retrievePropositionSettingsProxy() external override view returns (address) {
+        return (address(_PropositionSettings));
     }
 
     // configuration implementations
@@ -238,6 +247,10 @@ contract CertificatesPoolManager is IProxyManager, TokenGovernanceBaseContract{
 
     function retrievePriceConverter() external override view returns (address) {
         return internalRetrieveImpl(_PriceConverter);
+    }
+
+    function retrievePropositionSettings() external override view returns (address) {
+        return internalRetrieveImpl(_PropositionSettings);
     }
 
     function isInitialized() external override view returns(bool){

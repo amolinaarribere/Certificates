@@ -23,12 +23,14 @@ library Library{
         address NewProviderFactoryAddress;
         address NewProviderAddress;
         address NewPriceConverterAddress;
+        address NewPropositionSettingsAddress;
         bytes NewPublicPoolData;
         bytes NewTreasuryData;
         bytes NewCertisTokenData;
         bytes NewPrivatePoolFactoryData;
         bytes NewProviderFactoryData;
         bytes NewPriceConverterData;
+        bytes NewPropositionSettingsData;
         string NewPrivatePoolContractName;
         string NewPrivatePoolContractVersion;
     }
