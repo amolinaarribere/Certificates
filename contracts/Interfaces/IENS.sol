@@ -7,8 +7,8 @@ pragma solidity 0.8.7;
  * @dev Store & retrieve value in a variable
  */
 
- interface IPriceConverter  {
+ interface IENS  {
 
-    function fromUSDToETH(uint) external view returns(uint);
+    function createSubdomain(bytes32 node, bytes32 label, address resolver, uint64 ttl, address addr) external;
 
 }
