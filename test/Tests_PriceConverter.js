@@ -225,14 +225,4 @@ contract("Testing Price Converter",function(accounts){
         
     });
 
-    // ****** Testing Propostion Configuration ***************************************************************** // 
-
-    it("Vote/Propose/Cancel Prop Configuration WRONG",async function(){
-        await proposition.Config_Proposition_Wrong(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson);
-    });
-
-    it("Vote/Propose/Cancel Prop Configuration CORRECT",async function(){
-        await proposition.Config_Proposition_Correct(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson);
-    });
-
 });

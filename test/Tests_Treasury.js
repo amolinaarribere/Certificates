@@ -231,16 +231,6 @@ contract("Testing Treasury",function(accounts){
         
     });
 
-    // ****** Testing Propostion Configuration ***************************************************************** // 
-
-    it("Vote/Propose/Cancel Prop Configuration WRONG",async function(){
-        await proposition.Config_Proposition_Wrong(Treasury, certisTokenProxy, tokenOwner, user_1, chairPerson);
-    });
-
-    it("Vote/Propose/Cancel Prop Configuration CORRECT",async function(){
-        await proposition.Config_Proposition_Correct(Treasury, certisTokenProxy, tokenOwner, user_1, chairPerson);
-    });
-
     // ****** TESTING Paying ***************************************************************** //
 
     it("Pay New Proposal & New Pool & New Certificate & New Provider WRONG",async function(){

@@ -5,6 +5,7 @@ const PrivateCertificatesPool = artifacts.require("PrivateCertificatesPool");
 const Provider = artifacts.require("Provider");
 const CertisToken = artifacts.require("CertisToken");
 const PriceConverter = artifacts.require("PriceConverter");
+const PropositionSettings = artifacts.require("PropositionSettings");
 const MockChainLinkFeedRegistry = artifacts.require("MockChainLinkFeedRegistry"); // Mock
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const ProviderFactory = artifacts.require("ProviderFactory");
@@ -34,14 +35,11 @@ const TreasuryContractName = constants.TreasuryContractName;
 const TreasuryContractVersion = constants.TreasuryContractVersion;
 const PriceConverterContractName = constants.PriceConverterContractName;
 const PriceConverterContractVersion = constants.PriceConverterContractVersion;
+const PropositionSettingsContractName = constants.PropositionSettingsContractName;
+const PropositionSettingsContractVersion = constants.PropositionSettingsContractVersion;
 
-const PriceConverterProxyInitializerMethod = {
+const PropositionSettingsProxyInitializerMethod = {
   "inputs": [
-    {
-      "internalType": "address",
-      "name": "registry",
-      "type": "address"
-    },
     {
       "internalType": "address",
       "name": "managerContractAddress",
@@ -66,6 +64,39 @@ const PriceConverterProxyInitializerMethod = {
       "internalType": "uint8",
       "name": "minWeightToProposePercentage",
       "type": "uint8"
+    },
+    {
+      "internalType": "string",
+      "name": "contractName",
+      "type": "string"
+    },
+    {
+      "internalType": "string",
+      "name": "contractVersion",
+      "type": "string"
+    }
+  ],
+  "name": "PropositionSettings_init",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+};
+const PriceConverterProxyInitializerMethod = {
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "registry",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "managerContractAddress",
+      "type": "address"
+    },
+    {
+      "internalType": "address",
+      "name": "chairPerson",
+      "type": "address"
     },
     {
       "internalType": "string",
@@ -159,21 +190,6 @@ const TreasuryProxyInitializerMethod = {
       "type": "address"
     },
     {
-      "internalType": "uint256",
-      "name": "PropositionLifeTime",
-      "type": "uint256"
-    },
-    {
-      "internalType": "uint8",
-      "name": "PropositionThresholdPercentage",
-      "type": "uint8"
-    },
-    {
-      "internalType": "uint8",
-      "name": "minWeightToProposePercentage",
-      "type": "uint8"
-    },
-    {
       "internalType": "string",
       "name": "contractName",
       "type": "string"
@@ -250,12 +266,12 @@ const PublicCertificatesPoolProxyInitializerMethod = {
 };
 
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
-  let certPoolManager = await CertificatesPoolManager.new(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, CertificateManagerContractName, CertificateManagerContractVersion, {from: chairPerson});
+  let certPoolManager = await CertificatesPoolManager.new(CertificateManagerContractName, CertificateManagerContractVersion, {from: chairPerson});
   let implementations = await deployImplementations(user_1);
   let ProxyData = returnProxyInitData(PublicOwners, minOwners, certPoolManager.address, chairPerson, implementations[8]);
 
-  await certPoolManager.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6], implementations[7],
-    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5], PrivatePoolContractName, PrivatePoolContractVersion), {from: chairPerson});
+  await certPoolManager.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6], implementations[7], implementations[9],
+    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5], ProxyData[6], PrivatePoolContractName, PrivatePoolContractVersion), {from: chairPerson});
 
   let proxies = await retrieveProxies(certPoolManager, user_1);
 
@@ -271,9 +287,10 @@ async function deployImplementations(user_1){
     let providerFactory = await ProviderFactory.new({from: user_1});
     let provider = await Provider.new({from: user_1});
     let priceConverter = await PriceConverter.new({from: user_1});
+    let propositionSettings = await PropositionSettings.new({from: user_1});
     let mockChainLinkFeedRegistry = await MockChainLinkFeedRegistry.new(rate, decimals, {from: user_1}); // Mock
 
-    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address];
+    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address];
 }
 
 async function retrieveProxies(certPoolManager, user_1){
@@ -283,8 +300,9 @@ async function retrieveProxies(certPoolManager, user_1){
   let privatePoolFactoryProxy = await certPoolManager.retrievePrivatePoolFactoryProxy({from: user_1});
   let providerFactoryProxy = await certPoolManager.retrieveProviderFactoryProxy({from: user_1});
   let priceConverterProxy = await certPoolManager.retrievePriceConverterProxy({from: user_1});
+  let propositionSettingsProxy = await certPoolManager.retrievePropositionSettingsProxy({from: user_1});
 
-  return [publicPoolProxy, treasuryProxy, certisTokenProxy, privatePoolFactoryProxy, providerFactoryProxy, priceConverterProxy];
+  return [publicPoolProxy, treasuryProxy, certisTokenProxy, privatePoolFactoryProxy, providerFactoryProxy, priceConverterProxy, propositionSettingsProxy];
 }
 
 function getProxyData(method, parameters){
@@ -294,12 +312,13 @@ function getProxyData(method, parameters){
 function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPerson, mockChainLinkFeedRegistry){
   let CertisProxyData = getProxyData(CertisTokenProxyInitializerMethod, ["Certis Token for Test", "CERT", TotalTokenSupply, certPoolManager, 0, chairPerson]);
   let PublicCertificatesPoolProxyData = getProxyData(PublicCertificatesPoolProxyInitializerMethod, [PublicOwners, minOwners, certPoolManager, PublicPoolContractName, PublicPoolContractVersion]);
-  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD, certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, TreasuryContractName, TreasuryContractVersion]);
+  let TreasuryProxyData = getProxyData(TreasuryProxyInitializerMethod, [PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD, certPoolManager, chairPerson, TreasuryContractName, TreasuryContractVersion]);
   let PrivatePoolFactoryProxyData = getProxyData(PrivatePoolFactoryProxyInitializerMethod, [certPoolManager]);
   let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
-  let PriceConverterProxyData = getProxyData(PriceConverterProxyInitializerMethod, [mockChainLinkFeedRegistry, certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, PriceConverterContractName, PriceConverterContractVersion]);
+  let PriceConverterProxyData = getProxyData(PriceConverterProxyInitializerMethod, [mockChainLinkFeedRegistry, certPoolManager, chairPerson, PriceConverterContractName, PriceConverterContractVersion]);
+  let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion]);
 
-  return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData, PriceConverterProxyData];
+  return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData, PriceConverterProxyData, PropositionSettingsProxyData];
 }
 
 exports.InitializeContracts = InitializeContracts;

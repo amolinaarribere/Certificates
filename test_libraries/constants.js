@@ -20,6 +20,8 @@ const TreasuryContractName = "Treasury";
 const TreasuryContractVersion = "1.0";
 const PriceConverterContractName = "Price Converter";
 const PriceConverterContractVersion = "1.0";
+const PropositionSettingsContractName = "Proposition Settings";
+const PropositionSettingsContractVersion = "1.0";
 
 exports.PublicPriceUSD = PublicPriceUSD;
 exports.PrivatePriceUSD = PrivatePriceUSD;
@@ -43,3 +45,5 @@ exports.TreasuryContractName = TreasuryContractName;
 exports.TreasuryContractVersion = TreasuryContractVersion;
 exports.PriceConverterContractName = PriceConverterContractName;
 exports.PriceConverterContractVersion = PriceConverterContractVersion;
+exports.PropositionSettingsContractName = PropositionSettingsContractName;
+exports.PropositionSettingsContractVersion = PropositionSettingsContractVersion;
