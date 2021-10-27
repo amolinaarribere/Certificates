@@ -27,7 +27,7 @@ async function SplitTokenSupply(CT, tokenOwner, chairPerson){
 }
 
 async function checkProp(_plt, _ptp, _mp, user_1, contractAddress){
-    const{0:plt,1:ptp,2:mp} = await contractAddress.methods.retrievePropConfig().call({from: user_1}, function(error, result){});
+    const{0:plt,1:ptp,2:mp} = await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     expect(parseInt(plt)).to.be.equal(_plt);
     expect(parseInt(ptp)).to.be.equal(_ptp);
     expect(parseInt(mp)).to.be.equal(_mp);
@@ -37,7 +37,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     // act
     await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
     try{
-        await contractAddress.methods.updateProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1, gas: Gas}, function(error, result){});
+        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -46,7 +46,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // act
     try{
-        await contractAddress.methods.updateProp(PropositionLifeTime, 101, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.updateSettings(PropositionLifeTime, 101, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -55,7 +55,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // act
     try{
-        await contractAddress.methods.updateProp(PropositionLifeTime, PropositionThresholdPercentage, 101).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, 101).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -82,7 +82,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // act
     try{
-        await contractAddress.methods.updateProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
         await contractAddress.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
@@ -101,7 +101,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // act
     try{
-        await contractAddress.methods.updateProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -137,7 +137,7 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
     await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
 
     // Rejected
-     await contractAddress.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+     await contractAddress.methods.updateSettings(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
      await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
      await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, user_1, contractAddress);
      await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
@@ -148,7 +148,7 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
      await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, user_1, contractAddress);
 
      // Cancelled
-     await contractAddress.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+     await contractAddress.methods.updateSettings(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
      await contractAddress.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
      await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, user_1, contractAddress);
      await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
@@ -158,7 +158,7 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
 
 
      // Validated
-     await contractAddress.methods.updateProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+     await contractAddress.methods.updateSettings(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
      await contractAddress.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
      await checkProp(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, user_1, contractAddress);
      await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
@@ -167,7 +167,7 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
      await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1, user_1, contractAddress);
 
     // Validated again
-     await contractAddress.methods.updateProp(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
+     await contractAddress.methods.updateSettings(PropositionLifeTime + 2, PropositionThresholdPercentage + 2, minPercentageToPropose + 2).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
      await contractAddress.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
      await checkProp(PropositionLifeTime + 1, PropositionThresholdPercentage + 1, minPercentageToPropose + 1, user_1, contractAddress);
      await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});

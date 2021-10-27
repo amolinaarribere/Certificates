@@ -1,20 +1,10 @@
 // Chai library for testing
 // ERROR tests = First we test the error message then we test the action was not carried out
 
-const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
-const CertificatesPoolManagerAbi = CertificatesPoolManager.abi;
-const Treasury = artifacts.require("Treasury");
-const TreasuryAbi = Treasury.abi;
-const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
-const PublicCertificatesPoolAbi = PublicCertificatesPool.abi;
 const CertisToken = artifacts.require("CertisToken");
 const CertisTokenAbi = CertisToken.abi;
-const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
-const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
-const ProviderFactory = artifacts.require("ProviderFactory");
-const ProviderFactoryAbi = ProviderFactory.abi;
-const PriceConverter = artifacts.require("PriceConverter");
-const PriceConverterAbi = PriceConverter.abi;
+const PropositionSettings = artifacts.require("PropositionSettings");
+const PropositionSettingsAbi = PropositionSettings.abi;
 
 const init = require("../test_libraries/InitializeContracts.js");
 const proposition = require("../test_libraries/Propositions.js");
@@ -23,7 +13,7 @@ const proposition = require("../test_libraries/Propositions.js");
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
-contract("Testing Price Converter",function(accounts){
+contract("Testing Proposition Settings",function(accounts){
     var certPoolManager;
     var certisTokenProxy;
     var propositionSettingsProxy;
@@ -39,7 +29,7 @@ contract("Testing Price Converter",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
-        propositionSettingsProxy = new web3.eth.Contract(PriceConverterAbi, contracts[1][5]);
+        propositionSettingsProxy = new web3.eth.Contract(PropositionSettingsAbi, contracts[1][6]);
     });
 
 
