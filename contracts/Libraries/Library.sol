@@ -24,6 +24,7 @@ library Library{
         address NewProviderAddress;
         address NewPriceConverterAddress;
         address NewPropositionSettingsAddress;
+        address NewENSAddress;
         bytes NewPublicPoolData;
         bytes NewTreasuryData;
         bytes NewCertisTokenData;
@@ -31,6 +32,7 @@ library Library{
         bytes NewProviderFactoryData;
         bytes NewPriceConverterData;
         bytes NewPropositionSettingsData;
+        bytes NewENSData;
         string NewPrivatePoolContractName;
         string NewPrivatePoolContractVersion;
     }

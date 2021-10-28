@@ -21,6 +21,7 @@ pragma solidity 0.8.7;
     function retrieveProviderBeacon() external view returns (address);
     function retrievePriceConverterProxy() external view returns (address);
     function retrievePropositionSettingsProxy() external view returns (address);
+    function retrieveENSProxy() external view returns (address);
 
     function retrievePublicCertificatePool() external view returns (address);
     function retrieveTreasury() external view returns (address);
@@ -31,6 +32,7 @@ pragma solidity 0.8.7;
     function retrieveProvider() external view returns (address);
     function retrievePriceConverter() external view returns (address);
     function retrievePropositionSettings() external view returns (address);
+    function retrieveENS() external view returns (address);
 
     function isInitialized() external view returns(bool);
 }

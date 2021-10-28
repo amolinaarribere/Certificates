@@ -23,9 +23,10 @@ pragma solidity 0.8.7;
  */
 
  import '../Interfaces/IFactory.sol';
+ import '../Interfaces/IENS.sol';
  import "../Base/ManagedBaseContract.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
+ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     using Library for *;
@@ -63,10 +64,13 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function internalCreate(address beaconProxyAddress, string memory elementName) internal
+    function internalCreate(address beaconAddress, bytes memory data, string memory elementName, bytes32 ENSLabel) internal
     {
-        _ElementStruct memory element = _ElementStruct(msg.sender, beaconProxyAddress);
+        BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);
+        _ElementStruct memory element = _ElementStruct(msg.sender, address(beaconProxy));
         _Elements.push(element);
+
+        if(ENSLabel > 0)IENS(_managerContract.retrieveENSProxy()).createSubdomain(ENSLabel);
 
         emit _NewElement(_FactoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
     }

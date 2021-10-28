@@ -10,7 +10,7 @@ pragma solidity 0.8.7;
 
 interface IFactory {
 
-    function create(address[] memory owners,  uint256 minOwners, string memory ElementName) external payable;
+    function create(address[] memory owners,  uint256 minOwners, string memory ElementName, bytes32 ENSLabel) external payable;
     function updateContractName(string memory contractName) external;
     function updateContractVersion(string memory contractVersion) external;
 

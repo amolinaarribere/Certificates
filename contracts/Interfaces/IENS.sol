@@ -9,6 +9,6 @@ pragma solidity 0.8.7;
 
  interface IENS  {
 
-    function createSubdomain(bytes32 node, bytes32 label, address resolver, uint64 ttl, address addr) external;
+    function createSubdomain(bytes32 label) external;
 
 }
