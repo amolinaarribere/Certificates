@@ -42,6 +42,7 @@ contract("Testing Price Converter",function(accounts){
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     const address_1 = "0x0000000000000000000000000000000000000001";
+    const OthersEmpty = []
     // test constants
     const Unauthorized = new RegExp("EC8-");
     const CannotProposeChanges = new RegExp("EC22-");
@@ -56,13 +57,8 @@ contract("Testing Price Converter",function(accounts){
         certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
         priceConverterProxy = new web3.eth.Contract(PriceConverterAbi, contracts[1][5]);
         priceConverter = contracts[2][7];
-        registryAddress = await priceConverterProxy.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
+        //registryAddress = await priceConverterProxy.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
     });
-
-    async function checkAddress(_address){
-        let _registryAddress =  await priceConverterProxy.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
-        expect(_address).to.equal(_registryAddress);
-    }
 
     async function checkProposition(_address){
         var propositionResult = await priceConverterProxy.methods.retrieveProposition().call({from: user_1}, function(error, result){});
@@ -85,7 +81,7 @@ contract("Testing Price Converter",function(accounts){
     it("Retrieve Proposals Details",async function(){
         // act
         await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-        await priceConverterProxy.methods.updateRegistryAddress(address_1).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await priceConverterProxy.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
         // assert
         await checkProposition(address_1);
         
@@ -94,135 +90,11 @@ contract("Testing Price Converter",function(accounts){
     // ****** Testing Registry Configuration ***************************************************************** //
    
     it("Vote/Propose/Cancel Registry Address WRONG",async function(){
-         // act
-         await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-         // act
-        try{
-            await priceConverterProxy.methods.updateRegistryAddress(address_1).send({from: user_1, gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(CannotProposeChanges);
-        }
-        // act
-        try{
-            await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NoPropositionActivated);
-        }
-        // act
-        try{
-            await priceConverterProxy.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NoPropositionActivated);
-        }
-        // act
-        try{
-            await priceConverterProxy.methods.updateRegistryAddress(address_1).send({from: chairPerson, gas: Gas}, function(error, result){});
-            await priceConverterProxy.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(CanNotVote);
-        }
-        // act
-        try{
-            await priceConverterProxy.methods.cancelProposition().send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(Unauthorized);
-        }
-        // act
-        try{
-            await priceConverterProxy.methods.updateRegistryAddress(address_1).send({from: chairPerson, gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(PropositionAlreadyInProgress);
-        }
-        // act
-        try{
-            await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-            await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(CanNotVote);
-        }
-        // act
-        try{
-            await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-            await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-            await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NoPropositionActivated);
-        }
-        
+        await proposition.Config_RegistryOnly_Wrong(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty);
     });
 
     it("Vote/Propose/Cancel Registry Address CORRECT",async function(){
-        // act
-        await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-
-        // Rejected 
-        await priceConverterProxy.methods.updateRegistryAddress(address_1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-
-        // Cancelled
-        await priceConverterProxy.methods.updateRegistryAddress(address_1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-
-        // Validated
-        await priceConverterProxy.methods.updateRegistryAddress(address_1).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-        await checkAddress(address_1);
-
-        // Validated again
-        await priceConverterProxy.methods.updateRegistryAddress(registryAddress).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await checkAddress(address_1);
-        await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        await checkAddress(address_1);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-        await checkAddress(address_1);
-        await priceConverterProxy.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-        await checkAddress(address_1);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
-        await checkAddress(address_1);
-        await priceConverterProxy.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
-        await checkAddress(registryAddress);
-        
+        await proposition.Config_RegistryOnly_Correct(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty);
     });
 
 });

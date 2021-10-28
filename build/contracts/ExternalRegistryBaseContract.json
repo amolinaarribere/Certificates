@@ -476,39 +476,39 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n Price Converter is an interface to the Chain Link Price Registry for USD to ETH exchange\r\n */\r\n\r\nimport \"../Base/TokenGovernanceBaseContract.sol\";\r\nimport \"../Interfaces/IExternalRegistryBaseContract.sol\";\r\n\r\n\r\nabstract contract ExternalRegistryBaseContract is IExternalRegistryBaseContract, TokenGovernanceBaseContract {\r\n\r\n    // DATA /////////////////////////////////////////\r\n    address internal _ProposedRegistryAddress;\r\n\r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function ExternalRegistryBaseContract_init(address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer \r\n    {\r\n        super.TokenGovernanceContract_init(chairPerson, managerContractAddress, contractName, contractVersion);\r\n    }\r\n\r\n    // GOVERNANCE /////////////////////////////////////////\r\n    function update(address NewRegistryAddress, bytes32[] memory NewOthers) external override\r\n    {\r\n        addProposition();\r\n        _ProposedRegistryAddress = NewRegistryAddress;\r\n        updateOthers(NewOthers);\r\n    }\r\n\r\n    function propositionApproved() internal override\r\n    {\r\n        UpdateAll();\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionRejected() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionExpired() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function removeProposition() internal\r\n    {\r\n        delete(_ProposedRegistryAddress);\r\n        removePropositionPOST();\r\n    }\r\n\r\n    function retrieveProposition() external override view returns(bytes32[] memory)\r\n    {\r\n        bytes32[] memory propositionOthers = retrievePropositionOthers();\r\n        bytes32[] memory proposition = new bytes32[](propositionOthers.length + 1);\r\n        proposition[0] = AddressLibrary.AddressToBytes32(_ProposedRegistryAddress);\r\n\r\n        for(uint i=0; i < propositionOthers.length; i++){\r\n            proposition[i + 1] = propositionOthers[i];\r\n        }\r\n        \r\n        return proposition;\r\n    }\r\n\r\n    function updateOthers(bytes32[] memory NewOthers) internal virtual;\r\n\r\n    function removePropositionPOST() internal virtual;\r\n\r\n    function UpdateAll() internal virtual;\r\n\r\n    function retrieveRegistryAddress() external override virtual view returns(address);\r\n\r\n    function retrievePropositionOthers() internal virtual view returns(bytes32[] memory);\r\n\r\n}",
-  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Base/ExternalRegistryBaseContract.sol",
+  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Base\\ExternalRegistryBaseContract.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/ExternalRegistryBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        4129
+        8706
       ],
       "ExternalRegistryBaseContract": [
         2097
       ],
       "IERC20Upgradeable": [
-        5922
+        12026
       ],
       "IExternalRegistryBaseContract": [
-        3393
+        7970
       ],
       "IPropositionSettings": [
-        3662
+        8239
       ],
       "IProxyManager": [
-        3891
+        8468
       ],
       "ISignatureBaseContract": [
-        3911
+        8488
       ],
       "ITokenEventSubscriber": [
-        3924
+        8501
       ],
       "Initializable": [
-        5844
+        11375
       ],
       "Library": [
-        5385
+        9962
       ],
       "ManagedBaseContract": [
         2151
@@ -517,7 +517,7 @@
         2285
       ],
       "SignatureLibrary": [
-        5668
+        10245
       ],
       "TokenGovernanceBaseContract": [
         3205
@@ -556,7 +556,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2098,
-        "sourceUnit": 3394,
+        "sourceUnit": 7971,
         "src": "219:57:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -569,7 +569,7 @@
               "id": 1921,
               "name": "IExternalRegistryBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3393,
+              "referencedDeclaration": 7970,
               "src": "332:29:4"
             },
             "id": 1922,
@@ -597,11 +597,11 @@
           2097,
           3205,
           2151,
-          5844,
+          11375,
           2285,
-          3911,
-          3924,
-          3393
+          8488,
+          8501,
+          7970
         ],
         "name": "ExternalRegistryBaseContract",
         "nameLocation": "300:28:4",
@@ -771,7 +771,7 @@
                   "id": 1936,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 5843,
+                  "referencedDeclaration": 11374,
                   "src": "729:11:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -912,7 +912,7 @@
           },
           {
             "baseFunctions": [
-              3387
+              7964
             ],
             "body": {
               "id": 1969,
@@ -1855,10 +1855,10 @@
                           "name": "AddressLibrary",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 4129,
+                          "referencedDeclaration": 8706,
                           "src": "1895:14:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_AddressLibrary_$4129_$",
+                            "typeIdentifier": "t_type$_t_contract$_AddressLibrary_$8706_$",
                             "typeString": "type(library AddressLibrary)"
                           }
                         },
@@ -1869,7 +1869,7 @@
                         "lValueRequested": false,
                         "memberName": "AddressToBytes32",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 4077,
+                        "referencedDeclaration": 8654,
                         "src": "1895:31:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_delegatecall_pure$_t_address_$returns$_t_bytes32_$",
@@ -2387,7 +2387,7 @@
           },
           {
             "baseFunctions": [
-              3392
+              7969
             ],
             "functionSelector": "e1f5f858",
             "id": 2090,
@@ -2525,34 +2525,34 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/ExternalRegistryBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        4129
+        8706
       ],
       "ExternalRegistryBaseContract": [
         2097
       ],
       "IERC20Upgradeable": [
-        5922
+        12026
       ],
       "IExternalRegistryBaseContract": [
-        3393
+        7970
       ],
       "IPropositionSettings": [
-        3662
+        8239
       ],
       "IProxyManager": [
-        3891
+        8468
       ],
       "ISignatureBaseContract": [
-        3911
+        8488
       ],
       "ITokenEventSubscriber": [
-        3924
+        8501
       ],
       "Initializable": [
-        5844
+        11375
       ],
       "Library": [
-        5385
+        9962
       ],
       "ManagedBaseContract": [
         2151
@@ -2561,7 +2561,7 @@
         2285
       ],
       "SignatureLibrary": [
-        5668
+        10245
       ],
       "TokenGovernanceBaseContract": [
         3205
@@ -2600,7 +2600,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2098,
-        "sourceUnit": 3394,
+        "sourceUnit": 7971,
         "src": "219:57:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2613,7 +2613,7 @@
               "id": 1921,
               "name": "IExternalRegistryBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3393,
+              "referencedDeclaration": 7970,
               "src": "332:29:4"
             },
             "id": 1922,
@@ -2641,11 +2641,11 @@
           2097,
           3205,
           2151,
-          5844,
+          11375,
           2285,
-          3911,
-          3924,
-          3393
+          8488,
+          8501,
+          7970
         ],
         "name": "ExternalRegistryBaseContract",
         "nameLocation": "300:28:4",
@@ -2815,7 +2815,7 @@
                   "id": 1936,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 5843,
+                  "referencedDeclaration": 11374,
                   "src": "729:11:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2956,7 +2956,7 @@
           },
           {
             "baseFunctions": [
-              3387
+              7964
             ],
             "body": {
               "id": 1969,
@@ -3899,10 +3899,10 @@
                           "name": "AddressLibrary",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 4129,
+                          "referencedDeclaration": 8706,
                           "src": "1895:14:4",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_AddressLibrary_$4129_$",
+                            "typeIdentifier": "t_type$_t_contract$_AddressLibrary_$8706_$",
                             "typeString": "type(library AddressLibrary)"
                           }
                         },
@@ -3913,7 +3913,7 @@
                         "lValueRequested": false,
                         "memberName": "AddressToBytes32",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 4077,
+                        "referencedDeclaration": 8654,
                         "src": "1895:31:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_delegatecall_pure$_t_address_$returns$_t_bytes32_$",
@@ -4431,7 +4431,7 @@
           },
           {
             "baseFunctions": [
-              3392
+              7969
             ],
             "functionSelector": "e1f5f858",
             "id": 2090,
@@ -4571,7 +4571,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-10-28T12:30:41.922Z",
+  "updatedAt": "2021-10-28T14:28:53.172Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

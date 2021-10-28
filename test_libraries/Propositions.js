@@ -33,6 +33,11 @@ async function checkProp(_plt, _ptp, _mp, user_1, contractAddress){
     expect(parseInt(mp)).to.be.equal(_mp);
 }
 
+async function checkAddress(contractAddress, _address){
+    let _registryAddress =  await contractAddress.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
+    expect(_address).to.equal(_registryAddress);
+}
+
 async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson){
     // act
     await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
@@ -181,7 +186,142 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
     
 };
 
+async function Config_RegistryOnly_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty){
+    // act
+    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
+    // act
+   try{
+       await contractAddress.methods.update(address_1, OthersEmpty).send({from: user_1, gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(CannotProposeChanges);
+   }
+   // act
+   try{
+       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(NoPropositionActivated);
+   }
+   // act
+   try{
+       await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(NoPropositionActivated);
+   }
+   // act
+   try{
+       await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
+       await contractAddress.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(CanNotVote);
+   }
+   // act
+   try{
+       await contractAddress.methods.cancelProposition().send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(Unauthorized);
+   }
+   // act
+   try{
+       await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(PropositionAlreadyInProgress);
+   }
+   // act
+   try{
+       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(CanNotVote);
+   }
+   // act
+   try{
+       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
+       expect.fail();
+   }
+   // assert
+   catch(error){
+       expect(error.message).to.match(NoPropositionActivated);
+   }
+   
+};
+
+async function Config_RegistryOnly_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty){
+   // act
+   let registryAddress = await contractAddress.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
+   await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
+
+   // Rejected 
+   await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+
+   // Cancelled
+   await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+
+   // Validated
+   await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, address_1);
+
+   // Validated again
+   await contractAddress.methods.update(registryAddress, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, address_1);
+   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, address_1);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, address_1);
+   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, address_1);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, address_1);
+   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
+   await checkAddress(contractAddress, registryAddress);
+   
+};
+
 exports.AddressToBytes32 = AddressToBytes32;
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;
 exports.Config_Proposition_Correct = Config_Proposition_Correct;
+exports.Config_RegistryOnly_Wrong = Config_RegistryOnly_Wrong;
+exports.Config_RegistryOnly_Correct = Config_RegistryOnly_Correct;
 exports.SplitTokenSupply = SplitTokenSupply;

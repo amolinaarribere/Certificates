@@ -83,13 +83,11 @@ contract ENS is IENS, ExternalRegistryBaseContract {
     {
         bytes32 node = _ProviderNode;
         if(msg.sender == _managerContract.retrievePrivatePoolFactoryProxy()) node = _PrivatePoolNode;
+
         bytes32 FullNode = keccak256(abi.encodePacked(node, label));
         require(false == check(FullNode), "EC37-");
-        require(true == check(node), "EC38-");
 
         address resolverAddress = _ENS.resolver(node);
-        require(address(0) != resolverAddress, "EC39-");
-
         uint64 ttl = _ENS.ttl(node);
 
         _ENS.setSubnodeRecord(node, label, address(this), resolverAddress, ttl);
