@@ -65,7 +65,7 @@ const ENSContractVersion = "1.0";
 module.exports = async function(deployer, network, accounts){
   let ChainLinkRegistryAddress = await ExternalRegistries.GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry, rate, MockDecimals);
 
-  let ENSresult = await ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockENSReverseRegistry);
+  let ENSresult = await ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockENSReverseRegistry, initNodes);
   let ENSRegistryAddress = ENSresult[0];
   let ENSReverseRegistryAddress = ENSresult[1];
 

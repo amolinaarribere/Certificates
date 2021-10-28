@@ -25,7 +25,7 @@ async function GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry,
   
 }
 
-async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry){
+async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry, initNodes){
     var ENSRegistryAddress = MainENSRegistryAddress;
     var ENSReverseRegistryAddress = MainENSReverseRegistryAddress;
 
@@ -38,7 +38,7 @@ async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolv
         let MockENSResolverInstance = await MockENSResolver.deployed();
         console.log("MockENSResolverInstance deployed : " + MockENSResolverInstance.address);
 
-        await deployer.deploy(MockENSRegistry);
+        await deployer.deploy(MockENSRegistry, initNodes, MockENSResolverInstance.address);
         let MockENSRegistryInstance = await MockENSRegistry.deployed();
         console.log("MockENSRegistryInstance deployed : " + MockENSRegistryInstance.address);
 

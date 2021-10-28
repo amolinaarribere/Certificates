@@ -15,21 +15,29 @@ contract MockENSRegistry is IENSRegistry{
     struct RegistryStruct{
         address resolver;
         uint64 ttl;
-        address owner;
+        address owner; // does not really matter a slong as it is not empty
     }
 
-    mapping(bytes32 => RegistryStruct) registry;
+    mapping(bytes32 => RegistryStruct) nodes;
+
+    constructor(bytes32[] memory initNodes, address resolver){
+        for(uint i = 0; i < initNodes.length; i++){
+            nodes[initNodes[i]].ttl = 0;
+            nodes[initNodes[i]].resolver = resolver;
+            nodes[initNodes[i]].owner = msg.sender;
+        }
+    }
 
     function resolver(bytes32 node) external override view returns (address){ 
-        return registry[node].resolver;
+        return nodes[node].resolver;
     }
 
     function owner(bytes32 node) external override view returns (address){ 
-        return registry[node].owner;
+        return nodes[node].owner;
     }
 
     function ttl(bytes32 node) external override view returns (uint64){ 
-        return registry[node].ttl;
+        return nodes[node].ttl;
     }
 
     function setOwner(bytes32 node, address owner) external override{}
@@ -44,14 +52,14 @@ contract MockENSRegistry is IENSRegistry{
     }
 
     function recordExists(bytes32 node) external override view returns (bool){
-        return (address(0) != registry[node].owner);
+        return (address(0) != nodes[node].owner);
     }
 
     function setSubnodeRecord(bytes32 node, bytes32 label, address owner, address resolver, uint64 ttl) external override {
         bytes32 FullNode = keccak256(abi.encodePacked(node, label));
-        registry[FullNode].resolver = resolver;
-        registry[FullNode].owner = owner;
-        registry[FullNode].ttl = ttl;
+        nodes[FullNode].resolver = resolver;
+        nodes[FullNode].owner = owner;
+        nodes[FullNode].ttl = ttl;
     }
 
 }
