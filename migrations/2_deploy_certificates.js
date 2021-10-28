@@ -8,7 +8,10 @@ let PrivatePoolFactory = artifacts.require("./DeployedContracts/PrivatePoolFacto
 let ProviderFactory = artifacts.require("./DeployedContracts/ProviderFactory");
 let PriceConverter = artifacts.require("./DeployedContracts/PriceConverter");
 let PropositionSettings = artifacts.require("./DeployedContracts/PropositionSettings");
+let ENS = artifacts.require("./DeployedContracts/ENS");
+
 let ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+let ENSRegistryAddress = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"
 // only for testing
 let MockChainLinkFeedRegistry = artifacts.require("./DeployedContracts/Mock/MockChainLinkFeedRegistry");
 
