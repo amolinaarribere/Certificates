@@ -20,22 +20,13 @@ contract MockENSRegistry is IENSRegistry{
 
     mapping(bytes32 => RegistryStruct) registry;
 
-    modifier isOwner(address addr, bytes32 node){
-        require(addr == registry[node].owner, "it is not the node owner");
-        _;
-    }
-
-    constructor(bytes32 _initlNode, address _resolver, uint64 _ttl, address _Owner){
-        registry[_initlNode].resolver = _resolver;
-        registry[_initlNode].ttl = _ttl;
-        registry[_initlNode].owner = _Owner;
-    }
-
     function resolver(bytes32 node) external override view returns (address){ 
         return registry[node].resolver;
     }
 
-    function owner(bytes32 node) external override view returns (address){ return address(0);}
+    function owner(bytes32 node) external override view returns (address){ 
+        return registry[node].owner;
+    }
 
     function ttl(bytes32 node) external override view returns (uint64){ 
         return registry[node].ttl;
@@ -56,7 +47,7 @@ contract MockENSRegistry is IENSRegistry{
         return (address(0) != registry[node].owner);
     }
 
-    function setSubnodeRecord(bytes32 node, bytes32 label, address owner, address resolver, uint64 ttl) external override isOwner(msg.sender, node){
+    function setSubnodeRecord(bytes32 node, bytes32 label, address owner, address resolver, uint64 ttl) external override {
         bytes32 FullNode = keccak256(abi.encodePacked(node, label));
         registry[FullNode].resolver = resolver;
         registry[FullNode].owner = owner;

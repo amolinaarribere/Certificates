@@ -12,9 +12,6 @@ import "../Interfaces/IExternalRegistryBaseContract.sol";
 
 abstract contract ExternalRegistryBaseContract is IExternalRegistryBaseContract, TokenGovernanceBaseContract {
 
-    // EVENTS /////////////////////////////////////////
-    event _NewRegistryAddress(address Registry);
-
     // DATA /////////////////////////////////////////
     address internal _ProposedRegistryAddress;
 
@@ -25,19 +22,17 @@ abstract contract ExternalRegistryBaseContract is IExternalRegistryBaseContract,
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function updateRegistryAddress(address NewRegistryAddress) external override
+    function update(address NewRegistryAddress, bytes32[] memory NewOthers) external override
     {
         addProposition();
         _ProposedRegistryAddress = NewRegistryAddress;
+        updateOthers(NewOthers);
     }
 
     function propositionApproved() internal override
     {
-        UpdateRegistry();
-        
+        UpdateAll();
         removeProposition();
-
-        emit _NewRegistryAddress(_ProposedRegistryAddress);
     }
 
     function propositionRejected() internal override
@@ -52,18 +47,31 @@ abstract contract ExternalRegistryBaseContract is IExternalRegistryBaseContract,
 
     function removeProposition() internal
     {
-         delete(_ProposedRegistryAddress);
+        delete(_ProposedRegistryAddress);
+        removePropositionPOST();
     }
 
     function retrieveProposition() external override view returns(bytes32[] memory)
     {
-        bytes32[] memory proposition = new bytes32[](1);
+        bytes32[] memory propositionOthers = retrievePropositionOthers();
+        bytes32[] memory proposition = new bytes32[](propositionOthers.length + 1);
         proposition[0] = AddressLibrary.AddressToBytes32(_ProposedRegistryAddress);
+
+        for(uint i=0; i < propositionOthers.length; i++){
+            proposition[i + 1] = propositionOthers[i];
+        }
+        
         return proposition;
     }
 
-    function UpdateRegistry() internal virtual;
+    function updateOthers(bytes32[] memory NewOthers) internal virtual;
+
+    function removePropositionPOST() internal virtual;
+
+    function UpdateAll() internal virtual;
 
     function retrieveRegistryAddress() external override virtual view returns(address);
+
+    function retrievePropositionOthers() internal virtual view returns(bytes32[] memory);
 
 }

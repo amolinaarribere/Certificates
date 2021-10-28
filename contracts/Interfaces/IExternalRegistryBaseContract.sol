@@ -9,7 +9,7 @@ pragma solidity 0.8.7;
 
  interface IExternalRegistryBaseContract  {
 
-    function updateRegistryAddress(address NewRegistryAddress) external;
+    function update(address NewRegistryAddress, bytes32[] memory NewOthers) external;
 
     function retrieveRegistryAddress() external view returns(address);
 

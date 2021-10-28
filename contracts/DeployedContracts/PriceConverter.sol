@@ -14,6 +14,9 @@ import "@chainlink/contracts/src/v0.8/Denominations.sol";
 
 contract PriceConverter is IPriceConverter, ExternalRegistryBaseContract {
 
+    // EVENTS /////////////////////////////////////////
+    event _NewRegistryAddress(address Registry);
+
     // DATA /////////////////////////////////////////
     FeedRegistryInterface internal _registry;
     uint8 constant _ETHDecimals = 18;
@@ -27,14 +30,24 @@ contract PriceConverter is IPriceConverter, ExternalRegistryBaseContract {
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function UpdateRegistry() internal override
+    function UpdateAll() internal override
     {
         _registry = FeedRegistryInterface(_ProposedRegistryAddress);
+        emit _NewRegistryAddress(_ProposedRegistryAddress);
     }
 
     function retrieveRegistryAddress() external override view returns(address)
     {
         return address(_registry);
+    }
+
+    function updateOthers(bytes32[] memory NewOthers) internal override{}
+
+    function removePropositionPOST() internal override{}
+
+    function retrievePropositionOthers() internal override view returns(bytes32[] memory)
+    {
+        return new bytes32[](0);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////

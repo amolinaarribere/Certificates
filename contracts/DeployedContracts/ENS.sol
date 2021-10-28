@@ -11,7 +11,6 @@ import "../Base/ExternalRegistryBaseContract.sol";
 import "../Interfaces/IENSRegistry.sol";
 import "../Interfaces/IENSResolver.sol";
 
-
 contract ENS is IENS, ExternalRegistryBaseContract {
 
     // EVENTS /////////////////////////////////////////
@@ -19,8 +18,11 @@ contract ENS is IENS, ExternalRegistryBaseContract {
 
     // DATA /////////////////////////////////////////
     IENSRegistry internal _ENS;
-    bytes32 public constant PRIVATEPOOL_NODE = 0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4; // privatepool.blockcerts.aljomoar.eth
-    bytes32 public constant PROVIDER_NODE = 0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799; // provider.blockcerts.aljomoar.eth
+    bytes32 internal _PrivatePoolNode; 
+    bytes32 internal _ProviderNode; 
+
+    bytes32 internal _ProposedPrivatePoolNode;
+    bytes32 internal _ProposedProviderNode;
 
     // MODIFIERS /////////////////////////////////////////
     modifier isFromAuthorizedContract(address addr){
@@ -30,16 +32,40 @@ contract ENS is IENS, ExternalRegistryBaseContract {
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function ENS_init(address ENSRegistry, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
+    function ENS_init(address ENSRegistry, bytes32[] memory nodes, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
         super.ExternalRegistryBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         _ENS = IENSRegistry(ENSRegistry);
+        _PrivatePoolNode = nodes[0];
+        _ProviderNode = nodes[1];
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function UpdateRegistry() internal override
+    function updateOthers(bytes32[] memory NewOthers) internal override
     {
-        _ENS = IENSRegistry(_ProposedRegistryAddress);
+        _ProposedPrivatePoolNode = NewOthers[0];
+        _ProposedProviderNode = NewOthers[1];
+    }
+
+    function UpdateAll() internal override
+    {
+        if(address(0) != _ProposedRegistryAddress)_ENS = IENSRegistry(_ProposedRegistryAddress);
+        if(_ProposedPrivatePoolNode > 0) _PrivatePoolNode = _ProposedPrivatePoolNode;
+        if(_ProposedProviderNode > 0)_ProviderNode = _ProposedProviderNode;
+    }
+
+    function removePropositionPOST() internal override
+    {
+        delete(_ProposedPrivatePoolNode);
+        delete(_ProposedProviderNode);
+    }
+
+    function retrievePropositionOthers() internal override view returns(bytes32[] memory)
+    {
+        bytes32[] memory proposition = new bytes32[](2);
+        proposition[0] = _ProposedPrivatePoolNode;
+        proposition[1] = _ProposedProviderNode;
+        return proposition;
     }
 
     function retrieveRegistryAddress() external override view returns(address)
@@ -55,8 +81,8 @@ contract ENS is IENS, ExternalRegistryBaseContract {
     function createSubdomain(bytes32 label) external override
         isFromAuthorizedContract(msg.sender)
     {
-        bytes32 node = PROVIDER_NODE;
-        if(msg.sender == _managerContract.retrievePrivatePoolFactoryProxy()) node = PRIVATEPOOL_NODE;
+        bytes32 node = _ProviderNode;
+        if(msg.sender == _managerContract.retrievePrivatePoolFactoryProxy()) node = _PrivatePoolNode;
         bytes32 FullNode = keccak256(abi.encodePacked(node, label));
         require(false == check(FullNode), "EC37-");
         require(true == check(node), "EC38-");
@@ -69,6 +95,14 @@ contract ENS is IENS, ExternalRegistryBaseContract {
         _ENS.setSubnodeRecord(node, label, address(this), resolverAddress, ttl);
         IENSResolver resolver = IENSResolver(resolverAddress);
         resolver.setAddr(FullNode, msg.sender);
+    }
+
+    function retrieveNodes() external override view returns(bytes32[] memory)
+    {
+        bytes32[] memory nodes = new bytes32[](2);
+        nodes[0] = _PrivatePoolNode;
+        nodes[1] = _ProviderNode;
+        return nodes;
     }
     
 

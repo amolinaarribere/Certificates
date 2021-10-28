@@ -1,3 +1,5 @@
+let ExternalRegistries = require("./ExternalRegistries.js");
+
 let CertificatesPoolManager = artifacts.require("./DeployedContracts/CertificatesPoolManager");
 let Provider = artifacts.require("./DeployedContracts/Provider");
 let Treasury = artifacts.require("./DeployedContracts/Treasury");
@@ -10,10 +12,12 @@ let PriceConverter = artifacts.require("./DeployedContracts/PriceConverter");
 let PropositionSettings = artifacts.require("./DeployedContracts/PropositionSettings");
 let ENS = artifacts.require("./DeployedContracts/ENS");
 
-let ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
-let ENSRegistryAddress = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"
 // only for testing
 let MockChainLinkFeedRegistry = artifacts.require("./DeployedContracts/Mock/MockChainLinkFeedRegistry");
+let MockENSRegistry = artifacts.require("./DeployedContracts/Mock/MockENSRegistry");
+let MockENSResolver = artifacts.require("./DeployedContracts/Mock/MockENSResolver");
+let MockReverseRegistry = artifacts.require("./DeployedContracts/Mock/MockReverseRegistry");
+
 
 
 const obj = require("../test_libraries/objects.js");
@@ -39,6 +43,9 @@ const CertificatePriceUSD = 1;
 const OwnerRefundFeeUSD = 3;
 const rate = 338495835524;
 const MockDecimals = 8;
+const ttl = 0;
+const initNodes = [0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4, 0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799]
+// privatepool.blockcerts.aljomoar.eth, provider.blockcerts.aljomoar.eth
 const PublicMinOwners = 1;
 const PublicPoolContractName = "Public Certificate Pool";
 const PublicPoolContractVersion = "1.0";
@@ -52,11 +59,13 @@ const PriceConverterContractName = "Price Converter";
 const PriceConverterContractVersion = "1.0";
 const PropositionSettingsContractName = "Proposition Settings";
 const PropositionSettingsContractVersion = "1.0";
+const ENSContractName = "ENS";
+const ENSContractVersion = "1.0";
 
 
 module.exports = async function(deployer, network, accounts){
 
-  if("kovan" == network)
+  /*if("kovan" == network)
   {
     ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
   }
@@ -64,14 +73,18 @@ module.exports = async function(deployer, network, accounts){
   {
     ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
   }
-
   else
   {
     await deployer.deploy(MockChainLinkFeedRegistry, rate, MockDecimals);
     MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
     console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
     ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
-  }
+  }*/
+  let ChainLinkRegistryAddress = ExternalRegistries.GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry, rate, MockDecimals);
+
+  let ENSresult = ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry, initNodes, ttl, ENSContractAddress);
+  let ENSRegistryAddress = ENSresult[0];
+  let ENSReverseRegistryAddress = ENSresult[1];
 
   const PublicOwners = [accounts[0]];
 
@@ -120,6 +133,63 @@ module.exports = async function(deployer, network, accounts){
   CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
 
+  // ENS -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, ENS);
+  console.log("Library linked to ENS");
+
+  await deployer.link(AddressLibrary, ENS);
+  console.log("AddressLibrary linked to ENS");
+
+  await deployer.link(SignatureLibrary, ENS);
+  console.log("SignatureLibrary linked to ENS");
+
+  await deployer.deploy(ENS);
+  ENSInstance = await ENS.deployed();
+  console.log("ENS deployed : " + ENSInstance.address);
+
+  var ENSProxyInitializerMethod = {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "ENSRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "nodes",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "contractName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "contractVersion",
+        "type": "string"
+      }
+    ],
+    "name": "ENS_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  };
+
+  var ENSProxyInitializerParameters = [, , CertificatesPoolManagerInstance.address, accounts[0], ENSContractName, ENSContractVersion];
+  var ENSProxyData = web3.eth.abi.encodeFunctionCall(ENSProxyInitializerMethod, ENSProxyInitializerParameters);
+
+  
   // Proposition Settings -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, PropositionSettings);
   console.log("Library linked to Proposition Settings");

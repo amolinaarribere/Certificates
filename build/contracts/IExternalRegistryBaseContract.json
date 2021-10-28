@@ -7,9 +7,14 @@
           "internalType": "address",
           "name": "NewRegistryAddress",
           "type": "address"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "NewOthers",
+          "type": "bytes32[]"
         }
       ],
-      "name": "updateRegistryAddress",
+      "name": "update",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -28,7 +33,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"retrieveRegistryAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"NewRegistryAddress\",\"type\":\"address\"}],\"name\":\"updateRegistryAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IExternalRegistryBaseContract.sol\":\"IExternalRegistryBaseContract\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IExternalRegistryBaseContract.sol\":{\"keccak256\":\"0xe7c9dcfb8d700ba2337e92af4e8091694b05cd60218d5520839291ed1b0412b3\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://3f3c6741dd3843b447920aba749c512aff7cee306418f202e466f5f647decb61\",\"dweb:/ipfs/QmR8SdmKY9Zwm4hnYcVb9sAe8gTa5AhcFw3sHQEvbQNmSM\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"retrieveRegistryAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"NewRegistryAddress\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"NewOthers\",\"type\":\"bytes32[]\"}],\"name\":\"update\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Store & retrieve value in a variable\",\"kind\":\"dev\",\"methods\":{},\"title\":\"Storage\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IExternalRegistryBaseContract.sol\":\"IExternalRegistryBaseContract\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IExternalRegistryBaseContract.sol\":{\"keccak256\":\"0x43bf49203303eae3f6bcc7a44fbf5b6c070daee903c85804a456bb9ff8698d12\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://15ad7f57359d60b996e4dd1e0de2bca4631296d59313ea2e56ab576a93d75c74\",\"dweb:/ipfs/QmVBNBtYdZL7K7xRQbj8Zv2eARgYzhQ86EcQUtAMowsQRa\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -36,28 +41,28 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n interface IExternalRegistryBaseContract  {\r\n\r\n    function updateRegistryAddress(address NewRegistryAddress) external;\r\n\r\n    function retrieveRegistryAddress() external view returns(address);\r\n\r\n}",
-  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IExternalRegistryBaseContract.sol",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n\r\n interface IExternalRegistryBaseContract  {\r\n\r\n    function update(address NewRegistryAddress, bytes32[] memory NewOthers) external;\r\n\r\n    function retrieveRegistryAddress() external view returns(address);\r\n\r\n}",
+  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Interfaces\\IExternalRegistryBaseContract.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IExternalRegistryBaseContract.sol",
     "exportedSymbols": {
       "IExternalRegistryBaseContract": [
-        2031
+        1797
       ]
     },
-    "id": 2032,
+    "id": 1798,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2019,
+        "id": 1782,
         "literals": [
           "solidity",
           "0.8",
           ".7"
         ],
         "nodeType": "PragmaDirective",
-        "src": "39:22:7"
+        "src": "39:22:8"
       },
       {
         "abstract": false,
@@ -65,42 +70,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 2020,
+          "id": 1783,
           "nodeType": "StructuredDocumentation",
-          "src": "65:73:7",
+          "src": "65:73:8",
           "text": " @title Storage\n @dev Store & retrieve value in a variable"
         },
         "fullyImplemented": false,
-        "id": 2031,
+        "id": 1797,
         "linearizedBaseContracts": [
-          2031
+          1797
         ],
         "name": "IExternalRegistryBaseContract",
-        "nameLocation": "153:29:7",
+        "nameLocation": "153:29:8",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "functionSelector": "c57a8825",
-            "id": 2025,
+            "functionSelector": "ed67335b",
+            "id": 1791,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "updateRegistryAddress",
-            "nameLocation": "202:21:7",
+            "name": "update",
+            "nameLocation": "202:6:8",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2023,
+              "id": 1789,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2022,
+                  "id": 1785,
                   "mutability": "mutable",
                   "name": "NewRegistryAddress",
-                  "nameLocation": "232:18:7",
+                  "nameLocation": "217:18:8",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2025,
-                  "src": "224:26:7",
+                  "scope": 1791,
+                  "src": "209:26:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -108,10 +113,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2021,
+                    "id": 1784,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "224:7:7",
+                    "src": "209:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -119,50 +124,86 @@
                     }
                   },
                   "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1788,
+                  "mutability": "mutable",
+                  "name": "NewOthers",
+                  "nameLocation": "254:9:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1791,
+                  "src": "237:26:8",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1786,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "237:7:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 1787,
+                    "nodeType": "ArrayTypeName",
+                    "src": "237:9:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "visibility": "internal"
                 }
               ],
-              "src": "223:28:7"
+              "src": "208:56:8"
             },
             "returnParameters": {
-              "id": 2024,
+              "id": 1790,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "260:0:7"
+              "src": "273:0:8"
             },
-            "scope": 2031,
-            "src": "193:68:7",
+            "scope": 1797,
+            "src": "193:81:8",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "e1f5f858",
-            "id": 2030,
+            "id": 1796,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveRegistryAddress",
-            "nameLocation": "278:23:7",
+            "nameLocation": "291:23:8",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2026,
+              "id": 1792,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "301:2:7"
+              "src": "314:2:8"
             },
             "returnParameters": {
-              "id": 2029,
+              "id": 1795,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2028,
+                  "id": 1794,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2030,
-                  "src": "326:7:7",
+                  "scope": 1796,
+                  "src": "339:7:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -170,10 +211,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2027,
+                    "id": 1793,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "326:7:7",
+                    "src": "339:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -183,42 +224,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "325:9:7"
+              "src": "338:9:8"
             },
-            "scope": 2031,
-            "src": "269:66:7",
+            "scope": 1797,
+            "src": "282:66:8",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2032,
-        "src": "143:197:7",
+        "scope": 1798,
+        "src": "143:210:8",
         "usedErrors": []
       }
     ],
-    "src": "39:301:7"
+    "src": "39:314:8"
   },
   "legacyAST": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Interfaces/IExternalRegistryBaseContract.sol",
     "exportedSymbols": {
       "IExternalRegistryBaseContract": [
-        2031
+        1797
       ]
     },
-    "id": 2032,
+    "id": 1798,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2019,
+        "id": 1782,
         "literals": [
           "solidity",
           "0.8",
           ".7"
         ],
         "nodeType": "PragmaDirective",
-        "src": "39:22:7"
+        "src": "39:22:8"
       },
       {
         "abstract": false,
@@ -226,42 +267,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 2020,
+          "id": 1783,
           "nodeType": "StructuredDocumentation",
-          "src": "65:73:7",
+          "src": "65:73:8",
           "text": " @title Storage\n @dev Store & retrieve value in a variable"
         },
         "fullyImplemented": false,
-        "id": 2031,
+        "id": 1797,
         "linearizedBaseContracts": [
-          2031
+          1797
         ],
         "name": "IExternalRegistryBaseContract",
-        "nameLocation": "153:29:7",
+        "nameLocation": "153:29:8",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "functionSelector": "c57a8825",
-            "id": 2025,
+            "functionSelector": "ed67335b",
+            "id": 1791,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "updateRegistryAddress",
-            "nameLocation": "202:21:7",
+            "name": "update",
+            "nameLocation": "202:6:8",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2023,
+              "id": 1789,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2022,
+                  "id": 1785,
                   "mutability": "mutable",
                   "name": "NewRegistryAddress",
-                  "nameLocation": "232:18:7",
+                  "nameLocation": "217:18:8",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2025,
-                  "src": "224:26:7",
+                  "scope": 1791,
+                  "src": "209:26:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -269,10 +310,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2021,
+                    "id": 1784,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "224:7:7",
+                    "src": "209:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -280,50 +321,86 @@
                     }
                   },
                   "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1788,
+                  "mutability": "mutable",
+                  "name": "NewOthers",
+                  "nameLocation": "254:9:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1791,
+                  "src": "237:26:8",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 1786,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "237:7:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 1787,
+                    "nodeType": "ArrayTypeName",
+                    "src": "237:9:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "visibility": "internal"
                 }
               ],
-              "src": "223:28:7"
+              "src": "208:56:8"
             },
             "returnParameters": {
-              "id": 2024,
+              "id": 1790,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "260:0:7"
+              "src": "273:0:8"
             },
-            "scope": 2031,
-            "src": "193:68:7",
+            "scope": 1797,
+            "src": "193:81:8",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "e1f5f858",
-            "id": 2030,
+            "id": 1796,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveRegistryAddress",
-            "nameLocation": "278:23:7",
+            "nameLocation": "291:23:8",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2026,
+              "id": 1792,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "301:2:7"
+              "src": "314:2:8"
             },
             "returnParameters": {
-              "id": 2029,
+              "id": 1795,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2028,
+                  "id": 1794,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2030,
-                  "src": "326:7:7",
+                  "scope": 1796,
+                  "src": "339:7:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -331,10 +408,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2027,
+                    "id": 1793,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "326:7:7",
+                    "src": "339:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -344,21 +421,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "325:9:7"
+              "src": "338:9:8"
             },
-            "scope": 2031,
-            "src": "269:66:7",
+            "scope": 1797,
+            "src": "282:66:8",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2032,
-        "src": "143:197:7",
+        "scope": 1798,
+        "src": "143:210:8",
         "usedErrors": []
       }
     ],
-    "src": "39:301:7"
+    "src": "39:314:8"
   },
   "compiler": {
     "name": "solc",
@@ -366,7 +443,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-10-28T06:25:40.025Z",
+  "updatedAt": "2021-10-28T12:22:00.264Z",
   "devdoc": {
     "details": "Store & retrieve value in a variable",
     "kind": "dev",
