@@ -16,7 +16,7 @@ let ENS = artifacts.require("./DeployedContracts/ENS");
 let MockChainLinkFeedRegistry = artifacts.require("./DeployedContracts/Mock/MockChainLinkFeedRegistry");
 let MockENSRegistry = artifacts.require("./DeployedContracts/Mock/MockENSRegistry");
 let MockENSResolver = artifacts.require("./DeployedContracts/Mock/MockENSResolver");
-let MockReverseRegistry = artifacts.require("./DeployedContracts/Mock/MockReverseRegistry");
+let MockENSReverseRegistry = artifacts.require("./DeployedContracts/Mock/MockENSReverseRegistry");
 
 
 
@@ -43,8 +43,7 @@ const CertificatePriceUSD = 1;
 const OwnerRefundFeeUSD = 3;
 const rate = 338495835524;
 const MockDecimals = 8;
-const ttl = 0;
-const initNodes = [0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4, 0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799]
+const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"]
 // privatepool.blockcerts.aljomoar.eth, provider.blockcerts.aljomoar.eth
 const PublicMinOwners = 1;
 const PublicPoolContractName = "Public Certificate Pool";
@@ -64,25 +63,9 @@ const ENSContractVersion = "1.0";
 
 
 module.exports = async function(deployer, network, accounts){
+  let ChainLinkRegistryAddress = await ExternalRegistries.GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry, rate, MockDecimals);
 
-  /*if("kovan" == network)
-  {
-    ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
-  }
-  else if("mainnet" == network)
-  {
-    ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
-  }
-  else
-  {
-    await deployer.deploy(MockChainLinkFeedRegistry, rate, MockDecimals);
-    MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
-    console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
-    ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
-  }*/
-  let ChainLinkRegistryAddress = ExternalRegistries.GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry, rate, MockDecimals);
-
-  let ENSresult = ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry, initNodes, ttl, ENSContractAddress);
+  let ENSresult = await ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockENSReverseRegistry);
   let ENSRegistryAddress = ENSresult[0];
   let ENSReverseRegistryAddress = ENSresult[1];
 
@@ -186,7 +169,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var ENSProxyInitializerParameters = [, , CertificatesPoolManagerInstance.address, accounts[0], ENSContractName, ENSContractVersion];
+  var ENSProxyInitializerParameters = [ENSRegistryAddress, initNodes, CertificatesPoolManagerInstance.address, accounts[0], ENSContractName, ENSContractVersion];
   var ENSProxyData = web3.eth.abi.encodeFunctionCall(ENSProxyInitializerMethod, ENSProxyInitializerParameters);
 
   
@@ -573,6 +556,7 @@ module.exports = async function(deployer, network, accounts){
         ProviderInstance.address, 
         PriceConverterInstance.address,
         PropositionSettingsInstance.address,
+        ENSInstance.address,
         PublicCertificatesPoolProxyData, 
         TreasuryProxyData, 
         CertisProxyData, 
@@ -580,6 +564,7 @@ module.exports = async function(deployer, network, accounts){
         ProviderFactoryProxyData, 
         PriceConverterProxyData,
         PropositionSettingsProxyData,
+        ENSProxyData,
         PrivatePoolContractName,
         PrivatePoolContractVersion));
   console.log("CertificatesPoolManager initialized");

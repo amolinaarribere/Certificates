@@ -25,9 +25,7 @@ async function GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry,
   
 }
 
-
-
-function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry){
+async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry){
     var ENSRegistryAddress = MainENSRegistryAddress;
     var ENSReverseRegistryAddress = MainENSReverseRegistryAddress;
 
