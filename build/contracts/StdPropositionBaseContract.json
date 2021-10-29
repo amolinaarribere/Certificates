@@ -458,36 +458,36 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n Price Converter is an interface to the Chain Link Price Registry for USD to ETH exchange\r\n */\r\n\r\nimport \"../Base/TokenGovernanceBaseContract.sol\";\r\nimport \"../Interfaces/IStdPropositionBaseContract.sol\";\r\n\r\n\r\nabstract contract StdPropositionBaseContract is IStdPropositionBaseContract, TokenGovernanceBaseContract {\r\n\r\n    // DATA /////////////////////////////////////////\r\n    bytes32[] internal _ProposedNewValues;\r\n\r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function StdPropositionBaseContract_init(address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer \r\n    {\r\n        super.TokenGovernanceContract_init(chairPerson, managerContractAddress, contractName, contractVersion);\r\n    }\r\n\r\n    // GOVERNANCE /////////////////////////////////////////\r\n    function sendProposition(bytes32[] memory NewValues) external override\r\n    {\r\n        addProposition();\r\n        for(uint i=0; i < NewValues.length; i++){\r\n            _ProposedNewValues.push(NewValues[i]);\r\n        }\r\n    }\r\n\r\n    function propositionApproved() internal override\r\n    {\r\n        UpdateAll();\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionRejected() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionExpired() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function removeProposition() internal\r\n    {\r\n        delete(_ProposedNewValues);\r\n    }\r\n\r\n    function retrieveProposition() external override view returns(bytes32[] memory)\r\n    {\r\n        return _ProposedNewValues;\r\n    }\r\n\r\n    function UpdateAll() internal virtual;\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Base\\StdPropositionBaseContract.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        8173
+        4008
       ],
       "IERC20Upgradeable": [
-        10465
+        5817
       ],
       "IPropositionSettings": [
-        7697
+        3532
       ],
       "IProxyManager": [
-        7932
+        3767
       ],
       "ISignatureBaseContract": [
-        7952
+        3787
       ],
       "IStdPropositionBaseContract": [
-        7968
+        3803
       ],
       "ITokenEventSubscriber": [
-        7981
+        3816
       ],
       "Initializable": [
-        10387
+        5739
       ],
       "Library": [
-        9429
+        5264
       ],
       "ManagedBaseContract": [
         1970
@@ -496,7 +496,7 @@
         2104
       ],
       "SignatureLibrary": [
-        9712
+        5547
       ],
       "StdPropositionBaseContract": [
         2219
@@ -538,7 +538,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2220,
-        "sourceUnit": 7969,
+        "sourceUnit": 3804,
         "src": "219:55:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -551,7 +551,7 @@
               "id": 2109,
               "name": "IStdPropositionBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7968,
+              "referencedDeclaration": 3803,
               "src": "328:27:6"
             },
             "id": 2110,
@@ -579,11 +579,11 @@
           2219,
           3132,
           1970,
-          10387,
+          5739,
           2104,
-          7952,
-          7981,
-          7968
+          3787,
+          3816,
+          3803
         ],
         "name": "StdPropositionBaseContract",
         "nameLocation": "298:26:6",
@@ -761,7 +761,7 @@
                   "id": 2125,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 10386,
+                  "referencedDeclaration": 5738,
                   "src": "717:11:6"
                 },
                 "nodeType": "ModifierInvocation",
@@ -902,7 +902,7 @@
           },
           {
             "baseFunctions": [
-              7961
+              3796
             ],
             "body": {
               "id": 2169,
@@ -1609,7 +1609,7 @@
           },
           {
             "baseFunctions": [
-              7967
+              3802
             ],
             "body": {
               "id": 2214,
@@ -1743,31 +1743,31 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        8173
+        4008
       ],
       "IERC20Upgradeable": [
-        10465
+        5817
       ],
       "IPropositionSettings": [
-        7697
+        3532
       ],
       "IProxyManager": [
-        7932
+        3767
       ],
       "ISignatureBaseContract": [
-        7952
+        3787
       ],
       "IStdPropositionBaseContract": [
-        7968
+        3803
       ],
       "ITokenEventSubscriber": [
-        7981
+        3816
       ],
       "Initializable": [
-        10387
+        5739
       ],
       "Library": [
-        9429
+        5264
       ],
       "ManagedBaseContract": [
         1970
@@ -1776,7 +1776,7 @@
         2104
       ],
       "SignatureLibrary": [
-        9712
+        5547
       ],
       "StdPropositionBaseContract": [
         2219
@@ -1818,7 +1818,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2220,
-        "sourceUnit": 7969,
+        "sourceUnit": 3804,
         "src": "219:55:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1831,7 +1831,7 @@
               "id": 2109,
               "name": "IStdPropositionBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 7968,
+              "referencedDeclaration": 3803,
               "src": "328:27:6"
             },
             "id": 2110,
@@ -1859,11 +1859,11 @@
           2219,
           3132,
           1970,
-          10387,
+          5739,
           2104,
-          7952,
-          7981,
-          7968
+          3787,
+          3816,
+          3803
         ],
         "name": "StdPropositionBaseContract",
         "nameLocation": "298:26:6",
@@ -2041,7 +2041,7 @@
                   "id": 2125,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 10386,
+                  "referencedDeclaration": 5738,
                   "src": "717:11:6"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2182,7 +2182,7 @@
           },
           {
             "baseFunctions": [
-              7961
+              3796
             ],
             "body": {
               "id": 2169,
@@ -2889,7 +2889,7 @@
           },
           {
             "baseFunctions": [
-              7967
+              3802
             ],
             "body": {
               "id": 2214,
@@ -3025,7 +3025,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-10-29T09:24:37.399Z",
+  "updatedAt": "2021-10-29T09:25:36.140Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
