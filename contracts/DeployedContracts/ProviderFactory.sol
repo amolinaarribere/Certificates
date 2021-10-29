@@ -19,11 +19,12 @@ contract ProviderFactory is Factory{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function create(address[] memory owners,  uint256 minOwners, string memory ElementName, bytes32 ENSLabel) external override payable
+    function create(address[] memory owners,  uint256 minOwners, string memory ElementName, string memory ENSName) external override payable
     {
         ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProviderContract);
-        bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string)", owners, minOwners, ElementName);
-        internalCreate(_managerContract.retrieveProviderBeacon(), data, ElementName, ENSLabel);
+        (,address ENSReverseAddress,,) = IENS(_managerContract.retrieveENSProxy()).retrieveSettings();
+        bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string,string,address)", owners, minOwners, ElementName, ENSName, ENSReverseAddress);
+        internalCreate(_managerContract.retrieveProviderBeacon(), data, ElementName, ENSName);
     }
 
 

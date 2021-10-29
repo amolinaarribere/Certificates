@@ -14,11 +14,12 @@ import "../Interfaces/IENSResolver.sol";
 contract ENS is IENS, StdPropositionBaseContract {
 
     // EVENTS /////////////////////////////////////////
-    event _NewSettings(address Registry, bytes32 PrivatePoolNode, bytes32 ProviderNode);
+    event _NewSettings(address Registry, address ReverseRegistry, bytes32 PrivatePoolNode, bytes32 ProviderNode);
     event _NewSubdomainCreated(bytes32 node, bytes32 label);
 
     // DATA /////////////////////////////////////////
     IENSRegistry internal _ENS;
+    address internal _ENSReverseRegistry;
     bytes32 internal _PrivatePoolNode; 
     bytes32 internal _ProviderNode; 
 
@@ -30,10 +31,11 @@ contract ENS is IENS, StdPropositionBaseContract {
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function ENS_init(address ENSRegistry, bytes32[] memory nodes, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
+    function ENS_init(address ENSRegistry, address ENSReverseRegistry, bytes32[] memory nodes, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
         super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         _ENS = IENSRegistry(ENSRegistry);
+        _ENSReverseRegistry = ENSReverseRegistry;
         _PrivatePoolNode = nodes[0];
         _ProviderNode = nodes[1];
     }
@@ -42,17 +44,21 @@ contract ENS is IENS, StdPropositionBaseContract {
     function UpdateAll() internal override
     {
         address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(_ProposedNewValues[0]);
+        address NewReverseRegistryAddress = AddressLibrary.Bytes32ToAddress(_ProposedNewValues[1]);
 
         if(address(0) != NewRegistryAddress) _ENS = IENSRegistry(NewRegistryAddress);
         else NewRegistryAddress = address(_ENS);
 
-        if(_ProposedNewValues[1] > 0) _PrivatePoolNode = _ProposedNewValues[1];
+        if(address(0) != NewReverseRegistryAddress) _ENSReverseRegistry = NewReverseRegistryAddress;
+        else NewReverseRegistryAddress = _ENSReverseRegistry;
+
+        if(_ProposedNewValues[1] > 0) _PrivatePoolNode = _ProposedNewValues[2];
         else _ProposedNewValues[1] = _PrivatePoolNode;
 
-        if(_ProposedNewValues[2] > 0) _ProviderNode = _ProposedNewValues[2];
+        if(_ProposedNewValues[2] > 0) _ProviderNode = _ProposedNewValues[3];
         else _ProposedNewValues[2] = _ProviderNode;
 
-        emit _NewSettings(NewRegistryAddress, _ProposedNewValues[1], _ProposedNewValues[2]);
+        emit _NewSettings(NewRegistryAddress, NewReverseRegistryAddress, _ProposedNewValues[2], _ProposedNewValues[3]);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -77,9 +83,9 @@ contract ENS is IENS, StdPropositionBaseContract {
         resolver.setAddr(FullNode, msg.sender);
     }
 
-    function retrieveSettings() external override view returns(address, bytes32, bytes32)
+    function retrieveSettings() external override view returns(address, address, bytes32, bytes32)
     {
-        return (address(_ENS), _PrivatePoolNode, _ProviderNode);
+        return (address(_ENS), _ENSReverseRegistry, _PrivatePoolNode, _ProviderNode);
     }
     
 

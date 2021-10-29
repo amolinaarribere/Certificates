@@ -64,8 +64,11 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function internalCreate(address beaconAddress, bytes memory data, string memory elementName, bytes32 ENSLabel) internal
+    function internalCreate(address beaconAddress, bytes memory data, string memory elementName, string memory ENSName) internal
     {
+        bytes32 ENSLabel;
+        if(0 < bytes(ENSName).length) ENSLabel = keccak256(bytes(ENSName));
+
         BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);
         _ElementStruct memory element = _ElementStruct(msg.sender, address(beaconProxy));
         _Elements.push(element);
