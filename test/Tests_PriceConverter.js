@@ -58,7 +58,6 @@ contract("Testing Price Converter",function(accounts){
         certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
         priceConverterProxy = new web3.eth.Contract(PriceConverterAbi, contracts[1][5]);
         priceConverter = contracts[2][7];
-        //registryAddress = await priceConverterProxy.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
     });
 
     async function checkProposition(_address){
