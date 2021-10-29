@@ -25,6 +25,10 @@ contract("Testing ENS",function(accounts){
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     const address_1 = "0x0000000000000000000000000000000000000001";
     const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f36000000", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20000000"];
+    const label = "0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f36000000";
+
+    const Unauthorized = new RegExp("EC8-");
+
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
@@ -33,6 +37,17 @@ contract("Testing ENS",function(accounts){
         ensProxy = new web3.eth.Contract(ENSAbi, contracts[1][7]);
     });
 
+    // ****** TESTING Functionality ***************************************************************** //
+    it("Create Subdomain WRONG",async function(){
+        try{
+            await ensProxy.methods.createSubdomain(label).send({from: user_1}, function(error, result){});
+            expect.fail();
+        }
+        // assert
+        catch(error){
+            expect(error.message).to.match(Unauthorized);
+        }    
+    });
 
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Vote/Propose/Cancel ENS Config WRONG",async function(){
