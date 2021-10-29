@@ -10,6 +10,6 @@ pragma solidity 0.8.7;
  interface IENS  {
 
     function createSubdomain(bytes32 label) external;
-    function retrieveSettings() external view returns(address, bytes32[] memory);
+    function retrieveSettings() external view returns(address, bytes32, bytes32);
 
 }

@@ -77,12 +77,9 @@ contract ENS is IENS, StdPropositionBaseContract {
         resolver.setAddr(FullNode, msg.sender);
     }
 
-    function retrieveSettings() external override view returns(address, bytes32[] memory)
+    function retrieveSettings() external override view returns(address, bytes32, bytes32)
     {
-        bytes32[] memory nodes = new bytes32[](2);
-        nodes[0] = _PrivatePoolNode;
-        nodes[1] = _ProviderNode;
-        return (address(_ENS), nodes);
+        return (address(_ENS), _PrivatePoolNode, _ProviderNode);
     }
     
 

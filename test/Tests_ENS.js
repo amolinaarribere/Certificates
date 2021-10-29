@@ -9,7 +9,6 @@ const ENSAbi = ENS.abi;
 const init = require("../test_libraries/InitializeContracts.js");
 const proposition = require("../test_libraries/Propositions.js");
 
-
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,24 +24,23 @@ contract("Testing ENS",function(accounts){
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     const address_1 = "0x0000000000000000000000000000000000000001";
-    const OthersEmpty = []
+    const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f36000000", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20000000"];
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
         ensProxy = new web3.eth.Contract(ENSAbi, contracts[1][7]);
-        registryAddress = await ensProxy.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
     });
 
 
     // ****** Testing Settings Configuration ***************************************************************** //
-    it("Vote/Propose/Cancel Registry Address WRONG",async function(){
-        await proposition.Config_RegistryOnly_Wrong(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty);
+    it("Vote/Propose/Cancel ENS Config WRONG",async function(){
+        await proposition.Config_ENS_Wrong(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, initNodes[0], initNodes[1]);
     });
 
-    it("Vote/Propose/Cancel Registry Address CORRECT",async function(){
-        await proposition.Config_RegistryOnly_Correct(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty);
+    it("Vote/Propose/Cancel ENS Config CORRECT",async function(){
+        await proposition.Config_ENS_Correct(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, initNodes[0], initNodes[1]);
     });
 
 });
