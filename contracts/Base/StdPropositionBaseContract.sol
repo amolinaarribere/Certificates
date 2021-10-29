@@ -24,6 +24,7 @@ abstract contract StdPropositionBaseContract is IStdPropositionBaseContract, Tok
     // GOVERNANCE /////////////////////////////////////////
     function sendProposition(bytes32[] memory NewValues) external override
     {
+        checkProposition(NewValues);
         addProposition();
         for(uint i=0; i < NewValues.length; i++){
             _ProposedNewValues.push(NewValues[i]);
@@ -55,6 +56,8 @@ abstract contract StdPropositionBaseContract is IStdPropositionBaseContract, Tok
     {
         return _ProposedNewValues;
     }
+
+    function checkProposition(bytes32[] memory NewValues) internal virtual{}
 
     function UpdateAll() internal virtual;
 

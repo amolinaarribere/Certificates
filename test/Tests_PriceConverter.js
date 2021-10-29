@@ -20,6 +20,8 @@ const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
 const obj = require("../test_libraries/objects.js");
 const proposition = require("../test_libraries/Propositions.js");
+const aux = require("../test_libraries/auxiliaries.js");
+
 
 const Gas = constants.Gas;
 
@@ -42,7 +44,6 @@ contract("Testing Price Converter",function(accounts){
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     const address_1 = "0x0000000000000000000000000000000000000001";
-    const OthersEmpty = []
     // test constants
     const Unauthorized = new RegExp("EC8-");
     const CannotProposeChanges = new RegExp("EC22-");
@@ -64,7 +65,7 @@ contract("Testing Price Converter",function(accounts){
         var propositionResult = await priceConverterProxy.methods.retrieveProposition().call({from: user_1}, function(error, result){});
         let _registryAddressProposed = propositionResult[0];
 
-        expect(proposition.AddressToBytes32(_address)).to.equal(_registryAddressProposed);
+        expect(aux.AddressToBytes32(_address)).to.equal(_registryAddressProposed);
     }
 
     // ****** TESTING Retrieves ***************************************************************** //
@@ -81,7 +82,7 @@ contract("Testing Price Converter",function(accounts){
     it("Retrieve Proposals Details",async function(){
         // act
         await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-        await priceConverterProxy.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await priceConverterProxy.methods.sendProposition([aux.AddressToBytes32(address_1)]).send({from: chairPerson, gas: Gas}, function(error, result){});
         // assert
         await checkProposition(address_1);
         
@@ -90,11 +91,11 @@ contract("Testing Price Converter",function(accounts){
     // ****** Testing Registry Configuration ***************************************************************** //
    
     it("Vote/Propose/Cancel Registry Address WRONG",async function(){
-        await proposition.Config_RegistryOnly_Wrong(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty);
+        await proposition.Config_PriceConverter_Wrong(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1);
     });
 
     it("Vote/Propose/Cancel Registry Address CORRECT",async function(){
-        await proposition.Config_RegistryOnly_Correct(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty);
+        await proposition.Config_PriceConverter_Correct(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1);
     });
 
 });

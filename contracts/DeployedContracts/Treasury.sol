@@ -82,18 +82,27 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     }
 
     modifier isPriceOK(uint256 PublicPriceUSD, uint256 OwnerRefundFeeUSD){
-        require(PublicPriceUSD >= OwnerRefundFeeUSD, "EC21-");
+        isPriceOKFunc(PublicPriceUSD, OwnerRefundFeeUSD);
         _;
+    }
+
+    function isPriceOKFunc(uint256 PublicPriceUSD, uint256 OwnerRefundFeeUSD) internal pure{
+        require(PublicPriceUSD >= OwnerRefundFeeUSD, "EC21-");
     }
     
     // CONSTRUCTOR /////////////////////////////////////////
     function Treasury_init(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
+        isPriceOK(PublicPriceUSD, OwnerRefundFeeUSD)
     {
         super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD);
     }
 
     // GOVERNANCE /////////////////////////////////////////
+    function checkProposition(bytes32[] memory NewValues) internal override 
+        isPriceOK(UintLibrary.Bytes32ToUint(NewValues[0]), UintLibrary.Bytes32ToUint(NewValues[4]))
+    {}
+
     function UpdateAll() internal override
     {
         uint256 PublicPriceUSD = UintLibrary.Bytes32ToUint(_ProposedNewValues[0]);
@@ -108,7 +117,6 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     }
 
     function InternalupdatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD) internal
-        isPriceOK(PublicPriceUSD, OwnerRefundFeeUSD)
     {
         _PublicPriceUSD = PublicPriceUSD;
         _PrivatePriceUSD = PrivatePriceUSD;

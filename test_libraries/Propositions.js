@@ -1,5 +1,5 @@
 const constants = require("./constants.js");
-const aux = require("./auxiliaires.js");
+const aux = require("./auxiliaries.js");
 
 const TotalTokenSupply = constants.TotalTokenSupply;
 const Gas = constants.Gas;
@@ -28,9 +28,9 @@ async function checkProp(_plt, _ptp, _mp, user_1, contractAddress){
     expect(parseInt(mp)).to.be.equal(_mp);
 }
 
-async function checkAddress(contractAddress, _address){
-    let _registryAddress =  await contractAddress.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
-    expect(_address).to.equal(_registryAddress);
+async function checkPriceConverter(contractAddress, addressBytes, user_1){
+    let _registryAddress =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    expect(aux.Bytes32ToAddress(addressBytes[0])).to.equal(_registryAddress);
 }
 
 async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose){
@@ -110,55 +110,11 @@ async function Config_PriceConverter_Wrong(contractAddress, certisTokenProxy, to
     await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes32(address_1)]);
 };
 
-async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty){
-   // act
-   let registryAddress = await contractAddress.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
-   await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-
-   // Rejected 
-   await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-
-   // Cancelled
-   await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-
-   // Validated
-   await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, address_1);
-
-   // Validated again
-   await contractAddress.methods.update(registryAddress, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, address_1);
-   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, address_1);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, address_1);
-   await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, address_1);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, address_1);
-   await contractAddress.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
-   await checkAddress(contractAddress, registryAddress);
-   
+async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1){
+    let _registryAddress =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    let NewValues = [aux.AddressToBytes32(address_1)];
+    let InitValue = [aux.AddressToBytes32(_registryAddress)];
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPriceConverter);
 };
 
 async function Config_ENS_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, node_1, node_2){
@@ -252,6 +208,56 @@ async function Config_CommonProposition_Wrong(contractAddress, certisTokenProxy,
     }
     
 };
+
+async function Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFunction){
+    // act
+    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
+ 
+    // Rejected 
+    await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+ 
+    // Cancelled
+    await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+ 
+    // Validated
+    await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, NewValues, user_1);
+ 
+    // Validated again
+    await contractAddress.methods.sendProposition(InitValue).send({from: chairPerson, gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, NewValues, user_1);
+    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, NewValues, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, NewValues, user_1);
+    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, NewValues, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, NewValues, user_1);
+    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
+    await checkFunction(contractAddress, InitValue, user_1);
+    
+ };
 
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;
 exports.Config_Proposition_Correct = Config_Proposition_Correct;
