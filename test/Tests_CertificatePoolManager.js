@@ -24,6 +24,8 @@ const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
 const obj = require("../test_libraries/objects.js");
 const proposition = require("../test_libraries/Propositions.js");
+const aux = require("../test_libraries/auxiliaries.js");
+
 
 const PrivatePoolContractName = constants.PrivatePoolContractName;
 const PrivatePoolContractVersion = constants.PrivatePoolContractVersion;
@@ -159,16 +161,16 @@ contract("Testing Certificate Pool Manager",function(accounts){
         var propositionResult = await certPoolManager.retrieveProposition({from: user_1});
         let {0: _publicAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolFactoryAddress, 4: _privatePoolAddress, 5: _providerFactoryAddress, 6: _providerAddress, 7: _priceConverterAddress, 8: _propositionSettingsAddress, 9: _ensAddress} = propositionResult;
 
-        expect(proposition.AddressToBytes32(_ppa)).to.equal(_publicAddress);
-        expect(proposition.AddressToBytes32(_ta)).to.equal(_treasuryAddress);
-        expect(proposition.AddressToBytes32(_ca)).to.equal(_certisAddress);
-        expect(proposition.AddressToBytes32(_ppfa)).to.equal(_privatePoolFactoryAddress);
-        expect(proposition.AddressToBytes32(_prpa)).to.equal(_privatePoolAddress);
-        expect(proposition.AddressToBytes32(_pfa)).to.equal(_providerFactoryAddress);
-        expect(proposition.AddressToBytes32(_pra)).to.equal(_providerAddress);
-        expect(proposition.AddressToBytes32(_pco)).to.equal(_priceConverterAddress);
-        expect(proposition.AddressToBytes32(_ps)).to.equal(_propositionSettingsAddress);
-        expect(proposition.AddressToBytes32(_ens)).to.equal(_ensAddress);  
+        expect(aux.AddressToBytes32(_ppa)).to.equal(_publicAddress);
+        expect(aux.AddressToBytes32(_ta)).to.equal(_treasuryAddress);
+        expect(aux.AddressToBytes32(_ca)).to.equal(_certisAddress);
+        expect(aux.AddressToBytes32(_ppfa)).to.equal(_privatePoolFactoryAddress);
+        expect(aux.AddressToBytes32(_prpa)).to.equal(_privatePoolAddress);
+        expect(aux.AddressToBytes32(_pfa)).to.equal(_providerFactoryAddress);
+        expect(aux.AddressToBytes32(_pra)).to.equal(_providerAddress);
+        expect(aux.AddressToBytes32(_pco)).to.equal(_priceConverterAddress);
+        expect(aux.AddressToBytes32(_ps)).to.equal(_propositionSettingsAddress);
+        expect(aux.AddressToBytes32(_ens)).to.equal(_ensAddress);  
     }
 
     // ****** TESTING Retrieves ***************************************************************** //
