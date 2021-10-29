@@ -299,8 +299,6 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         return _nextPropID;
     }
 
-    function retrieveProposition() external virtual view returns(bytes32[] memory){}
-
     function propositionApproved() internal virtual{}
 
     function propositionRejected() internal virtual{}

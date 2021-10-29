@@ -7,12 +7,12 @@ pragma solidity 0.8.7;
  */
 
 import "../Interfaces/IPriceConverter.sol";
-import "../Base/ExternalRegistryBaseContract.sol";
+import "../Base/StdPropositionBaseContract.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/FeedRegistryInterface.sol";
 import "@chainlink/contracts/src/v0.8/Denominations.sol";
 
 
-contract PriceConverter is IPriceConverter, ExternalRegistryBaseContract {
+contract PriceConverter is IPriceConverter, StdPropositionBaseContract {
 
     // EVENTS /////////////////////////////////////////
     event _NewRegistryAddress(address Registry);
@@ -25,29 +25,18 @@ contract PriceConverter is IPriceConverter, ExternalRegistryBaseContract {
     // CONSTRUCTOR /////////////////////////////////////////
     function PriceConverter_init(address registry, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
-        super.ExternalRegistryBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
+        super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         _registry = FeedRegistryInterface(registry);
     }
 
     // GOVERNANCE /////////////////////////////////////////
     function UpdateAll() internal override
     {
-        _registry = FeedRegistryInterface(_ProposedRegistryAddress);
-        emit _NewRegistryAddress(_ProposedRegistryAddress);
-    }
+        address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(_ProposedNewValues[0]);
 
-    function retrieveRegistryAddress() external override view returns(address)
-    {
-        return address(_registry);
-    }
+        _registry = FeedRegistryInterface(NewRegistryAddress);
 
-    function updateOthers(bytes32[] memory NewOthers) internal override{}
-
-    function removePropositionPOST() internal override{}
-
-    function retrievePropositionOthers() internal override view returns(bytes32[] memory)
-    {
-        return new bytes32[](0);
+        emit _NewRegistryAddress(NewRegistryAddress);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -61,6 +50,11 @@ contract PriceConverter is IPriceConverter, ExternalRegistryBaseContract {
         if(remainder > 0) amount += 1;
 
         return amount;
+    }
+
+    function retrieveSettings() external override view returns(address)
+    {
+        return address(_registry);
     }
 
 }

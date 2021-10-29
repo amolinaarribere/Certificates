@@ -35,4 +35,5 @@ pragma solidity 0.8.7;
     function retrieveENS() external view returns (address);
 
     function isInitialized() external view returns(bool);
+    function retrieveProposition() external view returns(bytes32[] memory);
 }

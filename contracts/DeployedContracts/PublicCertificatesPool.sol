@@ -68,13 +68,13 @@ pragma solidity 0.8.7;
 
     function retrieveAddCertificatePriceWei() external override view returns(uint256)
     {
-        (, , , uint Price, ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrievePrices();
+        (, , , uint Price, ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrieveSettings();
         return IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(Price);
     }
 
     function retrieveSubscriptionPriceWei() external override virtual view returns(uint256)
     {
-        (uint Price, , , , ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrievePrices();
+        (uint Price, , , , ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrieveSettings();
         return IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(Price);
     }
 
