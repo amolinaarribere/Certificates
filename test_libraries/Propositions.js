@@ -30,9 +30,9 @@ async function checkPriceConverter(contractAddress, addressBytes, user_1){
 
 async function checkPropositionSettings(contractAddress, propBytes, user_1){
     let _propSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    expect(aux.Bytes32ToInt(propBytes[0])).to.equal(parseInt(_propSettings[0]));
-    expect(aux.Bytes32ToInt(propBytes[1])).to.equal(parseInt(_propSettings[1]));
-    expect(aux.Bytes32ToInt(propBytes[2])).to.equal(parseInt(_propSettings[2]));
+    for(let i=0; i < 3; i++){
+        expect(aux.Bytes32ToInt(propBytes[i])).to.equal(parseInt(_propSettings[i]));
+    }
 }
 
 async function checkENS(contractAddress, ENSBytes, user_1){
@@ -40,6 +40,14 @@ async function checkENS(contractAddress, ENSBytes, user_1){
     expect(aux.Bytes32ToAddress(ENSBytes[0])).to.equal(_ENS[0]);
     expect(ENSBytes[1]).to.equal(_ENS[1]);
     expect(ENSBytes[2]).to.equal(_ENS[2]);
+}
+
+async function checkPrice(contractAddress, PricesBytes, user_1){
+    let _Prices =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    for(let i=0; i < 5; i++){
+        expect(aux.Bytes32ToInt(PricesBytes[i])).to.equal(parseInt(_Prices[i]));
+    }
+
 }
 
 // tests
@@ -97,6 +105,28 @@ async function Config_ENS_Correct(contractAddress, certisTokenProxy, tokenOwner,
     let InitValue = [aux.AddressToBytes32(_ENSSettings[0]), _ENSSettings[1], _ENSSettings[2]];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkENS);
 
+   
+};
+
+async function Config_Treasury_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD){
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.IntToBytes32(PublicPriceUSD), aux.IntToBytes32(PrivatePriceUSD), aux.IntToBytes32(ProviderPriceUSD), aux.IntToBytes32(CertificatePriceUSD), aux.IntToBytes32(OwnerRefundPriceUSD)]);
+    // act
+    try{
+        await contractAddress.methods.sendProposition([aux.IntToBytes32(PublicPriceUSD), aux.IntToBytes32(PrivatePriceUSD), aux.IntToBytes32(ProviderPriceUSD), aux.IntToBytes32(CertificatePriceUSD), aux.IntToBytes32(PublicPriceUSD + 1)]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongConfig);
+    }
+    
+};
+
+async function Config_Treasury_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD ){
+    let _price =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
+    let NewValues =  [aux.IntToBytes32(PublicPriceUSD), aux.IntToBytes32(PrivatePriceUSD), aux.IntToBytes32(ProviderPriceUSD), aux.IntToBytes32(CertificatePriceUSD), aux.IntToBytes32(OwnerRefundPriceUSD)];
+    let InitValue = [aux.IntToBytes32(_price[0]), aux.IntToBytes32(_price[1]), aux.IntToBytes32(_price[2]), aux.IntToBytes32(_price[3]), aux.IntToBytes32(_price[4])];
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPrice);
    
 };
 
@@ -239,4 +269,6 @@ exports.Config_PriceConverter_Wrong = Config_PriceConverter_Wrong;
 exports.Config_PriceConverter_Correct = Config_PriceConverter_Correct;
 exports.Config_ENS_Wrong = Config_ENS_Wrong;
 exports.Config_ENS_Correct = Config_ENS_Correct;
+exports.Config_Treasury_Wrong = Config_Treasury_Wrong;
+exports.Config_Treasury_Correct = Config_Treasury_Correct;
 exports.SplitTokenSupply = SplitTokenSupply;
