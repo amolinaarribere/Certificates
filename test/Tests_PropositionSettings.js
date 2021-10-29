@@ -9,6 +9,10 @@ const PropositionSettingsAbi = PropositionSettings.abi;
 const init = require("../test_libraries/InitializeContracts.js");
 const proposition = require("../test_libraries/Propositions.js");
 
+const PropositionLifeTime = constants.PropositionLifeTime;
+const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
+const minPercentageToPropose = constants.minPercentageToPropose;
+
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------

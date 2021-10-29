@@ -1,8 +1,6 @@
 const constants = require("./constants.js");
+const aux = require("./auxiliaires.js");
 
-const PropositionLifeTime = constants.PropositionLifeTime;
-const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
-const minPercentageToPropose = constants.minPercentageToPropose;
 const TotalTokenSupply = constants.TotalTokenSupply;
 const Gas = constants.Gas;
 
@@ -14,9 +12,6 @@ const NoPropositionActivated = new RegExp("EC25-");
 const PropositionAlreadyInProgress = new RegExp("EC24-");
 const CanNotVote = new RegExp("EC23-");
 
-function AddressToBytes32(address){
-    return (address.substring(0,2) + "000000000000000000000000" +  address.substring(2,address.length));
-}
 
 async function SplitTokenSupply(CT, tokenOwner, chairPerson){
     await CT.methods.transfer(tokenOwner[0], (TotalTokenSupply / 5)).send({from: chairPerson, gas: Gas}, function(error, result){});
@@ -38,20 +33,11 @@ async function checkAddress(contractAddress, _address){
     expect(_address).to.equal(_registryAddress);
 }
 
-async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson){
-    // act
-    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-    try{
-        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: user_1, gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(CannotProposeChanges);
-    }
+async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose){
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.IntToBytes32(PropositionLifeTime), aux.IntToBytes32(PropositionThresholdPercentage), aux.IntToBytes32(minPercentageToPropose)]);
     // act
     try{
-        await contractAddress.methods.updateSettings(PropositionLifeTime, 101, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([aux.IntToBytes32(PropositionLifeTime), aux.IntToBytes32(101), aux.IntToBytes32(minPercentageToPropose)]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -60,80 +46,14 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // act
     try{
-        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, 101).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([aux.IntToBytes32(PropositionLifeTime), aux.IntToBytes32(PropositionThresholdPercentage), aux.IntToBytes32(101)]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
     catch(error){
         expect(error.message).to.match(WrongConfig);
     }
-    // act
-    try{
-        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(NoPropositionActivated);
-    }
-    // act
-    try{
-        await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(NoPropositionActivated);
-    }
-    // act
-    try{
-        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
-        await contractAddress.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(CanNotVote);
-    }
-    // act
-    try{
-        await contractAddress.methods.cancelProposition().send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(Unauthorized);
-    }
-    // act
-    try{
-        await contractAddress.methods.updateSettings(PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose).send({from: chairPerson, gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(PropositionAlreadyInProgress);
-    }
-    // act
-    try{
-        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(CanNotVote);
-    }
-    // act
-    try{
-        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
-        expect.fail();
-    }
-    // assert
-    catch(error){
-        expect(error.message).to.match(NoPropositionActivated);
-    }
+    
     
 };
 
@@ -186,89 +106,11 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
     
 };
 
-async function Config_RegistryOnly_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty){
-    // act
-    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-    // act
-   try{
-       await contractAddress.methods.update(address_1, OthersEmpty).send({from: user_1, gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(CannotProposeChanges);
-   }
-   // act
-   try{
-       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(NoPropositionActivated);
-   }
-   // act
-   try{
-       await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(NoPropositionActivated);
-   }
-   // act
-   try{
-       await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
-       await contractAddress.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(CanNotVote);
-   }
-   // act
-   try{
-       await contractAddress.methods.cancelProposition().send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(Unauthorized);
-   }
-   // act
-   try{
-       await contractAddress.methods.update(address_1, OthersEmpty).send({from: chairPerson, gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(PropositionAlreadyInProgress);
-   }
-   // act
-   try{
-       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(CanNotVote);
-   }
-   // act
-   try{
-       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-       await contractAddress.methods.voteProposition(false).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
-       expect.fail();
-   }
-   // assert
-   catch(error){
-       expect(error.message).to.match(NoPropositionActivated);
-   }
-   
+async function Config_PriceConverter_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1){
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes32(address_1)]);
 };
 
-async function Config_RegistryOnly_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty){
+async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty){
    // act
    let registryAddress = await contractAddress.methods.retrieveRegistryAddress().call({from: user_1}, function(error, result){});
    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
@@ -319,9 +161,102 @@ async function Config_RegistryOnly_Correct(contractAddress, certisTokenProxy, to
    
 };
 
-exports.AddressToBytes32 = AddressToBytes32;
+async function Config_ENS_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, node_1, node_2){
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes32(address_1), node_1, node_2]);
+};
+
+async function Config_ENS_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, OthersEmpty){
+   
+   
+};
+
+/////////////////////
+
+async function Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
+    // act
+    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
+    try{
+        await contractAddress.methods.sendProposition(NewValues).send({from: user_1, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(CannotProposeChanges);
+    }
+    // act
+    try{
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(NoPropositionActivated);
+    }
+    // act
+    try{
+        await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(NoPropositionActivated);
+    }
+    // act
+    try{
+        await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.voteProposition(false).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(CanNotVote);
+    }
+    // act
+    try{
+        await contractAddress.methods.cancelProposition().send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(Unauthorized);
+    }
+    // act
+    try{
+        await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(PropositionAlreadyInProgress);
+    }
+    // act
+    try{
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(CanNotVote);
+    }
+    // act
+    try{
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[3], gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(NoPropositionActivated);
+    }
+    
+};
+
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;
 exports.Config_Proposition_Correct = Config_Proposition_Correct;
-exports.Config_RegistryOnly_Wrong = Config_RegistryOnly_Wrong;
-exports.Config_RegistryOnly_Correct = Config_RegistryOnly_Correct;
+exports.Config_PriceConverter_Wrong = Config_PriceConverter_Wrong;
+exports.Config_PriceConverter_Correct = Config_PriceConverter_Correct;
+exports.Config_ENS_Wrong = Config_ENS_Wrong;
+exports.Config_ENS_Correct = Config_ENS_Correct;
 exports.SplitTokenSupply = SplitTokenSupply;
