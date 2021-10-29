@@ -157,7 +157,7 @@ contract("Testing Treasury",function(accounts){
         await TreasuryProxy.methods.pay(3).send({from: user_1, value: ProviderPriceWei, gas: Gas}, function(error, result){});
         await TreasuryProxy.methods.pay(3).send({from: user_1, value: ProviderPriceWei + 1, gas: Gas}, function(error, result){});
         // assert
-        var balance = parseInt(await web3.eth.getBalance(Treasury._address));
+        var balance = parseInt(await web3.eth.getBalance(TreasuryProxy._address));
         expect(balance).to.be.equal(PublicPriceWei + (PublicPriceWei + 1) + PrivatePriceWei + (PrivatePriceWei + 1) + ProviderPriceWei + (ProviderPriceWei + 1) + CertificatePriceWei + (CertificatePriceWei + 1));
         var Balance1 = parseInt(await TreasuryProxy.methods.retrieveFullBalance(chairPerson).call({from: user_1}, function(error, result){}));
         var Balance2 = parseInt(await TreasuryProxy.methods.retrieveFullBalance(user_1).call({from: user_1}, function(error, result){}));
@@ -208,7 +208,7 @@ contract("Testing Treasury",function(accounts){
         // act
         await SendingNewProviders();
         // assert
-        let TreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
+        let TreasuryBalance = parseInt(await web3.eth.getBalance(TreasuryProxy._address));
         for(let i=0; i < PublicOwners.length; i++){
             let balance = new BigNumber(await TreasuryProxy.methods.retrieveFullBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
             TreasuryBalance -= balance.toNumber();
@@ -225,7 +225,7 @@ contract("Testing Treasury",function(accounts){
             balance = new BigNumber(await TreasuryProxy.methods.retrieveFullBalance(PublicOwners[i]).call({from: user_1}, function(error, result){}));
             expect(balance.toString()).to.be.equal("0");
         }
-        let FinalTreasuryBalance = parseInt(await web3.eth.getBalance(Treasury._address));
+        let FinalTreasuryBalance = parseInt(await web3.eth.getBalance(TreasuryProxy._address));
         expect(FinalTreasuryBalance).to.be.equal(TreasuryBalance);
     });
 
