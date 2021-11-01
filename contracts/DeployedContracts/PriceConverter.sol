@@ -32,7 +32,9 @@ contract PriceConverter is IPriceConverter, StdPropositionBaseContract {
     // GOVERNANCE /////////////////////////////////////////
     function UpdateAll() internal override
     {
-        address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(_ProposedNewValues[0]);
+        bytes32[] memory ProposedNewValues = PropositionsToBytes32();
+
+        address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(ProposedNewValues[0]);
 
         _registry = FeedRegistryInterface(NewRegistryAddress);
 

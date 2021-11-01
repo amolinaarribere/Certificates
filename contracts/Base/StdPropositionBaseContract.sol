@@ -13,7 +13,7 @@ import "../Interfaces/IStdPropositionBaseContract.sol";
 abstract contract StdPropositionBaseContract is IStdPropositionBaseContract, TokenGovernanceBaseContract {
 
     // DATA /////////////////////////////////////////
-    bytes32[] internal _ProposedNewValues;
+    bytes[] internal _ProposedNewValues;
 
     // CONSTRUCTOR /////////////////////////////////////////
     function StdPropositionBaseContract_init(address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer 
@@ -22,7 +22,7 @@ abstract contract StdPropositionBaseContract is IStdPropositionBaseContract, Tok
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function sendProposition(bytes32[] memory NewValues) external override
+    function sendProposition(bytes[] memory NewValues) external override
     {
         checkProposition(NewValues);
         addProposition();
@@ -52,12 +52,23 @@ abstract contract StdPropositionBaseContract is IStdPropositionBaseContract, Tok
         delete(_ProposedNewValues);
     }
 
-    function retrieveProposition() external override view returns(bytes32[] memory)
+    function retrieveProposition() external override view returns(bytes[] memory)
     {
         return _ProposedNewValues;
     }
 
-    function checkProposition(bytes32[] memory NewValues) internal virtual{}
+    function PropositionsToBytes32() internal returns (bytes32[] memory)
+    {
+        bytes32[] memory PropositionsBytes32 = new bytes32[](_ProposedNewValues.length);
+
+        for(uint i=0; i<_ProposedNewValues.length; i++){
+            PropositionsBytes32[i] = Library.BytestoBytes32(_ProposedNewValues[i])[0];
+        }
+
+        return PropositionsBytes32;
+    }
+
+    function checkProposition(bytes[] memory NewValues) internal virtual{}
 
     function UpdateAll() internal virtual;
 

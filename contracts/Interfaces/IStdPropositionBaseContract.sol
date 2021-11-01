@@ -9,8 +9,8 @@ pragma solidity 0.8.7;
 
  interface IStdPropositionBaseContract  {
 
-    function sendProposition(bytes32[] memory NewValues) external;
+    function sendProposition(bytes[] memory NewValues) external;
 
-    function retrieveProposition() external view returns(bytes32[] memory);
+    function retrieveProposition() external view returns(bytes[] memory);
 
 }

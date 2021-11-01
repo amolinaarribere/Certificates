@@ -43,8 +43,10 @@ contract ENS is IENS, StdPropositionBaseContract {
     // GOVERNANCE /////////////////////////////////////////
     function UpdateAll() internal override
     {
-        address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(_ProposedNewValues[0]);
-        address NewReverseRegistryAddress = AddressLibrary.Bytes32ToAddress(_ProposedNewValues[1]);
+        bytes32[] memory ProposedNewValues = PropositionsToBytes32();
+
+        address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(ProposedNewValues[0]);
+        address NewReverseRegistryAddress = AddressLibrary.Bytes32ToAddress(ProposedNewValues[1]);
 
         if(address(0) != NewRegistryAddress) _ENS = IENSRegistry(NewRegistryAddress);
         else NewRegistryAddress = address(_ENS);
@@ -52,13 +54,13 @@ contract ENS is IENS, StdPropositionBaseContract {
         if(address(0) != NewReverseRegistryAddress) _ENSReverseRegistry = NewReverseRegistryAddress;
         else NewReverseRegistryAddress = _ENSReverseRegistry;
 
-        if(_ProposedNewValues[1] > 0) _PrivatePoolNode = _ProposedNewValues[2];
-        else _ProposedNewValues[1] = _PrivatePoolNode;
+        if(ProposedNewValues[2] > 0) _PrivatePoolNode = ProposedNewValues[2];
+        else ProposedNewValues[2] = _PrivatePoolNode;
 
-        if(_ProposedNewValues[2] > 0) _ProviderNode = _ProposedNewValues[3];
-        else _ProposedNewValues[2] = _ProviderNode;
+        if(ProposedNewValues[3] > 0) _ProviderNode = ProposedNewValues[3];
+        else ProposedNewValues[3] = _ProviderNode;
 
-        emit _NewSettings(NewRegistryAddress, NewReverseRegistryAddress, _ProposedNewValues[2], _ProposedNewValues[3]);
+        emit _NewSettings(NewRegistryAddress, NewReverseRegistryAddress, ProposedNewValues[2], ProposedNewValues[3]);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////

@@ -99,17 +99,19 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function checkProposition(bytes32[] memory NewValues) internal override 
-        isPriceOK(UintLibrary.Bytes32ToUint(NewValues[0]), UintLibrary.Bytes32ToUint(NewValues[4]))
+    function checkProposition(bytes[] memory NewValues) internal override 
+        isPriceOK(UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[0])[0]), UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[4])[0]))
     {}
 
     function UpdateAll() internal override
     {
-        uint256 PublicPriceUSD = UintLibrary.Bytes32ToUint(_ProposedNewValues[0]);
-        uint256 PrivatePriceUSD = UintLibrary.Bytes32ToUint(_ProposedNewValues[1]);
-        uint256 ProviderPriceUSD = UintLibrary.Bytes32ToUint(_ProposedNewValues[2]);
-        uint256 CertificatePriceUSD = UintLibrary.Bytes32ToUint(_ProposedNewValues[3]);
-        uint256 OwnerRefundFeeUSD = UintLibrary.Bytes32ToUint(_ProposedNewValues[4]);
+        bytes32[] memory ProposedNewValues = PropositionsToBytes32();
+
+        uint256 PublicPriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[0]);
+        uint256 PrivatePriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[1]);
+        uint256 ProviderPriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[2]);
+        uint256 CertificatePriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[3]);
+        uint256 OwnerRefundFeeUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[4]);
 
         InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD);
 

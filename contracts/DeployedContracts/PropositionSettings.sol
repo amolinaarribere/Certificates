@@ -43,15 +43,17 @@ contract PropositionSettings is IPropositionSettings, StdPropositionBaseContract
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function checkProposition(bytes32[] memory NewValues) internal override 
-        areSettingsOK(UintLibrary.Bytes32ToUint8(NewValues[1]), UintLibrary.Bytes32ToUint8(NewValues[2]))
+    function checkProposition(bytes[] memory NewValues) internal override 
+        areSettingsOK(UintLibrary.Bytes32ToUint8(Library.BytestoBytes32(NewValues[1])[0]), UintLibrary.Bytes32ToUint8(Library.BytestoBytes32(NewValues[2])[0]))
     {}
 
     function UpdateAll() internal override
     {
-        uint256 PropositionLifeTime = UintLibrary.Bytes32ToUint(_ProposedNewValues[0]);
-        uint8 PropositionThresholdPercentage = UintLibrary.Bytes32ToUint8(_ProposedNewValues[1]);
-        uint8 minWeightToProposePercentage = UintLibrary.Bytes32ToUint8(_ProposedNewValues[2]);
+        bytes32[] memory ProposedNewValues = PropositionsToBytes32();
+
+        uint256 PropositionLifeTime = UintLibrary.Bytes32ToUint(ProposedNewValues[0]);
+        uint8 PropositionThresholdPercentage = UintLibrary.Bytes32ToUint8(ProposedNewValues[1]);
+        uint8 minWeightToProposePercentage = UintLibrary.Bytes32ToUint8(ProposedNewValues[2]);
 
         InternalupdateSettings(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage);
 
