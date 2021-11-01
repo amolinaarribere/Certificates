@@ -68,12 +68,12 @@ contract("Testing Provider",function(accounts){
         providerFactoryProxy = new web3.eth.Contract(ProviderFactoryAbi, contracts[1][4]);
 
         privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, contracts[1][3]);
-        await privatePoolFactoryProxy.methods.create(PrivateOwners, minOwners, "").send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
+        await privatePoolFactoryProxy.methods.create(PrivateOwners, minOwners, "", "").send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
         let response1 = await privatePoolFactoryProxy.methods.retrieve(0).call({from: user_1}, function(error, result){});
         const {0: creator1, 1: privateCertPoolAddress} = response1;
         privateCertPool = new web3.eth.Contract(PrivateCertificatesAbi, privateCertPoolAddress); 
         
-        await providerFactoryProxy.methods.create(ProviderOwners, minOwners, provider_1_Info).send({from: user_1, value: ProviderPriceWei, gas: Gas}, function(error, result){});
+        await providerFactoryProxy.methods.create(ProviderOwners, minOwners, provider_1_Info, "").send({from: user_1, value: ProviderPriceWei, gas: Gas}, function(error, result){});
         let response2 = await providerFactoryProxy.methods.retrieve(0).call({from: user_1}, function(error, result){});
         const {0: creator2, 1: providerAddress} = response2;
         provider = new web3.eth.Contract(ProviderAbi, providerAddress); 
