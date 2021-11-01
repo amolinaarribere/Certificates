@@ -138,6 +138,11 @@ module.exports = async function(deployer, network, accounts){
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "ENSReverseRegistry",
+        "type": "address"
+      },
+      {
         "internalType": "bytes32[]",
         "name": "nodes",
         "type": "bytes32[]"
@@ -169,7 +174,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var ENSProxyInitializerParameters = [ENSRegistryAddress, initNodes, CertificatesPoolManagerInstance.address, accounts[0], ENSContractName, ENSContractVersion];
+  var ENSProxyInitializerParameters = [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, CertificatesPoolManagerInstance.address, accounts[0], ENSContractName, ENSContractVersion];
   var ENSProxyData = web3.eth.abi.encodeFunctionCall(ENSProxyInitializerMethod, ENSProxyInitializerParameters);
 
   

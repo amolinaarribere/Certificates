@@ -40,7 +40,7 @@ contract("Testing Private Pool",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, contracts[1][3]);
-        await privatePoolFactoryProxy.methods.create(PrivateOwners, minOwners, "").send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
+        await privatePoolFactoryProxy.methods.create(PrivateOwners, minOwners, "", "").send({from: user_1, value: PrivatePriceWei, gas: Gas}, function(error, result){});
         let response = await privatePoolFactoryProxy.methods.retrieve(0).call({from: user_1}, function(error, result){});
         const {0: creator, 1: privateCertPoolAddress} = response;
         privateCertPool = new web3.eth.Contract(PrivateCertificatesAbi, privateCertPoolAddress); 

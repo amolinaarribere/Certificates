@@ -7,8 +7,8 @@ const AtLeastOne = new RegExp("EC19-");
 const MinNumberRequired = new RegExp("EC19-");
 const NotEnoughFunds = new RegExp("EC2-");
 const NodeAlreadyExists = new RegExp("EC37-");
-const emptyLabel = "0x0000000000000000000000000000000000000000000000000000000000000000";
-const label = web3.utils.soliditySha3("TestLabel");
+const emptyLabel = "";
+const label = "TestLabel";
 
 async function createElementWrong(FactoryProxy, Owners, minOwners, ElementName, Price, user_1){
 

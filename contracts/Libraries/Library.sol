@@ -81,5 +81,9 @@ library Library{
        
         return result;
     }
+
+    function Bytes32toBytes(bytes32 _b) public pure returns(bytes memory){
+        return abi.encodePacked(_b);
+    }
     
 }

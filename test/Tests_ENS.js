@@ -24,6 +24,7 @@ contract("Testing ENS",function(accounts){
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     const address_1 = "0x0000000000000000000000000000000000000001";
+    const address_2 = "0x0000000000000000000000000000000000000002";
     const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f36000000", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20000000"];
     const label = "0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f36000000";
 
@@ -51,11 +52,11 @@ contract("Testing ENS",function(accounts){
 
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Vote/Propose/Cancel ENS Config WRONG",async function(){
-        await proposition.Config_ENS_Wrong(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, initNodes[0], initNodes[1]);
+        await proposition.Config_ENS_Wrong(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, address_2, initNodes[0], initNodes[1]);
     });
 
     it("Vote/Propose/Cancel ENS Config CORRECT",async function(){
-        await proposition.Config_ENS_Correct(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, initNodes[0], initNodes[1]);
+        await proposition.Config_ENS_Correct(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, address_2, initNodes[0], initNodes[1]);
     });
 
 });
