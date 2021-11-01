@@ -7,14 +7,14 @@ pragma solidity 0.8.7;
  */
 
 import "../Libraries/Library.sol";
-import "../Interfaces/IProxyManager.sol";
+import "../Interfaces/IManager.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract ManagedBaseContract is Initializable{
     using Library for *;
 
     // DATA /////////////////////////////////////////
-    IProxyManager internal _managerContract;
+    IManager internal _managerContract;
 
     // MODIFIERS /////////////////////////////////////////
      modifier isFromManagerContract(address addr){
@@ -24,7 +24,7 @@ contract ManagedBaseContract is Initializable{
 
     // CONSTRUCTOR /////////////////////////////////////////
     function ManagedBaseContract_init(address managerContractAddress) internal initializer {
-        _managerContract = IProxyManager(managerContractAddress);
+        _managerContract = IManager(managerContractAddress);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
