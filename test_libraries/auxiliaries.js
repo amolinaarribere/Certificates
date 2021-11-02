@@ -20,7 +20,17 @@ function IntToBytes32(value){
     return returnValue;
 }
 
+function StringToBytes(str) {
+    return web3.utils.asciiToHex(str);
+}
+
+function BytesToString(bytes) {
+    return web3.utils.hexToAscii(bytes);
+}
+
 exports.AddressToBytes32 = AddressToBytes32;
 exports.Bytes32ToAddress = Bytes32ToAddress;
 exports.IntToBytes32 = IntToBytes32;
 exports.Bytes32ToInt = Bytes32ToInt;
+exports.StringToBytes = StringToBytes;
+exports.BytesToString = BytesToString;

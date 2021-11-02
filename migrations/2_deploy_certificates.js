@@ -70,6 +70,7 @@ module.exports = async function(deployer, network, accounts){
   let ENSReverseRegistryAddress = ENSresult[1];
 
   const PublicOwners = [accounts[0]];
+  const ManagerOwner = accounts[0];
 
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.deploy(Library);
@@ -112,7 +113,7 @@ module.exports = async function(deployer, network, accounts){
   await deployer.link(SignatureLibrary, CertificatesPoolManager);
   console.log("SignatureLibrary linked to Certificate Pool Manager");
 
-  await deployer.deploy(CertificatesPoolManager, CertificateManagerContractName, CertificateManagerContractVersion);
+  await deployer.deploy(CertificatesPoolManager, CertificateManagerContractName, CertificateManagerContractVersion, ManagerOwner);
   CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
 

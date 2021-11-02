@@ -60,13 +60,6 @@ contract("Testing Price Converter",function(accounts){
         priceConverter = contracts[2][7];
     });
 
-    async function checkProposition(_address){
-        var propositionResult = await priceConverterProxy.methods.retrieveProposition().call({from: user_1}, function(error, result){});
-        let _registryAddressProposed = propositionResult[0];
-
-        expect(aux.AddressToBytes32(_address)).to.equal(_registryAddressProposed);
-    }
-
     // ****** TESTING Retrieves ***************************************************************** //
 
     it("Retrieve Exchange Rate ETH - USD",async function(){
@@ -78,17 +71,13 @@ contract("Testing Price Converter",function(accounts){
         
     });
 
+    // ****** Testing Registry Configuration ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
         // act
-        await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-        await priceConverterProxy.methods.sendProposition([aux.AddressToBytes32(address_1)]).send({from: chairPerson, gas: Gas}, function(error, result){});
-        // assert
-        await checkProposition(address_1);
-        
+        var PropositionValues = [address_1];
+        await proposition.Check_Proposition_Details(priceConverterProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
-    // ****** Testing Registry Configuration ***************************************************************** //
-   
     it("Vote/Propose/Cancel Registry Address WRONG",async function(){
         await proposition.Config_PriceConverter_Wrong(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1);
     });

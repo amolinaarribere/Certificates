@@ -51,6 +51,12 @@ contract("Testing ENS",function(accounts){
     });
 
     // ****** Testing Settings Configuration ***************************************************************** //
+    it("Retrieve Proposals Details",async function(){
+        // act
+        var PropositionValues = [address_1, address_2, initNodes[0], initNodes[1]];
+        await proposition.Check_Proposition_Details(ensProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+    });
+
     it("Vote/Propose/Cancel ENS Config WRONG",async function(){
         await proposition.Config_ENS_Wrong(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, address_2, initNodes[0], initNodes[1]);
     });

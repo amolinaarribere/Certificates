@@ -9,6 +9,8 @@ const PropositionSettingsAbi = PropositionSettings.abi;
 const constants = require("../test_libraries/constants.js");
 const init = require("../test_libraries/InitializeContracts.js");
 const proposition = require("../test_libraries/Propositions.js");
+const aux = require("../test_libraries/auxiliaries.js");
+
 
 const PropositionLifeTime = constants.PropositionLifeTime;
 const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
@@ -39,7 +41,14 @@ contract("Testing Proposition Settings",function(accounts){
 
 
     // ****** Testing Settings Configuration ***************************************************************** //
-   
+    it("Retrieve Proposals Details",async function(){
+        // act
+        var PropositionValues = [aux.IntToBytes32(PropositionLifeTime), 
+            aux.IntToBytes32(PropositionThresholdPercentage), 
+            aux.IntToBytes32(minPercentageToPropose)];
+        await proposition.Check_Proposition_Details(propositionSettingsProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+    });
+
     it("Vote/Propose/Cancel Settings WRONG",async function(){
         await proposition.Config_Proposition_Wrong(propositionSettingsProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
     });

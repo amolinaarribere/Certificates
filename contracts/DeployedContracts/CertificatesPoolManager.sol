@@ -28,12 +28,11 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     address PropositionSettings, address ENS);
 
     // DATA /////////////////////////////////////////
+    address private _ManagerOwner;
+
     // Admin Proxy to manage all the TransparentUpgradeableProxies
     ProxyAdmin private _Admin;
 
-    // proposition to change
-    Library.ProposedContractsStruct private _ProposedContracts;
-    
     // Private Certificate Pools Factory
     TransparentUpgradeableProxy private _PrivatePoolFactory;
 
@@ -73,12 +72,18 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         _;
     }
 
+    modifier isOwner(address addr){
+        Library.ItIsSomeone(addr, _ManagerOwner);
+        _;
+    }
+
     // CONSTRUCTOR and INITIALIZATION /////////////////////////////////////////
-    constructor(string memory contractName, string memory contractVersion) 
+    constructor(string memory contractName, string memory contractVersion, address managerOwner) 
     {
         super.TokenGovernanceContract_init(msg.sender, address(this), contractName, contractVersion);
         _Admin = new ProxyAdmin();
         _init = false;
+        _ManagerOwner = managerOwner;
     }
 
     function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) 
@@ -111,19 +116,17 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
 
     function UpdateAll() internal override
     {
-        bytes32[] memory ProposedNewValues = PropositionsToBytes32();
+        upgradeContractImplementation(_PublicCertificatesPool, _ProposedNewValues[0], _ProposedNewValues[10]);
+        upgradeContractImplementation(_Treasury, _ProposedNewValues[1], _ProposedNewValues[11]);
+        upgradeContractImplementation(_CertisToken, _ProposedNewValues[2], _ProposedNewValues[12]);
+        upgradeContractImplementation(_PrivatePoolFactory, _ProposedNewValues[3], _ProposedNewValues[13]);
+        upgradeContractImplementation(_ProviderFactory, _ProposedNewValues[5],_ProposedNewValues[14]);
+        upgradeContractImplementation(_PriceConverter, _ProposedNewValues[7], _ProposedNewValues[15]);
+        upgradeContractImplementation(_PropositionSettings, _ProposedNewValues[8], _ProposedNewValues[16]);
+        upgradeContractImplementation(_ENS, _ProposedNewValues[9],_ProposedNewValues[17]);
 
-        upgradeContractImplementation(_PublicCertificatesPool, AddressLibrary.Bytes32ToAddress(ProposedNewValues[0]), _ProposedNewValues[10]);
-        upgradeContractImplementation(_Treasury, AddressLibrary.Bytes32ToAddress(ProposedNewValues[1]), _ProposedNewValues[11]);
-        upgradeContractImplementation(_CertisToken, AddressLibrary.Bytes32ToAddress(ProposedNewValues[2]), _ProposedNewValues[12]);
-        upgradeContractImplementation(_PrivatePoolFactory, AddressLibrary.Bytes32ToAddress(ProposedNewValues[3]), _ProposedNewValues[13]);
-        upgradeContractImplementation(_ProviderFactory, AddressLibrary.Bytes32ToAddress(ProposedNewValues[5]),_ProposedNewValues[14]);
-        upgradeContractImplementation(_PriceConverter, AddressLibrary.Bytes32ToAddress(ProposedNewValues[7]), _ProposedNewValues[15]);
-        upgradeContractImplementation(_PropositionSettings, AddressLibrary.Bytes32ToAddress(ProposedNewValues[8]), _ProposedNewValues[16]);
-        upgradeContractImplementation(_ENS, AddressLibrary.Bytes32ToAddress(ProposedNewValues[9]),_ProposedNewValues[17]);
-
-        if(address(0) != AddressLibrary.Bytes32ToAddress(ProposedNewValues[4]))_PrivateCertificatePoolBeacon.upgradeTo(AddressLibrary.Bytes32ToAddress(ProposedNewValues[4]));
-        if(address(0) != AddressLibrary.Bytes32ToAddress(ProposedNewValues[6]))_ProviderBeacon.upgradeTo(AddressLibrary.Bytes32ToAddress(ProposedNewValues[6]));
+        if(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[4])[0]))_PrivateCertificatePoolBeacon.upgradeTo(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[4])[0]));
+        if(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[6])[0]))_ProviderBeacon.upgradeTo(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[6])[0]));
 
         if(0 < _ProposedNewValues[18].length)
             IFactory(address(_PrivatePoolFactory)).updateContractName(string(_ProposedNewValues[18]));
@@ -137,12 +140,19 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         internalRetrieveImpl(_PriceConverter), internalRetrieveImpl(_PropositionSettings), internalRetrieveImpl(_ENS));
     }
 
-    function upgradeContractImplementation(TransparentUpgradeableProxy proxy, address NewImpl, bytes memory Data) private
+    function upgradeContractImplementation(TransparentUpgradeableProxy proxy, bytes memory NewImpl, bytes memory Data) private
     {
-        if(address(0) != NewImpl){
-            if(0 < Data.length)_Admin.upgradeAndCall(proxy, NewImpl, Data);
-            else _Admin.upgrade(proxy, NewImpl);
+        address NewImplAddress = AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewImpl)[0]);
+        if(address(0) != NewImplAddress){
+            if(0 < Data.length)_Admin.upgradeAndCall(proxy, NewImplAddress, Data);
+            else _Admin.upgrade(proxy, NewImplAddress);
         }
+    }
+
+    function ChangeAdminOwner(address newOwner) external override 
+        isOwner(msg.sender)
+    {
+        _Admin.transferOwnership(newOwner);
     }
 
     // configuration Proxies

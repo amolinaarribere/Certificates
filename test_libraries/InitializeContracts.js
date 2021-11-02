@@ -320,7 +320,7 @@ const PublicCertificatesPoolProxyInitializerMethod = {
 };
 
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
-  let certPoolManager = await CertificatesPoolManager.new(CertificateManagerContractName, CertificateManagerContractVersion, {from: chairPerson});
+  let certPoolManager = await CertificatesPoolManager.new(CertificateManagerContractName, CertificateManagerContractVersion, chairPerson, {from: chairPerson});
   let implementations = await deployImplementations(user_1);
   let ProxyData = returnProxyInitData(PublicOwners, minOwners, certPoolManager.address, chairPerson, implementations[8]);
 

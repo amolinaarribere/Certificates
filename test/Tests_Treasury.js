@@ -6,6 +6,7 @@ const pool_common = require("../test_libraries/Pools.js");
 const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
 const proposition = require("../test_libraries/Propositions.js");
+const aux = require("../test_libraries/auxiliaries.js");
 
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PublicCertificates = artifacts.require("PublicCertificatesPool");
@@ -81,6 +82,15 @@ contract("Testing Treasury",function(accounts){
     }
 
     // ****** TESTING Price Config ***************************************************************** //
+    it("Retrieve Proposals Details",async function(){
+        // act
+        var PropositionValues = [aux.IntToBytes32(PublicPriceUSD), 
+            aux.IntToBytes32(PrivatePriceUSD), 
+            aux.IntToBytes32(ProviderPriceUSD),
+            aux.IntToBytes32(CertificatePriceUSD),
+            aux.IntToBytes32(OwnerRefundPriceUSD)];
+        await proposition.Check_Proposition_Details(TreasuryProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+    });
 
     it("Vote/Propose/cancel Price Configuration WRONG",async function(){
         await proposition.Config_Treasury_Wrong(TreasuryProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD);
