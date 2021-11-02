@@ -22,7 +22,6 @@ const ENSAbi = ENS.abi;
 
 const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
-const obj = require("../test_libraries/objects.js");
 const proposition = require("../test_libraries/Propositions.js");
 const aux = require("../test_libraries/auxiliaries.js");
 
