@@ -63,36 +63,19 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     // ENS
     TransparentUpgradeableProxy private _ENS;
 
-    // init
-    bool private _init;
-
     // MODIFIERS /////////////////////////////////////////
-    modifier isNotInitialized(){
-        require(false == _init, "EC26-");
-        _;
-    }
-
     modifier isOwner(address addr){
         Library.ItIsSomeone(addr, _ManagerOwner);
         _;
     }
 
-    // CONSTRUCTOR and INITIALIZATION /////////////////////////////////////////
-    constructor(string memory contractName, string memory contractVersion, address managerOwner) 
+    // INITIALIZATION /////////////////////////////////////////
+    function CertificatesPoolManager_init(string memory contractName, string memory contractVersion, address managerOwner, Library.ProposedContractsStruct calldata initialContracts) public initializer
     {
-        super.TokenGovernanceContract_init(msg.sender, address(this), contractName, contractVersion);
+        super.StdPropositionBaseContract_init(msg.sender, address(this), contractName, contractVersion);
         _Admin = new ProxyAdmin();
-        _init = false;
         _ManagerOwner = managerOwner;
-    }
-
-    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) 
-        isFromChairPerson(msg.sender)
-        isNotInitialized()
-    external override
-    {
         initProxies(initialContracts);
-        _init = true;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -235,10 +218,6 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
 
     function retrieveENS() external override view returns (address) {
         return internalRetrieveImpl(_ENS);
-    }
-
-    function isInitialized() external override view returns(bool){
-        return _init;
     }
 
     // internal
