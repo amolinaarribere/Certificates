@@ -76,7 +76,7 @@ async function returnContractManagerSettings(contractAddress, user_1){
 
 async function checkPriceConverter(contractAddress, addressBytes, user_1){
     let _registryAddress =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    expect(addressBytes[0]).to.equal(_registryAddress);
+    expect(aux.Bytes32ToAddress(addressBytes[0])).to.equal(_registryAddress);
 }
 
 async function checkPropositionSettings(contractAddress, propBytes, user_1){
@@ -88,8 +88,8 @@ async function checkPropositionSettings(contractAddress, propBytes, user_1){
 
 async function checkENS(contractAddress, ENSBytes, user_1){
     let _ENS =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    expect(ENSBytes[0]).to.equal(_ENS[0]);
-    expect(ENSBytes[1]).to.equal(_ENS[1]);
+    expect(aux.Bytes32ToAddress(ENSBytes[0])).to.equal(_ENS[0]);
+    expect(aux.Bytes32ToAddress(ENSBytes[1])).to.equal(_ENS[1]);
     expect(ENSBytes[2]).to.equal(_ENS[2]);
     expect(ENSBytes[3]).to.equal(_ENS[3]);
 }
@@ -155,24 +155,24 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
 };
 
 async function Config_PriceConverter_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1){
-    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes(address_1)]);
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes32(address_1)]);
 };
 
 async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1){
     let _registryAddress =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let NewValues = [aux.AddressToBytes(address_1)];
-    let InitValue = [aux.AddressToBytes(_registryAddress)];
+    let NewValues = [aux.AddressToBytes32(address_1)];
+    let InitValue = [aux.AddressToBytes32(_registryAddress)];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPriceConverter);
 };
 
 async function Config_ENS_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, address_2, node_1, node_2){
-    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes(address_1), aux.AddressToBytes(address_2), node_1, node_2]);
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes32(address_1), aux.AddressToBytes32(address_2), node_1, node_2]);
 };
 
 async function Config_ENS_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, address_2, node_1, node_2){
     let _ENSSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let NewValues = [aux.AddressToBytes(address_1), aux.AddressToBytes(address_2), node_1, node_2];
-    let InitValue = [aux.AddressToBytes(_ENSSettings[0]), aux.AddressToBytes(_ENSSettings[1]), _ENSSettings[2], _ENSSettings[3]];
+    let NewValues = [aux.AddressToBytes32(address_1), aux.AddressToBytes32(address_2), node_1, node_2];
+    let InitValue = [aux.AddressToBytes32(_ENSSettings[0]), aux.AddressToBytes32(_ENSSettings[1]), _ENSSettings[2], _ENSSettings[3]];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkENS);
 
    
