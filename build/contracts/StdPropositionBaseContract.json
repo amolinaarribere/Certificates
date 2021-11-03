@@ -458,36 +458,36 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n Price Converter is an interface to the Chain Link Price Registry for USD to ETH exchange\r\n */\r\n\r\nimport \"./TokenGovernanceBaseContract.sol\";\r\nimport \"../Interfaces/IStdPropositionBaseContract.sol\";\r\n\r\n\r\nabstract contract StdPropositionBaseContract is IStdPropositionBaseContract, TokenGovernanceBaseContract {\r\n\r\n    // DATA /////////////////////////////////////////\r\n    bytes[] internal _ProposedNewValues;\r\n\r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function StdPropositionBaseContract_init(address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer \r\n    {\r\n        super.TokenGovernanceContract_init(chairPerson, managerContractAddress, contractName, contractVersion);\r\n    }\r\n\r\n    // GOVERNANCE /////////////////////////////////////////\r\n    function sendProposition(bytes[] memory NewValues) external override\r\n    {\r\n        checkProposition(NewValues);\r\n        addProposition();\r\n        for(uint i=0; i < NewValues.length; i++){\r\n            _ProposedNewValues.push(NewValues[i]);\r\n        }\r\n    }\r\n\r\n    function propositionApproved() internal override\r\n    {\r\n        UpdateAll();\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionRejected() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionExpired() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function removeProposition() internal\r\n    {\r\n        delete(_ProposedNewValues);\r\n    }\r\n\r\n    function retrieveProposition() external override view returns(bytes[] memory)\r\n    {\r\n        return _ProposedNewValues;\r\n    }\r\n\r\n    function PropositionsToBytes32() internal view returns (bytes32[] memory)\r\n    {\r\n        bytes32[] memory PropositionsBytes32 = new bytes32[](_ProposedNewValues.length);\r\n\r\n        for(uint i=0; i<_ProposedNewValues.length; i++){\r\n            PropositionsBytes32[i] = Library.BytestoBytes32(_ProposedNewValues[i])[0];\r\n        }\r\n\r\n        return PropositionsBytes32;\r\n    }\r\n\r\n    function checkProposition(bytes[] memory NewValues) internal virtual{}\r\n\r\n    function UpdateAll() internal virtual;\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Base\\StdPropositionBaseContract.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        8700
+        4154
       ],
       "IERC20Upgradeable": [
-        12049
+        5976
       ],
       "IManager": [
-        8135
+        3589
       ],
       "IPropositionSettings": [
-        8351
+        3805
       ],
       "ISignatureBaseContract": [
-        8479
+        3933
       ],
       "IStdPropositionBaseContract": [
-        8495
+        3949
       ],
       "ITokenEventSubscriber": [
-        8508
+        3962
       ],
       "Initializable": [
-        11398
+        5898
       ],
       "Library": [
-        9969
+        5423
       ],
       "ManagedBaseContract": [
         1990
@@ -496,7 +496,7 @@
         2149
       ],
       "SignatureLibrary": [
-        10252
+        5706
       ],
       "StdPropositionBaseContract": [
         2322
@@ -538,7 +538,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2323,
-        "sourceUnit": 8496,
+        "sourceUnit": 3950,
         "src": "213:55:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -551,7 +551,7 @@
               "id": 2154,
               "name": "IStdPropositionBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8495,
+              "referencedDeclaration": 3949,
               "src": "322:27:7"
             },
             "id": 2155,
@@ -579,11 +579,11 @@
           2322,
           3235,
           1990,
-          11398,
+          5898,
           2149,
-          8479,
-          8508,
-          8495
+          3933,
+          3962,
+          3949
         ],
         "name": "StdPropositionBaseContract",
         "nameLocation": "292:26:7",
@@ -761,7 +761,7 @@
                   "id": 2170,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 11397,
+                  "referencedDeclaration": 5897,
                   "src": "709:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -902,7 +902,7 @@
           },
           {
             "baseFunctions": [
-              8488
+              3942
             ],
             "body": {
               "id": 2218,
@@ -1665,7 +1665,7 @@
           },
           {
             "baseFunctions": [
-              8494
+              3948
             ],
             "body": {
               "id": 2263,
@@ -2000,10 +2000,10 @@
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 9969,
+                                  "referencedDeclaration": 5423,
                                   "src": "2007:7:7",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$9969_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$5423_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
@@ -2014,7 +2014,7 @@
                                 "lValueRequested": false,
                                 "memberName": "BytestoBytes32",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 9955,
+                                "referencedDeclaration": 5409,
                                 "src": "2007:22:7",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -2410,31 +2410,31 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
     "exportedSymbols": {
       "AddressLibrary": [
-        8700
+        4154
       ],
       "IERC20Upgradeable": [
-        12049
+        5976
       ],
       "IManager": [
-        8135
+        3589
       ],
       "IPropositionSettings": [
-        8351
+        3805
       ],
       "ISignatureBaseContract": [
-        8479
+        3933
       ],
       "IStdPropositionBaseContract": [
-        8495
+        3949
       ],
       "ITokenEventSubscriber": [
-        8508
+        3962
       ],
       "Initializable": [
-        11398
+        5898
       ],
       "Library": [
-        9969
+        5423
       ],
       "ManagedBaseContract": [
         1990
@@ -2443,7 +2443,7 @@
         2149
       ],
       "SignatureLibrary": [
-        10252
+        5706
       ],
       "StdPropositionBaseContract": [
         2322
@@ -2485,7 +2485,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2323,
-        "sourceUnit": 8496,
+        "sourceUnit": 3950,
         "src": "213:55:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2498,7 +2498,7 @@
               "id": 2154,
               "name": "IStdPropositionBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8495,
+              "referencedDeclaration": 3949,
               "src": "322:27:7"
             },
             "id": 2155,
@@ -2526,11 +2526,11 @@
           2322,
           3235,
           1990,
-          11398,
+          5898,
           2149,
-          8479,
-          8508,
-          8495
+          3933,
+          3962,
+          3949
         ],
         "name": "StdPropositionBaseContract",
         "nameLocation": "292:26:7",
@@ -2708,7 +2708,7 @@
                   "id": 2170,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 11397,
+                  "referencedDeclaration": 5897,
                   "src": "709:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2849,7 +2849,7 @@
           },
           {
             "baseFunctions": [
-              8488
+              3942
             ],
             "body": {
               "id": 2218,
@@ -3612,7 +3612,7 @@
           },
           {
             "baseFunctions": [
-              8494
+              3948
             ],
             "body": {
               "id": 2263,
@@ -3947,10 +3947,10 @@
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 9969,
+                                  "referencedDeclaration": 5423,
                                   "src": "2007:7:7",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$9969_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$5423_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
@@ -3961,7 +3961,7 @@
                                 "lValueRequested": false,
                                 "memberName": "BytestoBytes32",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 9955,
+                                "referencedDeclaration": 5409,
                                 "src": "2007:22:7",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -4359,7 +4359,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-11-03T08:46:09.750Z",
+  "updatedAt": "2021-11-03T08:49:04.441Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

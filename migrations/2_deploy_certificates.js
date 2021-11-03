@@ -606,12 +606,16 @@ module.exports = async function(deployer, network, accounts){
       ProviderFactoryInstance.address, 
       ProviderInstance.address, 
       PriceConverterInstance.address,
+      PropositionSettingsInstance.address,
+      ENSInstance.address,
       PublicCertificatesPoolProxyData, 
       TreasuryProxyData, 
       CertisProxyData, 
       PrivatePoolFactoryProxyData, 
       ProviderFactoryProxyData, 
       PriceConverterProxyData,
+      PropositionSettingsProxyData,
+      ENSProxyData,
       PrivatePoolContractName,
       PrivatePoolContractVersion));
 
