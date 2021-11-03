@@ -230,6 +230,10 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         return internalRetrieveImpl(_ENS);
     }
 
+    function isInitialized() external override view returns(bool){
+        return _init;
+    }
+
     // internal
     function internalRetrieveImpl(TransparentUpgradeableProxy proxy) internal view returns (address){
         return _Admin.getProxyImplementation(proxy);

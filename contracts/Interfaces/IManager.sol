@@ -32,4 +32,6 @@ pragma solidity 0.8.7;
     function retrievePriceConverter() external view returns (address);
     function retrievePropositionSettings() external view returns (address);
     function retrieveENS() external view returns (address);
+
+    function isInitialized() external view returns(bool);
 }

@@ -34,11 +34,20 @@ contract Admin is IAdmin, StdPropositionBaseContract{
 
     // FUNCTIONALITY /////////////////////////////////////////
     // governance : contracts assignment and management
+    function checkProposition(bytes[] memory NewValues) internal override 
+    {
+        require(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[0])[0]));
+    }
+
     function UpdateAll() internal override
     {
-        _Manager.upgradeToAndCall(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[0])[0]), _ProposedNewValues[1]);
+        address NewImplAddress = AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[0])[0]);
+        bytes memory Data = _ProposedNewValues[1];
 
-        emit _NewManager(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[0])[0]));
+        if(0 < Data.length)_Manager.upgradeToAndCall(NewImplAddress, Data);
+        else _Manager.upgradeTo(NewImplAddress);
+
+        emit _NewManager(NewImplAddress);
     }
 
     // configuration Proxies
