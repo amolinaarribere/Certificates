@@ -9,7 +9,7 @@ pragma solidity 0.8.7;
  import "../Libraries/Library.sol";
 
  interface IManager  {
-    function ChangeAdminOwner(address newOwner) external;
+    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) external;
     
     function retrievePublicCertificatePoolProxy() external view returns (address);
     function retrieveTreasuryProxy() external view returns (address);

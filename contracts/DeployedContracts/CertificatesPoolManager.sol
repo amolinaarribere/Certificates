@@ -63,19 +63,34 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     // ENS
     TransparentUpgradeableProxy private _ENS;
 
+    // init
+    bool private _init;
+
     // MODIFIERS /////////////////////////////////////////
     modifier isOwner(address addr){
         Library.ItIsSomeone(addr, _ManagerOwner);
         _;
     }
 
+    modifier isNotInitialized(){
+        require(false == _init, "EC26-");
+        _;
+    }
+
     // INITIALIZATION /////////////////////////////////////////
-    function CertificatesPoolManager_init(string memory contractName, string memory contractVersion, address managerOwner, Library.ProposedContractsStruct calldata initialContracts) public initializer
+    function CertificatesPoolManager_init(string memory contractName, string memory contractVersion) public initializer
     {
         super.StdPropositionBaseContract_init(msg.sender, address(this), contractName, contractVersion);
         _Admin = new ProxyAdmin();
-        _ManagerOwner = managerOwner;
+    }
+
+    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) 
+        isFromChairPerson(msg.sender)
+        isNotInitialized()
+    external override
+    {
         initProxies(initialContracts);
+        _init = true;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -132,11 +147,6 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         }
     }
 
-    function ChangeAdminOwner(address newOwner) external override 
-        isOwner(msg.sender)
-    {
-        _Admin.transferOwnership(newOwner);
-    }
 
     // configuration Proxies
     function retrievePublicCertificatePoolProxy() external override view returns (address) {

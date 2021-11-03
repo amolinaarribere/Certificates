@@ -25,29 +25,11 @@ contract Admin is IAdmin, StdPropositionBaseContract{
     // Manager
     TransparentUpgradeableProxy private _Manager;
 
-    // init
-    bool private _init;
-
-    // MODIFIERS /////////////////////////////////////////
-    modifier isNotInitialized(){
-        require(false == _init, "EC26-");
-        _;
-    }
-
     // CONSTRUCTOR and INITIALIZATION /////////////////////////////////////////
-    constructor(string memory contractName, string memory contractVersion) 
+    constructor(string memory contractName, string memory contractVersion, address managerContract, bytes memory managerInit) 
     {
         super.StdPropositionBaseContract_init(msg.sender, address(this), contractName, contractVersion);
-        _init = false;
-    }
-
-    function Initialize(address managerContract, bytes calldata managerInit) 
-        isFromChairPerson(msg.sender)
-        isNotInitialized()
-    external override
-    {
         _Manager = new TransparentUpgradeableProxy(managerContract, address(this), managerInit);
-        _init = true;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
