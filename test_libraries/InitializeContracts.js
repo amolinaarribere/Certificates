@@ -1,3 +1,4 @@
+const Admin = artifacts.require("Admin");
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const Treasury = artifacts.require("Treasury");
 const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
@@ -9,6 +10,9 @@ const ENS = artifacts.require("ENS");
 const PropositionSettings = artifacts.require("PropositionSettings");
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const ProviderFactory = artifacts.require("ProviderFactory");
+
+const CertificatesPoolManagerAbi = CertificatesPoolManager.abi;
+
 
 const MockChainLinkFeedRegistry = artifacts.require("MockChainLinkFeedRegistry"); // Mock
 const MockENSRegistry = artifacts.require("MockENSRegistry"); // Mock
@@ -48,7 +52,32 @@ const PropositionSettingsContractName = constants.PropositionSettingsContractNam
 const PropositionSettingsContractVersion = constants.PropositionSettingsContractVersion;
 const ENSContractName = constants.ENSContractName;
 const ENSContractVersion = constants.ENSContractVersion;
+const AdminContractName = constants.AdminContractName;
+const AdminContractVersion = constants.AdminContractVersion;
 
+var CertificatesPoolManagerProxyInitializerMethod = {
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "chairPerson",
+      "type": "address"
+    },
+    {
+      "internalType": "string",
+      "name": "contractName",
+      "type": "string"
+    },
+    {
+      "internalType": "string",
+      "name": "contractVersion",
+      "type": "string"
+    }
+  ],
+  "name": "CertificatesPoolManager_init",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+};
 const ENSProxyInitializerMethod = {
   "inputs": [
     {
@@ -320,16 +349,22 @@ const PublicCertificatesPoolProxyInitializerMethod = {
 };
 
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
-  let certPoolManager = await CertificatesPoolManager.new(CertificateManagerContractName, CertificateManagerContractVersion, chairPerson, {from: chairPerson});
+  let certPoolManager = await CertificatesPoolManager.new({from: chairPerson, gas: Gas});
+  let CertPoolManagerProxyData = getProxyData(CertificatesPoolManagerProxyInitializerMethod, [chairPerson, CertificateManagerContractName, CertificateManagerContractVersion]);
+  let admin = await Admin.new(AdminContractName, AdminContractVersion, certPoolManager.address, CertPoolManagerProxyData, {from: chairPerson, gas: Gas});
+  let certPoolManagerProxyAddress = await admin.retrieveManagerProxy();
+
+  var certPoolManagerProxy = new web3.eth.Contract(CertificatesPoolManagerAbi, certPoolManagerProxyAddress);
+
   let implementations = await deployImplementations(user_1);
-  let ProxyData = returnProxyInitData(PublicOwners, minOwners, certPoolManager.address, chairPerson, implementations[8]);
+  let ProxyData = returnProxyInitData(PublicOwners, minOwners, certPoolManagerProxyAddress, chairPerson, implementations[8]);
 
-  await certPoolManager.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6], implementations[7], implementations[9], implementations[10],
-    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5], ProxyData[6], ProxyData[7], PrivatePoolContractName, PrivatePoolContractVersion), {from: chairPerson});
+  await certPoolManagerProxy.methods.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6], implementations[7], implementations[9], implementations[10],
+    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5], ProxyData[6], ProxyData[7], PrivatePoolContractName, PrivatePoolContractVersion)).send({from: chairPerson, gas: Gas});
 
-  let proxies = await retrieveProxies(certPoolManager, user_1);
+  let proxies = await retrieveProxies(certPoolManagerProxy, user_1);
 
-  return [certPoolManager, proxies, implementations];
+  return [certPoolManagerProxy, proxies, implementations];
 }
 
 async function deployImplementations(user_1){
@@ -355,14 +390,14 @@ async function deployImplementations(user_1){
 }
 
 async function retrieveProxies(certPoolManager, user_1){
-  let publicPoolProxy = await certPoolManager.retrievePublicCertificatePoolProxy({from: user_1});
-  let treasuryProxy = await certPoolManager.retrieveTreasuryProxy({from: user_1});
-  let certisTokenProxy = await certPoolManager.retrieveCertisTokenProxy({from: user_1});
-  let privatePoolFactoryProxy = await certPoolManager.retrievePrivatePoolFactoryProxy({from: user_1});
-  let providerFactoryProxy = await certPoolManager.retrieveProviderFactoryProxy({from: user_1});
-  let priceConverterProxy = await certPoolManager.retrievePriceConverterProxy({from: user_1});
-  let propositionSettingsProxy = await certPoolManager.retrievePropositionSettingsProxy({from: user_1});
-  let ensProxy = await certPoolManager.retrieveENSProxy({from: user_1});
+  let publicPoolProxy = await certPoolManager.methods.retrievePublicCertificatePoolProxy().call({from: user_1});
+  let treasuryProxy = await certPoolManager.methods.retrieveTreasuryProxy().call({from: user_1});
+  let certisTokenProxy = await certPoolManager.methods.retrieveCertisTokenProxy().call({from: user_1});
+  let privatePoolFactoryProxy = await certPoolManager.methods.retrievePrivatePoolFactoryProxy().call({from: user_1});
+  let providerFactoryProxy = await certPoolManager.methods.retrieveProviderFactoryProxy().call({from: user_1});
+  let priceConverterProxy = await certPoolManager.methods.retrievePriceConverterProxy().call({from: user_1});
+  let propositionSettingsProxy = await certPoolManager.methods.retrievePropositionSettingsProxy().call({from: user_1});
+  let ensProxy = await certPoolManager.methods.retrieveENSProxy().call({from: user_1});
 
   return [publicPoolProxy, treasuryProxy, certisTokenProxy, privatePoolFactoryProxy, providerFactoryProxy, priceConverterProxy, propositionSettingsProxy, ensProxy];
 }

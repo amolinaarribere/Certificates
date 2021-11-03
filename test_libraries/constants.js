@@ -25,6 +25,8 @@ const PropositionSettingsContractName = "Proposition Settings";
 const PropositionSettingsContractVersion = "1.0";
 const ENSContractName = "ENS";
 const ENSContractVersion = "1.0";
+const AdminContractName = "Admin";
+const AdminContractVersion = "1.0";
 
 exports.PublicPriceUSD = PublicPriceUSD;
 exports.PrivatePriceUSD = PrivatePriceUSD;
@@ -53,3 +55,5 @@ exports.PropositionSettingsContractName = PropositionSettingsContractName;
 exports.PropositionSettingsContractVersion = PropositionSettingsContractVersion;
 exports.ENSContractName = ENSContractName;
 exports.ENSContractVersion = ENSContractVersion;
+exports.AdminContractName = AdminContractName;
+exports.AdminContractVersion = AdminContractVersion;

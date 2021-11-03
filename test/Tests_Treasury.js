@@ -36,6 +36,7 @@ const Gas = constants.Gas;
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Treasury",function(accounts){
+    var certPoolManager;
     var certisTokenProxy;
     var publicCertPool;
     var Treasury;

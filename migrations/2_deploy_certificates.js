@@ -124,6 +124,11 @@ module.exports = async function(deployer, network, accounts){
   var CertificatesPoolManagerProxyInitializerMethod = {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
         "internalType": "string",
         "name": "contractName",
         "type": "string"
@@ -140,7 +145,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var CertificatesPoolManagerProxyInitializerParameters = [CertificateManagerContractName, CertificateManagerContractVersion];
+  var CertificatesPoolManagerProxyInitializerParameters = [accounts[0], CertificateManagerContractName, CertificateManagerContractVersion];
   var CertificatesPoolManagerProxyData = web3.eth.abi.encodeFunctionCall(CertificatesPoolManagerProxyInitializerMethod, CertificatesPoolManagerProxyInitializerParameters);
   
 
