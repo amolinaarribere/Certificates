@@ -364,7 +364,7 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
 
   let proxies = await retrieveProxies(certPoolManagerProxy, user_1);
 
-  return [certPoolManagerProxy, proxies, implementations];
+  return [certPoolManagerProxy, proxies, implementations, admin.address];
 }
 
 async function deployImplementations(user_1){

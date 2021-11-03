@@ -12,6 +12,7 @@ import "../Base/StdPropositionBaseContract.sol";
 import "../Libraries/AddressLibrary.sol";
 import "../Libraries/Library.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 
 contract Admin is IAdmin, StdPropositionBaseContract{
@@ -25,27 +26,36 @@ contract Admin is IAdmin, StdPropositionBaseContract{
     // Manager
     TransparentUpgradeableProxy private _Manager;
 
+    // Admin Proxy to manage the TransparentUpgradeableProxy
+    ProxyAdmin private _Admin;
+
+    // MODIFIERS /////////////////////////////////////////
+    modifier isAddressOK(address  addr){
+        require(address(0) != addr, "EC21-");
+        _;
+    }
+
     // CONSTRUCTOR and INITIALIZATION /////////////////////////////////////////
     constructor(string memory contractName, string memory contractVersion, address managerContract, bytes memory managerInit) 
     {
-        super.StdPropositionBaseContract_init(msg.sender, address(this), contractName, contractVersion);
-        _Manager = new TransparentUpgradeableProxy(managerContract, address(this), managerInit);
+        _Admin = new ProxyAdmin();
+        _Manager = new TransparentUpgradeableProxy(managerContract, address(_Admin), managerInit);
+        super.StdPropositionBaseContract_init(msg.sender, address(_Manager), contractName, contractVersion);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
     // governance : contracts assignment and management
     function checkProposition(bytes[] memory NewValues) internal override 
-    {
-        require(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[0])[0]));
-    }
+        isAddressOK(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[0])[0]))
+    {}
 
     function UpdateAll() internal override
     {
         address NewImplAddress = AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[0])[0]);
         bytes memory Data = _ProposedNewValues[1];
 
-        if(0 < Data.length)_Manager.upgradeToAndCall(NewImplAddress, Data);
-        else _Manager.upgradeTo(NewImplAddress);
+        if(0 < Data.length)_Admin.upgradeAndCall(_Manager, NewImplAddress, Data);
+        else _Admin.upgrade(_Manager, NewImplAddress);
 
         emit _NewManager(NewImplAddress);
     }

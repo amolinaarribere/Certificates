@@ -15,6 +15,7 @@ const CanNotVote = new RegExp("EC23-");
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 const emptyBytes = "0x";
+const address_0 = "0x0000000000000000000000000000000000000000";
 
 
 async function SplitTokenSupply(CT, tokenOwner, chairPerson){
@@ -120,6 +121,11 @@ async function checkContracts(contractAddress, ContractsBytes, user_1){
 
 }
 
+async function checkAdmin(contractAddress, addressBytes, user_1){
+    let _managerAddress =  await contractAddress.methods.retrieveManager().call({from: user_1}, function(error, result){});
+    expect(aux.Bytes32ToAddress(addressBytes[0])).to.equal(_managerAddress);
+}
+
 // tests
 
 async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose){
@@ -142,7 +148,6 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     catch(error){
         expect(error.message).to.match(WrongConfig);
     }
-    
     
 };
 
@@ -229,6 +234,26 @@ async function Config_ContractsManager_Correct(contractAddress, certisTokenProxy
     ];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts);
    
+};
+
+async function Config_Admin_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, data_1){
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes32(address_1), data_1]);
+    // act
+    try{
+        await contractAddress.methods.sendProposition([address_0, emptyBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongConfig);
+    }
+};
+
+async function Config_Admin_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, data_1){
+    let _managerAddress =  await contractAddress.methods.retrieveManager().call({from: user_1}, function(error, result){});
+    let NewValues = [aux.AddressToBytes32(address_1), data_1];
+    let InitValue = [aux.AddressToBytes32(_managerAddress), data_1];
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkAdmin);
 };
 
 /////////////////////
@@ -382,5 +407,7 @@ exports.Config_Treasury_Wrong = Config_Treasury_Wrong;
 exports.Config_Treasury_Correct = Config_Treasury_Correct;
 exports.Config_ContractsManager_Wrong = Config_ContractsManager_Wrong;
 exports.Config_ContractsManager_Correct = Config_ContractsManager_Correct;
+exports.Config_Admin_Wrong = Config_Admin_Wrong;
+exports.Config_Admin_Correct = Config_Admin_Correct;
 exports.SplitTokenSupply = SplitTokenSupply;
 exports.Check_Proposition_Details = Check_Proposition_Details;
