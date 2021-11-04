@@ -14,7 +14,10 @@ import "../Interfaces/IENSResolver.sol";
 contract ENS is IENS, StdPropositionBaseContract {
 
     // EVENTS /////////////////////////////////////////
-    event _NewSettings(address Registry, address ReverseRegistry, bytes32 PrivatePoolNode, bytes32 ProviderNode);
+    event _NewRegistry(address Registry);
+    event _NewReverseRegistry(address ReverseRegistry);
+    event _NewPrivatePoolNode(bytes32 PrivatePoolNode);
+    event _NewProviderNode(bytes32 ProviderNode);
     event _NewSubdomainCreated(bytes32 node, bytes32 label);
 
     // DATA /////////////////////////////////////////
@@ -30,6 +33,11 @@ contract ENS is IENS, StdPropositionBaseContract {
         _;
     }
 
+    modifier arePropositionsOK(address addr1, address addr2, bytes32 privatenode, bytes32 providernode){
+        require(address(0) != addr1 || address(0) != addr2 || privatenode > 0 || providernode > 0, "EC21-");
+        _;
+    }
+
     // CONSTRUCTOR /////////////////////////////////////////
     function ENS_init(address ENSRegistry, address ENSReverseRegistry, bytes32[] memory nodes, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
@@ -41,6 +49,13 @@ contract ENS is IENS, StdPropositionBaseContract {
     }
 
     // GOVERNANCE /////////////////////////////////////////
+    function checkProposition(bytes[] memory NewValues) internal override 
+        arePropositionsOK(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[0])[0]),
+                            AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[1])[0]),
+                            Library.BytestoBytes32(NewValues[2])[0],
+                            Library.BytestoBytes32(NewValues[3])[0])
+    {}
+
     function UpdateAll() internal override
     {
         bytes32[] memory ProposedNewValues = PropositionsToBytes32();
@@ -48,19 +63,26 @@ contract ENS is IENS, StdPropositionBaseContract {
         address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(ProposedNewValues[0]);
         address NewReverseRegistryAddress = AddressLibrary.Bytes32ToAddress(ProposedNewValues[1]);
 
-        if(address(0) != NewRegistryAddress) _ENS = IENSRegistry(NewRegistryAddress);
-        else NewRegistryAddress = address(_ENS);
+        if(address(0) != NewRegistryAddress){
+            _ENS = IENSRegistry(NewRegistryAddress);
+            emit _NewRegistry(NewRegistryAddress);
+        } 
 
-        if(address(0) != NewReverseRegistryAddress) _ENSReverseRegistry = NewReverseRegistryAddress;
-        else NewReverseRegistryAddress = _ENSReverseRegistry;
+        if(address(0) != NewReverseRegistryAddress){
+            _ENSReverseRegistry = NewReverseRegistryAddress;
+            emit _NewReverseRegistry(NewReverseRegistryAddress);
+        }
 
-        if(ProposedNewValues[2] > 0) _PrivatePoolNode = ProposedNewValues[2];
-        else ProposedNewValues[2] = _PrivatePoolNode;
+        if(ProposedNewValues[2] > 0) {
+            _PrivatePoolNode = ProposedNewValues[2];
+            emit _NewPrivatePoolNode(ProposedNewValues[2]);
+        }
 
-        if(ProposedNewValues[3] > 0) _ProviderNode = ProposedNewValues[3];
-        else ProposedNewValues[3] = _ProviderNode;
+        if(ProposedNewValues[3] > 0) {
+            _ProviderNode = ProposedNewValues[3];
+            emit _NewProviderNode(ProposedNewValues[3]);
+        }
 
-        emit _NewSettings(NewRegistryAddress, NewReverseRegistryAddress, ProposedNewValues[2], ProposedNewValues[3]);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////

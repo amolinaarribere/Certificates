@@ -22,6 +22,12 @@ contract PriceConverter is IPriceConverter, StdPropositionBaseContract {
     uint8 constant _ETHDecimals = 18;
     uint8 constant _USDDecimals = 2;
 
+    // MODIFIERS /////////////////////////////////////////
+    modifier isAddressOK(address addr){
+        require(address(0) != addr, "EC21-");
+        _;
+    }
+
     // CONSTRUCTOR /////////////////////////////////////////
     function PriceConverter_init(address registry, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
@@ -30,14 +36,15 @@ contract PriceConverter is IPriceConverter, StdPropositionBaseContract {
     }
 
     // GOVERNANCE /////////////////////////////////////////
+    function checkProposition(bytes[] memory NewValues) internal override 
+        isAddressOK(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[0])[0]))
+    {}
+
     function UpdateAll() internal override
     {
         bytes32[] memory ProposedNewValues = PropositionsToBytes32();
-
         address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(ProposedNewValues[0]);
-
         _registry = FeedRegistryInterface(NewRegistryAddress);
-
         emit _NewRegistryAddress(NewRegistryAddress);
     }
 
