@@ -5,6 +5,42 @@ pragma solidity 0.8.7;
 /**
  * @title Storage
  * @dev Store & retrieve value in a variable
+
+Transparent Proxies:
+    - 0 : Public Pool
+    - 1 : Treasury
+    - 2 : Certis Token
+    - 3 : Private Pool Factory
+    - 4 : Provider Factory
+    - 5 : Price Converter
+    - 6 : Proposition Settings
+    - 7 : ENS
+
+Beacons:
+    - 0 : Private Pool
+    - 1 : Provider
+
+ NewProposals :
+    - Amount of New Transaparent proxies = m
+    - Amount of New Beacons = q
+    - New Address Transaparent proxy 1
+    - ...
+    - New Address Transaparent proxy n
+    - Address New Transaparent proxy 1
+    - ...
+    - Address New Transaparent proxy m
+    - New Address Beacon proxy 1
+    - ...
+    - New Address Beacon proxy p
+    - Address New Beacon proxy 1
+    - ...
+    - Address New Beacon proxy q
+    - Data Transaparent proxy 1
+    - ..
+    - Data Transaparent proxy n
+    - Data New Transaparent proxy 1
+    - ..
+    - Data New Transaparent proxy m
  */
 
 import "../Interfaces/IManager.sol";
@@ -12,6 +48,7 @@ import "../Interfaces/IFactory.sol";
 import "../Base/StdPropositionBaseContract.sol";
 import "../Libraries/AddressLibrary.sol";
 import "../Libraries/Library.sol";
+import "../Libraries/UintLibrary.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
@@ -21,57 +58,31 @@ import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     using AddressLibrary for *;
     using Library for *;
+    using UintLibrary for *;
 
     // EVENTS /////////////////////////////////////////
-    event _NewContracts(address Public, address Treasury, address Certis, address PrivateFactory, 
-    address Private, address ProviderFactory, address Provider, address PriceConverter, 
-    address PropositionSettings, address ENS);
+    event _NewProxy(address NewContractAddress, uint ProxyId, string ProxyType);
+    event _ContractUpgrade(address NewContractAddress, uint ProxyId, string ProxyType);
 
     // DATA /////////////////////////////////////////
-    address private _ManagerOwner;
-
     // Admin Proxy to manage all the TransparentUpgradeableProxies
     ProxyAdmin private _Admin;
 
-    // Private Certificate Pools Factory
-    TransparentUpgradeableProxy private _PrivatePoolFactory;
+    // Transparent Proxies
+    TransparentUpgradeableProxy[] private _TransparentProxies;
 
-    // Private Certificates Pool
-    UpgradeableBeacon private _PrivateCertificatePoolBeacon;
+    // Beacons
+    UpgradeableBeacon[] private _Beacons;
 
-    // Provider Factory
-    TransparentUpgradeableProxy private _ProviderFactory;
-
-    // Provider
-    UpgradeableBeacon private _ProviderBeacon;
-
-    // Public Certificates Pool
-    TransparentUpgradeableProxy private _PublicCertificatesPool;
-
-    // Treasury
-    TransparentUpgradeableProxy private _Treasury;
-
-    // Certis Token
-    TransparentUpgradeableProxy private _CertisToken;
-
-    // Price Converter
-    TransparentUpgradeableProxy private _PriceConverter;
-
-    // Proposition Settings
-    TransparentUpgradeableProxy private _PropositionSettings;
-
-    // ENS
-    TransparentUpgradeableProxy private _ENS;
+    // Proxy Types
+    string constant _TransparentType = "Transparent";
+    string constant _BeaconType = "Beacon";
+    uint constant _NewPropositionsRedimesionFields = 2; // The first "NewPropositionsRedimesionFields" elements of every new proposition indicate the number of new transaprent/beacon/... proxies to add to the system
 
     // init
     bool private _init;
 
     // MODIFIERS /////////////////////////////////////////
-    modifier isOwner(address addr){
-        Library.ItIsSomeone(addr, _ManagerOwner);
-        _;
-    }
-
     modifier isNotInitialized(){
         require(false == _init, "EC26-");
         _;
@@ -97,137 +108,144 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     // governance : contracts assignment and management
     function initProxies(Library.ProposedContractsStruct calldata initialContracts) private
     {
-        _PublicCertificatesPool = new TransparentUpgradeableProxy(initialContracts.NewPublicPoolAddress, address(_Admin), initialContracts.NewPublicPoolData);
-        _Treasury = new TransparentUpgradeableProxy(initialContracts.NewTreasuryAddress, address(_Admin), initialContracts.NewTreasuryData);
-        _CertisToken = new TransparentUpgradeableProxy(initialContracts.NewCertisTokenAddress, address(_Admin), initialContracts.NewCertisTokenData);
-        _PrivatePoolFactory = new TransparentUpgradeableProxy(initialContracts.NewPrivatePoolFactoryAddress, address(_Admin), initialContracts.NewPrivatePoolFactoryData);
-        _PrivateCertificatePoolBeacon = new UpgradeableBeacon(initialContracts.NewPrivatePoolAddress);
-        _ProviderFactory = new TransparentUpgradeableProxy(initialContracts.NewProviderFactoryAddress, address(_Admin), initialContracts.NewProviderFactoryData);
-        _ProviderBeacon = new UpgradeableBeacon(initialContracts.NewProviderAddress);
-        _PriceConverter = new TransparentUpgradeableProxy(initialContracts.NewPriceConverterAddress, address(_Admin), initialContracts.NewPriceConverterData);
-        _PropositionSettings = new TransparentUpgradeableProxy(initialContracts.NewPropositionSettingsAddress, address(_Admin), initialContracts.NewPropositionSettingsData);
-        _ENS = new TransparentUpgradeableProxy(initialContracts.NewENSAddress, address(_Admin), initialContracts.NewENSData);
-
-        IFactory(address(_PrivatePoolFactory)).updateContractName(initialContracts.NewPrivatePoolContractName);
-        IFactory(address(_PrivatePoolFactory)).updateContractVersion(initialContracts.NewPrivatePoolContractVersion);
+        for(uint i=0; i < initialContracts.TransparentAddresses.length; i++){
+            addTransaprentProxy(initialContracts.TransparentAddresses[i], initialContracts.TransparentData[i]);
+        }
+        for(uint i=0; i < initialContracts.BeaconAddresses.length; i++){
+            addBeacon(initialContracts.BeaconAddresses[i]);
+        }
+        IFactory(address(_TransparentProxies[3])).updateContractName(initialContracts.PrivatePoolContractName);
+        IFactory(address(_TransparentProxies[3])).updateContractVersion(initialContracts.PrivatePoolContractVersion);
     }
 
     function UpdateAll() internal override
     {
-        upgradeContractImplementation(_PublicCertificatesPool, _ProposedNewValues[0], _ProposedNewValues[10]);
-        upgradeContractImplementation(_Treasury, _ProposedNewValues[1], _ProposedNewValues[11]);
-        upgradeContractImplementation(_CertisToken, _ProposedNewValues[2], _ProposedNewValues[12]);
-        upgradeContractImplementation(_PrivatePoolFactory, _ProposedNewValues[3], _ProposedNewValues[13]);
-        upgradeContractImplementation(_ProviderFactory, _ProposedNewValues[5],_ProposedNewValues[14]);
-        upgradeContractImplementation(_PriceConverter, _ProposedNewValues[7], _ProposedNewValues[15]);
-        upgradeContractImplementation(_PropositionSettings, _ProposedNewValues[8], _ProposedNewValues[16]);
-        upgradeContractImplementation(_ENS, _ProposedNewValues[9],_ProposedNewValues[17]);
 
-        if(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[4])[0]))_PrivateCertificatePoolBeacon.upgradeTo(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[4])[0]));
-        if(address(0) != AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[6])[0]))_ProviderBeacon.upgradeTo(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[6])[0]));
+        uint256 pointer = _NewPropositionsRedimesionFields - 1;
+        uint256 NewTransparentProxies = UintLibrary.Bytes32ToUint(Library.BytestoBytes32(_ProposedNewValues[0])[0]); // m
+        uint256 NewBeaconProxies = UintLibrary.Bytes32ToUint(Library.BytestoBytes32(_ProposedNewValues[1])[0]); // q
+        uint256 TransaprentProxyDataSkip = _TransparentProxies.length + NewTransparentProxies + _Beacons.length + NewBeaconProxies;
 
-        if(0 < _ProposedNewValues[18].length)
-            IFactory(address(_PrivatePoolFactory)).updateContractName(string(_ProposedNewValues[18]));
+        // Transaprent Proxies
+        for(uint i=0; i < _TransparentProxies.length; i++){
+            upgradeTransparentProxy(_TransparentProxies[i], 
+                i, 
+                _ProposedNewValues[pointer + i], 
+                _ProposedNewValues[pointer + TransaprentProxyDataSkip + i]);
+        }
 
-        if(0 < _ProposedNewValues[19].length)
-            IFactory(address(_PrivatePoolFactory)).updateContractVersion(string(_ProposedNewValues[19]));
+        pointer = pointer + _TransparentProxies.length;
+
+        if(NewTransparentProxies > 0){
+            for(uint i=0; i < NewTransparentProxies; i++){
+                addTransaprentProxy(
+                AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[pointer + i])[0]), 
+                _ProposedNewValues[pointer + TransaprentProxyDataSkip + i]);
+            }
+
+            pointer = pointer + NewTransparentProxies;
+        }
         
-        emit _NewContracts(internalRetrieveImpl(_PublicCertificatesPool), internalRetrieveImpl(_Treasury), 
-        internalRetrieveImpl(_CertisToken), internalRetrieveImpl(_PrivatePoolFactory), 
-        internalRetrievePrivatePool(), internalRetrieveImpl(_ProviderFactory), internalRetrieveProvider(),
-        internalRetrieveImpl(_PriceConverter), internalRetrieveImpl(_PropositionSettings), internalRetrieveImpl(_ENS));
+        // Beacons
+        for(uint i=0; i < _Beacons.length; i++){
+            upgradeBeacon(_Beacons[i], 
+                i, 
+                _ProposedNewValues[pointer + i]);
+        }
+
+        pointer = pointer + _Beacons.length;
+
+        if(NewBeaconProxies > 0){
+            for(uint i=0; i < NewBeaconProxies; i++){
+                addBeacon(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[pointer + i])[0]));
+            }
+
+            pointer = pointer + NewBeaconProxies;
+        }
+
+        pointer = pointer + _TransparentProxies.length + NewTransparentProxies;
+        
+
+        if(0 < _ProposedNewValues[pointer + 1].length)
+            IFactory(address(_TransparentProxies[3])).updateContractName(string(_ProposedNewValues[pointer + 1]));
+
+        if(0 < _ProposedNewValues[pointer + 2].length)
+            IFactory(address(_TransparentProxies[3])).updateContractVersion(string(_ProposedNewValues[pointer + 2]));
+
     }
 
-    function upgradeContractImplementation(TransparentUpgradeableProxy proxy, bytes memory NewImpl, bytes memory Data) private
+    function addTransaprentProxy(address implAddress, bytes memory data) private
+    {
+        if(address(0) != implAddress){
+            _TransparentProxies.push(new TransparentUpgradeableProxy(implAddress, address(_Admin), data));
+            emit _NewProxy(implAddress, _TransparentProxies.length, _TransparentType);
+        }
+    }
+
+    function addBeacon(address implAddress) private
+    {
+        if(address(0) != implAddress){
+            _Beacons.push(new UpgradeableBeacon(implAddress));
+            emit _NewProxy(implAddress, _Beacons.length, _BeaconType);
+        }
+    }
+
+    function upgradeTransparentProxy(TransparentUpgradeableProxy proxy, uint ProxyId, bytes memory NewImpl, bytes memory Data) private
     {
         address NewImplAddress = AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewImpl)[0]);
         if(address(0) != NewImplAddress){
             if(0 < Data.length)_Admin.upgradeAndCall(proxy, NewImplAddress, Data);
             else _Admin.upgrade(proxy, NewImplAddress);
+            emit _ContractUpgrade(NewImplAddress, ProxyId, _TransparentType);
         }
     }
 
+    function upgradeBeacon(UpgradeableBeacon beacon, uint BeaconId, bytes memory NewImpl) private
+    {
+        address NewImplAddress = AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewImpl)[0]);
+        if(address(0) != NewImplAddress){
+            beacon.upgradeTo(NewImplAddress);
+            emit _ContractUpgrade(NewImplAddress, BeaconId, _BeaconType);
+        }
+
+    }
 
     // configuration Proxies
-    function retrievePublicCertificatePoolProxy() external override view returns (address) {
-        return (address(_PublicCertificatesPool));
+    function retrieveTransparentProxies() external override view returns (address[] memory) 
+    {
+        address[] memory proxies = new address[](_TransparentProxies.length);
+        for(uint i=0; i < proxies.length; i++){
+            proxies[i] = address(_TransparentProxies[i]);
+        }
+        return proxies;
     }
 
-    function retrieveTreasuryProxy() external override view returns (address) {
-        return (address(_Treasury));
-    }
-
-    function retrieveCertisTokenProxy() external override view returns (address) {
-        return (address(_CertisToken));
-    }
-
-    function retrievePrivatePoolFactoryProxy() external override view returns (address) {
-        return (address(_PrivatePoolFactory));
-    }
-
-    function retrievePrivatePoolBeacon() external override view returns (address) {
-        return (address(_PrivateCertificatePoolBeacon));
-    }
-
-    function retrieveProviderFactoryProxy() external override view returns (address) {
-        return (address(_ProviderFactory));
-    }
-
-    function retrieveProviderBeacon() external override view returns (address) {
-        return (address(_ProviderBeacon));
-    }
-
-    function retrievePriceConverterProxy() external override view returns (address) {
-        return (address(_PriceConverter));
-    }
-
-    function retrievePropositionSettingsProxy() external override view returns (address) {
-        return (address(_PropositionSettings));
-    }
-
-    function retrieveENSProxy() external override view returns (address) {
-        return (address(_ENS));
+    function retrieveBeacons() external override view returns (address[] memory) 
+    {
+        address[] memory proxies = new address[](_Beacons.length);
+        for(uint i=0; i < proxies.length; i++){
+            proxies[i] = address(_Beacons[i]);
+        }
+        return proxies;
     }
 
     // configuration implementations
-    function retrievePublicCertificatePool() external override view returns (address) {
-        return internalRetrieveImpl(_PublicCertificatesPool);
+    function retrieveTransparentProxiesImpl() external override view returns (address[] memory) 
+    {
+        address[] memory implementations = new address[](_TransparentProxies.length);
+        for(uint i=0; i < implementations.length; i++){
+            implementations[i] = internalRetrieveTransparentProxyImpl(_TransparentProxies[i]);
+        }
+        return implementations;
     }
 
-    function retrieveTreasury() external override view returns (address) {
-        return internalRetrieveImpl(_Treasury);
-    }
-
-    function retrieveCertisToken() external override view returns (address) {
-        return internalRetrieveImpl(_CertisToken);
-    }
-
-    function retrievePrivatePoolFactory() external override view returns (address) {
-        return internalRetrieveImpl(_PrivatePoolFactory);
-    }
-
-    function retrievePrivatePool() external override view returns (address) {
-        return internalRetrievePrivatePool();
-    }
-
-    function retrieveProviderFactory() external override view returns (address) {
-        return internalRetrieveImpl(_ProviderFactory);
-    }
-
-    function retrieveProvider() external override view returns (address) {
-        return internalRetrieveProvider();
-    }
-
-    function retrievePriceConverter() external override view returns (address) {
-        return internalRetrieveImpl(_PriceConverter);
-    }
-
-    function retrievePropositionSettings() external override view returns (address) {
-        return internalRetrieveImpl(_PropositionSettings);
-    }
-
-    function retrieveENS() external override view returns (address) {
-        return internalRetrieveImpl(_ENS);
+    function retrieveBeaconsImpl() external override view returns (address[] memory) 
+    {
+        address[] memory implementations = new address[](_Beacons.length);
+        for(uint i=0; i < implementations.length; i++){
+            implementations[i] = internalRetrieveBeaconImpl(_Beacons[i]);
+        }
+        return implementations;
     }
 
     function isInitialized() external override view returns(bool){
@@ -235,16 +253,12 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     }
 
     // internal
-    function internalRetrieveImpl(TransparentUpgradeableProxy proxy) internal view returns (address){
+    function internalRetrieveTransparentProxyImpl(TransparentUpgradeableProxy proxy) internal view returns (address){
         return _Admin.getProxyImplementation(proxy);
     }
 
-    function internalRetrievePrivatePool() internal view returns (address) {
-        return _PrivateCertificatePoolBeacon.implementation();
-    }
-
-    function internalRetrieveProvider() internal view returns (address) {
-        return _ProviderBeacon.implementation();
+    function internalRetrieveBeaconImpl(UpgradeableBeacon beacon) internal view returns (address){
+        return beacon.implementation();
     }
   
 }

@@ -42,8 +42,8 @@ import "../Base/ManagedBaseContract.sol";
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override 
     {
         if(_managerContract.isInitialized()){
-            ITokenEventSubscriber(_managerContract.retrieveTreasuryProxy()).onTokenBalanceChanged(from, to, amount);
-            ITokenEventSubscriber(_managerContract.retrievePriceConverterProxy()).onTokenBalanceChanged(from, to, amount);
+            ITokenEventSubscriber(_managerContract.retrieveTransparentProxies()[1]).onTokenBalanceChanged(from, to, amount);
+            ITokenEventSubscriber(_managerContract.retrieveTransparentProxies()[5]).onTokenBalanceChanged(from, to, amount);
             ITokenEventSubscriber(address(_managerContract)).onTokenBalanceChanged(from, to, amount);
         } 
     }

@@ -15,26 +15,11 @@ library Library{
     // Structures
     // Certificate Manager
     struct ProposedContractsStruct{
-        address NewPublicPoolAddress;
-        address NewTreasuryAddress;
-        address NewCertisTokenAddress;
-        address NewPrivatePoolFactoryAddress;
-        address NewPrivatePoolAddress;
-        address NewProviderFactoryAddress;
-        address NewProviderAddress;
-        address NewPriceConverterAddress;
-        address NewPropositionSettingsAddress;
-        address NewENSAddress;
-        bytes NewPublicPoolData;
-        bytes NewTreasuryData;
-        bytes NewCertisTokenData;
-        bytes NewPrivatePoolFactoryData;
-        bytes NewProviderFactoryData;
-        bytes NewPriceConverterData;
-        bytes NewPropositionSettingsData;
-        bytes NewENSData;
-        string NewPrivatePoolContractName;
-        string NewPrivatePoolContractVersion;
+        address[] TransparentAddresses;
+        address[] BeaconAddresses;
+        bytes[] TransparentData;
+        string PrivatePoolContractName;
+        string PrivatePoolContractVersion;
     }
 
     // Pending Certificates

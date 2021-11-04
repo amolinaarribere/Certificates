@@ -65,7 +65,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
         else if(Library.Prices.NewCertificate == price) minPriceUSD = _CertificatePriceUSD;
         else minPriceUSD = _ProviderPriceUSD;
 
-        uint256 minPriceETH = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(minPriceUSD);
+        uint256 minPriceETH = IPriceConverter(_managerContract.retrieveTransparentProxies()[5]).fromUSDToETH(minPriceUSD);
 
         require(value >= minPriceETH, "EC2-");
         _;
@@ -77,7 +77,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     }
 
     modifier isFromPublicPool(address addr){
-        Library.ItIsSomeone(addr, _managerContract.retrievePublicCertificatePoolProxy());
+        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[0]);
         _;
     }
 
@@ -133,7 +133,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     override payable
     {
         uint256 amount = msg.value;
-        if(price == Library.Prices.NewProvider) amount -= IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(_OwnerRefundFeeUSD);
+        if(price == Library.Prices.NewProvider) amount -= IPriceConverter(_managerContract.retrieveTransparentProxies()[5]).fromUSDToETH(_OwnerRefundFeeUSD);
         _AggregatedDividendAmount += amount;
 
         emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);
@@ -162,7 +162,7 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
         isFromPublicPool(msg.sender)
     override
     {
-        uint OwnerRefundFeeWei = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(_OwnerRefundFeeUSD);
+        uint OwnerRefundFeeWei = IPriceConverter(_managerContract.retrieveTransparentProxies()[5]).fromUSDToETH(_OwnerRefundFeeUSD);
         addBalance(addr, OwnerRefundFeeWei, numberOfOwners);
 
         emit _Refund(addr, OwnerRefundFeeWei, numberOfOwners);

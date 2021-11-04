@@ -43,7 +43,7 @@ pragma solidity 0.8.7;
         ProviderisNotPending(provider)
     override payable
     {
-        ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProvider);
+        ITreasury(_managerContract.retrieveTransparentProxies()[1]).pay{value:msg.value}(Library.Prices.NewProvider);
         bytes32 providerInBytes = AddressLibrary.AddressToBytes32(provider);
         _Entities[_providerId]._items[providerInBytes]._Info = providerInfo;
         _Entities[_providerId]._pendingItemsAdd.push(providerInBytes);
@@ -57,25 +57,25 @@ pragma solidity 0.8.7;
         address[] memory Voters = (validatedOrRejected) ? _Entities[_providerId]._items[entityInBytes]._Validations : _Entities[_providerId]._items[entityInBytes]._Rejections;
 
         for(uint i=0; i < Voters.length; i++){
-            ITreasury(_managerContract.retrieveTreasuryProxy()).getRefund(Voters[i], Voters.length);
+            ITreasury(_managerContract.retrieveTransparentProxies()[1]).getRefund(Voters[i], Voters.length);
         }
     }
 
     function onBeforeAddCertificate() internal override 
     {
-        ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewCertificate);
+        ITreasury(_managerContract.retrieveTransparentProxies()[1]).pay{value:msg.value}(Library.Prices.NewCertificate);
     }
 
     function retrieveAddCertificatePriceWei() external override view returns(uint256)
     {
-        (, , , uint Price, ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrieveSettings();
-        return IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(Price);
+        (, , , uint Price, ) = ITreasury(_managerContract.retrieveTransparentProxies()[1]).retrieveSettings();
+        return IPriceConverter(_managerContract.retrieveTransparentProxies()[1]).fromUSDToETH(Price);
     }
 
     function retrieveSubscriptionPriceWei() external override virtual view returns(uint256)
     {
-        (uint Price, , , , ) = ITreasury(_managerContract.retrieveTreasuryProxy()).retrieveSettings();
-        return IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(Price);
+        (uint Price, , , , ) = ITreasury(_managerContract.retrieveTransparentProxies()[1]).retrieveSettings();
+        return IPriceConverter(_managerContract.retrieveTransparentProxies()[1]).fromUSDToETH(Price);
     }
 
     // Callback functions
