@@ -42,10 +42,15 @@ import "../Base/ManagedBaseContract.sol";
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override 
     {
         if(_managerContract.isInitialized()){
-            ITokenEventSubscriber(_managerContract.retrieveTransparentProxies()[1]).onTokenBalanceChanged(from, to, amount);
-            ITokenEventSubscriber(_managerContract.retrieveTransparentProxies()[5]).onTokenBalanceChanged(from, to, amount);
-            ITokenEventSubscriber(address(_managerContract)).onTokenBalanceChanged(from, to, amount);
-        } 
+            address[] memory Proxies = _managerContract.retrieveTransparentProxies();
+            
+            ITokenEventSubscriber(Proxies[1]).onTokenBalanceChanged(from, to, amount); // Treasury
+            //ITokenEventSubscriber(Proxies[5]).onTokenBalanceChanged(from, to, amount); // Price Converter
+            ITokenEventSubscriber(Proxies[6]).onTokenBalanceChanged(from, to, amount); // Proposition Settings
+            ITokenEventSubscriber(Proxies[7]).onTokenBalanceChanged(from, to, amount); // ENS
+            ITokenEventSubscriber(address(_managerContract)).onTokenBalanceChanged(from, to, amount); // Certificate Pool Manager
+            ITokenEventSubscriber(_managerContract.retrieveManagerAdmin()).onTokenBalanceChanged(from, to, amount); // Admin
+        }
     }
 
  }

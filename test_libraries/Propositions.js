@@ -34,19 +34,24 @@ async function checkProposition(contractAddress, Values, user_1){
 }
 
 async function returnContractManagerSettings(contractAddress, user_1){
-    let _publicCertPoolAddress = await contractAddress.methods.retrievePublicCertificatePool().call({from: user_1});
-    let _treasuryAddress = await contractAddress.methods.retrieveTreasury().call({from: user_1});
-    let _certisAddress = await contractAddress.methods.retrieveCertisToken().call({from: user_1});
-    let _privatePoolFactoryAddress = await contractAddress.methods.retrievePrivatePoolFactory().call({from: user_1});
-    let _privatePool = await contractAddress.methods.retrievePrivatePool().call({from: user_1});
-    let _providerFactoryAddress = await contractAddress.methods.retrieveProviderFactory().call({from: user_1});
-    let _provider = await contractAddress.methods.retrieveProvider().call({from: user_1});
-    let _priceConverter = await contractAddress.methods.retrievePriceConverter().call({from: user_1});
-    let _propositionSettings = await contractAddress.methods.retrievePropositionSettings().call({from: user_1});
-    let _ensSettings = await contractAddress.methods.retrieveENS().call({from: user_1});
+    let TransparentProxies = await certPoolManager.methods.retrieveTransparentProxies().call({from: user_1});
+    let TransparentImpl = await certPoolManager.methods.retrieveTransparentProxiesImpl().call({from: user_1});
+    let BeaconsImpl = await certPoolManager.methods.retrieveBeaconsImpl().call({from: user_1});
 
 
-    let _privatePoolFactoryProxyAddress = await contractAddress.methods.retrievePrivatePoolFactoryProxy().call({from: user_1});
+    let _publicCertPoolAddress = TransparentImpl[0];
+    let _treasuryAddress = TransparentImpl[1];
+    let _certisAddress = TransparentImpl[2];
+    let _privatePoolFactoryAddress = TransparentImpl[3];
+    let _privatePool = BeaconsImpl[0];
+    let _providerFactoryAddress = TransparentImpl[4];
+    let _provider = BeaconsImpl[1];
+    let _priceConverter = TransparentImpl[5];
+    let _propositionSettings = TransparentImpl[6];
+    let _ensSettings = TransparentImpl[7];
+
+
+    let _privatePoolFactoryProxyAddress = TransparentProxies[3];
     privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, _privatePoolFactoryProxyAddress);
 
     let _PrivatePoolFactoryConfiguration = await privatePoolFactoryProxy.methods.retrieveConfig().call({from: user_1}, function(error, result){});
@@ -55,12 +60,12 @@ async function returnContractManagerSettings(contractAddress, user_1){
         _treasuryAddress,
         _certisAddress,
         _privatePoolFactoryAddress,
-        _privatePool,
         _providerFactoryAddress,
-        _provider,
         _priceConverter,
         _propositionSettings,
         _ensSettings,
+        _privatePool,
+        _provider,
         emptyBytes, 
         emptyBytes, 
         emptyBytes, 
@@ -236,11 +241,11 @@ async function Config_ContractsManager_Correct(contractAddress, certisTokenProxy
    
 };
 
-async function Config_Admin_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, data_1){
-    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.AddressToBytes32(address_1), data_1]);
+async function Config_Admin_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
     // act
     try{
-        await contractAddress.methods.sendProposition([address_0, emptyBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([address_0, emptyBytes, address_0]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -249,10 +254,9 @@ async function Config_Admin_Wrong(contractAddress, certisTokenProxy, tokenOwner,
     }
 };
 
-async function Config_Admin_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, data_1){
+async function Config_Admin_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _managerAddress =  await contractAddress.methods.retrieveManager().call({from: user_1}, function(error, result){});
-    let NewValues = [aux.AddressToBytes32(address_1), data_1];
-    let InitValue = [aux.AddressToBytes32(_managerAddress), data_1];
+    let InitValue = [aux.AddressToBytes32(_managerAddress), data_1, contractAddress._address];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkAdmin);
 };
 
@@ -392,9 +396,9 @@ async function Config_CommonProposition_Correct(contractAddress, certisTokenProx
 async function Check_Proposition_Details(contractAddress, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues){
     // act
     await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-    await contractAddress.methods.sendProposition(PropositionValues).send({from: chairPerson, gas: Gas});
+    //await contractAddress.methods.sendProposition(PropositionValues).send({from: chairPerson, gas: Gas});
     // assert
-    await checkProposition(contractAddress, PropositionValues, user_1);
+    //await checkProposition(contractAddress, PropositionValues, user_1);
 }
 
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;

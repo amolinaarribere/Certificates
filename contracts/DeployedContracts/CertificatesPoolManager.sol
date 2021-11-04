@@ -65,6 +65,9 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     event _ContractUpgrade(address NewContractAddress, uint ProxyId, string ProxyType);
 
     // DATA /////////////////////////////////////////
+    // Admin Smart Contract
+    address private _AdminManager;
+
     // Admin Proxy to manage all the TransparentUpgradeableProxies
     ProxyAdmin private _Admin;
 
@@ -88,11 +91,17 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         _;
     }
 
+    modifier isFromManagerAdmin(address addr){
+        Library.ItIsSomeone(addr, _AdminManager);
+        _;
+    }
+
     // INITIALIZATION /////////////////////////////////////////
     function CertificatesPoolManager_init(address chairPerson, string memory contractName, string memory contractVersion) public initializer
     {
         super.StdPropositionBaseContract_init(chairPerson, address(this), contractName, contractVersion);
         _Admin = new ProxyAdmin();
+        _AdminManager = msg.sender;
     }
 
     function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) 
@@ -106,6 +115,12 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
 
     // FUNCTIONALITY /////////////////////////////////////////
     // governance : contracts assignment and management
+    function changeManagerAdmin(address newManagerAdmin) external override
+        isFromManagerAdmin(msg.sender)
+    {
+        _AdminManager = newManagerAdmin;
+    }
+
     function initProxies(Library.ProposedContractsStruct calldata initialContracts) private
     {
         for(uint i=0; i < initialContracts.TransparentAddresses.length; i++){
@@ -246,6 +261,11 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
             implementations[i] = internalRetrieveBeaconImpl(_Beacons[i]);
         }
         return implementations;
+    }
+
+    function retrieveManagerAdmin() external override view returns (address)
+    {
+        return _AdminManager;
     }
 
     function isInitialized() external override view returns(bool){

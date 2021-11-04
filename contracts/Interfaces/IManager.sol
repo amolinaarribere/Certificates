@@ -12,11 +12,13 @@ import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.so
 
  interface IManager  {
     function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) external;
+    function changeManagerAdmin(address newManagerAdmin) external;
 
     function retrieveTransparentProxies() external view returns (address[] memory) ;
     function retrieveBeacons() external view returns (address[] memory);
     function retrieveTransparentProxiesImpl() external view returns (address[] memory);
     function retrieveBeaconsImpl() external view returns (address[] memory);
+    function retrieveManagerAdmin() external view returns (address);
     
     function isInitialized() external view returns(bool);
 }

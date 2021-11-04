@@ -390,14 +390,16 @@ async function deployImplementations(user_1){
 }
 
 async function retrieveProxies(certPoolManager, user_1){
-  let publicPoolProxy = await certPoolManager.methods.retrievePublicCertificatePoolProxy().call({from: user_1});
-  let treasuryProxy = await certPoolManager.methods.retrieveTreasuryProxy().call({from: user_1});
-  let certisTokenProxy = await certPoolManager.methods.retrieveCertisTokenProxy().call({from: user_1});
-  let privatePoolFactoryProxy = await certPoolManager.methods.retrievePrivatePoolFactoryProxy().call({from: user_1});
-  let providerFactoryProxy = await certPoolManager.methods.retrieveProviderFactoryProxy().call({from: user_1});
-  let priceConverterProxy = await certPoolManager.methods.retrievePriceConverterProxy().call({from: user_1});
-  let propositionSettingsProxy = await certPoolManager.methods.retrievePropositionSettingsProxy().call({from: user_1});
-  let ensProxy = await certPoolManager.methods.retrieveENSProxy().call({from: user_1});
+  let TransparentProxies = await certPoolManager.methods.retrieveTransparentProxies().call({from: user_1});
+
+  let publicPoolProxy = TransparentProxies[0];
+  let treasuryProxy = TransparentProxies[1];
+  let certisTokenProxy = TransparentProxies[2];
+  let privatePoolFactoryProxy = TransparentProxies[3];
+  let providerFactoryProxy = TransparentProxies[4];
+  let priceConverterProxy = TransparentProxies[5];
+  let propositionSettingsProxy = TransparentProxies[6];
+  let ensProxy = TransparentProxies[7];
 
   return [publicPoolProxy, treasuryProxy, certisTokenProxy, privatePoolFactoryProxy, providerFactoryProxy, priceConverterProxy, propositionSettingsProxy, ensProxy];
 }

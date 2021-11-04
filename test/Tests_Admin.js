@@ -23,7 +23,9 @@ contract("Testing Admin",function(accounts){
     const minOwners = 2;
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
+    const address_0 = "0x0000000000000000000000000000000000000000";
     const address_1 = "0x0000000000000000000000000000000000000001";
+    const address_2 = "0x0000000000000000000000000000000000000002";
     const emptyBytes = "0x";
 
     beforeEach(async function(){
@@ -36,16 +38,18 @@ contract("Testing Admin",function(accounts){
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
         // act
-        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes];
+        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
         await proposition.Check_Proposition_Details(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
-
+/*
     it("Vote/Propose/Cancel Admin Config WRONG",async function(){
-        await proposition.Config_Admin_Wrong(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, emptyBytes);
+        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
+        await proposition.Config_Admin_Wrong(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Admin Config CORRECT",async function(){
-        await proposition.Config_Admin_Correct(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1, emptyBytes);
+        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_0)];
+        await proposition.Config_Admin_Correct(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
-
+*/
 });

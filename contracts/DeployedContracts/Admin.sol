@@ -65,6 +65,8 @@ contract Admin is IAdmin, StdPropositionBaseContract{
         
         if(address(0) != NewAdminAddress){
             _Admin.transferOwnership(NewAdminAddress);
+            (bool success, bytes memory data) = address(_Manager).call(abi.encodeWithSignature("changeManagerAdmin(address)", NewAdminAddress));
+            require(success, string(data));
             emit _NewAdmin(NewAdminAddress);
         }       
 

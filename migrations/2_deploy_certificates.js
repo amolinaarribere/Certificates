@@ -114,6 +114,9 @@ module.exports = async function(deployer, network, accounts){
   await deployer.link(AddressLibrary, CertificatesPoolManager);
   console.log("AddressLibrary linked to Certificate Pool Manager");
 
+  await deployer.link(UintLibrary, CertificatesPoolManager);
+  console.log("UintLibrary linked to CertificatesPoolManager");
+
   await deployer.link(SignatureLibrary, CertificatesPoolManager);
   console.log("SignatureLibrary linked to Certificate Pool Manager");
 
