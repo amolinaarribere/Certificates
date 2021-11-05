@@ -31,6 +31,9 @@ contract("Testing Proposition Settings",function(accounts){
     const minOwners = 2;
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
+    var PropositionValues = [aux.IntToBytes32(PropositionLifeTime), 
+        aux.IntToBytes32(PropositionThresholdPercentage), 
+        aux.IntToBytes32(minPercentageToPropose)];
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
@@ -42,19 +45,19 @@ contract("Testing Proposition Settings",function(accounts){
 
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
-        // act
-        var PropositionValues = [aux.IntToBytes32(PropositionLifeTime), 
-            aux.IntToBytes32(PropositionThresholdPercentage), 
-            aux.IntToBytes32(minPercentageToPropose)];
         await proposition.Check_Proposition_Details(propositionSettingsProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Settings WRONG",async function(){
-        await proposition.Config_Proposition_Wrong(propositionSettingsProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+        await proposition.Config_Proposition_Wrong(propositionSettingsProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Settings CORRECT",async function(){
-        await proposition.Config_Proposition_Correct(propositionSettingsProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose);
+        await proposition.Config_Proposition_Correct(propositionSettingsProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
+    });
+
+    it("Votes Reassignment Settings",async function(){
+        await proposition.Check_Votes_Reassignment(propositionSettingsProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
 });

@@ -43,6 +43,7 @@ contract("Testing Price Converter",function(accounts){
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     const address_1 = "0x0000000000000000000000000000000000000001";
+    var PropositionValues = [aux.AddressToBytes32(address_1)];
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
@@ -66,16 +67,19 @@ contract("Testing Price Converter",function(accounts){
     // ****** Testing Registry Configuration ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
         // act
-        var PropositionValues = [address_1];
         await proposition.Check_Proposition_Details(priceConverterProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Registry Address WRONG",async function(){
-        await proposition.Config_PriceConverter_Wrong(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1);
+        await proposition.Config_PriceConverter_Wrong(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Registry Address CORRECT",async function(){
-        await proposition.Config_PriceConverter_Correct(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, address_1);
+        await proposition.Config_PriceConverter_Correct(priceConverterProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
+    });
+
+    it("Votes Reassignment Price Converter",async function(){
+        await proposition.Check_Votes_Reassignment(priceConverterProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
 });

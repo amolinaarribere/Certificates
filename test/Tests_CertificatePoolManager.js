@@ -222,4 +222,11 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
     });
 
+    it("Votes Reassignment Contracts",async function(){
+        var PropositionValues = [address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
+
+        await proposition.Check_Votes_Reassignment(certContract, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+    });
+
 });
