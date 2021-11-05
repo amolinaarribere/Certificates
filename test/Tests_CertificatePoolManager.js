@@ -100,14 +100,16 @@ contract("Testing Certificate Pool Manager",function(accounts){
     });
 
     async function checkProxyAddresses( _ppa, _ta, _ca, _ppfa, _pfa, _pco, _ps, _ens){
-        let _publicCertPoolAddressProxy = await certContract.methods.retrievePublicCertificatePoolProxy().call({from: user_1});
-        let _treasuryAddressProxy = await certContract.methods.retrieveTreasuryProxy().call({from: user_1});
-        let _certisAddressProxy = await certContract.methods.retrieveCertisTokenProxy().call({from: user_1});
-        let _privatePoolFactoryAddressProxy = await certContract.methods.retrievePrivatePoolFactoryProxy().call({from: user_1});
-        let _providerFactoryAddressProxy = await certContract.methods.retrieveProviderFactoryProxy().call({from: user_1});
-        let _priceConverterAddressProxy = await certContract.methods.retrievePriceConverterProxy().call({from: user_1});
-        let _propositionSettingsAddressProxy = await certContract.methods.retrievePropositionSettingsProxy().call({from: user_1});
-        let _ensAddressProxy = await certContract.methods.retrieveENSProxy().call({from: user_1});
+        let TransparentProxies = await contractAddress.methods.retrieveTransparentProxies().call({from: user_1});
+
+        let _publicCertPoolAddressProxy = TransparentProxies[0];
+        let _treasuryAddressProxy = TransparentProxies[1];
+        let _certisAddressProxy = TransparentProxies[2];
+        let _privatePoolFactoryAddressProxy = TransparentProxies[3];
+        let _providerFactoryAddressProxy = TransparentProxies[4];
+        let _priceConverterAddressProxy = TransparentProxies[5];
+        let _propositionSettingsAddressProxy = TransparentProxies[6];
+        let _ensAddressProxy = TransparentProxies[7];
         
         expect(_ppa).to.equal(_publicCertPoolAddressProxy);
         expect(_ta).to.equal(_treasuryAddressProxy);
@@ -120,16 +122,21 @@ contract("Testing Certificate Pool Manager",function(accounts){
     }
 
     async function checkImplAddresses( _ppa, _ta, _ca, _ppfa, _prpa, _pfa, _pra, _pco, _ps, _ens, _ppcn, _ppcv){
-        let _publicCertPoolAddress = await certContract.methods.retrievePublicCertificatePool().call({from: user_1});
-        let _treasuryAddress = await certContract.methods.retrieveTreasury().call({from: user_1});
-        let _certisAddress = await certContract.methods.retrieveCertisToken().call({from: user_1});
-        let _privatePoolFactoryAddress = await certContract.methods.retrievePrivatePoolFactory().call({from: user_1});
-        let _privatePool = await certContract.methods.retrievePrivatePool().call({from: user_1});
-        let _providerFactoryAddress = await certContract.methods.retrieveProviderFactory().call({from: user_1});
-        let _provider = await certContract.methods.retrieveProvider().call({from: user_1});
-        let _priceConverter = await certContract.methods.retrievePriceConverter().call({from: user_1});
-        let _propositionSettings = await certContract.methods.retrievePropositionSettings().call({from: user_1});
-        let _ensSettings = await certContract.methods.retrieveENS().call({from: user_1});
+        let TransparentImpl = await contractAddress.methods.retrieveTransparentProxiesImpl().call({from: user_1});
+        let BeaconsImpl = await contractAddress.methods.retrieveBeaconsImpl().call({from: user_1});
+    
+    
+        let _publicCertPoolAddress = TransparentImpl[0];
+        let _treasuryAddress = TransparentImpl[1];
+        let _certisAddress = TransparentImpl[2];
+        let _privatePoolFactoryAddress = TransparentImpl[3];
+        let _privatePool = BeaconsImpl[0];
+        let _providerFactoryAddress = TransparentImpl[4];
+        let _provider = BeaconsImpl[1];
+        let _priceConverter = TransparentImpl[5];
+        let _propositionSettings = TransparentImpl[6];
+        let _ensSettings = TransparentImpl[7];
+
         let _PrivatePoolFactoryConfiguration = await privatePoolFactoryProxy.methods.retrieveConfig().call({from: user_1}, function(error, result){});
         
         expect(_ppa).to.equal(_publicCertPoolAddress);
