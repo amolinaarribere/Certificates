@@ -401,6 +401,43 @@ async function Check_Proposition_Details(contractAddress, certisTokenProxy, chai
     await checkProposition(contractAddress, PropositionValues, user_1);
 }
 
+async function Check_Votes_Reassignment(contractAddress, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues){
+    // act
+    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
+    await contractAddress.methods.sendProposition(PropositionValues).send({from: chairPerson, gas: Gas});
+    let propID = await contractAddress.methods.retrieveNextPropId().call({from: user_1, gas: Gas}, function(error, result){});
+    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+
+    // assert
+    let Votes00 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[0]).call({from: user_1, gas: Gas}, function(error, result){});
+    let Votes10 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[1]).call({from: user_1, gas: Gas}, function(error, result){});
+    let Votes20 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[2]).call({from: user_1, gas: Gas}, function(error, result){});
+    expect(parseInt(Votes00)).to.equal(TotalTokenSupply / 5);
+    expect(parseInt(Votes10)).to.equal(0);
+    expect(parseInt(Votes20)).to.equal(0);
+
+    await certisTokenProxy.methods.transfer(tokenOwner[2], (TotalTokenSupply / 10)).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+    await certisTokenProxy.methods.transfer(tokenOwner[2], (TotalTokenSupply / 10)).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+
+    let Votes01 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[0]).call({from: user_1, gas: Gas}, function(error, result){});
+    let Votes11 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[1]).call({from: user_1, gas: Gas}, function(error, result){});
+    let Votes21 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[2]).call({from: user_1, gas: Gas}, function(error, result){});
+    expect(parseInt(Votes01)).to.equal(TotalTokenSupply / 10);
+    expect(parseInt(Votes11)).to.equal(0);
+    expect(parseInt(Votes21)).to.equal(TotalTokenSupply / 10);
+
+    await certisTokenProxy.methods.transfer(tokenOwner[2], (TotalTokenSupply / 10)).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+    await certisTokenProxy.methods.transfer(tokenOwner[2], (TotalTokenSupply / 10)).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+
+    let Votes02 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[0]).call({from: user_1, gas: Gas}, function(error, result){});
+    let Votes12 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[1]).call({from: user_1, gas: Gas}, function(error, result){});
+    let Votes22 = await contractAddress.methods.retrieveVotesForVoter(propID - 1, tokenOwner[2]).call({from: user_1, gas: Gas}, function(error, result){});
+    expect(parseInt(Votes02)).to.equal(0);
+    expect(parseInt(Votes12)).to.equal(0);
+    expect(parseInt(Votes22)).to.equal(TotalTokenSupply / 5);
+
+}
+
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;
 exports.Config_Proposition_Correct = Config_Proposition_Correct;
 exports.Config_PriceConverter_Wrong = Config_PriceConverter_Wrong;
@@ -415,3 +452,4 @@ exports.Config_Admin_Wrong = Config_Admin_Wrong;
 exports.Config_Admin_Correct = Config_Admin_Correct;
 exports.SplitTokenSupply = SplitTokenSupply;
 exports.Check_Proposition_Details = Check_Proposition_Details;
+exports.Check_Votes_Reassignment = Check_Votes_Reassignment;

@@ -55,4 +55,9 @@ contract("Testing Admin",function(accounts){
         await proposition.Config_Admin_Correct(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
+    it("Votes Reassignment Admin",async function(){
+        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
+        await proposition.Check_Votes_Reassignment(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+    });
+
 });
