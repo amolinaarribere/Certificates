@@ -165,6 +165,15 @@ async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tok
 
 async function Config_PriceConverter_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
+    // act
+    try{
+        await contractAddress.methods.sendProposition([aux.AddressToBytes32(address_0)]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongConfig);
+    }
 };
 
 async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
@@ -175,6 +184,15 @@ async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, 
 
 async function Config_ENS_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
+    // act
+    try{
+        await contractAddress.methods.sendProposition([aux.AddressToBytes32(address_0), aux.AddressToBytes32(address_0), emptyBytes, emptyBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(WrongConfig);
+    }
 };
 
 async function Config_ENS_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){

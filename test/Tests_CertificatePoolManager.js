@@ -100,7 +100,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     });
 
     async function checkProxyAddresses( _ppa, _ta, _ca, _ppfa, _pfa, _pco, _ps, _ens){
-        let TransparentProxies = await contractAddress.methods.retrieveTransparentProxies().call({from: user_1});
+        let TransparentProxies = await certContract.methods.retrieveTransparentProxies().call({from: user_1});
 
         let _publicCertPoolAddressProxy = TransparentProxies[0];
         let _treasuryAddressProxy = TransparentProxies[1];
@@ -122,9 +122,8 @@ contract("Testing Certificate Pool Manager",function(accounts){
     }
 
     async function checkImplAddresses( _ppa, _ta, _ca, _ppfa, _prpa, _pfa, _pra, _pco, _ps, _ens, _ppcn, _ppcv){
-        let TransparentImpl = await contractAddress.methods.retrieveTransparentProxiesImpl().call({from: user_1});
-        let BeaconsImpl = await contractAddress.methods.retrieveBeaconsImpl().call({from: user_1});
-    
+        let TransparentImpl = await certContract.methods.retrieveTransparentProxiesImpl().call({from: user_1});
+        let BeaconsImpl = await certContract.methods.retrieveBeaconsImpl().call({from: user_1});
     
         let _publicCertPoolAddress = TransparentImpl[0];
         let _treasuryAddress = TransparentImpl[1];
@@ -211,7 +210,8 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
     it("Vote/Propose/Cancel Contracts Configuration CORRECT Empty",async function(){
         // act
-        var PropositionValues = [address_0, address_0, address_0, address_0, address_0, address_0, address_0, address_0, address_0, address_0,
+        var address0 = aux.AddressToBytes32(address_0);
+        var PropositionValues = [address0, address0, address0, address0, address0, address0, address0, address0, address0, address0,
             emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
 
 
