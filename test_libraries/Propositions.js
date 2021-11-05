@@ -34,9 +34,9 @@ async function checkProposition(contractAddress, Values, user_1){
 }
 
 async function returnContractManagerSettings(contractAddress, user_1){
-    let TransparentProxies = await certPoolManager.methods.retrieveTransparentProxies().call({from: user_1});
-    let TransparentImpl = await certPoolManager.methods.retrieveTransparentProxiesImpl().call({from: user_1});
-    let BeaconsImpl = await certPoolManager.methods.retrieveBeaconsImpl().call({from: user_1});
+    let TransparentProxies = await contractAddress.methods.retrieveTransparentProxies().call({from: user_1});
+    let TransparentImpl = await contractAddress.methods.retrieveTransparentProxiesImpl().call({from: user_1});
+    let BeaconsImpl = await contractAddress.methods.retrieveBeaconsImpl().call({from: user_1});
 
 
     let _publicCertPoolAddress = TransparentImpl[0];
@@ -256,7 +256,7 @@ async function Config_Admin_Wrong(contractAddress, certisTokenProxy, tokenOwner,
 
 async function Config_Admin_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _managerAddress =  await contractAddress.methods.retrieveManager().call({from: user_1}, function(error, result){});
-    let InitValue = [aux.AddressToBytes32(_managerAddress), data_1, contractAddress._address];
+    let InitValue = [aux.AddressToBytes32(_managerAddress), emptyBytes, contractAddress._address];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkAdmin);
 };
 
@@ -396,9 +396,9 @@ async function Config_CommonProposition_Correct(contractAddress, certisTokenProx
 async function Check_Proposition_Details(contractAddress, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues){
     // act
     await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-    //await contractAddress.methods.sendProposition(PropositionValues).send({from: chairPerson, gas: Gas});
+    await contractAddress.methods.sendProposition(PropositionValues).send({from: chairPerson, gas: Gas});
     // assert
-    //await checkProposition(contractAddress, PropositionValues, user_1);
+    await checkProposition(contractAddress, PropositionValues, user_1);
 }
 
 exports.Config_Proposition_Wrong = Config_Proposition_Wrong;

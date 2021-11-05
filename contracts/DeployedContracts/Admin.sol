@@ -78,8 +78,8 @@ contract Admin is IAdmin, StdPropositionBaseContract{
     }
 
     // configuration implementations
-    function retrieveManager() external override returns (address) {
-        return _Manager.implementation();
+    function retrieveManager() external view override returns (address) {
+        return _Admin.getProxyImplementation(_Manager);
     }
    
   

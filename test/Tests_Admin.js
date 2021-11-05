@@ -41,15 +41,18 @@ contract("Testing Admin",function(accounts){
         var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
         await proposition.Check_Proposition_Details(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
-/*
+
     it("Vote/Propose/Cancel Admin Config WRONG",async function(){
         var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
         await proposition.Config_Admin_Wrong(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
     it("Vote/Propose/Cancel Admin Config CORRECT",async function(){
-        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_0)];
+        let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
+        var certContractAddress = contracts[4];
+
+        var PropositionValues = [aux.AddressToBytes32(certContractAddress), emptyBytes, aux.AddressToBytes32(address_0)];
         await proposition.Config_Admin_Correct(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
-*/
+
 });
