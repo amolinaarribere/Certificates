@@ -201,11 +201,11 @@ async function Config_ENS_Correct(contractAddress, certisTokenProxy, tokenOwner,
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkENS);
 };
 
-async function Config_Treasury_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD){
-    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, [aux.IntToBytes32(PublicPriceUSD), aux.IntToBytes32(PrivatePriceUSD), aux.IntToBytes32(ProviderPriceUSD), aux.IntToBytes32(CertificatePriceUSD), aux.IntToBytes32(OwnerRefundPriceUSD)]);
+async function Config_Treasury_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
+    await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
     // act
     try{
-        await contractAddress.methods.sendProposition([aux.IntToBytes32(PublicPriceUSD), aux.IntToBytes32(PrivatePriceUSD), aux.IntToBytes32(ProviderPriceUSD), aux.IntToBytes32(CertificatePriceUSD), aux.IntToBytes32(PublicPriceUSD + 1)]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([NewValues[0], NewValues[1], NewValues[2], NewValues[3], aux.IntToBytes32(aux.Bytes32ToInt(NewValues[0]) + 1)]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -215,9 +215,8 @@ async function Config_Treasury_Wrong(contractAddress, certisTokenProxy, tokenOwn
     
 };
 
-async function Config_Treasury_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundPriceUSD ){
+async function Config_Treasury_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues ){
     let _price =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let NewValues =  [aux.IntToBytes32(PublicPriceUSD), aux.IntToBytes32(PrivatePriceUSD), aux.IntToBytes32(ProviderPriceUSD), aux.IntToBytes32(CertificatePriceUSD), aux.IntToBytes32(OwnerRefundPriceUSD)];
     let InitValue = [aux.IntToBytes32(_price[0]), aux.IntToBytes32(_price[1]), aux.IntToBytes32(_price[2]), aux.IntToBytes32(_price[3]), aux.IntToBytes32(_price[4])];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPrice);
    
