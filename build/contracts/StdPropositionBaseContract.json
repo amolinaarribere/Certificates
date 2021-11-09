@@ -458,81 +458,81 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n Price Converter is an interface to the Chain Link Price Registry for USD to ETH exchange\r\n */\r\n\r\nimport \"./TokenGovernanceBaseContract.sol\";\r\nimport \"../Interfaces/IStdPropositionBaseContract.sol\";\r\n\r\n\r\nabstract contract StdPropositionBaseContract is IStdPropositionBaseContract, TokenGovernanceBaseContract {\r\n\r\n    // DATA /////////////////////////////////////////\r\n    bytes[] internal _ProposedNewValues;\r\n\r\n    // CONSTRUCTOR /////////////////////////////////////////\r\n    function StdPropositionBaseContract_init(address chairPerson, address managerContractAddress, string memory contractName, string memory contractVersion) public initializer \r\n    {\r\n        super.TokenGovernanceContract_init(chairPerson, managerContractAddress, contractName, contractVersion);\r\n    }\r\n\r\n    // GOVERNANCE /////////////////////////////////////////\r\n    function sendProposition(bytes[] memory NewValues) external override\r\n    {\r\n        checkProposition(NewValues);\r\n        addProposition();\r\n        for(uint i=0; i < NewValues.length; i++){\r\n            _ProposedNewValues.push(NewValues[i]);\r\n        }\r\n    }\r\n\r\n    function propositionApproved() internal override\r\n    {\r\n        UpdateAll();\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionRejected() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function propositionExpired() internal override\r\n    {\r\n        removeProposition();\r\n    }\r\n\r\n    function removeProposition() internal\r\n    {\r\n        delete(_ProposedNewValues);\r\n    }\r\n\r\n    function retrieveProposition() external override view returns(bytes[] memory)\r\n    {\r\n        return _ProposedNewValues;\r\n    }\r\n\r\n    function PropositionsToBytes32() internal view returns (bytes32[] memory)\r\n    {\r\n        bytes32[] memory PropositionsBytes32 = new bytes32[](_ProposedNewValues.length);\r\n\r\n        for(uint i=0; i<_ProposedNewValues.length; i++){\r\n            PropositionsBytes32[i] = Library.BytestoBytes32(_ProposedNewValues[i])[0];\r\n        }\r\n\r\n        return PropositionsBytes32;\r\n    }\r\n\r\n    function checkProposition(bytes[] memory NewValues) internal virtual{}\r\n\r\n    function UpdateAll() internal virtual;\r\n\r\n}",
-  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Base\\StdPropositionBaseContract.sol",
+  "sourcePath": "C:/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
   "ast": {
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
     "exportedSymbols": {
       "Address": [
-        13700
+        7082
       ],
       "AddressLibrary": [
-        8989
+        4102
       ],
       "Context": [
-        13721
+        7103
       ],
       "ERC1967Proxy": [
-        12536
+        6054
       ],
       "ERC1967Upgrade": [
-        12885
+        6403
       ],
       "IBeacon": [
-        13029
+        6547
       ],
       "IERC20Upgradeable": [
-        12311
+        5897
       ],
       "IManager": [
-        8424
+        3537
       ],
       "IPropositionSettings": [
-        8640
+        3753
       ],
       "ISignatureBaseContract": [
-        8768
+        3881
       ],
       "IStdPropositionBaseContract": [
-        8784
+        3897
       ],
       "ITokenEventSubscriber": [
-        8797
+        3910
       ],
       "Initializable": [
-        11660
+        5819
       ],
       "Library": [
-        10231
+        5344
       ],
       "ManagedBaseContract": [
         1992
       ],
       "Ownable": [
-        12483
+        6001
       ],
       "Proxy": [
-        12937
+        6455
       ],
       "SignatureBaseContract": [
         2151
       ],
       "SignatureLibrary": [
-        10514
+        5627
       ],
       "StdPropositionBaseContract": [
         2324
       ],
       "StorageSlot": [
-        13781
+        7163
       ],
       "TokenGovernanceBaseContract": [
         3247
       ],
       "TransparentUpgradeableProxy": [
-        13404
+        6786
       ],
       "UpgradeableBeacon": [
-        13104
+        6622
       ]
     },
     "id": 2325,
@@ -568,7 +568,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2325,
-        "sourceUnit": 8785,
+        "sourceUnit": 3898,
         "src": "213:55:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -581,7 +581,7 @@
               "id": 2156,
               "name": "IStdPropositionBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8784,
+              "referencedDeclaration": 3897,
               "src": "322:27:7"
             },
             "id": 2157,
@@ -609,11 +609,11 @@
           2324,
           3247,
           1992,
-          11660,
+          5819,
           2151,
-          8768,
-          8797,
-          8784
+          3881,
+          3910,
+          3897
         ],
         "name": "StdPropositionBaseContract",
         "nameLocation": "292:26:7",
@@ -791,7 +791,7 @@
                   "id": 2172,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 11659,
+                  "referencedDeclaration": 5818,
                   "src": "709:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -932,7 +932,7 @@
           },
           {
             "baseFunctions": [
-              8777
+              3890
             ],
             "body": {
               "id": 2220,
@@ -1695,7 +1695,7 @@
           },
           {
             "baseFunctions": [
-              8783
+              3896
             ],
             "body": {
               "id": 2265,
@@ -2030,10 +2030,10 @@
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 10231,
+                                  "referencedDeclaration": 5344,
                                   "src": "2007:7:7",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$10231_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$5344_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
@@ -2044,7 +2044,7 @@
                                 "lValueRequested": false,
                                 "memberName": "BytestoBytes32",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 10217,
+                                "referencedDeclaration": 5330,
                                 "src": "2007:22:7",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -2440,76 +2440,76 @@
     "absolutePath": "/C/Users/d-aam/GitHub/Certificates/contracts/Base/StdPropositionBaseContract.sol",
     "exportedSymbols": {
       "Address": [
-        13700
+        7082
       ],
       "AddressLibrary": [
-        8989
+        4102
       ],
       "Context": [
-        13721
+        7103
       ],
       "ERC1967Proxy": [
-        12536
+        6054
       ],
       "ERC1967Upgrade": [
-        12885
+        6403
       ],
       "IBeacon": [
-        13029
+        6547
       ],
       "IERC20Upgradeable": [
-        12311
+        5897
       ],
       "IManager": [
-        8424
+        3537
       ],
       "IPropositionSettings": [
-        8640
+        3753
       ],
       "ISignatureBaseContract": [
-        8768
+        3881
       ],
       "IStdPropositionBaseContract": [
-        8784
+        3897
       ],
       "ITokenEventSubscriber": [
-        8797
+        3910
       ],
       "Initializable": [
-        11660
+        5819
       ],
       "Library": [
-        10231
+        5344
       ],
       "ManagedBaseContract": [
         1992
       ],
       "Ownable": [
-        12483
+        6001
       ],
       "Proxy": [
-        12937
+        6455
       ],
       "SignatureBaseContract": [
         2151
       ],
       "SignatureLibrary": [
-        10514
+        5627
       ],
       "StdPropositionBaseContract": [
         2324
       ],
       "StorageSlot": [
-        13781
+        7163
       ],
       "TokenGovernanceBaseContract": [
         3247
       ],
       "TransparentUpgradeableProxy": [
-        13404
+        6786
       ],
       "UpgradeableBeacon": [
-        13104
+        6622
       ]
     },
     "id": 2325,
@@ -2545,7 +2545,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2325,
-        "sourceUnit": 8785,
+        "sourceUnit": 3898,
         "src": "213:55:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2558,7 +2558,7 @@
               "id": 2156,
               "name": "IStdPropositionBaseContract",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 8784,
+              "referencedDeclaration": 3897,
               "src": "322:27:7"
             },
             "id": 2157,
@@ -2586,11 +2586,11 @@
           2324,
           3247,
           1992,
-          11660,
+          5819,
           2151,
-          8768,
-          8797,
-          8784
+          3881,
+          3910,
+          3897
         ],
         "name": "StdPropositionBaseContract",
         "nameLocation": "292:26:7",
@@ -2768,7 +2768,7 @@
                   "id": 2172,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 11659,
+                  "referencedDeclaration": 5818,
                   "src": "709:11:7"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2909,7 +2909,7 @@
           },
           {
             "baseFunctions": [
-              8777
+              3890
             ],
             "body": {
               "id": 2220,
@@ -3672,7 +3672,7 @@
           },
           {
             "baseFunctions": [
-              8783
+              3896
             ],
             "body": {
               "id": 2265,
@@ -4007,10 +4007,10 @@
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 10231,
+                                  "referencedDeclaration": 5344,
                                   "src": "2007:7:7",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$10231_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$5344_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
@@ -4021,7 +4021,7 @@
                                 "lValueRequested": false,
                                 "memberName": "BytestoBytes32",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 10217,
+                                "referencedDeclaration": 5330,
                                 "src": "2007:22:7",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -4419,7 +4419,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-11-05T10:05:55.201Z",
+  "updatedAt": "2021-11-08T14:10:37.358Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

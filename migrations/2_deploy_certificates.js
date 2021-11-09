@@ -32,6 +32,7 @@ let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
 let SignatureLibrary = artifacts.require("./Libraries/SignatureLibrary");
 let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominations.sol");
 
+const Gas = 6721975;
 const PropositionLifeTime = 604800;
 const PropositionThresholdPercentage = 50;
 const minWeightToProposePercentage = 5;
@@ -625,7 +626,57 @@ module.exports = async function(deployer, network, accounts){
       PropositionSettingsProxyData,
       ENSProxyData,
       PrivatePoolContractName,
-      PrivatePoolContractVersion));
+      PrivatePoolContractVersion)).send({from: accounts[0], gas: Gas});
 
   console.log("CertificatesPoolManager initialized");
+
+  let CertManagerAddress = await AdminInstance.retrieveManager();
+  let TransparentProxies = await CertificatesPoolManagerProxyInstance.methods.retrieveTransparentProxies().call();
+  let TransparentImpl = await CertificatesPoolManagerProxyInstance.methods.retrieveTransparentProxiesImpl().call();
+  let Beacons = await CertificatesPoolManagerProxyInstance.methods.retrieveBeacons().call();
+  let BeaconsImpl = await CertificatesPoolManagerProxyInstance.methods.retrieveBeaconsImpl().call();
+  let ManagerAdmin = await CertificatesPoolManagerProxyInstance.methods.retrieveManagerAdmin().call();
+  let init = await CertificatesPoolManagerProxyInstance.methods.isInitialized().call();
+
+
+
+
+  console.log("Deployment Summary ----------------------------------------------- ");
+
+  console.log("Admin Address : " + AdminInstance.address + " // " + ManagerAdmin);
+
+  console.log("Manager Proxy Address : " + CertificatesPoolManagerProxyInstance._address);
+  console.log("Manager Address : " + CertManagerAddress + " is iniitalized : " + init);
+
+  console.log("Public Pool Proxy Address : " + TransparentProxies[0]);
+  console.log("Public Pool Address : " + TransparentImpl[0]);
+
+  console.log("Treasury Proxy Address : " + TransparentProxies[1]);
+  console.log("Treasury Address : " + TransparentImpl[1]);
+
+  console.log("Certis Proxy Address : " + TransparentProxies[2]);
+  console.log("Certis Address : " + TransparentImpl[2]);
+
+  console.log("Private Pool Proxy Address : " + TransparentProxies[3]);
+  console.log("Private Pool Address : " + TransparentImpl[3]);
+
+  console.log("Provider Factory Proxy Address : " + TransparentProxies[4]);
+  console.log("Provider Factory Address : " + TransparentImpl[4]);
+
+  console.log("Price Converter Proxy Address : " + TransparentProxies[5]);
+  console.log("Price Converter Address : " + TransparentImpl[5]);
+
+  console.log("Proposition Settings Proxy Address : " + TransparentProxies[6]);
+  console.log("Proposition Settings Address : " + TransparentImpl[6]);
+
+  console.log("ENS Proxy Address : " + TransparentProxies[7]);
+  console.log("ENS Address : " + TransparentImpl[7]);
+
+  console.log("Private Pool Beacon Address : " + Beacons[0]);
+  console.log("Private Pool Implementation Address : " + BeaconsImpl[0]);
+
+  console.log("Provider Beacon Address : " + Beacons[1]);
+  console.log("Provider Implementation Address : " + BeaconsImpl[1]);
+
+
 }
