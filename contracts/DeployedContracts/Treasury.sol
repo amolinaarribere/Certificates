@@ -149,11 +149,10 @@ contract Treasury is ITreasury, StdPropositionBaseContract{
     function InternalAssignDividends(address recipient) internal
     {
         (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(recipient);
-
-        if(totalOffBalance > 0){
-           _lastAssigned[recipient] = _AggregatedDividendAmount;
+        _lastAssigned[recipient] = _AggregatedDividendAmount;
+        
+        if(totalOffBalance > 0){   
            addBalance(recipient, totalOffBalance, DividendOffBalance);
-           
            emit _AssignDividend(recipient, totalOffBalance, DividendOffBalance);
         }
     }
