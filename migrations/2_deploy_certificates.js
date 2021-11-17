@@ -1,5 +1,6 @@
-let ExternalRegistries = require("./ExternalRegistries.js");
+const BigNumber = require('bignumber.js');
 
+let ExternalRegistries = require("./ExternalRegistries.js");
 let Admin = artifacts.require("./DeployedContracts/Admin");
 let CertificatesPoolManager = artifacts.require("./DeployedContracts/CertificatesPoolManager");
 let Provider = artifacts.require("./DeployedContracts/Provider");
@@ -40,13 +41,13 @@ const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const PublicPriceUSD = 10;
-const PrivatePriceUSD = 2;
-const ProviderPriceUSD = 2;
+const PublicPriceUSD = 100;
+const PrivatePriceUSD = 50;
+const ProviderPriceUSD = 40;
 const CertificatePriceUSD = 1;
-const OwnerRefundFeeUSD = 3;
-const rate = 338495835524;
-const MockDecimals = 8;
+const OwnerRefundFeeUSD = 30;
+const rate = new BigNumber("10000");
+const MockDecimals = 0;
 const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"]
 // privatepool.blockcerts.aljomoar.eth, provider.blockcerts.aljomoar.eth
 const PublicMinOwners = 1;
