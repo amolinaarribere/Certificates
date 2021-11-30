@@ -18,7 +18,7 @@ contract ENS is IENS, StdPropositionBaseContract {
     event _NewReverseRegistry(address ReverseRegistry);
     event _NewPrivatePoolNode(bytes32 PrivatePoolNode);
     event _NewProviderNode(bytes32 ProviderNode);
-    event _NewSubdomainCreated(bytes32 node, bytes32 label);
+    event _NewSubdomainCreated(bytes32 node, bytes32 label, address addr);
 
     // DATA /////////////////////////////////////////
     IENSRegistry internal _ENS;
@@ -90,7 +90,7 @@ contract ENS is IENS, StdPropositionBaseContract {
         return _ENS.recordExists(node);
     }
 
-    function createSubdomain(bytes32 label) external override
+    function createSubdomain(bytes32 label, address addr) external override
         isFromAuthorizedContract(msg.sender)
     {
         bytes32 node = _ProviderNode;
@@ -104,7 +104,9 @@ contract ENS is IENS, StdPropositionBaseContract {
 
         _ENS.setSubnodeRecord(node, label, address(this), resolverAddress, ttl);
         IENSResolver resolver = IENSResolver(resolverAddress);
-        resolver.setAddr(FullNode, msg.sender);
+        resolver.setAddr(FullNode, addr);
+
+        emit _NewSubdomainCreated(node, label, addr);
     }
 
     function retrieveSettings() external override view returns(address, address, bytes32, bytes32)

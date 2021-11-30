@@ -22,8 +22,6 @@ let MockENSRegistry = artifacts.require("./DeployedContracts/Mock/MockENSRegistr
 let MockENSResolver = artifacts.require("./DeployedContracts/Mock/MockENSResolver");
 let MockENSReverseRegistry = artifacts.require("./DeployedContracts/Mock/MockENSReverseRegistry");
 
-
-
 const obj = require("../test_libraries/objects.js");
 
 let Library = artifacts.require("./Libraries/Library");
@@ -658,8 +656,8 @@ module.exports = async function(deployer, network, accounts){
   console.log("Certis Proxy Address : " + TransparentProxies[2]);
   console.log("Certis Address : " + TransparentImpl[2]);
 
-  console.log("Private Pool Proxy Address : " + TransparentProxies[3]);
-  console.log("Private Pool Address : " + TransparentImpl[3]);
+  console.log("Private Pool Factory Proxy Address : " + TransparentProxies[3]);
+  console.log("Private Pool Factory Address : " + TransparentImpl[3]);
 
   console.log("Provider Factory Proxy Address : " + TransparentProxies[4]);
   console.log("Provider Factory Address : " + TransparentImpl[4]);

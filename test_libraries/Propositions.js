@@ -16,6 +16,7 @@ const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 const emptyBytes = "0x";
 const address_0 = "0x0000000000000000000000000000000000000000";
+const zeroBytes = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 
 async function SplitTokenSupply(CT, tokenOwner, chairPerson){
@@ -56,7 +57,9 @@ async function returnContractManagerSettings(contractAddress, user_1){
 
     let _PrivatePoolFactoryConfiguration = await privatePoolFactoryProxy.methods.retrieveConfig().call({from: user_1}, function(error, result){});
 
-    return [_publicCertPoolAddress, 
+    return [zeroBytes,
+        zeroBytes,
+        _publicCertPoolAddress, 
         _treasuryAddress,
         _certisAddress,
         _privatePoolFactoryAddress,
@@ -111,8 +114,6 @@ async function checkPrice(contractAddress, PricesBytes, user_1){
 async function checkContracts(contractAddress, ContractsBytes, user_1){
     let _Contracts = await returnContractManagerSettings(contractAddress, user_1);
 
-    expect(aux.Bytes32ToAddress(ContractsBytes[0])).to.equal(_Contracts[0]);
-    expect(aux.Bytes32ToAddress(ContractsBytes[1])).to.equal(_Contracts[1]);
     expect(aux.Bytes32ToAddress(ContractsBytes[2])).to.equal(_Contracts[2]);
     expect(aux.Bytes32ToAddress(ContractsBytes[3])).to.equal(_Contracts[3]);
     expect(aux.Bytes32ToAddress(ContractsBytes[4])).to.equal(_Contracts[4]);
@@ -121,8 +122,10 @@ async function checkContracts(contractAddress, ContractsBytes, user_1){
     expect(aux.Bytes32ToAddress(ContractsBytes[7])).to.equal(_Contracts[7]);
     expect(aux.Bytes32ToAddress(ContractsBytes[8])).to.equal(_Contracts[8]);
     expect(aux.Bytes32ToAddress(ContractsBytes[9])).to.equal(_Contracts[9]);
-    expect(aux.BytesToString(ContractsBytes[18])).to.equal(_Contracts[18]);
-    expect(aux.BytesToString(ContractsBytes[19])).to.equal(_Contracts[19]);
+    expect(aux.Bytes32ToAddress(ContractsBytes[10])).to.equal(_Contracts[10]);
+    expect(aux.Bytes32ToAddress(ContractsBytes[11])).to.equal(_Contracts[11]);
+    expect(aux.BytesToString(ContractsBytes[20])).to.equal(_Contracts[20]);
+    expect(aux.BytesToString(ContractsBytes[21])).to.equal(_Contracts[21]);
 
 }
 
@@ -228,8 +231,8 @@ async function Config_ContractsManager_Wrong(contractAddress, certisTokenProxy, 
 
 async function Config_ContractsManager_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let result = await returnContractManagerSettings(contractAddress, user_1);
-    let InitValue = [aux.AddressToBytes32(result[0]),
-        aux.AddressToBytes32(result[1]),
+    let InitValue = [result[0],
+        result[1],
         aux.AddressToBytes32(result[2]),
         aux.AddressToBytes32(result[3]),
         aux.AddressToBytes32(result[4]),
@@ -238,16 +241,18 @@ async function Config_ContractsManager_Correct(contractAddress, certisTokenProxy
         aux.AddressToBytes32(result[7]),
         aux.AddressToBytes32(result[8]),
         aux.AddressToBytes32(result[9]),
-        result[10],
-        result[12],
+        aux.AddressToBytes32(result[10]),
+        aux.AddressToBytes32(result[11]),
         result[12],
         result[13],
         result[14],
         result[15],
         result[16],
         result[17],
-        aux.StringToBytes(result[18]),
-        aux.StringToBytes(result[19]),
+        result[18],
+        result[19],
+        aux.StringToBytes(result[20]),
+        aux.StringToBytes(result[21]),
     ];
     await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts);
    

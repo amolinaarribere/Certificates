@@ -136,7 +136,7 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     function UpdateAll() internal override
     {
 
-        uint256 pointer = _NewPropositionsRedimesionFields - 1;
+        uint256 pointer = _NewPropositionsRedimesionFields;
         uint256 NewTransparentProxies = UintLibrary.Bytes32ToUint(Library.BytestoBytes32(_ProposedNewValues[0])[0]); // m
         uint256 NewBeaconProxies = UintLibrary.Bytes32ToUint(Library.BytestoBytes32(_ProposedNewValues[1])[0]); // q
         uint256 TransaprentProxyDataSkip = _TransparentProxies.length + NewTransparentProxies + _Beacons.length + NewBeaconProxies;
@@ -181,11 +181,11 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         pointer = pointer + _TransparentProxies.length + NewTransparentProxies;
         
 
-        if(0 < _ProposedNewValues[pointer + 1].length)
-            IFactory(address(_TransparentProxies[3])).updateContractName(string(_ProposedNewValues[pointer + 1]));
+        if(0 < _ProposedNewValues[pointer].length)
+            IFactory(address(_TransparentProxies[3])).updateContractName(string(_ProposedNewValues[pointer]));
 
-        if(0 < _ProposedNewValues[pointer + 2].length)
-            IFactory(address(_TransparentProxies[3])).updateContractVersion(string(_ProposedNewValues[pointer + 2]));
+        if(0 < _ProposedNewValues[pointer + 1].length)
+            IFactory(address(_TransparentProxies[3])).updateContractVersion(string(_ProposedNewValues[pointer + 1]));
 
     }
 

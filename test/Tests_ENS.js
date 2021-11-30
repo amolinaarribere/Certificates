@@ -43,7 +43,7 @@ contract("Testing ENS",function(accounts){
     // ****** TESTING Functionality ***************************************************************** //
     it("Create Subdomain WRONG",async function(){
         try{
-            await ensProxy.methods.createSubdomain(label).send({from: user_1}, function(error, result){});
+            await ensProxy.methods.createSubdomain(label, address_1).send({from: user_1}, function(error, result){});
             expect.fail();
         }
         // assert

@@ -74,6 +74,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const address_10 = "0x000000000000000000000000000000000000000a";
     const emptyBytes = "0x";
     const emptyString = "0x";
+    const zeroBytes = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 
     beforeEach(async function(){
@@ -162,7 +163,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
     it("Retrieve Proposals Details",async function(){
         // act
-        var PropositionValues = [address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
+        var PropositionValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
             emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
 
         await proposition.Check_Proposition_Details(certContract, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
@@ -170,7 +171,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
     // ****** Testing Contracts Configuration ***************************************************************** //
     it("Vote/Propose/Cancel Contracts Config WRONG",async function(){
-        var NewValues = [address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
+        var NewValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
             emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
 
         await proposition.Config_ContractsManager_Wrong(certContract, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
@@ -191,16 +192,18 @@ contract("Testing Certificate Pool Manager",function(accounts){
         var NewPrivatePoolContractName = "New Private Pool Contract Name";
         var NewPrivatePoolContractVersion = "1.34";
 
-        var NewValues = [aux.AddressToBytes32(NewpublicPool), 
+        var NewValues = [zeroBytes,
+            zeroBytes,
+            aux.AddressToBytes32(NewpublicPool), 
             aux.AddressToBytes32(Newtreasury),
             aux.AddressToBytes32(NewcertisToken), 
             aux.AddressToBytes32(NewprivatePoolFactory), 
-            aux.AddressToBytes32(NewprivatePool), 
             aux.AddressToBytes32(NewproviderFactory), 
-            aux.AddressToBytes32(Newprovider), 
             aux.AddressToBytes32(NewpriceConverter), 
             aux.AddressToBytes32(NewpropositionSettings), 
             aux.AddressToBytes32(Newens),
+            aux.AddressToBytes32(NewprivatePool),
+            aux.AddressToBytes32(Newprovider),
             emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, 
             aux.StringToBytes(NewPrivatePoolContractName),
             aux.StringToBytes(NewPrivatePoolContractVersion)];
@@ -211,7 +214,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     it("Vote/Propose/Cancel Contracts Configuration CORRECT Empty",async function(){
         // act
         var address0 = aux.AddressToBytes32(address_0);
-        var PropositionValues = [address0, address0, address0, address0, address0, address0, address0, address0, address0, address0,
+        var PropositionValues = [zeroBytes, zeroBytes, address0, address0, address0, address0, address0, address0, address0, address0, address0, address0,
             emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
 
 
@@ -230,7 +233,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     });
 
     it("Votes Reassignment Contracts",async function(){
-        var PropositionValues = [address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
+        var PropositionValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
             emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
 
         await proposition.Check_Votes_Reassignment(certContract, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
