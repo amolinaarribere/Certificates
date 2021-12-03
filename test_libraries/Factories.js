@@ -75,17 +75,20 @@ async function createElementWrong(FactoryProxy, Owners, minOwners, ElementName, 
 async function createElementCorrect(FactoryProxy, Owners, minOwners, ElementName, Price, user_1, user_2, user_3){
     var total = await FactoryProxy.methods.retrieveTotal().call({from: user_1}, function(error, result){});
     expect(parseInt(total)).to.equal(0);
-    await FactoryProxy.methods.create(Owners, minOwners, ElementName, emptyLabel).send({from: user_1, value: Price, gas: Gas}, function(error, result){});
-    await FactoryProxy.methods.create(Owners, minOwners, ElementName, label).send({from: user_2, value: Price, gas: Gas}, function(error, result){});
-    await FactoryProxy.methods.create(Owners, minOwners, ElementName, emptyLabel).send({from: user_3, value: Price, gas: Gas}, function(error, result){});
+    await FactoryProxy.methods.create(Owners, minOwners, ElementName[0], emptyLabel).send({from: user_1, value: Price, gas: Gas}, function(error, result){});
+    await FactoryProxy.methods.create(Owners, minOwners, ElementName[1], label).send({from: user_2, value: Price, gas: Gas}, function(error, result){});
+    await FactoryProxy.methods.create(Owners, minOwners, ElementName[2], emptyLabel).send({from: user_3, value: Price, gas: Gas}, function(error, result){});
     total = await FactoryProxy.methods.retrieveTotal().call({from: user_1}, function(error, result){});
     expect(parseInt(total)).to.equal(3);
-    let {0:createElementCorrect_1, 1:proxyaddress_1} = await FactoryProxy.methods.retrieve(0).call({from: user_1}, function(error, result){});
-    let {0:createElementCorrect_2, 1:proxyaddress_2} = await FactoryProxy.methods.retrieve(1).call({from: user_1}, function(error, result){});
-    let {0:createElementCorrect_3, 1:proxyaddress_3} = await FactoryProxy.methods.retrieve(2).call({from: user_1}, function(error, result){});
+    let {0:createElementCorrect_1, 1:proxyaddress_1, 2:ElementName_1} = await FactoryProxy.methods.retrieve(0).call({from: user_1}, function(error, result){});
+    let {0:createElementCorrect_2, 1:proxyaddress_2, 2:ElementName_2} = await FactoryProxy.methods.retrieve(1).call({from: user_1}, function(error, result){});
+    let {0:createElementCorrect_3, 1:proxyaddress_3, 2:ElementName_3} = await FactoryProxy.methods.retrieve(2).call({from: user_1}, function(error, result){});
     expect(createElementCorrect_1).to.equal(user_1);
     expect(createElementCorrect_2).to.equal(user_2);
     expect(createElementCorrect_3).to.equal(user_3);
+    expect(ElementName_1).to.equal(ElementName[0]);
+    expect(ElementName_2).to.equal(ElementName[1]);
+    expect(ElementName_3).to.equal(ElementName[2]);
 }
 
 async function retrieveWrong(FactoryProxy, user_1){

@@ -14,7 +14,7 @@ interface IFactory {
     function updateContractName(string memory contractName) external;
     function updateContractVersion(string memory contractVersion) external;
 
-    function retrieve(uint Id) external view returns (address, address);
+    function retrieve(uint Id) external view returns (address, address, string memory);
     function retrieveTotal() external view returns (uint);
     function retrieveConfig() external view returns (string memory, string memory, string memory);
 

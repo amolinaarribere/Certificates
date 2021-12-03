@@ -38,7 +38,7 @@ contract("Testing Private Pool Factory",function(accounts){
     });
 
     it("Create Private Pool CORRECT",async function(){
-        await factory_common.createElementCorrect(privatePoolFactoryProxy, PrivateOwners, minOwners, "", PrivatePriceWei, user_1, user_2, user_3);
+        await factory_common.createElementCorrect(privatePoolFactoryProxy, PrivateOwners, minOwners, ["e1","e2","e3"], PrivatePriceWei, user_1, user_2, user_3);
     });
 
     // ****** Retrieve ***************************************************************** //

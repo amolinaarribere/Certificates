@@ -45,6 +45,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     struct _ElementStruct{
         address _creator;
         address _ElementProxyAddress;
+        string _ElementName;
     } 
 
     _ElementStruct[] internal _Elements;
@@ -70,12 +71,12 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
         if(0 < bytes(ENSName).length) ENSLabel = keccak256(bytes(ENSName));
 
         BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);
-        _ElementStruct memory element = _ElementStruct(msg.sender, address(beaconProxy));
+        _ElementStruct memory element = _ElementStruct(msg.sender, address(beaconProxy), elementName);
         _Elements.push(element);
 
         if(ENSLabel > 0)IENS(_managerContract.retrieveTransparentProxies()[7]).createSubdomain(ENSLabel, address(beaconProxy));
 
-        emit _NewElement(_FactoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
+        emit _NewElement(_FactoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, element._ElementName);
     }
 
     function updateContractName(string memory contractName) external override
@@ -94,9 +95,9 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
 
     function retrieve(uint Id) external override
         isIdCorrect(Id, _Elements.length)
-    view returns (address, address)
+    view returns (address, address, string memory)
     {
-        return(_Elements[Id]._creator, _Elements[Id]._ElementProxyAddress);
+        return(_Elements[Id]._creator, _Elements[Id]._ElementProxyAddress, _Elements[Id]._ElementName);
     }
 
     function retrieveTotal() external override view returns (uint)

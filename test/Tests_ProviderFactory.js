@@ -38,7 +38,7 @@ contract("Testing Provider Factory",function(accounts){
     });
 
     it("Create Provider CORRECT",async function(){
-        await factory_common.createElementCorrect(providerFactoryProxy, ProviderOwners, minOwners, "", ProviderPriceWei, user_1, user_2, user_3);
+        await factory_common.createElementCorrect(providerFactoryProxy, ProviderOwners, minOwners, ["e1","e2","e3"], ProviderPriceWei, user_1, user_2, user_3);
     });
 
     // ****** Retrieve ***************************************************************** //
