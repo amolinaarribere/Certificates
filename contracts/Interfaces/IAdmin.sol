@@ -8,6 +8,7 @@ pragma solidity 0.8.7;
  */
 
  interface IAdmin  {
+    function retrieveAdminProxy() external view returns (address);
     function retrieveManagerProxy() external view returns (address);
     function retrieveManager() external view returns (address);
 }

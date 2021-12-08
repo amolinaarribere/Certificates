@@ -7806,7 +7806,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_enum$_Prices_$12866__to_t_uint8__fromStack_reversed",
+            "name": "abi_encode_tuple_t_enum$_Prices_$12925__to_t_uint8__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -10791,7 +10791,7 @@
           }
         ]
       },
-      "contents": "{\n    { }\n    function abi_decode_string(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        if gt(_1, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        let array_1 := allocate_memory(add(and(add(_1, 0x1f), not(31)), 0x20))\n        mstore(array_1, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(array_1, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(array_1, _1), 0x20), 0)\n        array := array_1\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_addresst_addresst_bytes32t_bytes32_fromMemory(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := mload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        value2 := mload(add(headStart, 64))\n        value3 := mload(add(headStart, 96))\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptr_fromMemory(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := mload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := mload(_2)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _1)\n        let src := add(_2, _1)\n        if gt(add(add(_2, shl(5, _3)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := mload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptrt_uint256t_string_memory_ptrt_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := calldataload(_2)\n        let _4 := 0x20\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _4)\n        let src := add(_2, _4)\n        if gt(add(add(_2, shl(5, _3)), _4), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := calldataload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _4)\n            src := add(src, _4)\n        }\n        value0 := dst_1\n        value1 := calldataload(add(headStart, _4))\n        let offset_1 := calldataload(add(headStart, 64))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value2 := abi_decode_string(add(headStart, offset_1), dataEnd)\n        let offset_2 := calldataload(add(headStart, 96))\n        if gt(offset_2, _1) { revert(0, 0) }\n        value3 := abi_decode_string(add(headStart, offset_2), dataEnd)\n    }\n    function abi_decode_tuple_t_string_memory_ptr(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        value0 := abi_decode_string(add(headStart, offset), dataEnd)\n    }\n    function abi_decode_tuple_t_string_memory_ptrt_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        value0 := abi_decode_string(add(headStart, offset), dataEnd)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n    }\n    function abi_decode_tuple_t_uint256(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := calldataload(headStart)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 0x20) }\n        {\n            let _1 := 0x20\n            mstore(add(add(pos, i), _1), mload(add(add(value, i), _1)))\n        }\n        if gt(i, length)\n        {\n            mstore(add(add(pos, length), 0x20), 0)\n        }\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_string_storage(value, pos) -> ret\n    {\n        let slotValue := sload(value)\n        let length := 0\n        let _1 := 1\n        length := shr(_1, slotValue)\n        let outOfPlaceEncoding := and(slotValue, _1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        let _2 := 32\n        if eq(outOfPlaceEncoding, lt(length, _2))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n        let pos_1 := array_storeLengthForEncoding_array_address_dyn(pos, length)\n        switch outOfPlaceEncoding\n        case 0 {\n            mstore(pos_1, and(slotValue, not(255)))\n            ret := add(pos_1, _2)\n        }\n        case 1 {\n            let dataPos := array_dataslot_string_storage(value)\n            let i := 0\n            for { } lt(i, length) { i := add(i, _2) }\n            {\n                mstore(add(pos_1, i), sload(dataPos))\n                dataPos := add(dataPos, _1)\n            }\n            ret := add(pos_1, i)\n        }\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_address_t_address_t_string_memory_ptr__to_t_address_t_address_t_string_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), 96)\n        tail := abi_encode_bytes(value2, add(headStart, 96))\n    }\n    function abi_encode_tuple_t_address_t_bytes_memory_ptr__to_t_address_t_bytes_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), 64)\n        tail := abi_encode_bytes(value1, add(headStart, 64))\n    }\n    function abi_encode_tuple_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr_t_string_memory_ptr_t_address__to_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr_t_string_memory_ptr_t_address__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        let tail_1 := add(headStart, 160)\n        mstore(headStart, 160)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 192)\n        let _1 := 0x20\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, and(mload(srcPtr), sub(shl(160, 1), 1)))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        mstore(add(headStart, _1), value1)\n        mstore(add(headStart, 64), sub(pos, headStart))\n        let tail_2 := abi_encode_bytes(value2, pos)\n        mstore(add(headStart, 96), sub(tail_2, headStart))\n        tail := abi_encode_bytes(value3, tail_2)\n        mstore(add(headStart, 128), and(value4, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_bytes32_t_address__to_t_bytes32_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), and(value1, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_enum$_Prices_$12866__to_t_uint8__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        if iszero(lt(value0, 4))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x21)\n            revert(0, 0x24)\n        }\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_string_memory_ptr_t_string_memory_ptr_t_string_memory_ptr__to_t_string_memory_ptr_t_string_memory_ptr_t_string_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        mstore(headStart, 96)\n        let tail_1 := abi_encode_bytes(value0, add(headStart, 96))\n        mstore(add(headStart, 32), sub(tail_1, headStart))\n        let tail_2 := abi_encode_bytes(value1, tail_1)\n        mstore(add(headStart, 64), sub(tail_2, headStart))\n        tail := abi_encode_bytes(value2, tail_2)\n    }\n    function abi_encode_tuple_t_string_storage_t_string_storage__to_t_string_memory_ptr_t_string_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, 64)\n        let tail_1 := abi_encode_string_storage(value0, add(headStart, 64))\n        mstore(add(headStart, 32), sub(tail_1, headStart))\n        tail := abi_encode_string_storage(value1, tail_1)\n    }\n    function abi_encode_tuple_t_string_storage_t_uint256_t_address_t_string_memory_ptr__to_t_string_memory_ptr_t_uint256_t_address_t_string_memory_ptr__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        mstore(headStart, 128)\n        let tail_1 := abi_encode_string_storage(value0, add(headStart, 128))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), and(value2, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 96), sub(tail_1, headStart))\n        tail := abi_encode_bytes(value3, tail_1)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256__to_t_uint256_t_uint256__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function allocate_memory(size) -> memPtr\n    {\n        memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(size, 31), not(31)))\n        if or(gt(newFreePtr, sub(shl(64, 1), 1)), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n    }\n    function array_allocation_size_array_address_dyn(length) -> size\n    {\n        if gt(length, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        size := add(shl(5, length), 0x20)\n    }\n    function array_dataslot_string_storage(ptr) -> data\n    {\n        mstore(0, ptr)\n        data := keccak256(0, 0x20)\n    }\n    function array_storeLengthForEncoding_array_address_dyn(pos, length) -> updated_pos\n    {\n        mstore(pos, length)\n        updated_pos := add(pos, 0x20)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x11)\n            revert(0, 0x24)\n        }\n        diff := sub(x, y)\n    }\n    function extract_byte_array_length(data) -> length\n    {\n        length := shr(1, data)\n        let outOfPlaceEncoding := and(data, 1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        if eq(outOfPlaceEncoding, lt(length, 32))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n    }\n    function panic_error_0x21()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x21)\n        revert(0, 0x24)\n    }\n    function panic_error_0x32()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x32)\n        revert(0, 0x24)\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n}",
+      "contents": "{\n    { }\n    function abi_decode_string(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        if gt(_1, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        let array_1 := allocate_memory(add(and(add(_1, 0x1f), not(31)), 0x20))\n        mstore(array_1, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(array_1, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(array_1, _1), 0x20), 0)\n        array := array_1\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_addresst_addresst_bytes32t_bytes32_fromMemory(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := mload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        value2 := mload(add(headStart, 64))\n        value3 := mload(add(headStart, 96))\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptr_fromMemory(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := mload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := mload(_2)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _1)\n        let src := add(_2, _1)\n        if gt(add(add(_2, shl(5, _3)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := mload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptrt_uint256t_string_memory_ptrt_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := calldataload(_2)\n        let _4 := 0x20\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _4)\n        let src := add(_2, _4)\n        if gt(add(add(_2, shl(5, _3)), _4), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := calldataload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _4)\n            src := add(src, _4)\n        }\n        value0 := dst_1\n        value1 := calldataload(add(headStart, _4))\n        let offset_1 := calldataload(add(headStart, 64))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value2 := abi_decode_string(add(headStart, offset_1), dataEnd)\n        let offset_2 := calldataload(add(headStart, 96))\n        if gt(offset_2, _1) { revert(0, 0) }\n        value3 := abi_decode_string(add(headStart, offset_2), dataEnd)\n    }\n    function abi_decode_tuple_t_string_memory_ptr(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        value0 := abi_decode_string(add(headStart, offset), dataEnd)\n    }\n    function abi_decode_tuple_t_string_memory_ptrt_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        value0 := abi_decode_string(add(headStart, offset), dataEnd)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n    }\n    function abi_decode_tuple_t_uint256(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := calldataload(headStart)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 0x20) }\n        {\n            let _1 := 0x20\n            mstore(add(add(pos, i), _1), mload(add(add(value, i), _1)))\n        }\n        if gt(i, length)\n        {\n            mstore(add(add(pos, length), 0x20), 0)\n        }\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_string_storage(value, pos) -> ret\n    {\n        let slotValue := sload(value)\n        let length := 0\n        let _1 := 1\n        length := shr(_1, slotValue)\n        let outOfPlaceEncoding := and(slotValue, _1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        let _2 := 32\n        if eq(outOfPlaceEncoding, lt(length, _2))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n        let pos_1 := array_storeLengthForEncoding_array_address_dyn(pos, length)\n        switch outOfPlaceEncoding\n        case 0 {\n            mstore(pos_1, and(slotValue, not(255)))\n            ret := add(pos_1, _2)\n        }\n        case 1 {\n            let dataPos := array_dataslot_string_storage(value)\n            let i := 0\n            for { } lt(i, length) { i := add(i, _2) }\n            {\n                mstore(add(pos_1, i), sload(dataPos))\n                dataPos := add(dataPos, _1)\n            }\n            ret := add(pos_1, i)\n        }\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_address_t_address_t_string_memory_ptr__to_t_address_t_address_t_string_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), 96)\n        tail := abi_encode_bytes(value2, add(headStart, 96))\n    }\n    function abi_encode_tuple_t_address_t_bytes_memory_ptr__to_t_address_t_bytes_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), 64)\n        tail := abi_encode_bytes(value1, add(headStart, 64))\n    }\n    function abi_encode_tuple_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr_t_string_memory_ptr_t_address__to_t_array$_t_address_$dyn_memory_ptr_t_uint256_t_string_memory_ptr_t_string_memory_ptr_t_address__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        let tail_1 := add(headStart, 160)\n        mstore(headStart, 160)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 192)\n        let _1 := 0x20\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, and(mload(srcPtr), sub(shl(160, 1), 1)))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        mstore(add(headStart, _1), value1)\n        mstore(add(headStart, 64), sub(pos, headStart))\n        let tail_2 := abi_encode_bytes(value2, pos)\n        mstore(add(headStart, 96), sub(tail_2, headStart))\n        tail := abi_encode_bytes(value3, tail_2)\n        mstore(add(headStart, 128), and(value4, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_bytes32_t_address__to_t_bytes32_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), and(value1, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_enum$_Prices_$12925__to_t_uint8__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        if iszero(lt(value0, 4))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x21)\n            revert(0, 0x24)\n        }\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_string_memory_ptr_t_string_memory_ptr_t_string_memory_ptr__to_t_string_memory_ptr_t_string_memory_ptr_t_string_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        mstore(headStart, 96)\n        let tail_1 := abi_encode_bytes(value0, add(headStart, 96))\n        mstore(add(headStart, 32), sub(tail_1, headStart))\n        let tail_2 := abi_encode_bytes(value1, tail_1)\n        mstore(add(headStart, 64), sub(tail_2, headStart))\n        tail := abi_encode_bytes(value2, tail_2)\n    }\n    function abi_encode_tuple_t_string_storage_t_string_storage__to_t_string_memory_ptr_t_string_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, 64)\n        let tail_1 := abi_encode_string_storage(value0, add(headStart, 64))\n        mstore(add(headStart, 32), sub(tail_1, headStart))\n        tail := abi_encode_string_storage(value1, tail_1)\n    }\n    function abi_encode_tuple_t_string_storage_t_uint256_t_address_t_string_memory_ptr__to_t_string_memory_ptr_t_uint256_t_address_t_string_memory_ptr__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        mstore(headStart, 128)\n        let tail_1 := abi_encode_string_storage(value0, add(headStart, 128))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), and(value2, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 96), sub(tail_1, headStart))\n        tail := abi_encode_bytes(value3, tail_1)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256__to_t_uint256_t_uint256__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function allocate_memory(size) -> memPtr\n    {\n        memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(size, 31), not(31)))\n        if or(gt(newFreePtr, sub(shl(64, 1), 1)), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n    }\n    function array_allocation_size_array_address_dyn(length) -> size\n    {\n        if gt(length, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        size := add(shl(5, length), 0x20)\n    }\n    function array_dataslot_string_storage(ptr) -> data\n    {\n        mstore(0, ptr)\n        data := keccak256(0, 0x20)\n    }\n    function array_storeLengthForEncoding_array_address_dyn(pos, length) -> updated_pos\n    {\n        mstore(pos, length)\n        updated_pos := add(pos, 0x20)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x11)\n            revert(0, 0x24)\n        }\n        diff := sub(x, y)\n    }\n    function extract_byte_array_length(data) -> length\n    {\n        length := shr(1, data)\n        let outOfPlaceEncoding := and(data, 1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        if eq(outOfPlaceEncoding, lt(length, 32))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n    }\n    function panic_error_0x21()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x21)\n        revert(0, 0x24)\n    }\n    function panic_error_0x32()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x32)\n        revert(0, 0x24)\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n}",
       "id": 69,
       "language": "Yul",
       "name": "#utility.yul"
@@ -10826,22 +10826,22 @@
         1897
       ],
       "IENS": [
-        10985
+        11044
       ],
       "IFactory": [
-        11192
+        11251
       ],
       "IManager": [
-        11243
+        11302
       ],
       "ITreasury": [
-        11673
+        11732
       ],
       "Initializable": [
         528
       ],
       "Library": [
-        13062
+        13121
       ],
       "ManagedBaseContract": [
         4661
@@ -10850,7 +10850,7 @@
         1351
       ],
       "ProviderFactory": [
-        9444
+        9498
       ],
       "Proxy": [
         1805
@@ -10865,12 +10865,12 @@
         1972
       ]
     },
-    "id": 9445,
+    "id": 9499,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9344,
+        "id": 9398,
         "literals": [
           "solidity",
           "0.8",
@@ -10882,11 +10882,11 @@
       {
         "absolutePath": "project:/contracts/Interfaces/ITreasury.sol",
         "file": "../Interfaces/ITreasury.sol",
-        "id": 9345,
+        "id": 9399,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 9445,
-        "sourceUnit": 11674,
+        "scope": 9499,
+        "sourceUnit": 11733,
         "src": "288:37:40",
         "symbolAliases": [],
         "unitAlias": ""
@@ -10894,10 +10894,10 @@
       {
         "absolutePath": "project:/contracts/Abstract/Factory.sol",
         "file": "../Abstract/Factory.sol",
-        "id": 9346,
+        "id": 9400,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 9445,
+        "scope": 9499,
         "sourceUnit": 2948,
         "src": "328:33:40",
         "symbolAliases": [],
@@ -10908,13 +10908,13 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 9347,
+              "id": 9401,
               "name": "Factory",
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 2947,
               "src": "393:7:40"
             },
-            "id": 9348,
+            "id": 9402,
             "nodeType": "InheritanceSpecifier",
             "src": "393:7:40"
           }
@@ -10924,13 +10924,13 @@
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 9444,
+        "id": 9498,
         "linearizedBaseContracts": [
-          9444,
+          9498,
           2947,
           4661,
           528,
-          11192
+          11251
         ],
         "name": "ProviderFactory",
         "nameLocation": "374:15:40",
@@ -10938,7 +10938,7 @@
         "nodes": [
           {
             "body": {
-              "id": 9362,
+              "id": 9416,
               "nodeType": "Block",
               "src": "556:73:40",
               "statements": [
@@ -10947,7 +10947,7 @@
                     "arguments": [
                       {
                         "hexValue": "50726f7669646572",
-                        "id": 9358,
+                        "id": 9412,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -10962,11 +10962,11 @@
                         "value": "Provider"
                       },
                       {
-                        "id": 9359,
+                        "id": 9413,
                         "name": "managerContractAddress",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9350,
+                        "referencedDeclaration": 9404,
                         "src": "598:22:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -10986,18 +10986,18 @@
                         }
                       ],
                       "expression": {
-                        "id": 9355,
+                        "id": 9409,
                         "name": "super",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 4294967271,
                         "src": "567:5:40",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_super$_ProviderFactory_$9444_$",
+                          "typeIdentifier": "t_type$_t_super$_ProviderFactory_$9498_$",
                           "typeString": "type(contract super ProviderFactory)"
                         }
                       },
-                      "id": 9357,
+                      "id": 9411,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -11011,7 +11011,7 @@
                         "typeString": "function (string memory,address)"
                       }
                     },
-                    "id": 9360,
+                    "id": 9414,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -11026,22 +11026,22 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9361,
+                  "id": 9415,
                   "nodeType": "ExpressionStatement",
                   "src": "567:54:40"
                 }
               ]
             },
             "functionSelector": "fcc09e5b",
-            "id": 9363,
+            "id": 9417,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 9353,
+                "id": 9407,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 9352,
+                  "id": 9406,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 527,
@@ -11055,17 +11055,17 @@
             "nameLocation": "484:20:40",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 9351,
+              "id": 9405,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9350,
+                  "id": 9404,
                   "mutability": "mutable",
                   "name": "managerContractAddress",
                   "nameLocation": "513:22:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9363,
+                  "scope": 9417,
                   "src": "505:30:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -11074,7 +11074,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9349,
+                    "id": 9403,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "505:7:40",
@@ -11090,12 +11090,12 @@
               "src": "504:32:40"
             },
             "returnParameters": {
-              "id": 9354,
+              "id": 9408,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "556:0:40"
             },
-            "scope": 9444,
+            "scope": 9498,
             "src": "475:154:40",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -11103,10 +11103,10 @@
           },
           {
             "baseFunctions": [
-              11156
+              11215
             ],
             "body": {
-              "id": 9442,
+              "id": 9496,
               "nodeType": "Block",
               "src": "843:629:40",
               "statements": [
@@ -11116,42 +11116,42 @@
                       {
                         "expression": {
                           "expression": {
-                            "id": 9392,
+                            "id": 9446,
                             "name": "Library",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 13062,
+                            "referencedDeclaration": 13121,
                             "src": "978:7:40",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                              "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                               "typeString": "type(library Library)"
                             }
                           },
-                          "id": 9393,
+                          "id": 9447,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "Prices",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 12866,
+                          "referencedDeclaration": 12925,
                           "src": "978:14:40",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_enum$_Prices_$12866_$",
+                            "typeIdentifier": "t_type$_t_enum$_Prices_$12925_$",
                             "typeString": "type(enum Library.Prices)"
                           }
                         },
-                        "id": 9394,
+                        "id": 9448,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "lValueRequested": false,
                         "memberName": "NewProviderContract",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12865,
+                        "referencedDeclaration": 12924,
                         "src": "978:34:40",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$12866",
+                          "typeIdentifier": "t_enum$_Prices_$12925",
                           "typeString": "enum Library.Prices"
                         }
                       }
@@ -11159,14 +11159,14 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_enum$_Prices_$12866",
+                          "typeIdentifier": "t_enum$_Prices_$12925",
                           "typeString": "enum Library.Prices"
                         }
                       ],
                       "expression": {
                         "argumentTypes": [
                           {
-                            "typeIdentifier": "t_enum$_Prices_$12866",
+                            "typeIdentifier": "t_enum$_Prices_$12925",
                             "typeString": "enum Library.Prices"
                           }
                         ],
@@ -11178,32 +11178,32 @@
                                 "expression": {
                                   "argumentTypes": [],
                                   "expression": {
-                                    "id": 9377,
+                                    "id": 9431,
                                     "name": "_managerContract",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
                                     "referencedDeclaration": 4619,
                                     "src": "864:16:40",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_contract$_IManager_$11243",
+                                      "typeIdentifier": "t_contract$_IManager_$11302",
                                       "typeString": "contract IManager"
                                     }
                                   },
-                                  "id": 9378,
+                                  "id": 9432,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "memberName": "retrieveTransparentProxies",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 11214,
+                                  "referencedDeclaration": 11273,
                                   "src": "864:43:40",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
                                     "typeString": "function () view external returns (address[] memory)"
                                   }
                                 },
-                                "id": 9379,
+                                "id": 9433,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -11218,48 +11218,48 @@
                                   "typeString": "address[] memory"
                                 }
                               },
-                              "id": 9386,
+                              "id": 9440,
                               "indexExpression": {
                                 "arguments": [
                                   {
                                     "expression": {
                                       "expression": {
-                                        "id": 9382,
+                                        "id": 9436,
                                         "name": "Library",
                                         "nodeType": "Identifier",
                                         "overloadedDeclarations": [],
-                                        "referencedDeclaration": 13062,
+                                        "referencedDeclaration": 13121,
                                         "src": "918:7:40",
                                         "typeDescriptions": {
-                                          "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                                          "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                                           "typeString": "type(library Library)"
                                         }
                                       },
-                                      "id": 9383,
+                                      "id": 9437,
                                       "isConstant": false,
                                       "isLValue": false,
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "memberName": "TransparentProxies",
                                       "nodeType": "MemberAccess",
-                                      "referencedDeclaration": 12875,
+                                      "referencedDeclaration": 12934,
                                       "src": "918:26:40",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12875_$",
+                                        "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12934_$",
                                         "typeString": "type(enum Library.TransparentProxies)"
                                       }
                                     },
-                                    "id": 9384,
+                                    "id": 9438,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
                                     "lValueRequested": false,
                                     "memberName": "Treasury",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12868,
+                                    "referencedDeclaration": 12927,
                                     "src": "918:35:40",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                      "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                       "typeString": "enum Library.TransparentProxies"
                                     }
                                   }
@@ -11267,11 +11267,11 @@
                                 "expression": {
                                   "argumentTypes": [
                                     {
-                                      "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                      "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                       "typeString": "enum Library.TransparentProxies"
                                     }
                                   ],
-                                  "id": 9381,
+                                  "id": 9435,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
@@ -11283,14 +11283,14 @@
                                     "typeString": "type(uint256)"
                                   },
                                   "typeName": {
-                                    "id": 9380,
+                                    "id": 9434,
                                     "name": "uint256",
                                     "nodeType": "ElementaryTypeName",
                                     "src": "910:7:40",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 9385,
+                                "id": 9439,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": true,
@@ -11324,18 +11324,18 @@
                                 "typeString": "address"
                               }
                             ],
-                            "id": 9376,
+                            "id": 9430,
                             "name": "ITreasury",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 11673,
+                            "referencedDeclaration": 11732,
                             "src": "854:9:40",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$11673_$",
+                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$11732_$",
                               "typeString": "type(contract ITreasury)"
                             }
                           },
-                          "id": 9387,
+                          "id": 9441,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -11346,25 +11346,25 @@
                           "src": "854:102:40",
                           "tryCall": false,
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ITreasury_$11673",
+                            "typeIdentifier": "t_contract$_ITreasury_$11732",
                             "typeString": "contract ITreasury"
                           }
                         },
-                        "id": 9388,
+                        "id": 9442,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "pay",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 11625,
+                        "referencedDeclaration": 11684,
                         "src": "854:106:40",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12866_$returns$__$",
+                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12925_$returns$__$",
                           "typeString": "function (enum Library.Prices) payable external"
                         }
                       },
-                      "id": 9391,
+                      "id": 9445,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -11376,7 +11376,7 @@
                       "options": [
                         {
                           "expression": {
-                            "id": 9389,
+                            "id": 9443,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -11387,7 +11387,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9390,
+                          "id": 9444,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -11403,11 +11403,11 @@
                       ],
                       "src": "854:123:40",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12866_$returns$__$value",
+                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12925_$returns$__$value",
                         "typeString": "function (enum Library.Prices) payable external"
                       }
                     },
-                    "id": 9395,
+                    "id": 9449,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -11422,14 +11422,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9396,
+                  "id": 9450,
                   "nodeType": "ExpressionStatement",
                   "src": "854:159:40"
                 },
                 {
                   "assignments": [
                     null,
-                    9398,
+                    9452,
                     null,
                     null
                   ],
@@ -11437,12 +11437,12 @@
                     null,
                     {
                       "constant": false,
-                      "id": 9398,
+                      "id": 9452,
                       "mutability": "mutable",
                       "name": "ENSReverseAddress",
                       "nameLocation": "1034:17:40",
                       "nodeType": "VariableDeclaration",
-                      "scope": 9442,
+                      "scope": 9496,
                       "src": "1026:25:40",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -11451,7 +11451,7 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 9397,
+                        "id": 9451,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "1026:7:40",
@@ -11466,7 +11466,7 @@
                     null,
                     null
                   ],
-                  "id": 9413,
+                  "id": 9467,
                   "initialValue": {
                     "arguments": [],
                     "expression": {
@@ -11479,32 +11479,32 @@
                               "expression": {
                                 "argumentTypes": [],
                                 "expression": {
-                                  "id": 9400,
+                                  "id": 9454,
                                   "name": "_managerContract",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
                                   "referencedDeclaration": 4619,
                                   "src": "1062:16:40",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IManager_$11243",
+                                    "typeIdentifier": "t_contract$_IManager_$11302",
                                     "typeString": "contract IManager"
                                   }
                                 },
-                                "id": 9401,
+                                "id": 9455,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
                                 "lValueRequested": false,
                                 "memberName": "retrieveTransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 11214,
+                                "referencedDeclaration": 11273,
                                 "src": "1062:43:40",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
                                   "typeString": "function () view external returns (address[] memory)"
                                 }
                               },
-                              "id": 9402,
+                              "id": 9456,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": false,
@@ -11519,48 +11519,48 @@
                                 "typeString": "address[] memory"
                               }
                             },
-                            "id": 9409,
+                            "id": 9463,
                             "indexExpression": {
                               "arguments": [
                                 {
                                   "expression": {
                                     "expression": {
-                                      "id": 9405,
+                                      "id": 9459,
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 13062,
+                                      "referencedDeclaration": 13121,
                                       "src": "1116:7:40",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
-                                    "id": 9406,
+                                    "id": 9460,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": false,
                                     "lValueRequested": false,
                                     "memberName": "TransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12875,
+                                    "referencedDeclaration": 12934,
                                     "src": "1116:26:40",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12875_$",
+                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12934_$",
                                       "typeString": "type(enum Library.TransparentProxies)"
                                     }
                                   },
-                                  "id": 9407,
+                                  "id": 9461,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "memberName": "ENS",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 12874,
+                                  "referencedDeclaration": 12933,
                                   "src": "1116:30:40",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 }
@@ -11568,11 +11568,11 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 ],
-                                "id": 9404,
+                                "id": 9458,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": true,
@@ -11584,14 +11584,14 @@
                                   "typeString": "type(uint256)"
                                 },
                                 "typeName": {
-                                  "id": 9403,
+                                  "id": 9457,
                                   "name": "uint256",
                                   "nodeType": "ElementaryTypeName",
                                   "src": "1108:7:40",
                                   "typeDescriptions": {}
                                 }
                               },
-                              "id": 9408,
+                              "id": 9462,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -11625,18 +11625,18 @@
                               "typeString": "address"
                             }
                           ],
-                          "id": 9399,
+                          "id": 9453,
                           "name": "IENS",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 10985,
+                          "referencedDeclaration": 11044,
                           "src": "1057:4:40",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IENS_$10985_$",
+                            "typeIdentifier": "t_type$_t_contract$_IENS_$11044_$",
                             "typeString": "type(contract IENS)"
                           }
                         },
-                        "id": 9410,
+                        "id": 9464,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -11647,25 +11647,25 @@
                         "src": "1057:92:40",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IENS_$10985",
+                          "typeIdentifier": "t_contract$_IENS_$11044",
                           "typeString": "contract IENS"
                         }
                       },
-                      "id": 9411,
+                      "id": 9465,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "retrieveSettings",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 10984,
+                      "referencedDeclaration": 11043,
                       "src": "1057:109:40",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$__$returns$_t_address_$_t_address_$_t_bytes32_$_t_bytes32_$",
                         "typeString": "function () view external returns (address,address,bytes32,bytes32)"
                       }
                     },
-                    "id": 9412,
+                    "id": 9466,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -11685,17 +11685,17 @@
                 },
                 {
                   "assignments": [
-                    9415
+                    9469
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 9415,
+                      "id": 9469,
                       "mutability": "mutable",
                       "name": "data",
                       "nameLocation": "1192:4:40",
                       "nodeType": "VariableDeclaration",
-                      "scope": 9442,
+                      "scope": 9496,
                       "src": "1179:17:40",
                       "stateVariable": false,
                       "storageLocation": "memory",
@@ -11704,7 +11704,7 @@
                         "typeString": "bytes"
                       },
                       "typeName": {
-                        "id": 9414,
+                        "id": 9468,
                         "name": "bytes",
                         "nodeType": "ElementaryTypeName",
                         "src": "1179:5:40",
@@ -11716,12 +11716,12 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 9425,
+                  "id": 9479,
                   "initialValue": {
                     "arguments": [
                       {
                         "hexValue": "50726f76696465725f696e697428616464726573735b5d2c75696e743235362c737472696e672c737472696e672c6164647265737329",
-                        "id": 9418,
+                        "id": 9472,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -11736,11 +11736,11 @@
                         "value": "Provider_init(address[],uint256,string,string,address)"
                       },
                       {
-                        "id": 9419,
+                        "id": 9473,
                         "name": "owners",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9366,
+                        "referencedDeclaration": 9420,
                         "src": "1281:6:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
@@ -11748,11 +11748,11 @@
                         }
                       },
                       {
-                        "id": 9420,
+                        "id": 9474,
                         "name": "minOwners",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9368,
+                        "referencedDeclaration": 9422,
                         "src": "1289:9:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -11760,11 +11760,11 @@
                         }
                       },
                       {
-                        "id": 9421,
+                        "id": 9475,
                         "name": "ElementName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9370,
+                        "referencedDeclaration": 9424,
                         "src": "1300:11:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -11772,11 +11772,11 @@
                         }
                       },
                       {
-                        "id": 9422,
+                        "id": 9476,
                         "name": "ENSName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9372,
+                        "referencedDeclaration": 9426,
                         "src": "1313:7:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -11784,11 +11784,11 @@
                         }
                       },
                       {
-                        "id": 9423,
+                        "id": 9477,
                         "name": "ENSReverseAddress",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9398,
+                        "referencedDeclaration": 9452,
                         "src": "1322:17:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -11824,7 +11824,7 @@
                         }
                       ],
                       "expression": {
-                        "id": 9416,
+                        "id": 9470,
                         "name": "abi",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
@@ -11835,7 +11835,7 @@
                           "typeString": "abi"
                         }
                       },
-                      "id": 9417,
+                      "id": 9471,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -11848,7 +11848,7 @@
                         "typeString": "function (string memory) pure returns (bytes memory)"
                       }
                     },
-                    "id": 9424,
+                    "id": 9478,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -11875,32 +11875,32 @@
                           "expression": {
                             "argumentTypes": [],
                             "expression": {
-                              "id": 9427,
+                              "id": 9481,
                               "name": "_managerContract",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4619,
                               "src": "1366:16:40",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IManager_$11243",
+                                "typeIdentifier": "t_contract$_IManager_$11302",
                                 "typeString": "contract IManager"
                               }
                             },
-                            "id": 9428,
+                            "id": 9482,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
                             "lValueRequested": false,
                             "memberName": "retrieveBeacons",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 11220,
+                            "referencedDeclaration": 11279,
                             "src": "1366:32:40",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
                               "typeString": "function () view external returns (address[] memory)"
                             }
                           },
-                          "id": 9429,
+                          "id": 9483,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -11915,48 +11915,48 @@
                             "typeString": "address[] memory"
                           }
                         },
-                        "id": 9436,
+                        "id": 9490,
                         "indexExpression": {
                           "arguments": [
                             {
                               "expression": {
                                 "expression": {
-                                  "id": 9432,
+                                  "id": 9486,
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 13062,
+                                  "referencedDeclaration": 13121,
                                   "src": "1409:7:40",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
-                                "id": 9433,
+                                "id": 9487,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
                                 "lValueRequested": false,
                                 "memberName": "Beacons",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 12878,
+                                "referencedDeclaration": 12937,
                                 "src": "1409:15:40",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_type$_t_enum$_Beacons_$12878_$",
+                                  "typeIdentifier": "t_type$_t_enum$_Beacons_$12937_$",
                                   "typeString": "type(enum Library.Beacons)"
                                 }
                               },
-                              "id": 9434,
+                              "id": 9488,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "lValueRequested": false,
                               "memberName": "Provider",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 12877,
+                              "referencedDeclaration": 12936,
                               "src": "1409:24:40",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_enum$_Beacons_$12878",
+                                "typeIdentifier": "t_enum$_Beacons_$12937",
                                 "typeString": "enum Library.Beacons"
                               }
                             }
@@ -11964,11 +11964,11 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_enum$_Beacons_$12878",
+                                "typeIdentifier": "t_enum$_Beacons_$12937",
                                 "typeString": "enum Library.Beacons"
                               }
                             ],
-                            "id": 9431,
+                            "id": 9485,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -11980,14 +11980,14 @@
                               "typeString": "type(uint256)"
                             },
                             "typeName": {
-                              "id": 9430,
+                              "id": 9484,
                               "name": "uint256",
                               "nodeType": "ElementaryTypeName",
                               "src": "1401:7:40",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 9435,
+                          "id": 9489,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -12014,11 +12014,11 @@
                         }
                       },
                       {
-                        "id": 9437,
+                        "id": 9491,
                         "name": "data",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9415,
+                        "referencedDeclaration": 9469,
                         "src": "1437:4:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
@@ -12026,11 +12026,11 @@
                         }
                       },
                       {
-                        "id": 9438,
+                        "id": 9492,
                         "name": "ElementName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9370,
+                        "referencedDeclaration": 9424,
                         "src": "1443:11:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -12038,11 +12038,11 @@
                         }
                       },
                       {
-                        "id": 9439,
+                        "id": 9493,
                         "name": "ENSName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9372,
+                        "referencedDeclaration": 9426,
                         "src": "1456:7:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -12069,7 +12069,7 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 9426,
+                      "id": 9480,
                       "name": "internalCreate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
@@ -12080,7 +12080,7 @@
                         "typeString": "function (address,bytes memory,string memory,string memory)"
                       }
                     },
-                    "id": 9440,
+                    "id": 9494,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -12095,14 +12095,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9441,
+                  "id": 9495,
                   "nodeType": "ExpressionStatement",
                   "src": "1351:113:40"
                 }
               ]
             },
             "functionSelector": "7c980198",
-            "id": 9443,
+            "id": 9497,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -12110,23 +12110,23 @@
             "nameLocation": "710:6:40",
             "nodeType": "FunctionDefinition",
             "overrides": {
-              "id": 9374,
+              "id": 9428,
               "nodeType": "OverrideSpecifier",
               "overrides": [],
               "src": "821:8:40"
             },
             "parameters": {
-              "id": 9373,
+              "id": 9427,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9366,
+                  "id": 9420,
                   "mutability": "mutable",
                   "name": "owners",
                   "nameLocation": "734:6:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "717:23:40",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -12136,7 +12136,7 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 9364,
+                      "id": 9418,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
                       "src": "717:7:40",
@@ -12146,7 +12146,7 @@
                         "typeString": "address"
                       }
                     },
-                    "id": 9365,
+                    "id": 9419,
                     "nodeType": "ArrayTypeName",
                     "src": "717:9:40",
                     "typeDescriptions": {
@@ -12158,12 +12158,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9368,
+                  "id": 9422,
                   "mutability": "mutable",
                   "name": "minOwners",
                   "nameLocation": "751:9:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "743:17:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -12172,7 +12172,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 9367,
+                    "id": 9421,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "743:7:40",
@@ -12185,12 +12185,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9370,
+                  "id": 9424,
                   "mutability": "mutable",
                   "name": "ElementName",
                   "nameLocation": "776:11:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "762:25:40",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -12199,7 +12199,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9369,
+                    "id": 9423,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "762:6:40",
@@ -12212,12 +12212,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9372,
+                  "id": 9426,
                   "mutability": "mutable",
                   "name": "ENSName",
                   "nameLocation": "803:7:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "789:21:40",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -12226,7 +12226,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9371,
+                    "id": 9425,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "789:6:40",
@@ -12241,19 +12241,19 @@
               "src": "716:95:40"
             },
             "returnParameters": {
-              "id": 9375,
+              "id": 9429,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "843:0:40"
             },
-            "scope": 9444,
+            "scope": 9498,
             "src": "701:771:40",
             "stateMutability": "payable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 9445,
+        "scope": 9499,
         "src": "365:1114:40",
         "usedErrors": []
       }
@@ -12285,22 +12285,22 @@
         1897
       ],
       "IENS": [
-        10985
+        11044
       ],
       "IFactory": [
-        11192
+        11251
       ],
       "IManager": [
-        11243
+        11302
       ],
       "ITreasury": [
-        11673
+        11732
       ],
       "Initializable": [
         528
       ],
       "Library": [
-        13062
+        13121
       ],
       "ManagedBaseContract": [
         4661
@@ -12309,7 +12309,7 @@
         1351
       ],
       "ProviderFactory": [
-        9444
+        9498
       ],
       "Proxy": [
         1805
@@ -12324,12 +12324,12 @@
         1972
       ]
     },
-    "id": 9445,
+    "id": 9499,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9344,
+        "id": 9398,
         "literals": [
           "solidity",
           "0.8",
@@ -12341,11 +12341,11 @@
       {
         "absolutePath": "project:/contracts/Interfaces/ITreasury.sol",
         "file": "../Interfaces/ITreasury.sol",
-        "id": 9345,
+        "id": 9399,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 9445,
-        "sourceUnit": 11674,
+        "scope": 9499,
+        "sourceUnit": 11733,
         "src": "288:37:40",
         "symbolAliases": [],
         "unitAlias": ""
@@ -12353,10 +12353,10 @@
       {
         "absolutePath": "project:/contracts/Abstract/Factory.sol",
         "file": "../Abstract/Factory.sol",
-        "id": 9346,
+        "id": 9400,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 9445,
+        "scope": 9499,
         "sourceUnit": 2948,
         "src": "328:33:40",
         "symbolAliases": [],
@@ -12367,13 +12367,13 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 9347,
+              "id": 9401,
               "name": "Factory",
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 2947,
               "src": "393:7:40"
             },
-            "id": 9348,
+            "id": 9402,
             "nodeType": "InheritanceSpecifier",
             "src": "393:7:40"
           }
@@ -12383,13 +12383,13 @@
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 9444,
+        "id": 9498,
         "linearizedBaseContracts": [
-          9444,
+          9498,
           2947,
           4661,
           528,
-          11192
+          11251
         ],
         "name": "ProviderFactory",
         "nameLocation": "374:15:40",
@@ -12397,7 +12397,7 @@
         "nodes": [
           {
             "body": {
-              "id": 9362,
+              "id": 9416,
               "nodeType": "Block",
               "src": "556:73:40",
               "statements": [
@@ -12406,7 +12406,7 @@
                     "arguments": [
                       {
                         "hexValue": "50726f7669646572",
-                        "id": 9358,
+                        "id": 9412,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -12421,11 +12421,11 @@
                         "value": "Provider"
                       },
                       {
-                        "id": 9359,
+                        "id": 9413,
                         "name": "managerContractAddress",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9350,
+                        "referencedDeclaration": 9404,
                         "src": "598:22:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -12445,18 +12445,18 @@
                         }
                       ],
                       "expression": {
-                        "id": 9355,
+                        "id": 9409,
                         "name": "super",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 4294967271,
                         "src": "567:5:40",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_super$_ProviderFactory_$9444_$",
+                          "typeIdentifier": "t_type$_t_super$_ProviderFactory_$9498_$",
                           "typeString": "type(contract super ProviderFactory)"
                         }
                       },
-                      "id": 9357,
+                      "id": 9411,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -12470,7 +12470,7 @@
                         "typeString": "function (string memory,address)"
                       }
                     },
-                    "id": 9360,
+                    "id": 9414,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -12485,22 +12485,22 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9361,
+                  "id": 9415,
                   "nodeType": "ExpressionStatement",
                   "src": "567:54:40"
                 }
               ]
             },
             "functionSelector": "fcc09e5b",
-            "id": 9363,
+            "id": 9417,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 9353,
+                "id": 9407,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 9352,
+                  "id": 9406,
                   "name": "initializer",
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 527,
@@ -12514,17 +12514,17 @@
             "nameLocation": "484:20:40",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 9351,
+              "id": 9405,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9350,
+                  "id": 9404,
                   "mutability": "mutable",
                   "name": "managerContractAddress",
                   "nameLocation": "513:22:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9363,
+                  "scope": 9417,
                   "src": "505:30:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -12533,7 +12533,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9349,
+                    "id": 9403,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "505:7:40",
@@ -12549,12 +12549,12 @@
               "src": "504:32:40"
             },
             "returnParameters": {
-              "id": 9354,
+              "id": 9408,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "556:0:40"
             },
-            "scope": 9444,
+            "scope": 9498,
             "src": "475:154:40",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -12562,10 +12562,10 @@
           },
           {
             "baseFunctions": [
-              11156
+              11215
             ],
             "body": {
-              "id": 9442,
+              "id": 9496,
               "nodeType": "Block",
               "src": "843:629:40",
               "statements": [
@@ -12575,42 +12575,42 @@
                       {
                         "expression": {
                           "expression": {
-                            "id": 9392,
+                            "id": 9446,
                             "name": "Library",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 13062,
+                            "referencedDeclaration": 13121,
                             "src": "978:7:40",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                              "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                               "typeString": "type(library Library)"
                             }
                           },
-                          "id": 9393,
+                          "id": 9447,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "Prices",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 12866,
+                          "referencedDeclaration": 12925,
                           "src": "978:14:40",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_enum$_Prices_$12866_$",
+                            "typeIdentifier": "t_type$_t_enum$_Prices_$12925_$",
                             "typeString": "type(enum Library.Prices)"
                           }
                         },
-                        "id": 9394,
+                        "id": 9448,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "lValueRequested": false,
                         "memberName": "NewProviderContract",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12865,
+                        "referencedDeclaration": 12924,
                         "src": "978:34:40",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$12866",
+                          "typeIdentifier": "t_enum$_Prices_$12925",
                           "typeString": "enum Library.Prices"
                         }
                       }
@@ -12618,14 +12618,14 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_enum$_Prices_$12866",
+                          "typeIdentifier": "t_enum$_Prices_$12925",
                           "typeString": "enum Library.Prices"
                         }
                       ],
                       "expression": {
                         "argumentTypes": [
                           {
-                            "typeIdentifier": "t_enum$_Prices_$12866",
+                            "typeIdentifier": "t_enum$_Prices_$12925",
                             "typeString": "enum Library.Prices"
                           }
                         ],
@@ -12637,32 +12637,32 @@
                                 "expression": {
                                   "argumentTypes": [],
                                   "expression": {
-                                    "id": 9377,
+                                    "id": 9431,
                                     "name": "_managerContract",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
                                     "referencedDeclaration": 4619,
                                     "src": "864:16:40",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_contract$_IManager_$11243",
+                                      "typeIdentifier": "t_contract$_IManager_$11302",
                                       "typeString": "contract IManager"
                                     }
                                   },
-                                  "id": 9378,
+                                  "id": 9432,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "memberName": "retrieveTransparentProxies",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 11214,
+                                  "referencedDeclaration": 11273,
                                   "src": "864:43:40",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
                                     "typeString": "function () view external returns (address[] memory)"
                                   }
                                 },
-                                "id": 9379,
+                                "id": 9433,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
@@ -12677,48 +12677,48 @@
                                   "typeString": "address[] memory"
                                 }
                               },
-                              "id": 9386,
+                              "id": 9440,
                               "indexExpression": {
                                 "arguments": [
                                   {
                                     "expression": {
                                       "expression": {
-                                        "id": 9382,
+                                        "id": 9436,
                                         "name": "Library",
                                         "nodeType": "Identifier",
                                         "overloadedDeclarations": [],
-                                        "referencedDeclaration": 13062,
+                                        "referencedDeclaration": 13121,
                                         "src": "918:7:40",
                                         "typeDescriptions": {
-                                          "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                                          "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                                           "typeString": "type(library Library)"
                                         }
                                       },
-                                      "id": 9383,
+                                      "id": 9437,
                                       "isConstant": false,
                                       "isLValue": false,
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "memberName": "TransparentProxies",
                                       "nodeType": "MemberAccess",
-                                      "referencedDeclaration": 12875,
+                                      "referencedDeclaration": 12934,
                                       "src": "918:26:40",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12875_$",
+                                        "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12934_$",
                                         "typeString": "type(enum Library.TransparentProxies)"
                                       }
                                     },
-                                    "id": 9384,
+                                    "id": 9438,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
                                     "lValueRequested": false,
                                     "memberName": "Treasury",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12868,
+                                    "referencedDeclaration": 12927,
                                     "src": "918:35:40",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                      "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                       "typeString": "enum Library.TransparentProxies"
                                     }
                                   }
@@ -12726,11 +12726,11 @@
                                 "expression": {
                                   "argumentTypes": [
                                     {
-                                      "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                      "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                       "typeString": "enum Library.TransparentProxies"
                                     }
                                   ],
-                                  "id": 9381,
+                                  "id": 9435,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
@@ -12742,14 +12742,14 @@
                                     "typeString": "type(uint256)"
                                   },
                                   "typeName": {
-                                    "id": 9380,
+                                    "id": 9434,
                                     "name": "uint256",
                                     "nodeType": "ElementaryTypeName",
                                     "src": "910:7:40",
                                     "typeDescriptions": {}
                                   }
                                 },
-                                "id": 9385,
+                                "id": 9439,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": true,
@@ -12783,18 +12783,18 @@
                                 "typeString": "address"
                               }
                             ],
-                            "id": 9376,
+                            "id": 9430,
                             "name": "ITreasury",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 11673,
+                            "referencedDeclaration": 11732,
                             "src": "854:9:40",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$11673_$",
+                              "typeIdentifier": "t_type$_t_contract$_ITreasury_$11732_$",
                               "typeString": "type(contract ITreasury)"
                             }
                           },
-                          "id": 9387,
+                          "id": 9441,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -12805,25 +12805,25 @@
                           "src": "854:102:40",
                           "tryCall": false,
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ITreasury_$11673",
+                            "typeIdentifier": "t_contract$_ITreasury_$11732",
                             "typeString": "contract ITreasury"
                           }
                         },
-                        "id": 9388,
+                        "id": 9442,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "pay",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 11625,
+                        "referencedDeclaration": 11684,
                         "src": "854:106:40",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12866_$returns$__$",
+                          "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12925_$returns$__$",
                           "typeString": "function (enum Library.Prices) payable external"
                         }
                       },
-                      "id": 9391,
+                      "id": 9445,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -12835,7 +12835,7 @@
                       "options": [
                         {
                           "expression": {
-                            "id": 9389,
+                            "id": 9443,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -12846,7 +12846,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9390,
+                          "id": 9444,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -12862,11 +12862,11 @@
                       ],
                       "src": "854:123:40",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12866_$returns$__$value",
+                        "typeIdentifier": "t_function_external_payable$_t_enum$_Prices_$12925_$returns$__$value",
                         "typeString": "function (enum Library.Prices) payable external"
                       }
                     },
-                    "id": 9395,
+                    "id": 9449,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -12881,14 +12881,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9396,
+                  "id": 9450,
                   "nodeType": "ExpressionStatement",
                   "src": "854:159:40"
                 },
                 {
                   "assignments": [
                     null,
-                    9398,
+                    9452,
                     null,
                     null
                   ],
@@ -12896,12 +12896,12 @@
                     null,
                     {
                       "constant": false,
-                      "id": 9398,
+                      "id": 9452,
                       "mutability": "mutable",
                       "name": "ENSReverseAddress",
                       "nameLocation": "1034:17:40",
                       "nodeType": "VariableDeclaration",
-                      "scope": 9442,
+                      "scope": 9496,
                       "src": "1026:25:40",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -12910,7 +12910,7 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 9397,
+                        "id": 9451,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "1026:7:40",
@@ -12925,7 +12925,7 @@
                     null,
                     null
                   ],
-                  "id": 9413,
+                  "id": 9467,
                   "initialValue": {
                     "arguments": [],
                     "expression": {
@@ -12938,32 +12938,32 @@
                               "expression": {
                                 "argumentTypes": [],
                                 "expression": {
-                                  "id": 9400,
+                                  "id": 9454,
                                   "name": "_managerContract",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
                                   "referencedDeclaration": 4619,
                                   "src": "1062:16:40",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IManager_$11243",
+                                    "typeIdentifier": "t_contract$_IManager_$11302",
                                     "typeString": "contract IManager"
                                   }
                                 },
-                                "id": 9401,
+                                "id": 9455,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
                                 "lValueRequested": false,
                                 "memberName": "retrieveTransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 11214,
+                                "referencedDeclaration": 11273,
                                 "src": "1062:43:40",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
                                   "typeString": "function () view external returns (address[] memory)"
                                 }
                               },
-                              "id": 9402,
+                              "id": 9456,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": false,
@@ -12978,48 +12978,48 @@
                                 "typeString": "address[] memory"
                               }
                             },
-                            "id": 9409,
+                            "id": 9463,
                             "indexExpression": {
                               "arguments": [
                                 {
                                   "expression": {
                                     "expression": {
-                                      "id": 9405,
+                                      "id": 9459,
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 13062,
+                                      "referencedDeclaration": 13121,
                                       "src": "1116:7:40",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
-                                    "id": 9406,
+                                    "id": 9460,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": false,
                                     "lValueRequested": false,
                                     "memberName": "TransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12875,
+                                    "referencedDeclaration": 12934,
                                     "src": "1116:26:40",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12875_$",
+                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12934_$",
                                       "typeString": "type(enum Library.TransparentProxies)"
                                     }
                                   },
-                                  "id": 9407,
+                                  "id": 9461,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "memberName": "ENS",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 12874,
+                                  "referencedDeclaration": 12933,
                                   "src": "1116:30:40",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 }
@@ -13027,11 +13027,11 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12875",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12934",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 ],
-                                "id": 9404,
+                                "id": 9458,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": true,
@@ -13043,14 +13043,14 @@
                                   "typeString": "type(uint256)"
                                 },
                                 "typeName": {
-                                  "id": 9403,
+                                  "id": 9457,
                                   "name": "uint256",
                                   "nodeType": "ElementaryTypeName",
                                   "src": "1108:7:40",
                                   "typeDescriptions": {}
                                 }
                               },
-                              "id": 9408,
+                              "id": 9462,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -13084,18 +13084,18 @@
                               "typeString": "address"
                             }
                           ],
-                          "id": 9399,
+                          "id": 9453,
                           "name": "IENS",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 10985,
+                          "referencedDeclaration": 11044,
                           "src": "1057:4:40",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IENS_$10985_$",
+                            "typeIdentifier": "t_type$_t_contract$_IENS_$11044_$",
                             "typeString": "type(contract IENS)"
                           }
                         },
-                        "id": 9410,
+                        "id": 9464,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -13106,25 +13106,25 @@
                         "src": "1057:92:40",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IENS_$10985",
+                          "typeIdentifier": "t_contract$_IENS_$11044",
                           "typeString": "contract IENS"
                         }
                       },
-                      "id": 9411,
+                      "id": 9465,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "retrieveSettings",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 10984,
+                      "referencedDeclaration": 11043,
                       "src": "1057:109:40",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$__$returns$_t_address_$_t_address_$_t_bytes32_$_t_bytes32_$",
                         "typeString": "function () view external returns (address,address,bytes32,bytes32)"
                       }
                     },
-                    "id": 9412,
+                    "id": 9466,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -13144,17 +13144,17 @@
                 },
                 {
                   "assignments": [
-                    9415
+                    9469
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 9415,
+                      "id": 9469,
                       "mutability": "mutable",
                       "name": "data",
                       "nameLocation": "1192:4:40",
                       "nodeType": "VariableDeclaration",
-                      "scope": 9442,
+                      "scope": 9496,
                       "src": "1179:17:40",
                       "stateVariable": false,
                       "storageLocation": "memory",
@@ -13163,7 +13163,7 @@
                         "typeString": "bytes"
                       },
                       "typeName": {
-                        "id": 9414,
+                        "id": 9468,
                         "name": "bytes",
                         "nodeType": "ElementaryTypeName",
                         "src": "1179:5:40",
@@ -13175,12 +13175,12 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 9425,
+                  "id": 9479,
                   "initialValue": {
                     "arguments": [
                       {
                         "hexValue": "50726f76696465725f696e697428616464726573735b5d2c75696e743235362c737472696e672c737472696e672c6164647265737329",
-                        "id": 9418,
+                        "id": 9472,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -13195,11 +13195,11 @@
                         "value": "Provider_init(address[],uint256,string,string,address)"
                       },
                       {
-                        "id": 9419,
+                        "id": 9473,
                         "name": "owners",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9366,
+                        "referencedDeclaration": 9420,
                         "src": "1281:6:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
@@ -13207,11 +13207,11 @@
                         }
                       },
                       {
-                        "id": 9420,
+                        "id": 9474,
                         "name": "minOwners",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9368,
+                        "referencedDeclaration": 9422,
                         "src": "1289:9:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -13219,11 +13219,11 @@
                         }
                       },
                       {
-                        "id": 9421,
+                        "id": 9475,
                         "name": "ElementName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9370,
+                        "referencedDeclaration": 9424,
                         "src": "1300:11:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -13231,11 +13231,11 @@
                         }
                       },
                       {
-                        "id": 9422,
+                        "id": 9476,
                         "name": "ENSName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9372,
+                        "referencedDeclaration": 9426,
                         "src": "1313:7:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -13243,11 +13243,11 @@
                         }
                       },
                       {
-                        "id": 9423,
+                        "id": 9477,
                         "name": "ENSReverseAddress",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9398,
+                        "referencedDeclaration": 9452,
                         "src": "1322:17:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -13283,7 +13283,7 @@
                         }
                       ],
                       "expression": {
-                        "id": 9416,
+                        "id": 9470,
                         "name": "abi",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
@@ -13294,7 +13294,7 @@
                           "typeString": "abi"
                         }
                       },
-                      "id": 9417,
+                      "id": 9471,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -13307,7 +13307,7 @@
                         "typeString": "function (string memory) pure returns (bytes memory)"
                       }
                     },
-                    "id": 9424,
+                    "id": 9478,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -13334,32 +13334,32 @@
                           "expression": {
                             "argumentTypes": [],
                             "expression": {
-                              "id": 9427,
+                              "id": 9481,
                               "name": "_managerContract",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4619,
                               "src": "1366:16:40",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IManager_$11243",
+                                "typeIdentifier": "t_contract$_IManager_$11302",
                                 "typeString": "contract IManager"
                               }
                             },
-                            "id": 9428,
+                            "id": 9482,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
                             "lValueRequested": false,
                             "memberName": "retrieveBeacons",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 11220,
+                            "referencedDeclaration": 11279,
                             "src": "1366:32:40",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
                               "typeString": "function () view external returns (address[] memory)"
                             }
                           },
-                          "id": 9429,
+                          "id": 9483,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -13374,48 +13374,48 @@
                             "typeString": "address[] memory"
                           }
                         },
-                        "id": 9436,
+                        "id": 9490,
                         "indexExpression": {
                           "arguments": [
                             {
                               "expression": {
                                 "expression": {
-                                  "id": 9432,
+                                  "id": 9486,
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 13062,
+                                  "referencedDeclaration": 13121,
                                   "src": "1409:7:40",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$13062_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$13121_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
-                                "id": 9433,
+                                "id": 9487,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": false,
                                 "lValueRequested": false,
                                 "memberName": "Beacons",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 12878,
+                                "referencedDeclaration": 12937,
                                 "src": "1409:15:40",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_type$_t_enum$_Beacons_$12878_$",
+                                  "typeIdentifier": "t_type$_t_enum$_Beacons_$12937_$",
                                   "typeString": "type(enum Library.Beacons)"
                                 }
                               },
-                              "id": 9434,
+                              "id": 9488,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
                               "lValueRequested": false,
                               "memberName": "Provider",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 12877,
+                              "referencedDeclaration": 12936,
                               "src": "1409:24:40",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_enum$_Beacons_$12878",
+                                "typeIdentifier": "t_enum$_Beacons_$12937",
                                 "typeString": "enum Library.Beacons"
                               }
                             }
@@ -13423,11 +13423,11 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_enum$_Beacons_$12878",
+                                "typeIdentifier": "t_enum$_Beacons_$12937",
                                 "typeString": "enum Library.Beacons"
                               }
                             ],
-                            "id": 9431,
+                            "id": 9485,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -13439,14 +13439,14 @@
                               "typeString": "type(uint256)"
                             },
                             "typeName": {
-                              "id": 9430,
+                              "id": 9484,
                               "name": "uint256",
                               "nodeType": "ElementaryTypeName",
                               "src": "1401:7:40",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 9435,
+                          "id": 9489,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -13473,11 +13473,11 @@
                         }
                       },
                       {
-                        "id": 9437,
+                        "id": 9491,
                         "name": "data",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9415,
+                        "referencedDeclaration": 9469,
                         "src": "1437:4:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
@@ -13485,11 +13485,11 @@
                         }
                       },
                       {
-                        "id": 9438,
+                        "id": 9492,
                         "name": "ElementName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9370,
+                        "referencedDeclaration": 9424,
                         "src": "1443:11:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -13497,11 +13497,11 @@
                         }
                       },
                       {
-                        "id": 9439,
+                        "id": 9493,
                         "name": "ENSName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9372,
+                        "referencedDeclaration": 9426,
                         "src": "1456:7:40",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -13528,7 +13528,7 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 9426,
+                      "id": 9480,
                       "name": "internalCreate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
@@ -13539,7 +13539,7 @@
                         "typeString": "function (address,bytes memory,string memory,string memory)"
                       }
                     },
-                    "id": 9440,
+                    "id": 9494,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -13554,14 +13554,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9441,
+                  "id": 9495,
                   "nodeType": "ExpressionStatement",
                   "src": "1351:113:40"
                 }
               ]
             },
             "functionSelector": "7c980198",
-            "id": 9443,
+            "id": 9497,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -13569,23 +13569,23 @@
             "nameLocation": "710:6:40",
             "nodeType": "FunctionDefinition",
             "overrides": {
-              "id": 9374,
+              "id": 9428,
               "nodeType": "OverrideSpecifier",
               "overrides": [],
               "src": "821:8:40"
             },
             "parameters": {
-              "id": 9373,
+              "id": 9427,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9366,
+                  "id": 9420,
                   "mutability": "mutable",
                   "name": "owners",
                   "nameLocation": "734:6:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "717:23:40",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -13595,7 +13595,7 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 9364,
+                      "id": 9418,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
                       "src": "717:7:40",
@@ -13605,7 +13605,7 @@
                         "typeString": "address"
                       }
                     },
-                    "id": 9365,
+                    "id": 9419,
                     "nodeType": "ArrayTypeName",
                     "src": "717:9:40",
                     "typeDescriptions": {
@@ -13617,12 +13617,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9368,
+                  "id": 9422,
                   "mutability": "mutable",
                   "name": "minOwners",
                   "nameLocation": "751:9:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "743:17:40",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -13631,7 +13631,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 9367,
+                    "id": 9421,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "743:7:40",
@@ -13644,12 +13644,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9370,
+                  "id": 9424,
                   "mutability": "mutable",
                   "name": "ElementName",
                   "nameLocation": "776:11:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "762:25:40",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -13658,7 +13658,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9369,
+                    "id": 9423,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "762:6:40",
@@ -13671,12 +13671,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9372,
+                  "id": 9426,
                   "mutability": "mutable",
                   "name": "ENSName",
                   "nameLocation": "803:7:40",
                   "nodeType": "VariableDeclaration",
-                  "scope": 9443,
+                  "scope": 9497,
                   "src": "789:21:40",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -13685,7 +13685,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9371,
+                    "id": 9425,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "789:6:40",
@@ -13700,19 +13700,19 @@
               "src": "716:95:40"
             },
             "returnParameters": {
-              "id": 9375,
+              "id": 9429,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "843:0:40"
             },
-            "scope": 9444,
+            "scope": 9498,
             "src": "701:771:40",
             "stateMutability": "payable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 9445,
+        "scope": 9499,
         "src": "365:1114:40",
         "usedErrors": []
       }
@@ -13725,7 +13725,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-12-08T08:21:42.359Z",
+  "updatedAt": "2021-12-08T13:13:28.760Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

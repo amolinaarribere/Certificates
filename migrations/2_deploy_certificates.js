@@ -162,9 +162,12 @@ module.exports = async function(deployer, network, accounts){
   await deployer.link(SignatureLibrary, Admin);
   console.log("SignatureLibrary linked to Admin");
 
-  await deployer.deploy(Admin, AdminContractName, AdminContractVersion, CertificatesPoolManagerInstance.address, CertificatesPoolManagerProxyData);
+  await deployer.deploy(Admin);
   AdminInstance = await Admin.deployed();
   console.log("Admin deployed : " + AdminInstance.address);
+
+  await AdminInstance.Admin_init(AdminContractName, AdminContractVersion, CertificatesPoolManagerInstance.address, CertificatesPoolManagerProxyData, {from: accounts[0], gas: Gas});
+  console.log("Admin initialized");
 
   var ManagerAddress = await AdminInstance.retrieveManagerProxy();
 
