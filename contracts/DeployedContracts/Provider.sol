@@ -10,8 +10,10 @@ pragma solidity 0.8.7;
  import "../Interfaces/IPool.sol";
  import "../Abstract/MultiSigContract.sol";
  import "../Interfaces/IPriceConverter.sol";
+ import "../Base/ReverseRegistryBaseContract.sol";
 
- contract Provider is IProvider, MultiSigContract {
+
+ contract Provider is IProvider, ReverseRegistryBaseContract, MultiSigContract {
 
     // DATA /////////////////////////////////////////
     uint256 constant _TotalEntities = 2;
@@ -55,7 +57,7 @@ pragma solidity 0.8.7;
     }
 
      // CONSTRUCTOR /////////////////////////////////////////
-    function Provider_init(address[] memory owners,  uint256 minOwners, string memory ProviderInfo) public initializer 
+    function Provider_init(address[] memory owners,  uint256 minOwners, string memory ProviderInfo, string memory ENSName, address ReverseRegistryAddress) public initializer 
     {
         _Label = new string[](2);
         _Label[0] = _ownerLabel;
@@ -63,6 +65,10 @@ pragma solidity 0.8.7;
 
         super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdProviders); 
         _ProviderInfo = ProviderInfo;
+
+        if(0 < bytes(ENSName).length){
+            RegisterReverseAddress(ENSName, ReverseRegistryAddress);
+        }
     }
 
     // FUNCTIONALITY /////////////////////////////////////////

@@ -10,11 +10,11 @@ pragma solidity 0.8.7;
 
 interface IFactory {
 
-    function create(address[] memory owners,  uint256 minOwners, string memory ElementName) external payable;
+    function create(address[] memory owners,  uint256 minOwners, string memory ElementName, string memory ENSName) external payable;
     function updateContractName(string memory contractName) external;
     function updateContractVersion(string memory contractVersion) external;
 
-    function retrieve(uint Id) external view returns (address, address);
+    function retrieve(uint Id) external view returns (address, address, string memory);
     function retrieveTotal() external view returns (uint);
     function retrieveConfig() external view returns (string memory, string memory, string memory);
 

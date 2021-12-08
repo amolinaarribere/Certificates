@@ -37,6 +37,8 @@ Functionality (with basic security check)
  import "./SignatureBaseContract.sol";
  import "./ManagedBaseContract.sol";
  import "../Libraries/SignatureLibrary.sol";
+ import "../Interfaces/IPropositionSettings.sol";
+
 
 abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, SignatureBaseContract, ManagedBaseContract {
     using AddressLibrary for *; 
@@ -70,21 +72,6 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
 
     mapping(uint => mapping(address => uint)) internal _votersPerProp;
 
-    uint internal _PropositionLifeTime;
-    uint8 internal _PropositionThresholdPercentage;
-    uint8 internal _minWeightToProposePercentage;
-
-    // Proposition to change Prop parameters
-    bool internal _currentPropisProp;
-
-    struct ProposedPropositionStruct{
-        uint256 NewPropositionLifeTime;
-        uint8 NewPropositionThresholdPercentage;
-        uint8 NewMinWeightToProposePercentage;
-    }
-
-    ProposedPropositionStruct internal _ProposedProposition;
-
     // MODIFIERS /////////////////////////////////////////
     modifier isFromChairPerson(address addr){
         Library.ItIsSomeone(addr, _chairperson);
@@ -97,7 +84,8 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         else 
         {
             uint numberOfTokens = GetTokensBalance(addr);
-            if(numberOfTokens > (_minWeightToProposePercentage * totalSupply() / 100)) isAuthorized = true;
+            (, , uint8 MinWeightPropPerc) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
+            if(numberOfTokens > (MinWeightPropPerc * totalSupply() / 100)) isAuthorized = true;
         }
 
         require(true == isAuthorized, "EC22-");
@@ -126,30 +114,23 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
     }
 
     modifier isFromTokenContract(address addr){
-        Library.ItIsSomeone(addr, _managerContract.retrieveCertisTokenProxy());
-        _;
-    }
-
-    modifier isPropOK(uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage){
-        require(100 >= PropositionThresholdPercentage, "EC21-");
-        require(100 >= minWeightToProposePercentage, "EC21-");
+        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]);
         _;
     }
 
     // auxiliairy function
     
-
     function AuthorizedToVote(address addr, uint256 id) internal view returns(bool) {
         uint votingTokens = GetVotingTokens(addr, id);
         return (votingTokens > 0);
     }
 
     function totalSupply() internal view returns(uint256){
-        return IERC20Upgradeable(_managerContract.retrieveCertisTokenProxy()).totalSupply();
+        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]).totalSupply();
     }
 
     function GetTokensBalance(address add) internal view returns(uint256){
-        return IERC20Upgradeable(_managerContract.retrieveCertisTokenProxy()).balanceOf(add);
+        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]).balanceOf(add);
     }
 
     function GetVotingTokens(address addr, uint id) internal view returns(uint256){
@@ -172,51 +153,11 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
     }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function TokenGovernanceContract_init(uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, address chairperson, address managerContractAddress, string memory contractName, string memory contractVersion) internal initializer {
+    function TokenGovernanceContract_init(address chairperson, address managerContractAddress, string memory contractName, string memory contractVersion) internal initializer {
         super.ManagedBaseContract_init(managerContractAddress);
         _chairperson = chairperson;
         _nextPropID = 0; 
         setContractConfig(contractName, contractVersion);
-        InternalupdateProp(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, true);
-    }
-    
-    // Manage Prop Parameters
-    function updateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc) external
-    {
-        InternalupdateProp(PropLifeTime, PropThresholdPerc, minWeightToPropPerc, false);
-    }
-
-    function InternalupdateProp(uint256 PropLifeTime, uint8 PropThresholdPerc, uint8 minWeightToPropPerc, bool fromConstructor) internal
-        isPropOK(PropThresholdPerc, minWeightToPropPerc)
-    {
-        if(fromConstructor){
-            _PropositionLifeTime = PropLifeTime;
-            _PropositionThresholdPercentage = PropThresholdPerc;
-            _minWeightToProposePercentage = minWeightToPropPerc;
-        }
-        else{
-            _ProposedProposition.NewPropositionLifeTime = PropLifeTime;
-            _ProposedProposition.NewPropositionThresholdPercentage = PropThresholdPerc;
-            _ProposedProposition.NewMinWeightToProposePercentage = minWeightToPropPerc;
-            _currentPropisProp = true;
-            addProposition();
-        }   
-    }
-
-    function retrievePropConfig() external view returns(uint, uint8, uint8)
-    {
-        return(_PropositionLifeTime, _PropositionThresholdPercentage, _minWeightToProposePercentage);
-    }
-
-    function retrievePendingPropConfig() external view returns(uint, uint8, uint8, bool)
-    {
-        if(_currentPropisProp && (block.timestamp < _Proposition.DeadLine)){
-            return (_ProposedProposition.NewPropositionLifeTime,
-                _ProposedProposition.NewPropositionThresholdPercentage,
-                _ProposedProposition.NewMinWeightToProposePercentage,
-                true);
-        }
-        return (0,0,0,false);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -224,9 +165,10 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         PropositionInProgress(false)
         isAuthorizedToPropose(msg.sender)
     {
+        (uint256 PropLifeTime, uint8 PropThresPer, ) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
         _Proposition.Proposer = msg.sender;
-        _Proposition.DeadLine = block.timestamp + _PropositionLifeTime;
-        _Proposition.validationThreshold = totalSupply() * _PropositionThresholdPercentage / 100;
+        _Proposition.DeadLine = block.timestamp + PropLifeTime;
+        _Proposition.validationThreshold = totalSupply() * PropThresPer / 100;
         _Proposition.PropID = _nextPropID;
         _nextPropID++;
 
@@ -319,35 +261,16 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
     {
         if(_Proposition.VotesFor >= _Proposition.validationThreshold) 
         {
-            if(_currentPropisProp){
-                _PropositionLifeTime = _ProposedProposition.NewPropositionLifeTime;
-                _PropositionThresholdPercentage = _ProposedProposition.NewPropositionThresholdPercentage;
-                _minWeightToProposePercentage = _ProposedProposition.NewMinWeightToProposePercentage;
-                removePropositionProp();
-            }
-            else{
-                propositionApproved();
-            }
+            propositionApproved();
             InternalCancelProposition();
             emit _PropositionApproved(_Proposition.PropID, _Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst);
         }
         else if(_Proposition.VotesAgainst >= _Proposition.validationThreshold)
         {
-            if(_currentPropisProp){
-                removePropositionProp();
-            }
-            else{
-                propositionRejected();
-            }
+            propositionRejected();
             InternalCancelProposition();
             emit _PropositionRejected(_Proposition.PropID, _Proposition.Proposer, _Proposition.VotesFor, _Proposition.VotesAgainst);
         } 
-    }
-
-    function removePropositionProp() internal
-    {
-        delete(_ProposedProposition);
-        _currentPropisProp = false;
     }
 
     function InternalCancelProposition() internal
@@ -375,12 +298,6 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
     function retrieveNextPropId() external view returns(uint256){
         return _nextPropID;
     }
-
-    function isCurrentPropositionProp() external view returns(bool){
-        return _currentPropisProp;
-    }
-
-    function retrieveProposition() external virtual view returns(bytes32[] memory){}
 
     function propositionApproved() internal virtual{}
 

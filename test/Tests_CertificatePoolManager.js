@@ -15,11 +15,17 @@ const ProviderFactory = artifacts.require("ProviderFactory");
 const ProviderFactoryAbi = ProviderFactory.abi;
 const PriceConverter = artifacts.require("PriceConverter");
 const PriceConverterAbi = PriceConverter.abi;
+const PropositionSettings = artifacts.require("PropositionSettings");
+const PropositionSettingsAbi = PropositionSettings.abi;
+const ENS = artifacts.require("ENS");
+const ENSAbi = ENS.abi;
 
 const init = require("../test_libraries/InitializeContracts.js");
 const constants = require("../test_libraries/constants.js");
-const obj = require("../test_libraries/objects.js");
 const proposition = require("../test_libraries/Propositions.js");
+const aux = require("../test_libraries/auxiliaries.js");
+
+
 const PrivatePoolContractName = constants.PrivatePoolContractName;
 const PrivatePoolContractVersion = constants.PrivatePoolContractVersion;
 
@@ -29,17 +35,22 @@ const Gas = constants.Gas;
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 contract("Testing Certificate Pool Manager",function(accounts){
-    var certPoolManager;
     var certContract;
+
     var certisTokenProxy;
     var publicPoolProxy;
     var treasuryProxy;
     var priceConverterProxy;
+    var propositionSettingsProxy;
+    var ensProxy;
     var privatePoolFactoryProxy;
+
     var certisToken;
     var publicPool;
     var treasury;
     var priceConverter;
+    var propositionSettings;
+    var ens;
     var privatePoolFactory;
     var privatePool;
     var providerFactory;
@@ -59,28 +70,24 @@ contract("Testing Certificate Pool Manager",function(accounts){
     const address_6 = "0x0000000000000000000000000000000000000006";
     const address_7 = "0x0000000000000000000000000000000000000007";
     const address_8 = "0x0000000000000000000000000000000000000008";
+    const address_9 = "0x0000000000000000000000000000000000000009";
+    const address_10 = "0x000000000000000000000000000000000000000a";
     const emptyBytes = "0x";
-    const emptyString = "";
-    // providers info
-    const provider_1_Info = "Account 1 Info";
-    // test constants
-    const Unauthorized = new RegExp("EC8-");
-    const CannotProposeChanges = new RegExp("EC22-");
-    const WrongConfig = new RegExp("EC21-");
-    const NoPropositionActivated = new RegExp("EC25-");
-    const PropositionAlreadyInProgress = new RegExp("EC24-");
-    const CanNotVote = new RegExp("EC23-");
+    const emptyString = "0x";
+    const zeroBytes = "0x0000000000000000000000000000000000000000000000000000000000000000"
+
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
-        certPoolManager = contracts[0];
-        certContract = new web3.eth.Contract(CertificatesPoolManagerAbi, certPoolManager.address);
+        certContract = contracts[0];
         publicPoolProxy = new web3.eth.Contract(PublicCertificatesPoolAbi, contracts[1][0]);
         treasuryProxy = new web3.eth.Contract(TreasuryAbi, contracts[1][1]);
         certisTokenProxy = new web3.eth.Contract(CertisTokenAbi, contracts[1][2]);
         privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, contracts[1][3]);
         providerFactoryProxy = new web3.eth.Contract(ProviderFactoryAbi, contracts[1][4]);
         priceConverterProxy = new web3.eth.Contract(PriceConverterAbi, contracts[1][5]);
+        propositionSettingsProxy = new web3.eth.Contract(PropositionSettingsAbi, contracts[1][6]);
+        ensProxy = new web3.eth.Contract(ENSAbi, contracts[1][7]);
         publicPool = contracts[2][0];
         treasury = contracts[2][1];
         certisToken = contracts[2][2];
@@ -89,15 +96,21 @@ contract("Testing Certificate Pool Manager",function(accounts){
         providerFactory = contracts[2][5];
         provider = contracts[2][6];
         priceConverter = contracts[2][7];
+        propositionSettings = contracts[2][9];
+        ens = contracts[2][10];
     });
 
-    async function checkProxyAddresses( _ppa, _ta, _ca, _ppfa, _pfa, _pco){
-        let _publicCertPoolAddressProxy = await certPoolManager.retrievePublicCertificatePoolProxy({from: user_1});
-        let _treasuryAddressProxy = await certPoolManager.retrieveTreasuryProxy({from: user_1});
-        let _certisAddressProxy = await certPoolManager.retrieveCertisTokenProxy({from: user_1});
-        let _privatePoolFactoryAddressProxy = await certPoolManager.retrievePrivatePoolFactoryProxy({from: user_1});
-        let _providerFactoryAddressProxy = await certPoolManager.retrieveProviderFactoryProxy({from: user_1});
-        let _priceConverterAddressProxy = await certPoolManager.retrievePriceConverterProxy({from: user_1});
+    async function checkProxyAddresses( _ppa, _ta, _ca, _ppfa, _pfa, _pco, _ps, _ens){
+        let TransparentProxies = await certContract.methods.retrieveTransparentProxies().call({from: user_1});
+
+        let _publicCertPoolAddressProxy = TransparentProxies[0];
+        let _treasuryAddressProxy = TransparentProxies[1];
+        let _certisAddressProxy = TransparentProxies[2];
+        let _privatePoolFactoryAddressProxy = TransparentProxies[3];
+        let _providerFactoryAddressProxy = TransparentProxies[4];
+        let _priceConverterAddressProxy = TransparentProxies[5];
+        let _propositionSettingsAddressProxy = TransparentProxies[6];
+        let _ensAddressProxy = TransparentProxies[7];
         
         expect(_ppa).to.equal(_publicCertPoolAddressProxy);
         expect(_ta).to.equal(_treasuryAddressProxy);
@@ -105,17 +118,25 @@ contract("Testing Certificate Pool Manager",function(accounts){
         expect(_ppfa).to.equal(_privatePoolFactoryAddressProxy);
         expect(_pfa).to.equal(_providerFactoryAddressProxy);
         expect(_pco).to.equal(_priceConverterAddressProxy);
+        expect(_ps).to.equal(_propositionSettingsAddressProxy);
+        expect(_ens).to.equal(_ensAddressProxy);
     }
 
-    async function checkImplAddresses( _ppa, _ta, _ca, _ppfa, _prpa, _pfa, _pra, _pco, _ppcn, _ppcv){
-        let _publicCertPoolAddress = await certPoolManager.retrievePublicCertificatePool({from: user_1});
-        let _treasuryAddress = await certPoolManager.retrieveTreasury({from: user_1});
-        let _certisAddress = await certPoolManager.retrieveCertisToken({from: user_1});
-        let _privatePoolFactoryAddress = await certPoolManager.retrievePrivatePoolFactory({from: user_1});
-        let _privatePool = await certPoolManager.retrievePrivatePool({from: user_1});
-        let _providerFactoryAddress = await certPoolManager.retrieveProviderFactory({from: user_1});
-        let _provider = await certPoolManager.retrieveProvider({from: user_1});
-        let _priceConverter = await certPoolManager.retrievePriceConverter({from: user_1});
+    async function checkImplAddresses( _ppa, _ta, _ca, _ppfa, _prpa, _pfa, _pra, _pco, _ps, _ens, _ppcn, _ppcv){
+        let TransparentImpl = await certContract.methods.retrieveTransparentProxiesImpl().call({from: user_1});
+        let BeaconsImpl = await certContract.methods.retrieveBeaconsImpl().call({from: user_1});
+    
+        let _publicCertPoolAddress = TransparentImpl[0];
+        let _treasuryAddress = TransparentImpl[1];
+        let _certisAddress = TransparentImpl[2];
+        let _privatePoolFactoryAddress = TransparentImpl[3];
+        let _privatePool = BeaconsImpl[0];
+        let _providerFactoryAddress = TransparentImpl[4];
+        let _provider = BeaconsImpl[1];
+        let _priceConverter = TransparentImpl[5];
+        let _propositionSettings = TransparentImpl[6];
+        let _ensSettings = TransparentImpl[7];
+
         let _PrivatePoolFactoryConfiguration = await privatePoolFactoryProxy.methods.retrieveConfig().call({from: user_1}, function(error, result){});
         
         expect(_ppa).to.equal(_publicCertPoolAddress);
@@ -126,131 +147,38 @@ contract("Testing Certificate Pool Manager",function(accounts){
         expect(_pfa).to.equal(_providerFactoryAddress);
         expect(_pra).to.equal(_provider);
         expect(_pco).to.equal(_priceConverter);
+        expect(_ps).to.equal(_propositionSettings);
+        expect(_ens).to.equal(_ensSettings);
         expect(_ppcn).to.equal(_PrivatePoolFactoryConfiguration[1]);
         expect(_ppcv).to.equal(_PrivatePoolFactoryConfiguration[2]);
-    }
-
-    async function checkProposition( _ppa, _ta, _ca, _ppfa, _prpa, _pfa, _pra, _pco){
-        var propositionResult = await certPoolManager.retrieveProposition({from: user_1});
-        let {0: _publicAddress, 1: _treasuryAddress, 2: _certisAddress, 3: _privatePoolFactoryAddress, 4: _privatePoolAddress, 5: _providerFactoryAddress, 6: _providerAddress, 7: _priceConverterAddress} = propositionResult;
-
-        expect(proposition.AddressToBytes32(_ppa)).to.equal(_publicAddress);
-        expect(proposition.AddressToBytes32(_ta)).to.equal(_treasuryAddress);
-        expect(proposition.AddressToBytes32(_ca)).to.equal(_certisAddress);
-        expect(proposition.AddressToBytes32(_ppfa)).to.equal(_privatePoolFactoryAddress);
-        expect(proposition.AddressToBytes32(_prpa)).to.equal(_privatePoolAddress);
-        expect(proposition.AddressToBytes32(_pfa)).to.equal(_providerFactoryAddress);
-        expect(proposition.AddressToBytes32(_pra)).to.equal(_providerAddress);
-        expect(proposition.AddressToBytes32(_pco)).to.equal(_priceConverterAddress);
     }
 
     // ****** TESTING Retrieves ***************************************************************** //
 
     it("Retrieve Configuration",async function(){
         // assert
-        await checkProxyAddresses(publicPoolProxy._address, treasuryProxy._address, certisTokenProxy._address, privatePoolFactoryProxy._address, providerFactoryProxy._address, priceConverterProxy._address);
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
+        await checkProxyAddresses(publicPoolProxy._address, treasuryProxy._address, certisTokenProxy._address, privatePoolFactoryProxy._address, providerFactoryProxy._address, priceConverterProxy._address, propositionSettingsProxy._address, ensProxy._address);
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, propositionSettings, ens, PrivatePoolContractName, PrivatePoolContractVersion);
     });
 
     it("Retrieve Proposals Details",async function(){
         // act
-        await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-        await certPoolManager.upgradeContracts(obj.returnUpgradeObject(address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8,
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString), {from: chairPerson, gas: Gas});
-        // assert
-        await checkProposition(address_1,address_2,address_3,address_4,address_5,address_6,address_7,address_8);
-        
+        var PropositionValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
+
+        await proposition.Check_Proposition_Details(certContract, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
     // ****** Testing Contracts Configuration ***************************************************************** //
- 
-    it("Vote/Propose/Cancel Contracts Configuration WRONG",async function(){
-        await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
-        // act
-        try{
-            await certPoolManager.upgradeContracts(obj.returnUpgradeObject(address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8,
-                emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString), {from: user_1, gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(CannotProposeChanges);
-        }
-        // act
-        try{
-            await certPoolManager.voteProposition(false, {from: tokenOwner[0], gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NoPropositionActivated);
-        }
-        // act
-        try{
-            await certPoolManager.cancelProposition({from: chairPerson, gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NoPropositionActivated);
-        }
-        // act
-        try{
-            await certPoolManager.upgradeContracts(obj.returnUpgradeObject(address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8,
-                emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString), {from: chairPerson, gas: Gas});
-            await certPoolManager.voteProposition(false, {from: chairPerson, gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(CanNotVote);
-        }
-        // act
-        try{
-            await certPoolManager.upgradeContracts(obj.returnUpgradeObject(address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8,
-                emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString), {from: tokenOwner[0], gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(PropositionAlreadyInProgress);
-        }
-        // act
-        try{
-            await certPoolManager.cancelProposition({from: tokenOwner[0], gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(Unauthorized);
-        }
-        // act
-        try{
-            await certPoolManager.voteProposition(false, {from: tokenOwner[0], gas: Gas});
-            await certPoolManager.voteProposition(false, {from: tokenOwner[0], gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(CanNotVote);
-        }
-        // act
-        try{
-            await certPoolManager.voteProposition(false, {from: tokenOwner[1], gas: Gas});
-            await certPoolManager.voteProposition(false, {from: tokenOwner[2], gas: Gas});
-            await certPoolManager.voteProposition(true, {from: tokenOwner[3], gas: Gas});
-            expect.fail();
-        }
-        // assert
-        catch(error){
-            expect(error.message).to.match(NoPropositionActivated);
-        }
-        
+    it("Vote/Propose/Cancel Contracts Config WRONG",async function(){
+        var NewValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
+
+        await proposition.Config_ContractsManager_Wrong(certContract, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
     });
 
-    it("Vote/Propose/Cancel Contracts Configuration CORRECT",async function(){
-        // act
-        let contracts = await init.deployImplementations(chairPerson, PublicOwners, minOwners, user_1, certPoolManager.address);
+    it("Vote/Propose/Cancel Contracts Config CORRECT",async function(){
+        let contracts = await init.deployImplementations(chairPerson, PublicOwners, minOwners, user_1, certContract._address);
         var NewpublicPool = contracts[0];
         var Newtreasury = contracts[1];
         var NewcertisToken = contracts[2];
@@ -259,81 +187,56 @@ contract("Testing Certificate Pool Manager",function(accounts){
         var NewproviderFactory = contracts[5]; 
         var Newprovider = contracts[6];
         var NewpriceConverter = contracts[7];
+        var NewpropositionSettings = contracts[9];
+        var Newens = contracts[10];
         var NewPrivatePoolContractName = "New Private Pool Contract Name";
         var NewPrivatePoolContractVersion = "1.34";
 
+        var NewValues = [zeroBytes,
+            zeroBytes,
+            aux.AddressToBytes32(NewpublicPool), 
+            aux.AddressToBytes32(Newtreasury),
+            aux.AddressToBytes32(NewcertisToken), 
+            aux.AddressToBytes32(NewprivatePoolFactory), 
+            aux.AddressToBytes32(NewproviderFactory), 
+            aux.AddressToBytes32(NewpriceConverter), 
+            aux.AddressToBytes32(NewpropositionSettings), 
+            aux.AddressToBytes32(Newens),
+            aux.AddressToBytes32(NewprivatePool),
+            aux.AddressToBytes32(Newprovider),
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, 
+            aux.StringToBytes(NewPrivatePoolContractName),
+            aux.StringToBytes(NewPrivatePoolContractVersion)];
+        
+        await proposition.Config_ContractsManager_Correct(certContract, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
+    });
+
+    it("Vote/Propose/Cancel Contracts Configuration CORRECT Empty",async function(){
+        // act
+        var address0 = aux.AddressToBytes32(address_0);
+        var PropositionValues = [zeroBytes, zeroBytes, address0, address0, address0, address0, address0, address0, address0, address0, address0, address0,
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
+
+
         await proposition.SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
 
-        // Update contracts Not validated
-        await certPoolManager.upgradeContracts(obj.returnUpgradeObject(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter,
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, NewPrivatePoolContractName, NewPrivatePoolContractVersion), {from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(false, {from: tokenOwner[0], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(false, {from: tokenOwner[1], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(false, {from: tokenOwner[2], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        
-        // Update contracts cancelled
-        await certPoolManager.upgradeContracts(obj.returnUpgradeObject(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter,
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, NewPrivatePoolContractName, NewPrivatePoolContractVersion), {from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[0], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[1], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.cancelProposition({from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-
         // Update contracts validated (address(0)) nothing done
-        await certPoolManager.upgradeContracts(obj.returnUpgradeObject(address_0, address_0, address_0, address_0, address_0, address_0, address_0, address_0,
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString), {from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[0], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[1], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[2], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
+        await certContract.methods.sendProposition(PropositionValues).send({from: chairPerson, gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, propositionSettings, ens, PrivatePoolContractName, PrivatePoolContractVersion);
+        await certContract.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, propositionSettings, ens, PrivatePoolContractName, PrivatePoolContractVersion);
+        await certContract.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, propositionSettings, ens, PrivatePoolContractName, PrivatePoolContractVersion);
+        await certContract.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas});
+        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, propositionSettings, ens, PrivatePoolContractName, PrivatePoolContractVersion);
 
-
-        // Update contracts validated
-        await certPoolManager.upgradeContracts(obj.returnUpgradeObject(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter,
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, NewPrivatePoolContractName, NewPrivatePoolContractVersion), {from: chairPerson, gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[0], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[1], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[2], gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter, NewPrivatePoolContractName, NewPrivatePoolContractVersion);
-
-        // Rollback to original contracts
-        await certPoolManager.upgradeContracts(obj.returnUpgradeObject(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter,
-            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, PrivatePoolContractName, PrivatePoolContractVersion), {from: chairPerson, gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter, NewPrivatePoolContractName, NewPrivatePoolContractVersion);
-        await certPoolManager.voteProposition(false, {from: tokenOwner[0], gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter, NewPrivatePoolContractName, NewPrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[1], gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter, NewPrivatePoolContractName, NewPrivatePoolContractVersion);
-        await certPoolManager.voteProposition(false, {from: tokenOwner[2], gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter, NewPrivatePoolContractName, NewPrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[3], gas: Gas});
-        await checkImplAddresses(NewpublicPool, Newtreasury, NewcertisToken, NewprivatePoolFactory, NewprivatePool, NewproviderFactory, Newprovider, NewpriceConverter, NewPrivatePoolContractName, NewPrivatePoolContractVersion);
-        await certPoolManager.voteProposition(true, {from: tokenOwner[4], gas: Gas});
-        await checkImplAddresses(publicPool, treasury, certisToken, privatePoolFactory, privatePool, providerFactory, provider, priceConverter, PrivatePoolContractName, PrivatePoolContractVersion);
-        
     });
 
-    // ****** Testing Propostion Configuration ***************************************************************** // 
+    it("Votes Reassignment Contracts",async function(){
+        var PropositionValues = [zeroBytes, zeroBytes, address_1, address_2, address_3, address_4, address_5, address_6, address_7, address_8, address_9, address_10,
+            emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyBytes, emptyString, emptyString];
 
-    it("Vote/Propose/Cancel Prop Configuration WRONG",async function(){
-        await proposition.Config_Proposition_Wrong(certContract, certisTokenProxy, tokenOwner, user_1, chairPerson);
-    });
-
-    it("Vote/Propose/Cancel Prop Configuration CORRECT",async function(){
-        await proposition.Config_Proposition_Correct(certContract, certisTokenProxy, tokenOwner, user_1, chairPerson);
+        await proposition.Check_Votes_Reassignment(certContract, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
 });

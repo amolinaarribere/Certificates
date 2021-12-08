@@ -10,7 +10,6 @@ pragma solidity 0.8.7;
 
  import "../Interfaces/ITreasury.sol";
  import "../Abstract/Factory.sol";
- import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 contract ProviderFactory is Factory{
     
@@ -20,12 +19,12 @@ contract ProviderFactory is Factory{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function create(address[] memory owners,  uint256 minOwners, string memory ElementName) external override payable
+    function create(address[] memory owners,  uint256 minOwners, string memory ElementName, string memory ENSName) external override payable
     {
-        ITreasury(_managerContract.retrieveTreasuryProxy()).pay{value:msg.value}(Library.Prices.NewProviderContract);
-        bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string)", owners, minOwners, ElementName);
-        BeaconProxy providerProxy = new BeaconProxy(_managerContract.retrieveProviderBeacon(), data);
-        internalCreate(address(providerProxy), ElementName);
+        ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}(Library.Prices.NewProviderContract);
+        (,address ENSReverseAddress,,) = IENS(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ENS)]).retrieveSettings();
+        bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string,string,address)", owners, minOwners, ElementName, ENSName, ENSReverseAddress);
+        internalCreate(_managerContract.retrieveBeacons()[uint256(Library.Beacons.Provider)], data, ElementName, ENSName);
     }
 
 

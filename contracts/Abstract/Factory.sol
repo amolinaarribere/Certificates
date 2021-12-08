@@ -23,9 +23,10 @@ pragma solidity 0.8.7;
  */
 
  import '../Interfaces/IFactory.sol';
+ import '../Interfaces/IENS.sol';
  import "../Base/ManagedBaseContract.sol";
  import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
+ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     using Library for *;
@@ -44,6 +45,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     struct _ElementStruct{
         address _creator;
         address _ElementProxyAddress;
+        string _ElementName;
     } 
 
     _ElementStruct[] internal _Elements;
@@ -63,12 +65,18 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
-    function internalCreate(address beaconProxyAddress, string memory elementName) internal
+    function internalCreate(address beaconAddress, bytes memory data, string memory elementName, string memory ENSName) internal
     {
-        _ElementStruct memory element = _ElementStruct(msg.sender, beaconProxyAddress);
+        bytes32 ENSLabel;
+        if(0 < bytes(ENSName).length) ENSLabel = keccak256(bytes(ENSName));
+
+        BeaconProxy beaconProxy = new BeaconProxy(beaconAddress, data);
+        _ElementStruct memory element = _ElementStruct(msg.sender, address(beaconProxy), elementName);
         _Elements.push(element);
 
-        emit _NewElement(_FactoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, elementName);
+        if(ENSLabel > 0)IENS(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ENS)]).createSubdomain(ENSLabel, address(beaconProxy));
+
+        emit _NewElement(_FactoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, element._ElementName);
     }
 
     function updateContractName(string memory contractName) external override
@@ -87,9 +95,9 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
 
     function retrieve(uint Id) external override
         isIdCorrect(Id, _Elements.length)
-    view returns (address, address)
+    view returns (address, address, string memory)
     {
-        return(_Elements[Id]._creator, _Elements[Id]._ElementProxyAddress);
+        return(_Elements[Id]._creator, _Elements[Id]._ElementProxyAddress, _Elements[Id]._ElementName);
     }
 
     function retrieveTotal() external override view returns (uint)

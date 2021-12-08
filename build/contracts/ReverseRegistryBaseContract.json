@@ -1,0 +1,1193 @@
+{
+  "contractName": "ReverseRegistryBaseContract",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "ENSName",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "node",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "_NewReverseENSCreated",
+      "type": "event"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ENSName\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"node\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"_NewReverseENSCreated\",\"type\":\"event\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Base/ReverseRegistryBaseContract.sol\":\"ReverseRegistryBaseContract\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Base/ReverseRegistryBaseContract.sol\":{\"keccak256\":\"0x4bd91658d82a5263c216131f31f6672c874a04b46ce06c1f34d073827a506fcc\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://2e9bbdda5eeb807fd728efafd9c05b121b89a01630f54185ed0fca4dac113465\",\"dweb:/ipfs/QmVBHs1oo1ZjpQM3h9zJxjctCPxndAsxb8oD1yZb19TwXn\"]},\"project:/contracts/Interfaces/IENSReverseRegistry.sol\":{\"keccak256\":\"0xa6acb0b6901497698b57dc3fa7051ba760aa322609fc5a499806a8798751d409\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://477451ba17234511273e8e49bd0761682ee4dba463ed6c4d9d1b0be977cc448d\",\"dweb:/ipfs/QmdwMGjtQLLVRGP9jiyuuD9cGwzNU3p5LKHnqaaQycV2Th\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212203dd912e7d7993e180cf0c32729e82c911b1f6f88cdd117b2c65dc111b5d5725264736f6c63430008070033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212203dd912e7d7993e180cf0c32729e82c911b1f6f88cdd117b2c65dc111b5d5725264736f6c63430008070033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "216:586:27:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "216:586:27:-:0;;;;;",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/*\r\n  Private Certificate Pools offer the default MultiSig Certificate Pool functionality\r\n */\r\n\r\n import \"../Interfaces/IENSReverseRegistry.sol\";\r\n\r\n contract ReverseRegistryBaseContract {\r\n\r\n    // EVENTS /////////////////////////////////////////\r\n    event _NewReverseENSCreated(string ENSName, bytes32 node, address addr);\r\n\r\n    // CONSTRUCTOR & INIT /////////////////////////////////////////\r\n    function RegisterReverseAddress(string memory ENSName, address ReverseRegistryAddress) internal \r\n    {\r\n        IENSReverseRegistry ReverseRegistry = IENSReverseRegistry(ReverseRegistryAddress);\r\n        bytes32 node = ReverseRegistry.setName(ENSName);\r\n        emit _NewReverseENSCreated(ENSName, node, address(this));\r\n    }\r\n\r\n  }",
+  "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Base\\ReverseRegistryBaseContract.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/Base/ReverseRegistryBaseContract.sol",
+    "exportedSymbols": {
+      "IENSReverseRegistry": [
+        11141
+      ],
+      "ReverseRegistryBaseContract": [
+        4704
+      ]
+    },
+    "id": 4705,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 4663,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:27"
+      },
+      {
+        "absolutePath": "project:/contracts/Interfaces/IENSReverseRegistry.sol",
+        "file": "../Interfaces/IENSReverseRegistry.sol",
+        "id": 4664,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 4705,
+        "sourceUnit": 11142,
+        "src": "164:47:27",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 4704,
+        "linearizedBaseContracts": [
+          4704
+        ],
+        "name": "ReverseRegistryBaseContract",
+        "nameLocation": "225:27:27",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "id": 4672,
+            "name": "_NewReverseENSCreated",
+            "nameLocation": "325:21:27",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 4671,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4666,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "ENSName",
+                  "nameLocation": "354:7:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4672,
+                  "src": "347:14:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 4665,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "347:6:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 4668,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "node",
+                  "nameLocation": "371:4:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4672,
+                  "src": "363:12:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 4667,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "363:7:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 4670,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "addr",
+                  "nameLocation": "385:4:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4672,
+                  "src": "377:12:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 4669,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "377:7:27",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "346:44:27"
+            },
+            "src": "319:72:27"
+          },
+          {
+            "body": {
+              "id": 4702,
+              "nodeType": "Block",
+              "src": "570:225:27",
+              "statements": [
+                {
+                  "assignments": [
+                    4681
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 4681,
+                      "mutability": "mutable",
+                      "name": "ReverseRegistry",
+                      "nameLocation": "601:15:27",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 4702,
+                      "src": "581:35:27",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                        "typeString": "contract IENSReverseRegistry"
+                      },
+                      "typeName": {
+                        "id": 4680,
+                        "nodeType": "UserDefinedTypeName",
+                        "pathNode": {
+                          "id": 4679,
+                          "name": "IENSReverseRegistry",
+                          "nodeType": "IdentifierPath",
+                          "referencedDeclaration": 11141,
+                          "src": "581:19:27"
+                        },
+                        "referencedDeclaration": 11141,
+                        "src": "581:19:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                          "typeString": "contract IENSReverseRegistry"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 4685,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 4683,
+                        "name": "ReverseRegistryAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4676,
+                        "src": "639:22:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 4682,
+                      "name": "IENSReverseRegistry",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 11141,
+                      "src": "619:19:27",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_contract$_IENSReverseRegistry_$11141_$",
+                        "typeString": "type(contract IENSReverseRegistry)"
+                      }
+                    },
+                    "id": 4684,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "typeConversion",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "619:43:27",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                      "typeString": "contract IENSReverseRegistry"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "581:81:27"
+                },
+                {
+                  "assignments": [
+                    4687
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 4687,
+                      "mutability": "mutable",
+                      "name": "node",
+                      "nameLocation": "681:4:27",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 4702,
+                      "src": "673:12:27",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 4686,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "673:7:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 4692,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 4690,
+                        "name": "ENSName",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4674,
+                        "src": "712:7:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "id": 4688,
+                        "name": "ReverseRegistry",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4681,
+                        "src": "688:15:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                          "typeString": "contract IENSReverseRegistry"
+                        }
+                      },
+                      "id": 4689,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "setName",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11128,
+                      "src": "688:23:27",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$returns$_t_bytes32_$",
+                        "typeString": "function (string memory) external returns (bytes32)"
+                      }
+                    },
+                    "id": 4691,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "688:32:27",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "673:47:27"
+                },
+                {
+                  "eventCall": {
+                    "arguments": [
+                      {
+                        "id": 4694,
+                        "name": "ENSName",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4674,
+                        "src": "758:7:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      },
+                      {
+                        "id": 4695,
+                        "name": "node",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4687,
+                        "src": "767:4:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "arguments": [
+                          {
+                            "id": 4698,
+                            "name": "this",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967268,
+                            "src": "781:4:27",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_ReverseRegistryBaseContract_$4704",
+                              "typeString": "contract ReverseRegistryBaseContract"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_ReverseRegistryBaseContract_$4704",
+                              "typeString": "contract ReverseRegistryBaseContract"
+                            }
+                          ],
+                          "id": 4697,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "773:7:27",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": {
+                            "id": 4696,
+                            "name": "address",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "773:7:27",
+                            "typeDescriptions": {}
+                          }
+                        },
+                        "id": 4699,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "773:13:27",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 4693,
+                      "name": "_NewReverseENSCreated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 4672,
+                      "src": "736:21:27",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_bytes32_$_t_address_$returns$__$",
+                        "typeString": "function (string memory,bytes32,address)"
+                      }
+                    },
+                    "id": 4700,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "736:51:27",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 4701,
+                  "nodeType": "EmitStatement",
+                  "src": "731:56:27"
+                }
+              ]
+            },
+            "id": 4703,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "RegisterReverseAddress",
+            "nameLocation": "477:22:27",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 4677,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4674,
+                  "mutability": "mutable",
+                  "name": "ENSName",
+                  "nameLocation": "514:7:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4703,
+                  "src": "500:21:27",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 4673,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "500:6:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 4676,
+                  "mutability": "mutable",
+                  "name": "ReverseRegistryAddress",
+                  "nameLocation": "531:22:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4703,
+                  "src": "523:30:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 4675,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "523:7:27",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "499:55:27"
+            },
+            "returnParameters": {
+              "id": 4678,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "570:0:27"
+            },
+            "scope": 4704,
+            "src": "468:327:27",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 4705,
+        "src": "216:586:27",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:763:27"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/Base/ReverseRegistryBaseContract.sol",
+    "exportedSymbols": {
+      "IENSReverseRegistry": [
+        11141
+      ],
+      "ReverseRegistryBaseContract": [
+        4704
+      ]
+    },
+    "id": 4705,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 4663,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".7"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:22:27"
+      },
+      {
+        "absolutePath": "project:/contracts/Interfaces/IENSReverseRegistry.sol",
+        "file": "../Interfaces/IENSReverseRegistry.sol",
+        "id": 4664,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 4705,
+        "sourceUnit": 11142,
+        "src": "164:47:27",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 4704,
+        "linearizedBaseContracts": [
+          4704
+        ],
+        "name": "ReverseRegistryBaseContract",
+        "nameLocation": "225:27:27",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "id": 4672,
+            "name": "_NewReverseENSCreated",
+            "nameLocation": "325:21:27",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 4671,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4666,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "ENSName",
+                  "nameLocation": "354:7:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4672,
+                  "src": "347:14:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 4665,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "347:6:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 4668,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "node",
+                  "nameLocation": "371:4:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4672,
+                  "src": "363:12:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 4667,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "363:7:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 4670,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "addr",
+                  "nameLocation": "385:4:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4672,
+                  "src": "377:12:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 4669,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "377:7:27",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "346:44:27"
+            },
+            "src": "319:72:27"
+          },
+          {
+            "body": {
+              "id": 4702,
+              "nodeType": "Block",
+              "src": "570:225:27",
+              "statements": [
+                {
+                  "assignments": [
+                    4681
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 4681,
+                      "mutability": "mutable",
+                      "name": "ReverseRegistry",
+                      "nameLocation": "601:15:27",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 4702,
+                      "src": "581:35:27",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                        "typeString": "contract IENSReverseRegistry"
+                      },
+                      "typeName": {
+                        "id": 4680,
+                        "nodeType": "UserDefinedTypeName",
+                        "pathNode": {
+                          "id": 4679,
+                          "name": "IENSReverseRegistry",
+                          "nodeType": "IdentifierPath",
+                          "referencedDeclaration": 11141,
+                          "src": "581:19:27"
+                        },
+                        "referencedDeclaration": 11141,
+                        "src": "581:19:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                          "typeString": "contract IENSReverseRegistry"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 4685,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 4683,
+                        "name": "ReverseRegistryAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4676,
+                        "src": "639:22:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 4682,
+                      "name": "IENSReverseRegistry",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 11141,
+                      "src": "619:19:27",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_contract$_IENSReverseRegistry_$11141_$",
+                        "typeString": "type(contract IENSReverseRegistry)"
+                      }
+                    },
+                    "id": 4684,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "typeConversion",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "619:43:27",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                      "typeString": "contract IENSReverseRegistry"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "581:81:27"
+                },
+                {
+                  "assignments": [
+                    4687
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 4687,
+                      "mutability": "mutable",
+                      "name": "node",
+                      "nameLocation": "681:4:27",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 4702,
+                      "src": "673:12:27",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 4686,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "673:7:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 4692,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 4690,
+                        "name": "ENSName",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4674,
+                        "src": "712:7:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "id": 4688,
+                        "name": "ReverseRegistry",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4681,
+                        "src": "688:15:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IENSReverseRegistry_$11141",
+                          "typeString": "contract IENSReverseRegistry"
+                        }
+                      },
+                      "id": 4689,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "setName",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11128,
+                      "src": "688:23:27",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_string_memory_ptr_$returns$_t_bytes32_$",
+                        "typeString": "function (string memory) external returns (bytes32)"
+                      }
+                    },
+                    "id": 4691,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "688:32:27",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "673:47:27"
+                },
+                {
+                  "eventCall": {
+                    "arguments": [
+                      {
+                        "id": 4694,
+                        "name": "ENSName",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4674,
+                        "src": "758:7:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      },
+                      {
+                        "id": 4695,
+                        "name": "node",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4687,
+                        "src": "767:4:27",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "arguments": [
+                          {
+                            "id": 4698,
+                            "name": "this",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967268,
+                            "src": "781:4:27",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_ReverseRegistryBaseContract_$4704",
+                              "typeString": "contract ReverseRegistryBaseContract"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_ReverseRegistryBaseContract_$4704",
+                              "typeString": "contract ReverseRegistryBaseContract"
+                            }
+                          ],
+                          "id": 4697,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "773:7:27",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": {
+                            "id": 4696,
+                            "name": "address",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "773:7:27",
+                            "typeDescriptions": {}
+                          }
+                        },
+                        "id": 4699,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "773:13:27",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 4693,
+                      "name": "_NewReverseENSCreated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 4672,
+                      "src": "736:21:27",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$_t_bytes32_$_t_address_$returns$__$",
+                        "typeString": "function (string memory,bytes32,address)"
+                      }
+                    },
+                    "id": 4700,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "736:51:27",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 4701,
+                  "nodeType": "EmitStatement",
+                  "src": "731:56:27"
+                }
+              ]
+            },
+            "id": 4703,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "RegisterReverseAddress",
+            "nameLocation": "477:22:27",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 4677,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4674,
+                  "mutability": "mutable",
+                  "name": "ENSName",
+                  "nameLocation": "514:7:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4703,
+                  "src": "500:21:27",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 4673,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "500:6:27",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 4676,
+                  "mutability": "mutable",
+                  "name": "ReverseRegistryAddress",
+                  "nameLocation": "531:22:27",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 4703,
+                  "src": "523:30:27",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 4675,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "523:7:27",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "499:55:27"
+            },
+            "returnParameters": {
+              "id": 4678,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "570:0:27"
+            },
+            "scope": 4704,
+            "src": "468:327:27",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 4705,
+        "src": "216:586:27",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:763:27"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2021-12-08T08:21:42.260Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

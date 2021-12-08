@@ -10,9 +10,6 @@ pragma solidity 0.8.7;
  interface IPriceConverter  {
 
     function fromUSDToETH(uint) external view returns(uint);
-
-    function updateRegistryAddress(address NewRegistryAddress) external;
-
-    function retrieveRegistryAddress() external view returns(address);
+    function retrieveSettings() external view returns(address);
 
 }

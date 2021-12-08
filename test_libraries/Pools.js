@@ -604,7 +604,7 @@ async function AddCertificateWrong(CertPool, Owners, provider_1, provider_2, hol
     if(!isPrivate) value_To_Pay = CertificatePriceWei;
 
     try{
-        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, value:value_To_Pay}, function(error, result){});
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: user_1, gas: Gas, value:value_To_Pay}, function(error, result){});
         expect.fail();
     }
     // assert

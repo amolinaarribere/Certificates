@@ -21,11 +21,11 @@ import "../Interfaces/ITreasury.sol";
 import "../Interfaces/IPriceConverter.sol";
 import "../Libraries/UintLibrary.sol";
 import "../Libraries/Library.sol";
-import "../Base/TokenGovernanceBaseContract.sol";
+import "../Base/StdPropositionBaseContract.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 
-contract Treasury is ITreasury, TokenGovernanceBaseContract{
+contract Treasury is ITreasury, StdPropositionBaseContract{
     using Library for *;
     using UintLibrary for *;
 
@@ -37,17 +37,6 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     event _Withdraw(address indexed Recipient, uint Amount);
 
     // DATA /////////////////////////////////////////
-    // proposition to change prices
-    struct ProposedPricesStruct{
-        uint NewPublicPriceUSD;
-        uint NewCertificatePriceUSD;
-        uint NewPrivatePriceUSD;
-        uint NewProviderPriceUSD;
-        uint NewOwnerRefundFeeUSD;
-    }
-
-    ProposedPricesStruct private _ProposedPrices;
-
     // prices parameters usd
     uint private _PublicPriceUSD;
     uint private _CertificatePriceUSD;
@@ -76,7 +65,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         else if(Library.Prices.NewCertificate == price) minPriceUSD = _CertificatePriceUSD;
         else minPriceUSD = _ProviderPriceUSD;
 
-        uint256 minPriceETH = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(minPriceUSD);
+        uint256 minPriceETH = IPriceConverter(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PriceConverter)]).fromUSDToETH(minPriceUSD);
 
         require(value >= minPriceETH, "EC2-");
         _;
@@ -88,86 +77,54 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     }
 
     modifier isFromPublicPool(address addr){
-        Library.ItIsSomeone(addr, _managerContract.retrievePublicCertificatePoolProxy());
+        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)]);
         _;
     }
 
     modifier isPriceOK(uint256 PublicPriceUSD, uint256 OwnerRefundFeeUSD){
-        require(PublicPriceUSD >= OwnerRefundFeeUSD, "EC21-");
+        isPriceOKFunc(PublicPriceUSD, OwnerRefundFeeUSD);
         _;
+    }
+
+    function isPriceOKFunc(uint256 PublicPriceUSD, uint256 OwnerRefundFeeUSD) internal pure{
+        require(PublicPriceUSD >= OwnerRefundFeeUSD, "EC21-");
     }
     
     // CONSTRUCTOR /////////////////////////////////////////
-    function Treasury_init(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, string memory contractName, string memory contractVersion) public initializer 
+    function Treasury_init(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
+        isPriceOK(PublicPriceUSD, OwnerRefundFeeUSD)
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress, contractName, contractVersion);
-        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, true);
+        super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
+        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD);
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function updatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD) external override
+    function checkProposition(bytes[] memory NewValues) internal override 
+        isPriceOK(UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[0])[0]), UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[4])[0]))
+    {}
+
+    function UpdateAll() internal override
     {
-        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, false);
+        bytes32[] memory ProposedNewValues = PropositionsToBytes32();
+
+        uint256 PublicPriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[0]);
+        uint256 PrivatePriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[1]);
+        uint256 ProviderPriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[2]);
+        uint256 CertificatePriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[3]);
+        uint256 OwnerRefundFeeUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[4]);
+
+        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD);
+
+        emit _NewPrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD);
     }
 
-    function InternalupdatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, bool fromConstructor) internal
-        isPriceOK(PublicPriceUSD, OwnerRefundFeeUSD)
+    function InternalupdatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD) internal
     {
-        if(fromConstructor){
-            _PublicPriceUSD = PublicPriceUSD;
-            _PrivatePriceUSD = PrivatePriceUSD;
-            _ProviderPriceUSD = ProviderPriceUSD;
-            _CertificatePriceUSD = CertificatePriceUSD;
-            _OwnerRefundFeeUSD = OwnerRefundFeeUSD;
-        }
-        else{
-            addProposition();
-            _ProposedPrices.NewPublicPriceUSD = PublicPriceUSD;
-            _ProposedPrices.NewCertificatePriceUSD = CertificatePriceUSD;
-            _ProposedPrices.NewPrivatePriceUSD = PrivatePriceUSD;
-            _ProposedPrices.NewProviderPriceUSD = ProviderPriceUSD;
-            _ProposedPrices.NewOwnerRefundFeeUSD = OwnerRefundFeeUSD;
-        }
-        
-    }
-
-    function propositionApproved() internal override
-    {
-        _PublicPriceUSD = _ProposedPrices.NewPublicPriceUSD;
-        _PrivatePriceUSD = _ProposedPrices.NewPrivatePriceUSD;
-        _ProviderPriceUSD = _ProposedPrices.NewProviderPriceUSD;
-        _CertificatePriceUSD = _ProposedPrices.NewCertificatePriceUSD;
-        _OwnerRefundFeeUSD = _ProposedPrices.NewOwnerRefundFeeUSD;
-        
-        removeProposition();
-
-        emit _NewPrices(_PublicPriceUSD, _PrivatePriceUSD, _ProviderPriceUSD, _CertificatePriceUSD, _OwnerRefundFeeUSD);
-    }
-
-    function propositionRejected() internal override
-    {
-        removeProposition();
-    }
-
-    function propositionExpired() internal override
-    {
-        removeProposition();
-    }
-
-    function removeProposition() internal
-    {
-         delete(_ProposedPrices);
-    }
-
-    function retrieveProposition() external override view returns(bytes32[] memory)
-    {
-        bytes32[] memory proposition = new bytes32[](5);
-        proposition[0] = UintLibrary.UintToBytes32(_ProposedPrices.NewPublicPriceUSD);
-        proposition[1] = UintLibrary.UintToBytes32(_ProposedPrices.NewPrivatePriceUSD);
-        proposition[2] = UintLibrary.UintToBytes32(_ProposedPrices.NewProviderPriceUSD);
-        proposition[3] = UintLibrary.UintToBytes32(_ProposedPrices.NewCertificatePriceUSD);
-        proposition[4] = UintLibrary.UintToBytes32(_ProposedPrices.NewOwnerRefundFeeUSD);
-        return proposition;
+        _PublicPriceUSD = PublicPriceUSD;
+        _PrivatePriceUSD = PrivatePriceUSD;
+        _ProviderPriceUSD = ProviderPriceUSD;
+        _CertificatePriceUSD = CertificatePriceUSD;
+        _OwnerRefundFeeUSD = OwnerRefundFeeUSD;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -176,7 +133,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     override payable
     {
         uint256 amount = msg.value;
-        if(price == Library.Prices.NewProvider) amount -= IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(_OwnerRefundFeeUSD);
+        if(price == Library.Prices.NewProvider) amount -= IPriceConverter(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PriceConverter)]).fromUSDToETH(_OwnerRefundFeeUSD);
         _AggregatedDividendAmount += amount;
 
         emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);
@@ -192,11 +149,10 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
     function InternalAssignDividends(address recipient) internal
     {
         (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(recipient);
-
-        if(totalOffBalance > 0){
-           _lastAssigned[recipient] = _AggregatedDividendAmount;
+        _lastAssigned[recipient] = _AggregatedDividendAmount;
+        
+        if(totalOffBalance > 0){   
            addBalance(recipient, totalOffBalance, DividendOffBalance);
-           
            emit _AssignDividend(recipient, totalOffBalance, DividendOffBalance);
         }
     }
@@ -205,7 +161,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         isFromPublicPool(msg.sender)
     override
     {
-        uint OwnerRefundFeeWei = IPriceConverter(_managerContract.retrievePriceConverterProxy()).fromUSDToETH(_OwnerRefundFeeUSD);
+        uint OwnerRefundFeeWei = IPriceConverter(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PriceConverter)]).fromUSDToETH(_OwnerRefundFeeUSD);
         addBalance(addr, OwnerRefundFeeWei, numberOfOwners);
 
         emit _Refund(addr, OwnerRefundFeeWei, numberOfOwners);
@@ -253,7 +209,7 @@ contract Treasury is ITreasury, TokenGovernanceBaseContract{
         return checkFullBalance(addr);
     }
 
-    function retrievePrices() external override view returns(uint, uint, uint, uint, uint)
+    function retrieveSettings() external override view returns(uint, uint, uint, uint, uint)
     {
         return(_PublicPriceUSD, _PrivatePriceUSD, _ProviderPriceUSD, _CertificatePriceUSD, _OwnerRefundFeeUSD);
     }

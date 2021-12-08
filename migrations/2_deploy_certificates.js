@@ -1,3 +1,7 @@
+const BigNumber = require('bignumber.js');
+
+let ExternalRegistries = require("./ExternalRegistries.js");
+let Admin = artifacts.require("./DeployedContracts/Admin");
 let CertificatesPoolManager = artifacts.require("./DeployedContracts/CertificatesPoolManager");
 let Provider = artifacts.require("./DeployedContracts/Provider");
 let Treasury = artifacts.require("./DeployedContracts/Treasury");
@@ -7,10 +11,16 @@ let CertisToken = artifacts.require("./DeployedContracts/CertisToken");
 let PrivatePoolFactory = artifacts.require("./DeployedContracts/PrivatePoolFactory");
 let ProviderFactory = artifacts.require("./DeployedContracts/ProviderFactory");
 let PriceConverter = artifacts.require("./DeployedContracts/PriceConverter");
-let ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
+let PropositionSettings = artifacts.require("./DeployedContracts/PropositionSettings");
+let ENS = artifacts.require("./DeployedContracts/ENS");
+
+const CertificatesPoolManagerAbi = CertificatesPoolManager.abi;
+
 // only for testing
 let MockChainLinkFeedRegistry = artifacts.require("./DeployedContracts/Mock/MockChainLinkFeedRegistry");
-
+let MockENSRegistry = artifacts.require("./DeployedContracts/Mock/MockENSRegistry");
+let MockENSResolver = artifacts.require("./DeployedContracts/Mock/MockENSResolver");
+let MockENSReverseRegistry = artifacts.require("./DeployedContracts/Mock/MockENSReverseRegistry");
 
 const obj = require("../test_libraries/objects.js");
 
@@ -21,6 +31,7 @@ let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
 let SignatureLibrary = artifacts.require("./Libraries/SignatureLibrary");
 let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominations.sol");
 
+const Gas = 6721975;
 const PropositionLifeTime = 604800;
 const PropositionThresholdPercentage = 50;
 const minWeightToProposePercentage = 5;
@@ -28,13 +39,15 @@ const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
 const TokenDecimals = 0;
-const PublicPriceUSD = 10;
-const PrivatePriceUSD = 2;
-const ProviderPriceUSD = 2;
+const PublicPriceUSD = 100;
+const PrivatePriceUSD = 50;
+const ProviderPriceUSD = 40;
 const CertificatePriceUSD = 1;
-const OwnerRefundFeeUSD = 3;
-const rate = 338495835524;
-const MockDecimals = 8;
+const OwnerRefundFeeUSD = 30;
+const rate = new BigNumber("10000");
+const MockDecimals = 0;
+const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"]
+// privatepool.blockcerts.aljomoar.eth, provider.blockcerts.aljomoar.eth
 const PublicMinOwners = 1;
 const PublicPoolContractName = "Public Certificate Pool";
 const PublicPoolContractVersion = "1.0";
@@ -46,26 +59,20 @@ const TreasuryContractName = "Treasury";
 const TreasuryContractVersion = "1.0";
 const PriceConverterContractName = "Price Converter";
 const PriceConverterContractVersion = "1.0";
+const PropositionSettingsContractName = "Proposition Settings";
+const PropositionSettingsContractVersion = "1.0";
+const ENSContractName = "ENS";
+const ENSContractVersion = "1.0";
+const AdminContractName = "Admin";
+const AdminContractVersion = "1.0";
 
 
 module.exports = async function(deployer, network, accounts){
+  let ChainLinkRegistryAddress = await ExternalRegistries.GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry, rate, MockDecimals);
 
-  if("kovan" == network)
-  {
-    ChainLinkRegistryAddress = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0"
-  }
-  else if("mainnet" == network)
-  {
-    ChainLinkRegistryAddress = "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
-  }
-
-  else
-  {
-    await deployer.deploy(MockChainLinkFeedRegistry, rate, MockDecimals);
-    MockChainLinkFeedRegistryInstance = await MockChainLinkFeedRegistry.deployed();
-    console.log("MockChainLinkFeedRegistry deployed : " + MockChainLinkFeedRegistryInstance.address);
-    ChainLinkRegistryAddress = MockChainLinkFeedRegistryInstance.address
-  }
+  let ENSresult = await ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockENSReverseRegistry, initNodes);
+  let ENSRegistryAddress = ENSresult[0];
+  let ENSReverseRegistryAddress = ENSresult[1];
 
   const PublicOwners = [accounts[0]];
 
@@ -107,37 +114,138 @@ module.exports = async function(deployer, network, accounts){
   await deployer.link(AddressLibrary, CertificatesPoolManager);
   console.log("AddressLibrary linked to Certificate Pool Manager");
 
+  await deployer.link(UintLibrary, CertificatesPoolManager);
+  console.log("UintLibrary linked to CertificatesPoolManager");
+
   await deployer.link(SignatureLibrary, CertificatesPoolManager);
   console.log("SignatureLibrary linked to Certificate Pool Manager");
 
-  await deployer.deploy(CertificatesPoolManager, PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, CertificateManagerContractName, CertificateManagerContractVersion);
+  await deployer.deploy(CertificatesPoolManager);
   CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
 
-  // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, PriceConverter);
-  console.log("Library linked to Price Converter");
-
-  await deployer.link(AddressLibrary, PriceConverter);
-  console.log("AddressLibrary linked to Price Converter");
-
-  await deployer.link(Denominations, PriceConverter);
-  console.log("Denominations linked to Price Converter");
-
-  await deployer.link(SignatureLibrary, PriceConverter);
-  console.log("SignatureLibrary linked to Price Converter");
-
-  await deployer.deploy(PriceConverter);
-  PriceConverterInstance = await PriceConverter.deployed();
-  console.log("PriceConverter deployed : " + PriceConverterInstance.address);
-
-  var PriceConverterProxyInitializerMethod = {
+  var CertificatesPoolManagerProxyInitializerMethod = {
     "inputs": [
       {
         "internalType": "address",
-        "name": "registry",
+        "name": "chairPerson",
         "type": "address"
       },
+      {
+        "internalType": "string",
+        "name": "contractName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "contractVersion",
+        "type": "string"
+      }
+    ],
+    "name": "CertificatesPoolManager_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  };
+
+  var CertificatesPoolManagerProxyInitializerParameters = [accounts[0], CertificateManagerContractName, CertificateManagerContractVersion];
+  var CertificatesPoolManagerProxyData = web3.eth.abi.encodeFunctionCall(CertificatesPoolManagerProxyInitializerMethod, CertificatesPoolManagerProxyInitializerParameters);
+  
+
+  // Admin -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, Admin);
+  console.log("Library linked to Admin");
+
+  await deployer.link(AddressLibrary, Admin);
+  console.log("AddressLibrary linked to Admin");
+
+  await deployer.link(SignatureLibrary, Admin);
+  console.log("SignatureLibrary linked to Admin");
+
+  await deployer.deploy(Admin, AdminContractName, AdminContractVersion, CertificatesPoolManagerInstance.address, CertificatesPoolManagerProxyData);
+  AdminInstance = await Admin.deployed();
+  console.log("Admin deployed : " + AdminInstance.address);
+
+  var ManagerAddress = await AdminInstance.retrieveManagerProxy();
+
+  // ENS -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, ENS);
+  console.log("Library linked to ENS");
+
+  await deployer.link(AddressLibrary, ENS);
+  console.log("AddressLibrary linked to ENS");
+
+  await deployer.link(SignatureLibrary, ENS);
+  console.log("SignatureLibrary linked to ENS");
+
+  await deployer.deploy(ENS);
+  ENSInstance = await ENS.deployed();
+  console.log("ENS deployed : " + ENSInstance.address);
+
+  var ENSProxyInitializerMethod = {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "ENSRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "ENSReverseRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "nodes",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "contractName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "contractVersion",
+        "type": "string"
+      }
+    ],
+    "name": "ENS_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  };
+
+  var ENSProxyInitializerParameters = [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, ManagerAddress, accounts[0], ENSContractName, ENSContractVersion];
+  var ENSProxyData = web3.eth.abi.encodeFunctionCall(ENSProxyInitializerMethod, ENSProxyInitializerParameters);
+
+  
+  // Proposition Settings -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, PropositionSettings);
+  console.log("Library linked to Proposition Settings");
+
+  await deployer.link(UintLibrary, PropositionSettings);
+  console.log("UintLibrary linked to Proposition Settings");
+
+  await deployer.link(SignatureLibrary, PropositionSettings);
+  console.log("SignatureLibrary linked to Proposition Settings");
+
+  await deployer.deploy(PropositionSettings);
+  PropositionSettingsInstance = await PropositionSettings.deployed();
+  console.log("PropositionSettings deployed : " + PropositionSettingsInstance.address);
+
+  var PropositionSettingsProxyInitializerMethod = {
+    "inputs": [
       {
         "internalType": "address",
         "name": "managerContractAddress",
@@ -174,12 +282,66 @@ module.exports = async function(deployer, network, accounts){
         "type": "string"
       }
     ],
+    "name": "PropositionSettings_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  };
+
+  var PropositionSettingsProxyInitializerParameters = [ManagerAddress, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, PropositionSettingsContractName, PropositionSettingsContractVersion];
+  var PropositionSettingsProxyData = web3.eth.abi.encodeFunctionCall(PropositionSettingsProxyInitializerMethod, PropositionSettingsProxyInitializerParameters);
+
+  // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  await deployer.link(Library, PriceConverter);
+  console.log("Library linked to Price Converter");
+
+  await deployer.link(AddressLibrary, PriceConverter);
+  console.log("AddressLibrary linked to Price Converter");
+
+  await deployer.link(Denominations, PriceConverter);
+  console.log("Denominations linked to Price Converter");
+
+  await deployer.link(SignatureLibrary, PriceConverter);
+  console.log("SignatureLibrary linked to Price Converter");
+
+  await deployer.deploy(PriceConverter);
+  PriceConverterInstance = await PriceConverter.deployed();
+  console.log("PriceConverter deployed : " + PriceConverterInstance.address);
+
+  var PriceConverterProxyInitializerMethod = {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "managerContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "chairPerson",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "contractName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "contractVersion",
+        "type": "string"
+      }
+    ],
     "name": "PriceConverter_init",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var PriceConverterProxyInitializerParameters = [ChainLinkRegistryAddress, CertificatesPoolManagerInstance.address, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, PriceConverterContractName, PriceConverterContractVersion];
+  var PriceConverterProxyInitializerParameters = [ChainLinkRegistryAddress, ManagerAddress, accounts[0], PriceConverterContractName, PriceConverterContractVersion];
   var PriceConverterProxyData = web3.eth.abi.encodeFunctionCall(PriceConverterProxyInitializerMethod, PriceConverterProxyInitializerParameters);
 
   // Certis Token -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -231,7 +393,7 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var CertisTokenProxyInitializerParameters = [TokenName, TokenSymbol, TokenSupply, CertificatesPoolManagerInstance.address, TokenDecimals, accounts[0]];
+  var CertisTokenProxyInitializerParameters = [TokenName, TokenSymbol, TokenSupply, ManagerAddress, TokenDecimals, accounts[0]];
   var CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
 
   // Treasury -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -289,21 +451,6 @@ module.exports = async function(deployer, network, accounts){
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "PropositionLifeTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint8",
-        "name": "PropositionThresholdPercentage",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "minWeightToProposePercentage",
-        "type": "uint8"
-      },
-      {
         "internalType": "string",
         "name": "contractName",
         "type": "string"
@@ -320,7 +467,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var TreasuryProxyInitializerParameters = [PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, CertificatesPoolManagerInstance.address, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, TreasuryContractName, TreasuryContractVersion];
+  var TreasuryProxyInitializerParameters = [PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD, ManagerAddress, accounts[0], TreasuryContractName, TreasuryContractVersion];
   var TreasuryProxyData = web3.eth.abi.encodeFunctionCall(TreasuryProxyInitializerMethod, TreasuryProxyInitializerParameters);
 
   // Private Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -361,7 +508,7 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var PrivatePoolFactoryProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
+  var PrivatePoolFactoryProxyInitializerParameters = [ManagerAddress];
   var PrivatePoolFactoryProxyData = web3.eth.abi.encodeFunctionCall(PrivatePoolFactoryProxyInitializerMethod, PrivatePoolFactoryProxyInitializerParameters);
 
   // Public Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -414,7 +561,7 @@ module.exports = async function(deployer, network, accounts){
      "stateMutability": "nonpayable",
      "type": "function"
   };
-  var PublicCertificatesPoolProxyInitializerParameters = [PublicOwners, PublicMinOwners, CertificatesPoolManagerInstance.address, PublicPoolContractName, PublicPoolContractVersion];
+  var PublicCertificatesPoolProxyInitializerParameters = [PublicOwners, PublicMinOwners, ManagerAddress, PublicPoolContractName, PublicPoolContractVersion];
   var PublicCertificatesPoolProxyData = web3.eth.abi.encodeFunctionCall(PublicCertificatesPoolProxyInitializerMethod, PublicCertificatesPoolProxyInitializerParameters);
 
   // Provider -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -452,27 +599,83 @@ module.exports = async function(deployer, network, accounts){
     "stateMutability": "nonpayable",
     "type": "function"
   };
-  var ProviderFactoryProxyInitializerParameters = [CertificatesPoolManagerInstance.address];
+  var ProviderFactoryProxyInitializerParameters = [ManagerAddress];
   var ProviderFactoryProxyData = web3.eth.abi.encodeFunctionCall(ProviderFactoryProxyInitializerMethod, ProviderFactoryProxyInitializerParameters);
 
-  // Initialized Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await CertificatesPoolManagerInstance.InitializeContracts(
-    obj.returnUpgradeObject(PublicCertificatesPoolInstance.address,
-       TreasuryInstance.address,
-        CertisTokenInstance.address, 
-        PrivatePoolFactoryInstance.address, 
-        PrivateCertificatesPoolInstance.address, 
-        ProviderFactoryInstance.address, 
-        ProviderInstance.address, 
-        PriceConverterInstance.address,
-        PublicCertificatesPoolProxyData, 
-        TreasuryProxyData, 
-        CertisProxyData, 
-        PrivatePoolFactoryProxyData, 
-        ProviderFactoryProxyData, 
-        PriceConverterProxyData,
-        PrivatePoolContractName,
-        PrivatePoolContractVersion));
+ // Initialize Contract Manager
+ var CertificatesPoolManagerProxyInstance = new web3.eth.Contract(CertificatesPoolManagerAbi, ManagerAddress);
+  
+ await CertificatesPoolManagerProxyInstance.methods.InitializeContracts(
+  obj.returnUpgradeObject(PublicCertificatesPoolInstance.address,
+     TreasuryInstance.address,
+      CertisTokenInstance.address, 
+      PrivatePoolFactoryInstance.address, 
+      PrivateCertificatesPoolInstance.address, 
+      ProviderFactoryInstance.address, 
+      ProviderInstance.address, 
+      PriceConverterInstance.address,
+      PropositionSettingsInstance.address,
+      ENSInstance.address,
+      PublicCertificatesPoolProxyData, 
+      TreasuryProxyData, 
+      CertisProxyData, 
+      PrivatePoolFactoryProxyData, 
+      ProviderFactoryProxyData, 
+      PriceConverterProxyData,
+      PropositionSettingsProxyData,
+      ENSProxyData,
+      PrivatePoolContractName,
+      PrivatePoolContractVersion)).send({from: accounts[0], gas: Gas});
+
   console.log("CertificatesPoolManager initialized");
-    
+
+  let CertManagerAddress = await AdminInstance.retrieveManager();
+  let TransparentProxies = await CertificatesPoolManagerProxyInstance.methods.retrieveTransparentProxies().call();
+  let TransparentImpl = await CertificatesPoolManagerProxyInstance.methods.retrieveTransparentProxiesImpl().call();
+  let Beacons = await CertificatesPoolManagerProxyInstance.methods.retrieveBeacons().call();
+  let BeaconsImpl = await CertificatesPoolManagerProxyInstance.methods.retrieveBeaconsImpl().call();
+  let ManagerAdmin = await CertificatesPoolManagerProxyInstance.methods.retrieveManagerAdmin().call();
+  let init = await CertificatesPoolManagerProxyInstance.methods.isInitialized().call();
+
+
+
+
+  console.log("Deployment Summary ----------------------------------------------- ");
+
+  console.log("Admin Address : " + AdminInstance.address + " // " + ManagerAdmin);
+
+  console.log("Manager Proxy Address : " + CertificatesPoolManagerProxyInstance._address);
+  console.log("Manager Address : " + CertManagerAddress + " is iniitalized : " + init);
+
+  console.log("Public Pool Proxy Address : " + TransparentProxies[0]);
+  console.log("Public Pool Address : " + TransparentImpl[0]);
+
+  console.log("Treasury Proxy Address : " + TransparentProxies[1]);
+  console.log("Treasury Address : " + TransparentImpl[1]);
+
+  console.log("Certis Proxy Address : " + TransparentProxies[2]);
+  console.log("Certis Address : " + TransparentImpl[2]);
+
+  console.log("Private Pool Factory Proxy Address : " + TransparentProxies[3]);
+  console.log("Private Pool Factory Address : " + TransparentImpl[3]);
+
+  console.log("Provider Factory Proxy Address : " + TransparentProxies[4]);
+  console.log("Provider Factory Address : " + TransparentImpl[4]);
+
+  console.log("Price Converter Proxy Address : " + TransparentProxies[5]);
+  console.log("Price Converter Address : " + TransparentImpl[5]);
+
+  console.log("Proposition Settings Proxy Address : " + TransparentProxies[6]);
+  console.log("Proposition Settings Address : " + TransparentImpl[6]);
+
+  console.log("ENS Proxy Address : " + TransparentProxies[7]);
+  console.log("ENS Address : " + TransparentImpl[7]);
+
+  console.log("Private Pool Beacon Address : " + Beacons[0]);
+  console.log("Private Pool Implementation Address : " + BeaconsImpl[0]);
+
+  console.log("Provider Beacon Address : " + Beacons[1]);
+  console.log("Provider Implementation Address : " + BeaconsImpl[1]);
+
+
 }

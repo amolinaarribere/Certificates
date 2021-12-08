@@ -7,14 +7,14 @@ pragma solidity 0.8.7;
  */
 
 import "../Interfaces/IPriceConverter.sol";
-import "../Base/TokenGovernanceBaseContract.sol";
+import "../Base/StdPropositionBaseContract.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/FeedRegistryInterface.sol";
 import "@chainlink/contracts/src/v0.8/Denominations.sol";
 
 
-contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
+contract PriceConverter is IPriceConverter, StdPropositionBaseContract {
 
-     // EVENTS /////////////////////////////////////////
+    // EVENTS /////////////////////////////////////////
     event _NewRegistryAddress(address Registry);
 
     // DATA /////////////////////////////////////////
@@ -22,51 +22,30 @@ contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
     uint8 constant _ETHDecimals = 18;
     uint8 constant _USDDecimals = 2;
 
-    address internal _ProposedRegistryAddress;
+    // MODIFIERS /////////////////////////////////////////
+    modifier isAddressOK(address addr){
+        require(address(0) != addr, "EC21-");
+        _;
+    }
 
     // CONSTRUCTOR /////////////////////////////////////////
-    function PriceConverter_init(address registry, address managerContractAddress, address chairPerson, uint256 PropositionLifeTime, uint8 PropositionThresholdPercentage, uint8 minWeightToProposePercentage, string memory contractName, string memory contractVersion) public initializer 
+    function PriceConverter_init(address registry, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer 
     {
-        super.TokenGovernanceContract_init(PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, chairPerson, managerContractAddress, contractName, contractVersion);
+        super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion);
         _registry = FeedRegistryInterface(registry);
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function updateRegistryAddress(address NewRegistryAddress) external override
-    {
-        addProposition();
-        _ProposedRegistryAddress = NewRegistryAddress;
-    }
+    function checkProposition(bytes[] memory NewValues) internal override 
+        isAddressOK(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[0])[0]))
+    {}
 
-    function propositionApproved() internal override
+    function UpdateAll() internal override
     {
-        _registry = FeedRegistryInterface(_ProposedRegistryAddress);
-        
-        removeProposition();
-
-        emit _NewRegistryAddress(_ProposedRegistryAddress);
-    }
-
-    function propositionRejected() internal override
-    {
-        removeProposition();
-    }
-
-    function propositionExpired() internal override
-    {
-        removeProposition();
-    }
-
-    function removeProposition() internal
-    {
-         delete(_ProposedRegistryAddress);
-    }
-
-    function retrieveProposition() external override view returns(bytes32[] memory)
-    {
-        bytes32[] memory proposition = new bytes32[](1);
-        proposition[0] = AddressLibrary.AddressToBytes32(_ProposedRegistryAddress);
-        return proposition;
+        bytes32[] memory ProposedNewValues = PropositionsToBytes32();
+        address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(ProposedNewValues[0]);
+        _registry = FeedRegistryInterface(NewRegistryAddress);
+        emit _NewRegistryAddress(NewRegistryAddress);
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
@@ -82,7 +61,8 @@ contract PriceConverter is IPriceConverter, TokenGovernanceBaseContract {
         return amount;
     }
 
-    function retrieveRegistryAddress() external override view returns(address){
+    function retrieveSettings() external override view returns(address)
+    {
         return address(_registry);
     }
 

@@ -11,26 +11,17 @@ library Library{
     // DATA /////////////////////////////////////////
     // enum
     enum Prices{NewProvider, NewPool, NewCertificate, NewProviderContract}
+    enum TransparentProxies{PublicPool, Treasury, Certis, PrivatePoolFactory, ProviderFactory, PriceConverter, PropSettings, ENS}
+    enum Beacons{PrivatePool, Provider}
 
     // Structures
     // Certificate Manager
     struct ProposedContractsStruct{
-        address NewPublicPoolAddress;
-        address NewTreasuryAddress;
-        address NewCertisTokenAddress;
-        address NewPrivatePoolFactoryAddress;
-        address NewPrivatePoolAddress;
-        address NewProviderFactoryAddress;
-        address NewProviderAddress;
-        address NewPriceConverterAddress;
-        bytes NewPublicPoolData;
-        bytes NewTreasuryData;
-        bytes NewCertisTokenData;
-        bytes NewPrivatePoolFactoryData;
-        bytes NewProviderFactoryData;
-        bytes NewPriceConverterData;
-        string NewPrivatePoolContractName;
-        string NewPrivatePoolContractVersion;
+        address[] TransparentAddresses;
+        address[] BeaconAddresses;
+        bytes[] TransparentData;
+        string PrivatePoolContractName;
+        string PrivatePoolContractVersion;
     }
 
     // Pending Certificates
@@ -76,6 +67,10 @@ library Library{
         }
        
         return result;
+    }
+
+    function Bytes32toBytes(bytes32 _b) public pure returns(bytes memory){
+        return abi.encodePacked(_b);
     }
     
 }
