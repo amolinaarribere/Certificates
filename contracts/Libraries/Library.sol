@@ -11,6 +11,8 @@ library Library{
     // DATA /////////////////////////////////////////
     // enum
     enum Prices{NewProvider, NewPool, NewCertificate, NewProviderContract}
+    enum TransparentProxies{PublicPool, Treasury, Certis, PrivatePoolFactory, ProviderFactory, PriceConverter, PropSettings, ENS}
+    enum Beacons{PrivatePool, Provider}
 
     // Structures
     // Certificate Manager

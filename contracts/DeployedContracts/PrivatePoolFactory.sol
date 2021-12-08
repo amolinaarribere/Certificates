@@ -21,9 +21,9 @@ contract PrivatePoolFactory is Factory{
     // FUNCTIONALITY /////////////////////////////////////////
     function create(address[] memory owners,  uint256 minOwners, string memory ElementName, string memory ENSName) external override payable
     {
-        ITreasury(_managerContract.retrieveTransparentProxies()[1]).pay{value:msg.value}(Library.Prices.NewPool);
-        (,address ENSReverseAddress,,) = IENS(_managerContract.retrieveTransparentProxies()[7]).retrieveSettings();
+        ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}(Library.Prices.NewPool);
+        (,address ENSReverseAddress,,) = IENS(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ENS)]).retrieveSettings();
         bytes memory data = abi.encodeWithSignature("PrivateCertPool_init(address[],uint256,string,string,string,address)", owners, minOwners, _ContractName, _ContractVersion, ENSName, ENSReverseAddress);
-        internalCreate(_managerContract.retrieveBeacons()[0], data, ElementName, ENSName);
+        internalCreate(_managerContract.retrieveBeacons()[uint256(Library.Beacons.PrivatePool)], data, ElementName, ENSName);
     }
 }

@@ -74,7 +74,7 @@ abstract contract Factory is IFactory, Initializable, ManagedBaseContract{
         _ElementStruct memory element = _ElementStruct(msg.sender, address(beaconProxy), elementName);
         _Elements.push(element);
 
-        if(ENSLabel > 0)IENS(_managerContract.retrieveTransparentProxies()[7]).createSubdomain(ENSLabel, address(beaconProxy));
+        if(ENSLabel > 0)IENS(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ENS)]).createSubdomain(ENSLabel, address(beaconProxy));
 
         emit _NewElement(_FactoryName, _Elements.length - 1, element._creator, element._ElementProxyAddress, element._ElementName);
     }

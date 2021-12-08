@@ -28,8 +28,8 @@ contract ENS is IENS, StdPropositionBaseContract {
 
     // MODIFIERS /////////////////////////////////////////
     modifier isFromAuthorizedContract(address addr){
-        require(_managerContract.retrieveTransparentProxies()[3] == addr ||
-                _managerContract.retrieveTransparentProxies()[4] == addr, "EC8-");
+        require(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PrivatePoolFactory)] == addr ||
+                _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ProviderFactory)] == addr, "EC8-");
         _;
     }
 
@@ -94,7 +94,7 @@ contract ENS is IENS, StdPropositionBaseContract {
         isFromAuthorizedContract(msg.sender)
     {
         bytes32 node = _ProviderNode;
-        if(msg.sender == _managerContract.retrieveTransparentProxies()[3]) node = _PrivatePoolNode;
+        if(msg.sender == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PrivatePoolFactory)]) node = _PrivatePoolNode;
 
         bytes32 FullNode = keccak256(abi.encodePacked(node, label));
         require(false == check(FullNode), "EC37-");

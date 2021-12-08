@@ -84,7 +84,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         else 
         {
             uint numberOfTokens = GetTokensBalance(addr);
-            (, , uint8 MinWeightPropPerc) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[6]).retrieveSettings();
+            (, , uint8 MinWeightPropPerc) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
             if(numberOfTokens > (MinWeightPropPerc * totalSupply() / 100)) isAuthorized = true;
         }
 
@@ -114,7 +114,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
     }
 
     modifier isFromTokenContract(address addr){
-        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[2]);
+        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]);
         _;
     }
 
@@ -126,11 +126,11 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
     }
 
     function totalSupply() internal view returns(uint256){
-        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[2]).totalSupply();
+        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]).totalSupply();
     }
 
     function GetTokensBalance(address add) internal view returns(uint256){
-        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[2]).balanceOf(add);
+        return IERC20Upgradeable(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Certis)]).balanceOf(add);
     }
 
     function GetVotingTokens(address addr, uint id) internal view returns(uint256){
@@ -165,7 +165,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         PropositionInProgress(false)
         isAuthorizedToPropose(msg.sender)
     {
-        (uint256 PropLifeTime, uint8 PropThresPer, ) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[6]).retrieveSettings();
+        (uint256 PropLifeTime, uint8 PropThresPer, ) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
         _Proposition.Proposer = msg.sender;
         _Proposition.DeadLine = block.timestamp + PropLifeTime;
         _Proposition.validationThreshold = totalSupply() * PropThresPer / 100;
