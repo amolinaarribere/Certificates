@@ -1,3 +1,5 @@
+let ExternalRegistries = require("./ExternalRegistries.js");
+let Admin = artifacts.require("./DeployedContracts/Admin");
 let CertificatesPoolManager = artifacts.require("./DeployedContracts/CertificatesPoolManager");
 let Provider = artifacts.require("./DeployedContracts/Provider");
 let Treasury = artifacts.require("./DeployedContracts/Treasury");
@@ -17,11 +19,17 @@ let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
 let SignatureLibrary = artifacts.require("./Libraries/SignatureLibrary");
 let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominations.sol");
 
+const AdminContractName = "Admin";
+const AdminContractVersion = "1.0";
+const CertificatesPoolManagerProxyAddress = "0x49aCE77a02b93a97c71952F23Fa768Fd92EE23B8";
+const AdminProxyAddress = "0xad105A9D84CD632EC1acd4a26Ec21A648aE8B99E";
+
 
 
 module.exports = async function(deployer, network, accounts){
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   const LibraryInstance = await Library.at("0xC06F2Ba0a4AC9555AAB0F3F06Dfb808854abdBD0");
+  await deployer.deploy(Library);
 
   const UintLibraryInstance = await UintLibrary.at("0x68b7fafD3f1d45301981cdf72999Df2BC4a0C888");
 
@@ -32,7 +40,7 @@ module.exports = async function(deployer, network, accounts){
   const SignatureLibraryInstance = await SignatureLibrary.at("0x476eB80ABC54F5166553cb871fE7B1a26f216E39");
 
   const DenominationsInstance = await Denominations.at("0x0aBfc8BF274C7787afFAf5eC3850d6e565B81F3A");
-
+/*
   // Certificate Pool Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(LibraryInstance, CertificatesPoolManager);
   console.log("Library linked to Certificate Pool Manager");
@@ -49,7 +57,28 @@ module.exports = async function(deployer, network, accounts){
   await deployer.deploy(CertificatesPoolManager);
   CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
+*/
+  // Admin -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+  console.log(deployer);
+  //console.log("old library : " + LibraryInstance.contract_name);
+  //console.log("new library : " + Library.contract_name);
 
+ /* await deployer.link(Library, Admin);
+  console.log("Library linked to Admin");
+
+  await deployer.link(AddressLibrary, Admin);
+  console.log("AddressLibrary linked to Admin");
+
+  await deployer.link(SignatureLibrary, Admin);
+  console.log("SignatureLibrary linked to Admin");
+
+  await deployer.deploy(Admin);
+  AdminInstance = await Admin.deployed();
+  console.log("Admin deployed : " + AdminInstance.address);
+
+  await AdminInstance.Admin_init_redeploy(AdminContractName, AdminContractVersion, CertificatesPoolManagerProxyAddress, AdminProxyAddress, {from: accounts[0], gas: Gas});
+  console.log("Admin initialized");*/
+/*
   // ENS -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(LibraryInstance, ENS);
   console.log("Library linked to ENS");
@@ -186,11 +215,13 @@ module.exports = async function(deployer, network, accounts){
   await deployer.deploy(ProviderFactory);
   ProviderFactoryInstance = await ProviderFactory.deployed();
   console.log("ProviderFactory deployed : " + ProviderFactoryInstance.address);
-
+*/
 
   console.log("Deployment Summary ----------------------------------------------- ");
 
-  console.log("Manager Address : " + CertificatesPoolManagerInstance.address);
+  //console.log("Admin Address : " + AdminInstance.address);
+
+ /* console.log("Manager Address : " + CertificatesPoolManagerInstance.address);
 
   console.log("Public Pool Address : " + PublicCertificatesPoolInstance.address);
 
@@ -210,7 +241,7 @@ module.exports = async function(deployer, network, accounts){
 
   console.log("Private Pool Implementation Address : " + PrivateCertificatesPoolInstance.address);
 
-  console.log("Provider Implementation Address : " + ProviderInstance.address);
+  console.log("Provider Implementation Address : " + ProviderInstance.address);*/
 
 
 }

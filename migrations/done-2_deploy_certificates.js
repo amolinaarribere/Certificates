@@ -78,18 +78,21 @@ module.exports = async function(deployer, network, accounts){
 
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.deploy(Library);
+  LibraryInstance = await Library.deployed();
   console.log("Library deployed");
 
   await deployer.link(Library, UintLibrary);
   console.log("Library linked to Uint Library");
 
   await deployer.deploy(UintLibrary);
+  UintLibraryInstance = await UintLibrary.deployed();
   console.log("UintLibrary deployed");
 
   await deployer.link(Library, AddressLibrary);
   console.log("Library linked to Address Library");
 
   await deployer.deploy(AddressLibrary);
+  AddressLibraryInstance = await AddressLibrary.deployed();
   console.log("AddressLibrary deployed");
 
   await deployer.link(Library, ItemsLibrary);
@@ -99,12 +102,15 @@ module.exports = async function(deployer, network, accounts){
   console.log("Address Library linked to Items Library");
 
   await deployer.deploy(ItemsLibrary);
+  ItemsLibraryInstance = await ItemsLibrary.deployed();
   console.log("ItemsLibrary deployed");
 
   await deployer.deploy(SignatureLibrary);
+  SignatureLibraryInstance = await SignatureLibrary.deployed();
   console.log("SignatureLibrary deployed");
 
   await deployer.deploy(Denominations);
+  DenominationsInstance = await Denominations.deployed();
   console.log("Denominations deployed");
 
   // Certificate Pool Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -644,6 +650,17 @@ module.exports = async function(deployer, network, accounts){
 
 
   console.log("Deployment Summary ----------------------------------------------- ");
+
+  console.log("Libraries ******* ");
+
+  console.log("Library Address : " + LibraryInstance.address);
+  console.log("UintLibrary Address : " + UintLibraryInstance.address);
+  console.log("AddressLibrary Address : " + AddressLibraryInstance.address);
+  console.log("ItemsLibrary Address : " + ItemsLibraryInstance.address);
+  console.log("SignatureLibrary Address : " + SignatureLibraryInstance.address);
+  console.log("Denominations Address : " + DenominationsInstance.address);
+
+  console.log("Contracts ******* ");
 
   console.log("Admin Address : " + AdminInstance.address + " // " + ManagerAdmin);
 

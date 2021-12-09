@@ -123,7 +123,8 @@
         }
       ],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -184,7 +185,8 @@
         }
       ],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_AddItemRejection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_AddItemValidation\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_RemoveItemRejection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"ItemType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"Item\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"Info\",\"type\":\"string\"}],\"name\":\"_RemoveItemValidation\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"signatures\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"minSignatures\",\"type\":\"uint256\"}],\"name\":\"CheckValidations\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"item\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"info\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"_minSignatures\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"ItemTypeLabel\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"}],\"internalType\":\"struct ItemsLibrary._manipulateItemStruct\",\"name\":\"manipulateItemstruct\",\"type\":\"tuple\"}],\"name\":\"ReturnManipulateStructContent\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Libraries/ItemsLibrary.sol\":\"ItemsLibrary\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"project:/contracts/Libraries/AddressLibrary.sol\":{\"keccak256\":\"0x9b857d01af9584bd900e3cb3d3e6806911e1f44cb4c968064ecde6aaa053d020\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://bd2582fc1b0deedf784adc17c12d18574e191fac05ff677e535f47c0ac2dc5b9\",\"dweb:/ipfs/QmRy1tEoSVhDgVNqGBVVnVrDbhq6LPo2NnSFjhEM1txyTA\"]},\"project:/contracts/Libraries/ItemsLibrary.sol\":{\"keccak256\":\"0xbd93ffc25084ebc1fa4b9245587f92193b8af1861a1ca85ae8cc632a9738a8db\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://a5c892d79557457c808db879a6cd4fc832d16253bb46c9afc0b1e2a8a0e95b73\",\"dweb:/ipfs/QmcaZ7qvmddLjM7WE7UjXbojLHPink5D7HXUEZ4EMP93J4\"]},\"project:/contracts/Libraries/Library.sol\":{\"keccak256\":\"0xd22f5b4a8b10fb295e7cf2230b3ceabce4350544b84b2b4844494eef99050a71\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://c4bd07717413a3b4fda00f98a6da095fdcbb8c3968a3e60e577e08f278d58d09\",\"dweb:/ipfs/QmZwBr2rGx5L49rVGJiE3zscxrX24AS12vcNHpovj4KsHb\"]}},\"version\":1}",
@@ -39297,9 +39299,121 @@
     "name": "solc",
     "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "4": {
+      "events": {
+        "0x54b570d1f49da5a541163492680b5d458d7394bd913058973d58c83787e7b1af": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_AddItemRejection",
+          "type": "event"
+        },
+        "0x78affcbd9eae81f6f814ad113a0530fe7251494185b89753505ab3529e8f6971": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_AddItemValidation",
+          "type": "event"
+        },
+        "0xe89687f0c26a809a947b2c0e0df6af4f18066aab08e8c6a5c67bb816c3b250ca": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_RemoveItemRejection",
+          "type": "event"
+        },
+        "0xe3ca55e2b495b3586f7b93152cce47df5bebef16d327f330c0e28f9348d9e6b3": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "ItemType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "Item",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "Info",
+              "type": "string"
+            }
+          ],
+          "name": "_RemoveItemValidation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Library": "0xaeb4caa028B3F33f91617eD8912a79ba0Cdf0Dc4",
+        "AddressLibrary": "0xD52eB2CA94033AE75E8DE12Ad44E38fb2E5F4FF8"
+      },
+      "address": "0xF313239bBB0932691746fb6a0773Edd4B5B6cb26",
+      "transactionHash": "0x2c8083a92821f0f4f0f8f78b5ac15d1de6e937576cca50b4b66ca735cf5ee4da"
+    }
+  },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-12-08T13:13:28.835Z",
+  "updatedAt": "2021-12-09T09:03:00.968Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},
