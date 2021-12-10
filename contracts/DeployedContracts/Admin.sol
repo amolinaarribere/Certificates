@@ -37,10 +37,17 @@ contract Admin is IAdmin, StdPropositionBaseContract{
     }
 
     // CONSTRUCTOR and INITIALIZATION /////////////////////////////////////////
-    constructor(string memory contractName, string memory contractVersion, address managerContract, bytes memory managerInit) 
+    function Admin_init(string memory contractName, string memory contractVersion, address managerContract, bytes memory managerInit) public initializer 
     {
         _Admin = new ProxyAdmin();
         _Manager = new TransparentUpgradeableProxy(managerContract, address(_Admin), managerInit);
+        super.StdPropositionBaseContract_init(msg.sender, address(_Manager), contractName, contractVersion);
+    }
+
+    function Admin_init_redeploy(string memory contractName, string memory contractVersion, address payable managerContractProxyAddress, address AdminProxyAddress) public initializer 
+    {
+        _Admin = ProxyAdmin(AdminProxyAddress);
+        _Manager = TransparentUpgradeableProxy(managerContractProxyAddress);
         super.StdPropositionBaseContract_init(msg.sender, address(_Manager), contractName, contractVersion);
     }
 
@@ -73,6 +80,10 @@ contract Admin is IAdmin, StdPropositionBaseContract{
     }
 
     // configuration Proxies
+    function retrieveAdminProxy() external override view returns (address) {
+        return (address(_Admin));
+    }
+
     function retrieveManagerProxy() external override view returns (address) {
         return (address(_Manager));
     }

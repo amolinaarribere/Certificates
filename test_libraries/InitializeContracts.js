@@ -351,7 +351,7 @@ const PublicCertificatesPoolProxyInitializerMethod = {
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
   let certPoolManager = await CertificatesPoolManager.new({from: chairPerson, gas: Gas});
   let CertPoolManagerProxyData = getProxyData(CertificatesPoolManagerProxyInitializerMethod, [chairPerson, CertificateManagerContractName, CertificateManagerContractVersion]);
-  let admin = await Admin.new(AdminContractName, AdminContractVersion, certPoolManager.address, CertPoolManagerProxyData, {from: chairPerson, gas: Gas});
+  let admin = await deployAndInitNewAdmin(AdminContractName, AdminContractVersion, certPoolManager.address, CertPoolManagerProxyData, chairPerson);
   let certPoolManagerProxyAddress = await admin.retrieveManagerProxy();
 
   var certPoolManagerProxy = new web3.eth.Contract(CertificatesPoolManagerAbi, certPoolManagerProxyAddress);
@@ -365,6 +365,18 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
   let proxies = await retrieveProxies(certPoolManagerProxy, user_1);
 
   return [certPoolManagerProxy, proxies, implementations, admin.address, certPoolManager.address];
+}
+
+async function deployAndInitNewAdmin(ContractName, ContractVersion, certPoolManagerAddress, CertPoolManagerProxyData, chairPerson){
+  let admin = await Admin.new();
+  await admin.Admin_init(ContractName, ContractVersion, certPoolManagerAddress, CertPoolManagerProxyData, {from: chairPerson, gas: Gas});
+  return admin;
+}
+
+async function redeployAndInitAdmin(ContractName, ContractVersion, certPoolManagerProxyAddress, adminProxyAddress, chairPerson){
+  let admin = await Admin.new();
+  await admin.Admin_init_redeploy(ContractName, ContractVersion, certPoolManagerProxyAddress, adminProxyAddress, {from: chairPerson, gas: Gas});
+  return admin;
 }
 
 async function deployImplementations(user_1){
@@ -424,3 +436,4 @@ function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPers
 exports.InitializeContracts = InitializeContracts;
 exports.deployImplementations = deployImplementations;
 exports.returnProxyInitData = returnProxyInitData;
+exports.redeployAndInitAdmin = redeployAndInitAdmin;

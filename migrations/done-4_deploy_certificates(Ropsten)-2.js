@@ -114,81 +114,17 @@ module.exports = async function(deployer, network, accounts){
   console.log("Denominations deployed");
 
   // Certificate Pool Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, CertificatesPoolManager);
-  console.log("Library linked to Certificate Pool Manager");
-
-  await deployer.link(AddressLibrary, CertificatesPoolManager);
-  console.log("AddressLibrary linked to Certificate Pool Manager");
-
-  await deployer.link(UintLibrary, CertificatesPoolManager);
-  console.log("UintLibrary linked to CertificatesPoolManager");
-
-  await deployer.link(SignatureLibrary, CertificatesPoolManager);
-  console.log("SignatureLibrary linked to Certificate Pool Manager");
-
-  await deployer.deploy(CertificatesPoolManager);
-  CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
+  let CertificatesPoolManagerInstance =  await new CertificatesPoolManager("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
 
-  var CertificatesPoolManagerProxyInitializerMethod = {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "chairPerson",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "contractName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "contractVersion",
-        "type": "string"
-      }
-    ],
-    "name": "CertificatesPoolManager_init",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  };
-
-  var CertificatesPoolManagerProxyInitializerParameters = [accounts[0], CertificateManagerContractName, CertificateManagerContractVersion];
-  var CertificatesPoolManagerProxyData = web3.eth.abi.encodeFunctionCall(CertificatesPoolManagerProxyInitializerMethod, CertificatesPoolManagerProxyInitializerParameters);
-  
-
   // Admin -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, Admin);
-  console.log("Library linked to Admin");
-
-  await deployer.link(AddressLibrary, Admin);
-  console.log("AddressLibrary linked to Admin");
-
-  await deployer.link(SignatureLibrary, Admin);
-  console.log("SignatureLibrary linked to Admin");
-
-  await deployer.deploy(Admin);
-  AdminInstance = await Admin.deployed();
+  let AdminInstance =  await new Admin("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
   console.log("Admin deployed : " + AdminInstance.address);
-
-  await AdminInstance.Admin_init(AdminContractName, AdminContractVersion, CertificatesPoolManagerInstance.address, CertificatesPoolManagerProxyData, {from: accounts[0], gas: Gas});
-  console.log("Admin initialized");
 
   var ManagerAddress = await AdminInstance.retrieveManagerProxy();
 
   // ENS -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, ENS);
-  console.log("Library linked to ENS");
-
-  await deployer.link(AddressLibrary, ENS);
-  console.log("AddressLibrary linked to ENS");
-
-  await deployer.link(SignatureLibrary, ENS);
-  console.log("SignatureLibrary linked to ENS");
-
-  await deployer.deploy(ENS);
-  ENSInstance = await ENS.deployed();
+  let ENSInstance =  await new ENS("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
   console.log("ENS deployed : " + ENSInstance.address);
 
   var ENSProxyInitializerMethod = {
@@ -240,18 +176,8 @@ module.exports = async function(deployer, network, accounts){
 
   
   // Proposition Settings -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, PropositionSettings);
-  console.log("Library linked to Proposition Settings");
-
-  await deployer.link(UintLibrary, PropositionSettings);
-  console.log("UintLibrary linked to Proposition Settings");
-
-  await deployer.link(SignatureLibrary, PropositionSettings);
-  console.log("SignatureLibrary linked to Proposition Settings");
-
-  await deployer.deploy(PropositionSettings);
-  PropositionSettingsInstance = await PropositionSettings.deployed();
-  console.log("PropositionSettings deployed : " + PropositionSettingsInstance.address);
+  let PropositionSettingsInstance =  await new PropositionSettings("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
+  console.log("Proposition Settings deployed : " + PropositionSettingsInstance.address);
 
   var PropositionSettingsProxyInitializerMethod = {
     "inputs": [
@@ -301,22 +227,9 @@ module.exports = async function(deployer, network, accounts){
   var PropositionSettingsProxyData = web3.eth.abi.encodeFunctionCall(PropositionSettingsProxyInitializerMethod, PropositionSettingsProxyInitializerParameters);
 
   // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, PriceConverter);
-  console.log("Library linked to Price Converter");
-
-  await deployer.link(AddressLibrary, PriceConverter);
-  console.log("AddressLibrary linked to Price Converter");
-
-  await deployer.link(Denominations, PriceConverter);
-  console.log("Denominations linked to Price Converter");
-
-  await deployer.link(SignatureLibrary, PriceConverter);
-  console.log("SignatureLibrary linked to Price Converter");
-
-  await deployer.deploy(PriceConverter);
-  PriceConverterInstance = await PriceConverter.deployed();
-  console.log("PriceConverter deployed : " + PriceConverterInstance.address);
-
+  let PriceConverterInstance =  await new PriceConverter("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
+  console.log("Price Converter deployed : " + PriceConverterInstance.address);
+  
   var PriceConverterProxyInitializerMethod = {
     "inputs": [
       {
@@ -354,15 +267,8 @@ module.exports = async function(deployer, network, accounts){
   var PriceConverterProxyData = web3.eth.abi.encodeFunctionCall(PriceConverterProxyInitializerMethod, PriceConverterProxyInitializerParameters);
 
   // Certis Token -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, CertisToken);
-  console.log("Library linked to CertisToken");
-
-  await deployer.link(AddressLibrary, CertisToken);
-  console.log("AddressLibrary linked to CertisToken");
-
-  await deployer.deploy(CertisToken);
-  CertisTokenInstance = await CertisToken.deployed();
-  console.log("CertisToken deployed : " + CertisTokenInstance.address);
+  let CertisTokenInstance =  await new CertisToken("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
+  console.log("Certis Token deployed : " + CertisTokenInstance.address);
 
   var CertisTokenProxyInitializerMethod = {
     "inputs": [
@@ -406,22 +312,9 @@ module.exports = async function(deployer, network, accounts){
   var CertisProxyData = web3.eth.abi.encodeFunctionCall(CertisTokenProxyInitializerMethod, CertisTokenProxyInitializerParameters);
 
   // Treasury -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(Library, Treasury);
-  console.log("Library linked to Treasury");
-
-  await deployer.link(UintLibrary, Treasury);
-  console.log("UintLibrary linked to Treasury");
-
-  await deployer.link(AddressLibrary, Treasury);
-  console.log("AddressLibrary linked to Treasury");
-
-  await deployer.link(SignatureLibrary, Treasury);
-  console.log("SignatureLibrary linked to Treasury");
-
-  await deployer.deploy(Treasury);
-  TreasuryInstance = await Treasury.deployed();
-  console.log("Treasury deployed : " + TreasuryInstance.address);
-
+  let TreasuryInstance =  await new Treasury("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
+  console.log("Certis Token deployed : " + TreasuryInstance.address);
+  
   var TreasuryProxyInitializerMethod = {
     "inputs": [
       {

@@ -60,4 +60,25 @@ contract("Testing Admin",function(accounts){
         await proposition.Check_Votes_Reassignment(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
 
+    it("Reassigning Admin",async function(){
+        // arrange
+        let Name = "Name";
+        let Version = "Version";
+        let adminProxy = await admin.methods.retrieveAdminProxy().call();
+        let managerProxy = await admin.methods.retrieveManagerProxy().call();
+
+        // act
+        let redeployedAdmin = await init.redeployAndInitAdmin(Name, Version, managerProxy, adminProxy, chairPerson);
+        let admin2 = new web3.eth.Contract(AdminAbi, redeployedAdmin.address);
+        let adminProxy_2 = await admin2.methods.retrieveAdminProxy().call();
+        let managerProxy_2 = await admin2.methods.retrieveManagerProxy().call();
+        let result = await admin2.methods.retrieveContractConfig().call();
+
+        // assert
+        expect(adminProxy_2).to.equal(adminProxy);
+        expect(managerProxy_2).to.equal(managerProxy);
+        expect(result[0]).to.equal(Name);
+        expect(result[1]).to.equal(Version);
+    });
+
 });
