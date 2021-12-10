@@ -1,4 +1,3 @@
-let ExternalRegistries = require("./ExternalRegistries.js");
 let Admin = artifacts.require("./DeployedContracts/Admin");
 let CertificatesPoolManager = artifacts.require("./DeployedContracts/CertificatesPoolManager");
 let Provider = artifacts.require("./DeployedContracts/Provider");
@@ -19,6 +18,7 @@ let ItemsLibrary = artifacts.require("./Libraries/ItemsLibrary");
 let SignatureLibrary = artifacts.require("./Libraries/SignatureLibrary");
 let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominations.sol");
 
+const Gas = 6721975;
 const AdminContractName = "Admin";
 const AdminContractVersion = "1.0";
 const CertificatesPoolManagerProxyAddress = "0x49aCE77a02b93a97c71952F23Fa768Fd92EE23B8";
@@ -28,42 +28,38 @@ const AdminProxyAddress = "0xad105A9D84CD632EC1acd4a26Ec21A648aE8B99E";
 
 module.exports = async function(deployer, network, accounts){
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  const LibraryInstance = await Library.at("0xC06F2Ba0a4AC9555AAB0F3F06Dfb808854abdBD0");
-  await deployer.deploy(Library);
+  await Library.at("0xaeb4caa028B3F33f91617eD8912a79ba0Cdf0Dc4");
 
-  const UintLibraryInstance = await UintLibrary.at("0x68b7fafD3f1d45301981cdf72999Df2BC4a0C888");
+  await UintLibrary.at("0x56352030A75DB799910143Ae8a43aF7D94624831");
 
-  const AddressLibraryInstance = await AddressLibrary.at("0xa1EE21282Bb65CD13a161490e78DcB98B73F036b");
+  await AddressLibrary.at("0xD52eB2CA94033AE75E8DE12Ad44E38fb2E5F4FF8");
 
-  const ItemsLibraryInstance = await ItemsLibrary.at("0xBE2358F428a7e48De5F10198c091448D76FCcA51");
+  await ItemsLibrary.at("0xF313239bBB0932691746fb6a0773Edd4B5B6cb26");
 
-  const SignatureLibraryInstance = await SignatureLibrary.at("0x476eB80ABC54F5166553cb871fE7B1a26f216E39");
+  await SignatureLibrary.at("0x644b1cF22110a58f7cB2A8b5dB9B2A21C09666e7");
 
-  const DenominationsInstance = await Denominations.at("0x0aBfc8BF274C7787afFAf5eC3850d6e565B81F3A");
-/*
+  await Denominations.at("0xdDFd0614750cacA9A8dd81027c1cC471B6C71059");
+
   // Certificate Pool Manager -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, CertificatesPoolManager);
+  await deployer.link(Library, CertificatesPoolManager);
   console.log("Library linked to Certificate Pool Manager");
 
-  await deployer.link(AddressLibraryInstance, CertificatesPoolManager);
+  await deployer.link(AddressLibrary, CertificatesPoolManager);
   console.log("AddressLibrary linked to Certificate Pool Manager");
 
-  await deployer.link(UintLibraryInstance, CertificatesPoolManager);
+  await deployer.link(UintLibrary, CertificatesPoolManager);
   console.log("UintLibrary linked to CertificatesPoolManager");
 
-  await deployer.link(SignatureLibraryInstance, CertificatesPoolManager);
+  await deployer.link(SignatureLibrary, CertificatesPoolManager);
   console.log("SignatureLibrary linked to Certificate Pool Manager");
 
   await deployer.deploy(CertificatesPoolManager);
   CertificatesPoolManagerInstance = await CertificatesPoolManager.deployed();
   console.log("certPoolManager deployed : " + CertificatesPoolManagerInstance.address);
-*/
-  // Admin -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  console.log(deployer);
-  //console.log("old library : " + LibraryInstance.contract_name);
-  //console.log("new library : " + Library.contract_name);
 
- /* await deployer.link(Library, Admin);
+  // Admin -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  await deployer.link(Library, Admin);
   console.log("Library linked to Admin");
 
   await deployer.link(AddressLibrary, Admin);
@@ -77,16 +73,16 @@ module.exports = async function(deployer, network, accounts){
   console.log("Admin deployed : " + AdminInstance.address);
 
   await AdminInstance.Admin_init_redeploy(AdminContractName, AdminContractVersion, CertificatesPoolManagerProxyAddress, AdminProxyAddress, {from: accounts[0], gas: Gas});
-  console.log("Admin initialized");*/
-/*
+  console.log("Admin initialized");
+
   // ENS -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, ENS);
+  await deployer.link(Library, ENS);
   console.log("Library linked to ENS");
 
-  await deployer.link(AddressLibraryInstance, ENS);
+  await deployer.link(AddressLibrary, ENS);
   console.log("AddressLibrary linked to ENS");
 
-  await deployer.link(SignatureLibraryInstance, ENS);
+  await deployer.link(SignatureLibrary, ENS);
   console.log("SignatureLibrary linked to ENS");
 
   await deployer.deploy(ENS);
@@ -94,13 +90,13 @@ module.exports = async function(deployer, network, accounts){
   console.log("ENS deployed : " + ENSInstance.address);
 
   // Proposition Settings -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, PropositionSettings);
+  await deployer.link(Library, PropositionSettings);
   console.log("Library linked to Proposition Settings");
 
-  await deployer.link(UintLibraryInstance, PropositionSettings);
+  await deployer.link(UintLibrary, PropositionSettings);
   console.log("UintLibrary linked to Proposition Settings");
 
-  await deployer.link(SignatureLibraryInstance, PropositionSettings);
+  await deployer.link(SignatureLibrary, PropositionSettings);
   console.log("SignatureLibrary linked to Proposition Settings");
 
   await deployer.deploy(PropositionSettings);
@@ -108,16 +104,16 @@ module.exports = async function(deployer, network, accounts){
   console.log("PropositionSettings deployed : " + PropositionSettingsInstance.address);
 
   // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, PriceConverter);
+  await deployer.link(Library, PriceConverter);
   console.log("Library linked to Price Converter");
 
-  await deployer.link(AddressLibraryInstance, PriceConverter);
+  await deployer.link(AddressLibrary, PriceConverter);
   console.log("AddressLibrary linked to Price Converter");
 
-  await deployer.link(DenominationsInstance, PriceConverter);
+  await deployer.link(Denominations, PriceConverter);
   console.log("Denominations linked to Price Converter");
 
-  await deployer.link(SignatureLibraryInstance, PriceConverter);
+  await deployer.link(SignatureLibrary, PriceConverter);
   console.log("SignatureLibrary linked to Price Converter");
 
   await deployer.deploy(PriceConverter);
@@ -125,10 +121,10 @@ module.exports = async function(deployer, network, accounts){
   console.log("PriceConverter deployed : " + PriceConverterInstance.address);
 
   // Certis Token -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, CertisToken);
+  await deployer.link(Library, CertisToken);
   console.log("Library linked to CertisToken");
 
-  await deployer.link(AddressLibraryInstance, CertisToken);
+  await deployer.link(AddressLibrary, CertisToken);
   console.log("AddressLibrary linked to CertisToken");
 
   await deployer.deploy(CertisToken);
@@ -136,16 +132,16 @@ module.exports = async function(deployer, network, accounts){
   console.log("CertisToken deployed : " + CertisTokenInstance.address);
 
   // Treasury -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, Treasury);
+  await deployer.link(Library, Treasury);
   console.log("Library linked to Treasury");
 
-  await deployer.link(UintLibraryInstance, Treasury);
+  await deployer.link(UintLibrary, Treasury);
   console.log("UintLibrary linked to Treasury");
 
-  await deployer.link(AddressLibraryInstance, Treasury);
+  await deployer.link(AddressLibrary, Treasury);
   console.log("AddressLibrary linked to Treasury");
 
-  await deployer.link(SignatureLibraryInstance, Treasury);
+  await deployer.link(SignatureLibrary, Treasury);
   console.log("SignatureLibrary linked to Treasury");
 
   await deployer.deploy(Treasury);
@@ -153,16 +149,16 @@ module.exports = async function(deployer, network, accounts){
   console.log("Treasury deployed : " + TreasuryInstance.address);
 
   // Private Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, PrivateCertificatesPool);
+  await deployer.link(Library, PrivateCertificatesPool);
   console.log("Library linked to PrivateCertificatesPool");
 
-  await deployer.link(AddressLibraryInstance, PrivateCertificatesPool);
+  await deployer.link(AddressLibrary, PrivateCertificatesPool);
   console.log("Address Library linked to PrivateCertificatesPool");
 
-  await deployer.link(ItemsLibraryInstance, PrivateCertificatesPool);
+  await deployer.link(ItemsLibrary, PrivateCertificatesPool);
   console.log("Items Library linked to PrivateCertificatesPool");
 
-  await deployer.link(SignatureLibraryInstance, PrivateCertificatesPool);
+  await deployer.link(SignatureLibrary, PrivateCertificatesPool);
   console.log("SignatureLibrary linked to PrivateCertificatesPool");
 
   await deployer.deploy(PrivateCertificatesPool);
@@ -170,7 +166,7 @@ module.exports = async function(deployer, network, accounts){
   console.log("PrivateCertificatesPool deployed : " + PrivateCertificatesPoolInstance.address);
 
   // Private Pool Factory -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, PrivatePoolFactory);
+  await deployer.link(Library, PrivatePoolFactory);
   console.log("Library linked to PrivatePoolFactory");
 
   await deployer.deploy(PrivatePoolFactory);
@@ -178,16 +174,16 @@ module.exports = async function(deployer, network, accounts){
   console.log("PrivatePoolFactory deployed : " + PrivatePoolFactoryInstance.address);
   
   // Public Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, PublicCertificatesPool);
+  await deployer.link(Library, PublicCertificatesPool);
   console.log("Library linked to PublicCertificatesPool");
 
-  await deployer.link(AddressLibraryInstance, PublicCertificatesPool);
+  await deployer.link(AddressLibrary, PublicCertificatesPool);
   console.log("Address Library linked to PublicCertificatesPool");
 
-  await deployer.link(ItemsLibraryInstance, PublicCertificatesPool);
+  await deployer.link(ItemsLibrary, PublicCertificatesPool);
   console.log("Items Library linked to PublicCertificatesPool");
 
-  await deployer.link(SignatureLibraryInstance, PublicCertificatesPool);
+  await deployer.link(SignatureLibrary, PublicCertificatesPool);
   console.log("SignatureLibrary linked to PublicCertificatesPool");
 
   await deployer.deploy(PublicCertificatesPool);
@@ -195,13 +191,13 @@ module.exports = async function(deployer, network, accounts){
   console.log("PublicCertificatesPool deployed : " + PublicCertificatesPoolInstance.address);
 
   // Provider -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, Provider);
+  await deployer.link(Library, Provider);
   console.log("Library linked to Provider");
 
-  await deployer.link(AddressLibraryInstance, Provider);
+  await deployer.link(AddressLibrary, Provider);
   console.log("Address Library linked to Provider");
 
-  await deployer.link(ItemsLibraryInstance, Provider);
+  await deployer.link(ItemsLibrary, Provider);
   console.log("Items Library linked to Provider");
 
   await deployer.deploy(Provider);
@@ -209,19 +205,19 @@ module.exports = async function(deployer, network, accounts){
   console.log("Provider deployed : " + ProviderInstance.address);
 
   // Provider Factory -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  await deployer.link(LibraryInstance, ProviderFactory);
+  await deployer.link(Library, ProviderFactory);
   console.log("Library linked to ProviderFactory");
 
   await deployer.deploy(ProviderFactory);
   ProviderFactoryInstance = await ProviderFactory.deployed();
   console.log("ProviderFactory deployed : " + ProviderFactoryInstance.address);
-*/
+
 
   console.log("Deployment Summary ----------------------------------------------- ");
 
-  //console.log("Admin Address : " + AdminInstance.address);
+  console.log("Admin Address : " + AdminInstance.address);
 
- /* console.log("Manager Address : " + CertificatesPoolManagerInstance.address);
+  console.log("Manager Address : " + CertificatesPoolManagerInstance.address);
 
   console.log("Public Pool Address : " + PublicCertificatesPoolInstance.address);
 
@@ -241,7 +237,7 @@ module.exports = async function(deployer, network, accounts){
 
   console.log("Private Pool Implementation Address : " + PrivateCertificatesPoolInstance.address);
 
-  console.log("Provider Implementation Address : " + ProviderInstance.address);*/
+  console.log("Provider Implementation Address : " + ProviderInstance.address);
 
 
 }
