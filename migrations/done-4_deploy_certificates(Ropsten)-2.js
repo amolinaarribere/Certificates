@@ -78,6 +78,7 @@ module.exports = async function(deployer, network, accounts){
 
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.deploy(Library);
+  LibraryInstance = await Library.deployed();
   console.log("Library deployed");
 
   await deployer.link(Library, UintLibrary);
@@ -118,7 +119,7 @@ module.exports = async function(deployer, network, accounts){
 
   // Admin -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   let AdminInstance =  await new Admin("0x7F0e846092941D58Ea4B6DeC4502c6f2D7A366c3");
-  console.log("Admin deployed : " + ENSInstance.address);
+  console.log("Admin deployed : " + AdminInstance.address);
 
   var ManagerAddress = await AdminInstance.retrieveManagerProxy();
 
