@@ -47,9 +47,4 @@ library UintLibrary{
         return uint256(element);
     }
 
-    function Bytes32ToUint8(bytes32 element) public pure returns(uint8)
-    {
-        return uint8(uint256(element));
-    }
-
 }

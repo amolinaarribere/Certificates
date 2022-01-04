@@ -11,6 +11,6 @@ pragma solidity 0.8.7;
 
  interface IPropositionSettings  {
 
-    function retrieveSettings() external view returns(uint256, uint8, uint8);
+    function retrieveSettings() external view returns(uint256, uint256, uint256);
 
 }

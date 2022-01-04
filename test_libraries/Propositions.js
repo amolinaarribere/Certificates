@@ -138,9 +138,10 @@ async function checkAdmin(contractAddress, addressBytes, user_1){
 
 async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
+    let tooMuch = TotalTokenSupply + 1;
     // act
     try{
-        await contractAddress.methods.sendProposition([NewValues[0], aux.IntToBytes32(101), NewValues[2]]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([NewValues[0], aux.IntToBytes32(tooMuch), NewValues[2]]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -149,7 +150,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // act
     try{
-        await contractAddress.methods.sendProposition([NewValues[0], NewValues[1], aux.IntToBytes32(101)]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([NewValues[0], NewValues[1], aux.IntToBytes32(tooMuch)]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert

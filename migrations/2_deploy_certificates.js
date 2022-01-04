@@ -33,8 +33,8 @@ let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominatio
 
 const Gas = 6721975;
 const PropositionLifeTime = 604800;
-const PropositionThresholdPercentage = 50;
-const minWeightToProposePercentage = 5;
+const PropositionThreshold = 50000000;
+const minToPropose = 5000000;
 const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
@@ -271,14 +271,14 @@ module.exports = async function(deployer, network, accounts){
         "type": "uint256"
       },
       {
-        "internalType": "uint8",
-        "name": "PropositionThresholdPercentage",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "PropositionThreshold",
+        "type": "uint256"
       },
       {
-        "internalType": "uint8",
-        "name": "minWeightToProposePercentage",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "minToPropose",
+        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -297,7 +297,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var PropositionSettingsProxyInitializerParameters = [ManagerAddress, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, PropositionSettingsContractName, PropositionSettingsContractVersion];
+  var PropositionSettingsProxyInitializerParameters = [ManagerAddress, accounts[0], PropositionLifeTime, PropositionThreshold, minToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion];
   var PropositionSettingsProxyData = web3.eth.abi.encodeFunctionCall(PropositionSettingsProxyInitializerMethod, PropositionSettingsProxyInitializerParameters);
 
   // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -13,8 +13,8 @@ const aux = require("../test_libraries/auxiliaries.js");
 
 
 const PropositionLifeTime = constants.PropositionLifeTime;
-const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
-const minPercentageToPropose = constants.minPercentageToPropose;
+const PropositionThreshold = constants.PropositionThreshold;
+const minToPropose = constants.minToPropose;
 
 
 // TEST -------------------------------------------------------------------------------------------------------------------------------------------
@@ -32,8 +32,8 @@ contract("Testing Proposition Settings",function(accounts){
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
     var PropositionValues = [aux.IntToBytes32(PropositionLifeTime), 
-        aux.IntToBytes32(PropositionThresholdPercentage), 
-        aux.IntToBytes32(minPercentageToPropose)];
+        aux.IntToBytes32(PropositionThreshold), 
+        aux.IntToBytes32(minToPropose)];
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);

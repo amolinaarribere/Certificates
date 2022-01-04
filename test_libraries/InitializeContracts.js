@@ -34,8 +34,8 @@ const initNodes = constants.initNodes; // mock
 var ENSRegistryAddress; // mock
 var ENSReverseRegistryAddress; // mock
 const PropositionLifeTime = constants.PropositionLifeTime;
-const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
-const minPercentageToPropose = constants.minPercentageToPropose;
+const PropositionThreshold = constants.PropositionThreshold;
+const minToPropose = constants.minToPropose;
 const TotalTokenSupply = constants.TotalTokenSupply;
 const Gas = constants.Gas;
 const PublicPoolContractName = constants.PublicPoolContractName;
@@ -139,14 +139,14 @@ const PropositionSettingsProxyInitializerMethod = {
       "type": "uint256"
     },
     {
-      "internalType": "uint8",
-      "name": "PropositionThresholdPercentage",
-      "type": "uint8"
+      "internalType": "uint256",
+      "name": "PropositionThreshold",
+      "type": "uint256"
     },
     {
-      "internalType": "uint8",
-      "name": "minWeightToProposePercentage",
-      "type": "uint8"
+      "internalType": "uint256",
+      "name": "minToPropose",
+      "type": "uint256"
     },
     {
       "internalType": "string",
@@ -427,7 +427,7 @@ function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPers
   let PrivatePoolFactoryProxyData = getProxyData(PrivatePoolFactoryProxyInitializerMethod, [certPoolManager]);
   let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
   let PriceConverterProxyData = getProxyData(PriceConverterProxyInitializerMethod, [mockChainLinkFeedRegistry, certPoolManager, chairPerson, PriceConverterContractName, PriceConverterContractVersion]);
-  let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion]);
+  let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [certPoolManager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion]);
   let ENSProxyData = getProxyData(ENSProxyInitializerMethod, [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, certPoolManager, chairPerson, ENSContractName, ENSContractVersion]);
 
   return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData, PriceConverterProxyData, PropositionSettingsProxyData, ENSProxyData];

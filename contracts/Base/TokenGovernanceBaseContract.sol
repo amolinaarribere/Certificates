@@ -84,8 +84,8 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         else 
         {
             uint numberOfTokens = GetTokensBalance(addr);
-            (, , uint8 MinWeightPropPerc) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
-            if(numberOfTokens > (MinWeightPropPerc * totalSupply() / 100)) isAuthorized = true;
+            (, , uint256 MinProp) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
+            if(numberOfTokens > MinProp) isAuthorized = true;
         }
 
         require(true == isAuthorized, "EC22-");
@@ -165,10 +165,10 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         PropositionInProgress(false)
         isAuthorizedToPropose(msg.sender)
     {
-        (uint256 PropLifeTime, uint8 PropThresPer, ) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
+        (uint256 PropLifeTime, uint256 PropThres, ) = IPropositionSettings(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PropSettings)]).retrieveSettings();
         _Proposition.Proposer = msg.sender;
         _Proposition.DeadLine = block.timestamp + PropLifeTime;
-        _Proposition.validationThreshold = totalSupply() * PropThresPer / 100;
+        _Proposition.validationThreshold = PropThres;
         _Proposition.PropID = _nextPropID;
         _nextPropID++;
 
