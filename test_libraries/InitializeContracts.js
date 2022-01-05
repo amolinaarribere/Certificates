@@ -13,11 +13,12 @@ const ProviderFactory = artifacts.require("ProviderFactory");
 
 const CertificatesPoolManagerAbi = CertificatesPoolManager.abi;
 
-
 const MockChainLinkFeedRegistry = artifacts.require("MockChainLinkFeedRegistry"); // Mock
 const MockENSRegistry = artifacts.require("MockENSRegistry"); // Mock
 const MockENSResolver = artifacts.require("MockENSResolver"); // Mock
 const MockENSReverseRegistry = artifacts.require("MockENSReverseRegistry"); // Mock
+
+const MockENSRegistryAbi = MockENSRegistry.abi;
 
 
 const constants = require("../test_libraries/constants.js");
@@ -28,11 +29,14 @@ const PrivatePriceUSD = constants.PrivatePriceUSD;
 const ProviderPriceUSD = constants.ProviderPriceUSD;
 const CertificatePriceUSD = constants.CertificatePriceUSD;
 const OwnerRefundPriceUSD = constants.OwnerRefundPriceUSD;
-const rate = constants.rate; // mock
-const decimals = constants.decimals; // mock
-const initNodes = constants.initNodes; // mock
-var ENSRegistryAddress; // mock
-var ENSReverseRegistryAddress; // mock
+// Mock -----------
+const rate = constants.rate;
+const decimals = constants.decimals;
+const initNodes = constants.initNodes;
+var ENSRegistryAddress;
+var ENSReverseRegistryAddress;
+var ENSResolverAddress;
+// Mock -----------
 const PropositionLifeTime = constants.PropositionLifeTime;
 const PropositionThreshold = constants.PropositionThreshold;
 const minToPropose = constants.minToPropose;
@@ -364,6 +368,11 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
 
   let proxies = await retrieveProxies(certPoolManagerProxy, user_1);
 
+  let mockENSRegistryContract = new web3.eth.Contract(MockENSRegistryAbi, ENSRegistryAddress);
+  await mockENSRegistryContract.methods.initialize(initNodes, ENSResolverAddress, proxies[7]).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('reverse'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner("0xa097f6721ce401e757d1223a763fef49b8b5f90bb18567ddb86fd205dff71d34", web3.utils.sha3('addr'), ENSReverseRegistryAddress).send({from: user_1, gas: Gas});
+
   return [certPoolManagerProxy, proxies, implementations, admin.address, certPoolManager.address];
 }
 
@@ -391,12 +400,15 @@ async function deployImplementations(user_1){
     let propositionSettings = await PropositionSettings.new({from: user_1});
     let ens = await ENS.new({from: user_1});
 
-    let mockChainLinkFeedRegistry = await MockChainLinkFeedRegistry.new(rate, decimals, {from: user_1}); // Mock
-    let mockENSResolver = await MockENSResolver.new({from: user_1}); // Mock
-    let mockENSRegistry = await MockENSRegistry.new(initNodes, mockENSResolver.address, {from: user_1}); // Mock
+    // Mock ---------------
+    let mockChainLinkFeedRegistry = await MockChainLinkFeedRegistry.new(rate, decimals, {from: user_1});
+    let mockENSRegistry = await MockENSRegistry.new({from: user_1});
     ENSRegistryAddress = mockENSRegistry.address;
-    let mockENSReverseRegistry = await MockENSReverseRegistry.new({from: user_1}); // Mock
+    let mockENSResolver = await MockENSResolver.new(ENSRegistryAddress, {from: user_1});
+    ENSResolverAddress = mockENSResolver.address;
+    let mockENSReverseRegistry = await MockENSReverseRegistry.new(ENSRegistryAddress, mockENSResolver.address, {from: user_1});
     ENSReverseRegistryAddress = mockENSReverseRegistry.address;
+    // Mock ---------------
 
     return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address, ens.address, mockENSRegistry.address, mockENSReverseRegistry.address];
 }

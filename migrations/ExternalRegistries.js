@@ -25,7 +25,7 @@ async function GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry,
   
 }
 
-async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry, initNodes){
+async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry, initNodes, web3, account){
     var ENSRegistryAddress = MainENSRegistryAddress;
     var ENSReverseRegistryAddress = MainENSReverseRegistryAddress;
 
@@ -34,18 +34,21 @@ async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolv
        "rinkeby" != network &&
        "goerli" != network)
     {
-        await deployer.deploy(MockENSResolver);
-        let MockENSResolverInstance = await MockENSResolver.deployed();
-        console.log("MockENSResolverInstance deployed : " + MockENSResolverInstance.address);
-
-        await deployer.deploy(MockENSRegistry, initNodes, MockENSResolverInstance.address);
+        await deployer.deploy(MockENSRegistry);
         let MockENSRegistryInstance = await MockENSRegistry.deployed();
         console.log("MockENSRegistryInstance deployed : " + MockENSRegistryInstance.address);
 
-        await deployer.deploy(MockReverseRegistry);
+        await deployer.deploy(MockENSResolver, MockENSRegistryInstance.address);
+        let MockENSResolverInstance = await MockENSResolver.deployed();
+        console.log("MockENSResolverInstance deployed : " + MockENSResolverInstance.address);
+
+        var MockENSRegistryContract = new web3.eth.Contract(MockENSRegistry.abi, MockENSRegistryInstance.address);
+        await MockENSRegistryContract.methods.initialize(initNodes, MockENSResolverInstance.address, account);
+        console.log("MockENSRegistryInstance initialized");
+
+        await deployer.deploy(MockReverseRegistry, MockENSRegistryInstance.address, MockENSResolverInstance.address);
         let MockReverseRegistryInstance = await MockReverseRegistry.deployed();
         console.log("MockReverseRegistryInstance deployed : " + MockReverseRegistryInstance.address);
-
 
         ENSRegistryAddress = MockENSRegistryInstance.address
         ENSReverseRegistryAddress = MockReverseRegistryInstance.address

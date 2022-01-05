@@ -47,5 +47,4 @@ contract("Testing Provider Factory",function(accounts){
         await factory_common.retrieveWrong(providerFactoryProxy, user_1);
     });
 
-    
 });

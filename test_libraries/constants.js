@@ -3,9 +3,11 @@ const PrivatePriceUSD = 2000;
 const ProviderPriceUSD = 2500;
 const CertificatePriceUSD = 500;
 const OwnerRefundPriceUSD = 200;
-const rate = 1000000000000; // Mock
-const decimals = 0; // Mock
-const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"] // Mock
+// Mock ------------------
+const rate = 1000000000000;
+const decimals = 0;
+const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"]
+// Mock ------------------
 const TotalTokenSupply = 1000;
 const PropositionLifeTime = 604800;
 const PropositionThreshold = 500;
@@ -33,9 +35,11 @@ exports.PrivatePriceUSD = PrivatePriceUSD;
 exports.ProviderPriceUSD = ProviderPriceUSD;
 exports.CertificatePriceUSD = CertificatePriceUSD;
 exports.OwnerRefundPriceUSD = OwnerRefundPriceUSD;
-exports.rate = rate; // Mock
-exports.decimals = decimals; // Mock
-exports.initNodes = initNodes; // Mock
+// Mock ------------------
+exports.rate = rate;
+exports.decimals = decimals;
+exports.initNodes = initNodes;
+// Mock ------------------
 exports.TotalTokenSupply = TotalTokenSupply;
 exports.PropositionLifeTime = PropositionLifeTime;
 exports.PropositionThreshold = PropositionThreshold;

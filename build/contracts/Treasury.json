@@ -6696,7 +6696,7 @@
                 }
               ]
             },
-            "name": "abi_decode_tuple_t_enum$_Prices_$12905",
+            "name": "abi_decode_tuple_t_enum$_Prices_$12941",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -19699,7 +19699,7 @@
           }
         ]
       },
-      "contents": "{\n    { }\n    function abi_decode_bytes(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        if gt(_1, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        let array_1 := allocate_memory(add(and(add(_1, 0x1f), not(31)), 0x20))\n        mstore(array_1, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(array_1, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(array_1, _1), 0x20), 0)\n        array := array_1\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_addresst_addresst_string_memory_ptrt_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        let offset := calldataload(add(headStart, 64))\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        value2 := abi_decode_bytes(add(headStart, offset), dataEnd)\n        let offset_1 := calldataload(add(headStart, 96))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value3 := abi_decode_bytes(add(headStart, offset_1), dataEnd)\n    }\n    function abi_decode_tuple_t_addresst_addresst_uint256(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        value2 := calldataload(add(headStart, 64))\n    }\n    function abi_decode_tuple_t_addresst_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_addresst_uint256t_boolt_uint256t_uint256t_bytes_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3, value4, value5\n    {\n        if slt(sub(dataEnd, headStart), 192) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n        let value_1 := calldataload(add(headStart, 64))\n        validator_revert_bool(value_1)\n        value2 := value_1\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n        let offset := calldataload(add(headStart, 160))\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        value5 := abi_decode_bytes(add(headStart, offset), dataEnd)\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptr_fromMemory(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := mload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := mload(_2)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _1)\n        let src := add(_2, _1)\n        if gt(add(add(_2, shl(5, _3)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := mload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_array$_t_bytes32_$dyn_memory_ptr_fromMemory(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := mload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := mload(_2)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _1)\n        let src := add(_2, _1)\n        if gt(add(add(_2, shl(5, _3)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            mstore(dst, mload(src))\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _2 := sub(shl(64, 1), 1)\n        if gt(offset, _2) { revert(0, 0) }\n        let _3 := add(headStart, offset)\n        if iszero(slt(add(_3, 0x1f), dataEnd)) { revert(0, 0) }\n        let _4 := calldataload(_3)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_4))\n        let dst_1 := dst\n        mstore(dst, _4)\n        dst := add(dst, _1)\n        let src := add(_3, _1)\n        if gt(add(add(_3, shl(5, _4)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        let i_1 := i\n        for { } lt(i_1, _4) { i_1 := add(i_1, 1) }\n        {\n            let innerOffset := calldataload(src)\n            if gt(innerOffset, _2) { revert(i, i) }\n            mstore(dst, abi_decode_bytes(add(add(_3, innerOffset), _1), dataEnd))\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_bool(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_bool(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_bool(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_enum$_Prices_$12905(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        if iszero(lt(value, 4)) { revert(0, 0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_uint256(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := calldataload(headStart)\n    }\n    function abi_decode_tuple_t_uint256_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := mload(headStart)\n    }\n    function abi_decode_tuple_t_uint256t_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        value0 := calldataload(headStart)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n    }\n    function abi_decode_tuple_t_uint256t_uint256t_uint256_fromMemory(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(0, 0) }\n        value0 := mload(headStart)\n        value1 := mload(add(headStart, 32))\n        value2 := mload(add(headStart, 64))\n    }\n    function abi_decode_tuple_t_uint256t_uint256t_uint256t_uint256t_uint256t_addresst_addresst_string_memory_ptrt_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3, value4, value5, value6, value7, value8\n    {\n        if slt(sub(dataEnd, headStart), 288) { revert(0, 0) }\n        value0 := calldataload(headStart)\n        value1 := calldataload(add(headStart, 32))\n        value2 := calldataload(add(headStart, 64))\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n        let value := calldataload(add(headStart, 160))\n        validator_revert_address(value)\n        value5 := value\n        let value_1 := calldataload(add(headStart, 192))\n        validator_revert_address(value_1)\n        value6 := value_1\n        let offset := calldataload(add(headStart, 224))\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        value7 := abi_decode_bytes(add(headStart, offset), dataEnd)\n        let offset_1 := calldataload(add(headStart, 256))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value8 := abi_decode_bytes(add(headStart, offset_1), dataEnd)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        copy_memory_to_memory(add(value, 0x20), add(pos, 0x20), length)\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_bytes_storage(value, pos) -> ret\n    {\n        let slotValue := sload(value)\n        let length := 0\n        let _1 := 1\n        length := shr(_1, slotValue)\n        let outOfPlaceEncoding := and(slotValue, _1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        let _2 := 32\n        if eq(outOfPlaceEncoding, lt(length, _2))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n        mstore(pos, length)\n        switch outOfPlaceEncoding\n        case 0 {\n            mstore(add(pos, _2), and(slotValue, not(255)))\n            ret := add(pos, 64)\n        }\n        case 1 {\n            mstore(0, value)\n            let dataPos := keccak256(0, _2)\n            let i := 0\n            for { } lt(i, length) { i := add(i, _2) }\n            {\n                mstore(add(add(pos, i), _2), sload(dataPos))\n                dataPos := add(dataPos, _1)\n            }\n            ret := add(add(pos, i), _2)\n        }\n    }\n    function abi_encode_tuple_packed_t_stringliteral_7c7065b4b528eb6c3048e6713d52c889ba39c5566ba8c73922d3ebca1c5ab8d3_t_bytes_memory_ptr__to_t_string_memory_ptr_t_bytes_memory_ptr__nonPadded_inplace_fromStack_reversed(pos, value0) -> end\n    {\n        mstore(pos, \"Error transfering funds to addre\")\n        mstore(add(pos, 32), \"ss : \")\n        let length := mload(value0)\n        copy_memory_to_memory(add(value0, 32), add(pos, 37), length)\n        end := add(add(pos, length), 37)\n    }\n    function abi_encode_tuple_packed_t_stringliteral_c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470__to_t_bytes_memory_ptr__nonPadded_inplace_fromStack_reversed(pos) -> end\n    { end := pos }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_address_t_address_t_uint256__to_t_address_t_address_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_address_t_uint256_t_bool_t_uint256_t_uint256_t_bytes_memory_ptr_t_string_storage_t_string_storage__to_t_address_t_uint256_t_bool_t_uint256_t_uint256_t_bytes_memory_ptr_t_string_memory_ptr_t_string_memory_ptr__fromStack_library_reversed(headStart, value7, value6, value5, value4, value3, value2, value1, value0) -> tail\n    {\n        let _1 := 256\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), iszero(iszero(value2)))\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n        mstore(add(headStart, 160), _1)\n        let tail_1 := abi_encode_bytes(value5, add(headStart, _1))\n        mstore(add(headStart, 192), sub(tail_1, headStart))\n        let tail_2 := abi_encode_bytes_storage(value6, tail_1)\n        mstore(add(headStart, 224), sub(tail_2, headStart))\n        tail := abi_encode_bytes_storage(value7, tail_2)\n    }\n    function abi_encode_tuple_t_address_t_uint256_t_uint256_t_uint256_t_uint256__to_t_address_t_uint256_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n    }\n    function abi_encode_tuple_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr__to_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        let _1 := 32\n        let tail_1 := add(headStart, _1)\n        mstore(headStart, _1)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 64)\n        let tail_2 := add(add(headStart, shl(5, length)), 64)\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, add(sub(tail_2, headStart), not(63)))\n            tail_2 := abi_encode_bytes(mload(srcPtr), tail_2)\n            srcPtr := add(srcPtr, _1)\n            pos := add(pos, _1)\n        }\n        tail := tail_2\n    }\n    function abi_encode_tuple_t_array$_t_uint256_$dyn_memory_ptr__to_t_array$_t_uint256_$dyn_memory_ptr__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        let _1 := 32\n        let tail_1 := add(headStart, _1)\n        mstore(headStart, _1)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 64)\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, mload(srcPtr))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        tail := pos\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_bytes32__to_t_bytes32__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_bytes_memory_ptr__to_t_bytes_memory_ptr__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_bytes_storage__to_t_bytes_memory_ptr__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes_storage(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_string_memory_ptr_t_string_memory_ptr__to_t_string_memory_ptr_t_string_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, 64)\n        let tail_1 := abi_encode_bytes(value0, add(headStart, 64))\n        mstore(add(headStart, 32), sub(tail_1, headStart))\n        tail := abi_encode_bytes(value1, tail_1)\n    }\n    function abi_encode_tuple_t_stringliteral_07d373d1f93962af81bccfc5ed107a1e45133d11f0c004abed3d6c51b56ed80f__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC20-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_0ded0ceccb1b53065ee6adbf4620c06966a04eb064f132e0cf898341c4738c12__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC34-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_1cfe397872c100eed5903c94b8106ab893d14a60665402a5ebcbf404be675867__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC21-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_252091e1e1f3ccdeb76fd919e3227b886856ffa097a76080a223737c1fd67464__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 4)\n        mstore(add(headStart, 64), \"EC2-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_410a549f8e9f8131464da58faf039c8c3509f4c660c53eb7a67af768c3f3d5d4__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC24-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_561bdd287b683c893d455c81480689e9a15853e061cfa97a9ab314a8b869cd4a__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC23-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_8e93196cff3b71f5e1263c1a8a03f96ef59eadae0736aae9384ea3cdd54ccfc0__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC25-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_add388fe0fc35af7ea971a6e4c44054c524b4720e670029029c4b909f1aac479__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC32-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_ae21427077aa50ae94a35e2fd393c5097e202b09debb159fea75399e6b01d7b4__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC33-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_b3e6dafa6b6bccb479446d8c6f802ff31ea1fb3690d1d840f74ab434d94b5c75__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC35-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_b57a5d0c8b8d8f80c5c3881b8fab5bd07bafaab7b89b53db38c5a0d31c454122__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 34)\n        mstore(add(headStart, 64), \"Not enough balance for this fact\")\n        mstore(add(headStart, 96), \"or\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_c3d730d60a1aef178eb38844a3c8768d44ea3b8f3b93ff7c042444410cce78a2__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC22-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_array$_t_uint256_$dyn_storage__to_t_uint256_t_array$_t_uint256_$dyn_memory_ptr__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        let tail_1 := add(headStart, 64)\n        mstore(headStart, value0)\n        let _1 := 32\n        mstore(add(headStart, _1), 64)\n        let pos := tail_1\n        let length := sload(value1)\n        mstore(tail_1, length)\n        pos := add(headStart, 96)\n        mstore(0, value1)\n        let srcPtr := keccak256(0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, sload(srcPtr))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, 1)\n        }\n        tail := pos\n    }\n    function abi_encode_tuple_t_uint256_t_array$_t_uint256_$dyn_storage__to_t_uint256_t_uint256__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_uint256_t_bool_t_uint256__to_t_uint256_t_bool_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), iszero(iszero(value1)))\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256__to_t_uint256_t_uint256__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256_t_uint256__to_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256_t_uint256_t_uint256_t_uint256__to_t_uint256_t_uint256_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n    }\n    function allocate_memory(size) -> memPtr\n    {\n        memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(size, 31), not(31)))\n        if or(gt(newFreePtr, sub(shl(64, 1), 1)), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n    }\n    function array_allocation_size_array_address_dyn(length) -> size\n    {\n        if gt(length, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        size := add(shl(5, length), 0x20)\n    }\n    function checked_add_t_uint256(x, y) -> sum\n    {\n        if gt(x, not(y)) { panic_error_0x11() }\n        sum := add(x, y)\n    }\n    function checked_div_t_uint256(x, y) -> r\n    {\n        if iszero(y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x12)\n            revert(0, 0x24)\n        }\n        r := div(x, y)\n    }\n    function checked_mul_t_uint256(x, y) -> product\n    {\n        if and(iszero(iszero(x)), gt(y, div(not(0), x))) { panic_error_0x11() }\n        product := mul(x, y)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y) { panic_error_0x11() }\n        diff := sub(x, y)\n    }\n    function copy_memory_to_memory(src, dst, length)\n    {\n        let i := 0\n        for { } lt(i, length) { i := add(i, 32) }\n        {\n            mstore(add(dst, i), mload(add(src, i)))\n        }\n        if gt(i, length) { mstore(add(dst, length), 0) }\n    }\n    function extract_byte_array_length(data) -> length\n    {\n        length := shr(1, data)\n        let outOfPlaceEncoding := and(data, 1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        if eq(outOfPlaceEncoding, lt(length, 32))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n    }\n    function increment_t_uint256(value) -> ret\n    {\n        if eq(value, not(0)) { panic_error_0x11() }\n        ret := add(value, 1)\n    }\n    function panic_error_0x11()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x11)\n        revert(0, 0x24)\n    }\n    function panic_error_0x21()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x21)\n        revert(0, 0x24)\n    }\n    function panic_error_0x32()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x32)\n        revert(0, 0x24)\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n    function validator_revert_bool(value)\n    {\n        if iszero(eq(value, iszero(iszero(value)))) { revert(0, 0) }\n    }\n}",
+      "contents": "{\n    { }\n    function abi_decode_bytes(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        if gt(_1, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        let array_1 := allocate_memory(add(and(add(_1, 0x1f), not(31)), 0x20))\n        mstore(array_1, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(array_1, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(array_1, _1), 0x20), 0)\n        array := array_1\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_addresst_addresst_string_memory_ptrt_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3\n    {\n        if slt(sub(dataEnd, headStart), 128) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        let offset := calldataload(add(headStart, 64))\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        value2 := abi_decode_bytes(add(headStart, offset), dataEnd)\n        let offset_1 := calldataload(add(headStart, 96))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value3 := abi_decode_bytes(add(headStart, offset_1), dataEnd)\n    }\n    function abi_decode_tuple_t_addresst_addresst_uint256(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let value_1 := calldataload(add(headStart, 32))\n        validator_revert_address(value_1)\n        value1 := value_1\n        value2 := calldataload(add(headStart, 64))\n    }\n    function abi_decode_tuple_t_addresst_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_addresst_uint256t_boolt_uint256t_uint256t_bytes_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3, value4, value5\n    {\n        if slt(sub(dataEnd, headStart), 192) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        value1 := calldataload(add(headStart, 32))\n        let value_1 := calldataload(add(headStart, 64))\n        validator_revert_bool(value_1)\n        value2 := value_1\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n        let offset := calldataload(add(headStart, 160))\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        value5 := abi_decode_bytes(add(headStart, offset), dataEnd)\n    }\n    function abi_decode_tuple_t_array$_t_address_$dyn_memory_ptr_fromMemory(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := mload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := mload(_2)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _1)\n        let src := add(_2, _1)\n        if gt(add(add(_2, shl(5, _3)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            let value := mload(src)\n            validator_revert_address(value)\n            mstore(dst, value)\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_array$_t_bytes32_$dyn_memory_ptr_fromMemory(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := mload(headStart)\n        if gt(offset, sub(shl(64, 1), 1)) { revert(0, 0) }\n        let _2 := add(headStart, offset)\n        if iszero(slt(add(_2, 0x1f), dataEnd)) { revert(0, 0) }\n        let _3 := mload(_2)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_3))\n        let dst_1 := dst\n        mstore(dst, _3)\n        dst := add(dst, _1)\n        let src := add(_2, _1)\n        if gt(add(add(_2, shl(5, _3)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        for { } lt(i, _3) { i := add(i, 1) }\n        {\n            mstore(dst, mload(src))\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr(headStart, dataEnd) -> value0\n    {\n        let _1 := 32\n        if slt(sub(dataEnd, headStart), _1) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _2 := sub(shl(64, 1), 1)\n        if gt(offset, _2) { revert(0, 0) }\n        let _3 := add(headStart, offset)\n        if iszero(slt(add(_3, 0x1f), dataEnd)) { revert(0, 0) }\n        let _4 := calldataload(_3)\n        let dst := allocate_memory(array_allocation_size_array_address_dyn(_4))\n        let dst_1 := dst\n        mstore(dst, _4)\n        dst := add(dst, _1)\n        let src := add(_3, _1)\n        if gt(add(add(_3, shl(5, _4)), _1), dataEnd) { revert(0, 0) }\n        let i := 0\n        let i_1 := i\n        for { } lt(i_1, _4) { i_1 := add(i_1, 1) }\n        {\n            let innerOffset := calldataload(src)\n            if gt(innerOffset, _2) { revert(i, i) }\n            mstore(dst, abi_decode_bytes(add(add(_3, innerOffset), _1), dataEnd))\n            dst := add(dst, _1)\n            src := add(src, _1)\n        }\n        value0 := dst_1\n    }\n    function abi_decode_tuple_t_bool(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_bool(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_bool(value)\n        value0 := value\n    }\n    function abi_decode_tuple_t_enum$_Prices_$12941(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        if iszero(lt(value, 4)) { revert(0, 0) }\n        value0 := value\n    }\n    function abi_decode_tuple_t_uint256(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := calldataload(headStart)\n    }\n    function abi_decode_tuple_t_uint256_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := mload(headStart)\n    }\n    function abi_decode_tuple_t_uint256t_address(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        value0 := calldataload(headStart)\n        let value := calldataload(add(headStart, 32))\n        validator_revert_address(value)\n        value1 := value\n    }\n    function abi_decode_tuple_t_uint256t_uint256t_uint256_fromMemory(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(0, 0) }\n        value0 := mload(headStart)\n        value1 := mload(add(headStart, 32))\n        value2 := mload(add(headStart, 64))\n    }\n    function abi_decode_tuple_t_uint256t_uint256t_uint256t_uint256t_uint256t_addresst_addresst_string_memory_ptrt_string_memory_ptr(headStart, dataEnd) -> value0, value1, value2, value3, value4, value5, value6, value7, value8\n    {\n        if slt(sub(dataEnd, headStart), 288) { revert(0, 0) }\n        value0 := calldataload(headStart)\n        value1 := calldataload(add(headStart, 32))\n        value2 := calldataload(add(headStart, 64))\n        value3 := calldataload(add(headStart, 96))\n        value4 := calldataload(add(headStart, 128))\n        let value := calldataload(add(headStart, 160))\n        validator_revert_address(value)\n        value5 := value\n        let value_1 := calldataload(add(headStart, 192))\n        validator_revert_address(value_1)\n        value6 := value_1\n        let offset := calldataload(add(headStart, 224))\n        let _1 := sub(shl(64, 1), 1)\n        if gt(offset, _1) { revert(0, 0) }\n        value7 := abi_decode_bytes(add(headStart, offset), dataEnd)\n        let offset_1 := calldataload(add(headStart, 256))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value8 := abi_decode_bytes(add(headStart, offset_1), dataEnd)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        copy_memory_to_memory(add(value, 0x20), add(pos, 0x20), length)\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_bytes_storage(value, pos) -> ret\n    {\n        let slotValue := sload(value)\n        let length := 0\n        let _1 := 1\n        length := shr(_1, slotValue)\n        let outOfPlaceEncoding := and(slotValue, _1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        let _2 := 32\n        if eq(outOfPlaceEncoding, lt(length, _2))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n        mstore(pos, length)\n        switch outOfPlaceEncoding\n        case 0 {\n            mstore(add(pos, _2), and(slotValue, not(255)))\n            ret := add(pos, 64)\n        }\n        case 1 {\n            mstore(0, value)\n            let dataPos := keccak256(0, _2)\n            let i := 0\n            for { } lt(i, length) { i := add(i, _2) }\n            {\n                mstore(add(add(pos, i), _2), sload(dataPos))\n                dataPos := add(dataPos, _1)\n            }\n            ret := add(add(pos, i), _2)\n        }\n    }\n    function abi_encode_tuple_packed_t_stringliteral_7c7065b4b528eb6c3048e6713d52c889ba39c5566ba8c73922d3ebca1c5ab8d3_t_bytes_memory_ptr__to_t_string_memory_ptr_t_bytes_memory_ptr__nonPadded_inplace_fromStack_reversed(pos, value0) -> end\n    {\n        mstore(pos, \"Error transfering funds to addre\")\n        mstore(add(pos, 32), \"ss : \")\n        let length := mload(value0)\n        copy_memory_to_memory(add(value0, 32), add(pos, 37), length)\n        end := add(add(pos, length), 37)\n    }\n    function abi_encode_tuple_packed_t_stringliteral_c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470__to_t_bytes_memory_ptr__nonPadded_inplace_fromStack_reversed(pos) -> end\n    { end := pos }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n    function abi_encode_tuple_t_address_t_address_t_uint256__to_t_address_t_address_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_address_t_uint256_t_bool_t_uint256_t_uint256_t_bytes_memory_ptr_t_string_storage_t_string_storage__to_t_address_t_uint256_t_bool_t_uint256_t_uint256_t_bytes_memory_ptr_t_string_memory_ptr_t_string_memory_ptr__fromStack_library_reversed(headStart, value7, value6, value5, value4, value3, value2, value1, value0) -> tail\n    {\n        let _1 := 256\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), iszero(iszero(value2)))\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n        mstore(add(headStart, 160), _1)\n        let tail_1 := abi_encode_bytes(value5, add(headStart, _1))\n        mstore(add(headStart, 192), sub(tail_1, headStart))\n        let tail_2 := abi_encode_bytes_storage(value6, tail_1)\n        mstore(add(headStart, 224), sub(tail_2, headStart))\n        tail := abi_encode_bytes_storage(value7, tail_2)\n    }\n    function abi_encode_tuple_t_address_t_uint256_t_uint256_t_uint256_t_uint256__to_t_address_t_uint256_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n    }\n    function abi_encode_tuple_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr__to_t_array$_t_bytes_memory_ptr_$dyn_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        let _1 := 32\n        let tail_1 := add(headStart, _1)\n        mstore(headStart, _1)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 64)\n        let tail_2 := add(add(headStart, shl(5, length)), 64)\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, add(sub(tail_2, headStart), not(63)))\n            tail_2 := abi_encode_bytes(mload(srcPtr), tail_2)\n            srcPtr := add(srcPtr, _1)\n            pos := add(pos, _1)\n        }\n        tail := tail_2\n    }\n    function abi_encode_tuple_t_array$_t_uint256_$dyn_memory_ptr__to_t_array$_t_uint256_$dyn_memory_ptr__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        let _1 := 32\n        let tail_1 := add(headStart, _1)\n        mstore(headStart, _1)\n        let pos := tail_1\n        let length := mload(value0)\n        mstore(tail_1, length)\n        pos := add(headStart, 64)\n        let srcPtr := add(value0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, mload(srcPtr))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, _1)\n        }\n        tail := pos\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_bytes32__to_t_bytes32__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_bytes_memory_ptr__to_t_bytes_memory_ptr__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_bytes_storage__to_t_bytes_memory_ptr__fromStack_library_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes_storage(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_string_memory_ptr_t_string_memory_ptr__to_t_string_memory_ptr_t_string_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, 64)\n        let tail_1 := abi_encode_bytes(value0, add(headStart, 64))\n        mstore(add(headStart, 32), sub(tail_1, headStart))\n        tail := abi_encode_bytes(value1, tail_1)\n    }\n    function abi_encode_tuple_t_stringliteral_07d373d1f93962af81bccfc5ed107a1e45133d11f0c004abed3d6c51b56ed80f__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC20-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_0ded0ceccb1b53065ee6adbf4620c06966a04eb064f132e0cf898341c4738c12__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC34-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_1cfe397872c100eed5903c94b8106ab893d14a60665402a5ebcbf404be675867__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC21-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_252091e1e1f3ccdeb76fd919e3227b886856ffa097a76080a223737c1fd67464__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 4)\n        mstore(add(headStart, 64), \"EC2-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_410a549f8e9f8131464da58faf039c8c3509f4c660c53eb7a67af768c3f3d5d4__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC24-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_561bdd287b683c893d455c81480689e9a15853e061cfa97a9ab314a8b869cd4a__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC23-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_8e93196cff3b71f5e1263c1a8a03f96ef59eadae0736aae9384ea3cdd54ccfc0__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC25-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_add388fe0fc35af7ea971a6e4c44054c524b4720e670029029c4b909f1aac479__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC32-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_ae21427077aa50ae94a35e2fd393c5097e202b09debb159fea75399e6b01d7b4__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC33-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_b3e6dafa6b6bccb479446d8c6f802ff31ea1fb3690d1d840f74ab434d94b5c75__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC35-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_b57a5d0c8b8d8f80c5c3881b8fab5bd07bafaab7b89b53db38c5a0d31c454122__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 34)\n        mstore(add(headStart, 64), \"Not enough balance for this fact\")\n        mstore(add(headStart, 96), \"or\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_c3d730d60a1aef178eb38844a3c8768d44ea3b8f3b93ff7c042444410cce78a2__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 5)\n        mstore(add(headStart, 64), \"EC22-\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_uint256_t_array$_t_uint256_$dyn_storage__to_t_uint256_t_array$_t_uint256_$dyn_memory_ptr__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        let tail_1 := add(headStart, 64)\n        mstore(headStart, value0)\n        let _1 := 32\n        mstore(add(headStart, _1), 64)\n        let pos := tail_1\n        let length := sload(value1)\n        mstore(tail_1, length)\n        pos := add(headStart, 96)\n        mstore(0, value1)\n        let srcPtr := keccak256(0, _1)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 1) }\n        {\n            mstore(pos, sload(srcPtr))\n            pos := add(pos, _1)\n            srcPtr := add(srcPtr, 1)\n        }\n        tail := pos\n    }\n    function abi_encode_tuple_t_uint256_t_array$_t_uint256_$dyn_storage__to_t_uint256_t_uint256__fromStack_library_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_uint256_t_bool_t_uint256__to_t_uint256_t_bool_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), iszero(iszero(value1)))\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256__to_t_uint256_t_uint256__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256_t_uint256__to_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_uint256_t_uint256_t_uint256_t_uint256_t_uint256__to_t_uint256_t_uint256_t_uint256_t_uint256_t_uint256__fromStack_reversed(headStart, value4, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), value3)\n        mstore(add(headStart, 128), value4)\n    }\n    function allocate_memory(size) -> memPtr\n    {\n        memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(size, 31), not(31)))\n        if or(gt(newFreePtr, sub(shl(64, 1), 1)), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n    }\n    function array_allocation_size_array_address_dyn(length) -> size\n    {\n        if gt(length, sub(shl(64, 1), 1)) { panic_error_0x41() }\n        size := add(shl(5, length), 0x20)\n    }\n    function checked_add_t_uint256(x, y) -> sum\n    {\n        if gt(x, not(y)) { panic_error_0x11() }\n        sum := add(x, y)\n    }\n    function checked_div_t_uint256(x, y) -> r\n    {\n        if iszero(y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x12)\n            revert(0, 0x24)\n        }\n        r := div(x, y)\n    }\n    function checked_mul_t_uint256(x, y) -> product\n    {\n        if and(iszero(iszero(x)), gt(y, div(not(0), x))) { panic_error_0x11() }\n        product := mul(x, y)\n    }\n    function checked_sub_t_uint256(x, y) -> diff\n    {\n        if lt(x, y) { panic_error_0x11() }\n        diff := sub(x, y)\n    }\n    function copy_memory_to_memory(src, dst, length)\n    {\n        let i := 0\n        for { } lt(i, length) { i := add(i, 32) }\n        {\n            mstore(add(dst, i), mload(add(src, i)))\n        }\n        if gt(i, length) { mstore(add(dst, length), 0) }\n    }\n    function extract_byte_array_length(data) -> length\n    {\n        length := shr(1, data)\n        let outOfPlaceEncoding := and(data, 1)\n        if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }\n        if eq(outOfPlaceEncoding, lt(length, 32))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n    }\n    function increment_t_uint256(value) -> ret\n    {\n        if eq(value, not(0)) { panic_error_0x11() }\n        ret := add(value, 1)\n    }\n    function panic_error_0x11()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x11)\n        revert(0, 0x24)\n    }\n    function panic_error_0x21()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x21)\n        revert(0, 0x24)\n    }\n    function panic_error_0x32()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x32)\n        revert(0, 0x24)\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n    function validator_revert_bool(value)\n    {\n        if iszero(eq(value, iszero(iszero(value)))) { revert(0, 0) }\n    }\n}",
       "id": 69,
       "language": "Yul",
       "name": "#utility.yul"
@@ -19716,7 +19716,7 @@
         2568
       ],
       "AddressLibrary": [
-        11847
+        11883
       ],
       "Context": [
         2589
@@ -19734,31 +19734,31 @@
         1179
       ],
       "IManager": [
-        11282
+        11318
       ],
       "IPriceConverter": [
-        11485
+        11521
       ],
       "IPropositionSettings": [
-        11498
+        11534
       ],
       "ISignatureBaseContract": [
-        11626
+        11662
       ],
       "IStdPropositionBaseContract": [
-        11642
+        11678
       ],
       "ITokenEventSubscriber": [
-        11655
+        11691
       ],
       "ITreasury": [
-        11712
+        11748
       ],
       "Initializable": [
         528
       ],
       "Library": [
-        13101
+        13137
       ],
       "ManagedBaseContract": [
         4661
@@ -19773,7 +19773,7 @@
         4838
       ],
       "SignatureLibrary": [
-        13384
+        13420
       ],
       "StdPropositionBaseContract": [
         5011
@@ -19791,7 +19791,7 @@
         10983
       ],
       "UintLibrary": [
-        13514
+        13550
       ],
       "UpgradeableBeacon": [
         1972
@@ -19818,7 +19818,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 11713,
+        "sourceUnit": 11749,
         "src": "714:37:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -19830,7 +19830,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 11486,
+        "sourceUnit": 11522,
         "src": "753:43:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -19842,7 +19842,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 13515,
+        "sourceUnit": 13551,
         "src": "798:38:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -19854,7 +19854,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 13102,
+        "sourceUnit": 13138,
         "src": "838:34:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -19891,7 +19891,7 @@
               "id": 9908,
               "name": "ITreasury",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 11712,
+              "referencedDeclaration": 11748,
               "src": "1030:9:42"
             },
             "id": 9909,
@@ -19922,10 +19922,10 @@
           4661,
           528,
           4838,
-          11626,
-          11655,
-          11642,
-          11712
+          11662,
+          11691,
+          11678,
+          11748
         ],
         "name": "Treasury",
         "nameLocation": "1018:8:42",
@@ -19937,7 +19937,7 @@
               "id": 9912,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 13101,
+              "referencedDeclaration": 13137,
               "src": "1080:7:42"
             },
             "nodeType": "UsingForDirective",
@@ -19949,7 +19949,7 @@
               "id": 9914,
               "name": "UintLibrary",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 13514,
+              "referencedDeclaration": 13550,
               "src": "1106:11:42"
             },
             "nodeType": "UsingForDirective",
@@ -20967,7 +20967,7 @@
                 {
                   "condition": {
                     "commonType": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     },
                     "id": 10005,
@@ -20982,10 +20982,10 @@
                           "name": "Library",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 13101,
+                          "referencedDeclaration": 13137,
                           "src": "2420:7:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                            "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                             "typeString": "type(library Library)"
                           }
                         },
@@ -20996,10 +20996,10 @@
                         "lValueRequested": false,
                         "memberName": "Prices",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12905,
+                        "referencedDeclaration": 12941,
                         "src": "2420:14:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                          "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                           "typeString": "type(enum Library.Prices)"
                         }
                       },
@@ -21010,10 +21010,10 @@
                       "lValueRequested": false,
                       "memberName": "NewProvider",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 12901,
+                      "referencedDeclaration": 12937,
                       "src": "2420:26:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -21027,7 +21027,7 @@
                       "referencedDeclaration": 9991,
                       "src": "2450:5:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -21040,7 +21040,7 @@
                   "falseBody": {
                     "condition": {
                       "commonType": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       },
                       "id": 10014,
@@ -21055,10 +21055,10 @@
                             "name": "Library",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 13101,
+                            "referencedDeclaration": 13137,
                             "src": "2505:7:42",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                              "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                               "typeString": "type(library Library)"
                             }
                           },
@@ -21069,10 +21069,10 @@
                           "lValueRequested": false,
                           "memberName": "Prices",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 12905,
+                          "referencedDeclaration": 12941,
                           "src": "2505:14:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                            "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                             "typeString": "type(enum Library.Prices)"
                           }
                         },
@@ -21083,10 +21083,10 @@
                         "lValueRequested": false,
                         "memberName": "NewPool",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12902,
+                        "referencedDeclaration": 12938,
                         "src": "2505:22:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$12905",
+                          "typeIdentifier": "t_enum$_Prices_$12941",
                           "typeString": "enum Library.Prices"
                         }
                       },
@@ -21100,7 +21100,7 @@
                         "referencedDeclaration": 9991,
                         "src": "2531:5:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$12905",
+                          "typeIdentifier": "t_enum$_Prices_$12941",
                           "typeString": "enum Library.Prices"
                         }
                       },
@@ -21113,7 +21113,7 @@
                     "falseBody": {
                       "condition": {
                         "commonType": {
-                          "typeIdentifier": "t_enum$_Prices_$12905",
+                          "typeIdentifier": "t_enum$_Prices_$12941",
                           "typeString": "enum Library.Prices"
                         },
                         "id": 10023,
@@ -21128,10 +21128,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13101,
+                              "referencedDeclaration": 13137,
                               "src": "2587:7:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -21142,10 +21142,10 @@
                             "lValueRequested": false,
                             "memberName": "Prices",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 12905,
+                            "referencedDeclaration": 12941,
                             "src": "2587:14:42",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                              "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                               "typeString": "type(enum Library.Prices)"
                             }
                           },
@@ -21156,10 +21156,10 @@
                           "lValueRequested": false,
                           "memberName": "NewCertificate",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 12903,
+                          "referencedDeclaration": 12939,
                           "src": "2587:29:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_enum$_Prices_$12905",
+                            "typeIdentifier": "t_enum$_Prices_$12941",
                             "typeString": "enum Library.Prices"
                           }
                         },
@@ -21173,7 +21173,7 @@
                           "referencedDeclaration": 9991,
                           "src": "2620:5:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_enum$_Prices_$12905",
+                            "typeIdentifier": "t_enum$_Prices_$12941",
                             "typeString": "enum Library.Prices"
                           }
                         },
@@ -21438,7 +21438,7 @@
                                   "referencedDeclaration": 4619,
                                   "src": "2759:16:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IManager_$11282",
+                                    "typeIdentifier": "t_contract$_IManager_$11318",
                                     "typeString": "contract IManager"
                                   }
                                 },
@@ -21449,7 +21449,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveTransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 11253,
+                                "referencedDeclaration": 11289,
                                 "src": "2759:43:42",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -21481,10 +21481,10 @@
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 13101,
+                                      "referencedDeclaration": 13137,
                                       "src": "2813:7:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
@@ -21495,10 +21495,10 @@
                                     "lValueRequested": false,
                                     "memberName": "TransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12914,
+                                    "referencedDeclaration": 12950,
                                     "src": "2813:26:42",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                       "typeString": "type(enum Library.TransparentProxies)"
                                     }
                                   },
@@ -21509,10 +21509,10 @@
                                   "lValueRequested": false,
                                   "memberName": "PriceConverter",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 12911,
+                                  "referencedDeclaration": 12947,
                                   "src": "2813:41:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 }
@@ -21520,7 +21520,7 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 ],
@@ -21581,10 +21581,10 @@
                           "name": "IPriceConverter",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 11485,
+                          "referencedDeclaration": 11521,
                           "src": "2743:15:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11485_$",
+                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11521_$",
                             "typeString": "type(contract IPriceConverter)"
                           }
                         },
@@ -21599,7 +21599,7 @@
                         "src": "2743:114:42",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IPriceConverter_$11485",
+                          "typeIdentifier": "t_contract$_IPriceConverter_$11521",
                           "typeString": "contract IPriceConverter"
                         }
                       },
@@ -21610,7 +21610,7 @@
                       "lValueRequested": false,
                       "memberName": "fromUSDToETH",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11479,
+                      "referencedDeclaration": 11515,
                       "src": "2743:127:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -21795,7 +21795,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_Prices_$12905",
+                    "typeIdentifier": "t_enum$_Prices_$12941",
                     "typeString": "enum Library.Prices"
                   },
                   "typeName": {
@@ -21805,13 +21805,13 @@
                       "id": 9989,
                       "name": "Library.Prices",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 12905,
+                      "referencedDeclaration": 12941,
                       "src": "2340:14:42"
                     },
-                    "referencedDeclaration": 12905,
+                    "referencedDeclaration": 12941,
                     "src": "2340:14:42",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     }
                   },
@@ -22083,7 +22083,7 @@
                               "referencedDeclaration": 4619,
                               "src": "3177:16:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IManager_$11282",
+                                "typeIdentifier": "t_contract$_IManager_$11318",
                                 "typeString": "contract IManager"
                               }
                             },
@@ -22094,7 +22094,7 @@
                             "lValueRequested": false,
                             "memberName": "retrieveTransparentProxies",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 11253,
+                            "referencedDeclaration": 11289,
                             "src": "3177:43:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -22126,10 +22126,10 @@
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 13101,
+                                  "referencedDeclaration": 13137,
                                   "src": "3231:7:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
@@ -22140,10 +22140,10 @@
                                 "lValueRequested": false,
                                 "memberName": "TransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 12914,
+                                "referencedDeclaration": 12950,
                                 "src": "3231:26:42",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                  "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                   "typeString": "type(enum Library.TransparentProxies)"
                                 }
                               },
@@ -22154,10 +22154,10 @@
                               "lValueRequested": false,
                               "memberName": "PublicPool",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 12906,
+                              "referencedDeclaration": 12942,
                               "src": "3231:37:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                 "typeString": "enum Library.TransparentProxies"
                               }
                             }
@@ -22165,7 +22165,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                 "typeString": "enum Library.TransparentProxies"
                               }
                             ],
@@ -22231,10 +22231,10 @@
                         "name": "Library",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13101,
+                        "referencedDeclaration": 13137,
                         "src": "3151:7:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                          "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                           "typeString": "type(library Library)"
                         }
                       },
@@ -22245,7 +22245,7 @@
                       "lValueRequested": false,
                       "memberName": "ItIsSomeone",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 12968,
+                      "referencedDeclaration": 13004,
                       "src": "3151:19:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_address_$_t_address_$returns$__$",
@@ -23307,10 +23307,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13101,
+                              "referencedDeclaration": 13137,
                               "src": "4464:7:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -23321,7 +23321,7 @@
                             "lValueRequested": false,
                             "memberName": "BytestoBytes32",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 13087,
+                            "referencedDeclaration": 13123,
                             "src": "4464:22:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -23384,10 +23384,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4438:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -23398,7 +23398,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4438:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -23479,10 +23479,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13101,
+                              "referencedDeclaration": 13137,
                               "src": "4532:7:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -23493,7 +23493,7 @@
                             "lValueRequested": false,
                             "memberName": "BytestoBytes32",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 13087,
+                            "referencedDeclaration": 13123,
                             "src": "4532:22:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -23556,10 +23556,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4506:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -23570,7 +23570,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4506:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -23845,10 +23845,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4742:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -23859,7 +23859,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4742:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -23974,10 +23974,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4826:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -23988,7 +23988,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4826:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -24103,10 +24103,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4911:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -24117,7 +24117,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4911:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -24232,10 +24232,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4999:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -24246,7 +24246,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4999:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -24361,10 +24361,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "5085:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -24375,7 +24375,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "5085:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -25053,7 +25053,7 @@
           },
           {
             "baseFunctions": [
-              11664
+              11700
             ],
             "body": {
               "id": 10367,
@@ -25126,7 +25126,7 @@
                 {
                   "condition": {
                     "commonType": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     },
                     "id": 10335,
@@ -25142,7 +25142,7 @@
                       "referencedDeclaration": 10317,
                       "src": "6048:5:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -25155,10 +25155,10 @@
                           "name": "Library",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 13101,
+                          "referencedDeclaration": 13137,
                           "src": "6057:7:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                            "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                             "typeString": "type(library Library)"
                           }
                         },
@@ -25169,10 +25169,10 @@
                         "lValueRequested": false,
                         "memberName": "Prices",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12905,
+                        "referencedDeclaration": 12941,
                         "src": "6057:14:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                          "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                           "typeString": "type(enum Library.Prices)"
                         }
                       },
@@ -25183,10 +25183,10 @@
                       "lValueRequested": false,
                       "memberName": "NewProvider",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 12901,
+                      "referencedDeclaration": 12937,
                       "src": "6057:26:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -25257,7 +25257,7 @@
                                       "referencedDeclaration": 4619,
                                       "src": "6111:16:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_contract$_IManager_$11282",
+                                        "typeIdentifier": "t_contract$_IManager_$11318",
                                         "typeString": "contract IManager"
                                       }
                                     },
@@ -25268,7 +25268,7 @@
                                     "lValueRequested": false,
                                     "memberName": "retrieveTransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 11253,
+                                    "referencedDeclaration": 11289,
                                     "src": "6111:43:42",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -25300,10 +25300,10 @@
                                           "name": "Library",
                                           "nodeType": "Identifier",
                                           "overloadedDeclarations": [],
-                                          "referencedDeclaration": 13101,
+                                          "referencedDeclaration": 13137,
                                           "src": "6165:7:42",
                                           "typeDescriptions": {
-                                            "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                            "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                             "typeString": "type(library Library)"
                                           }
                                         },
@@ -25314,10 +25314,10 @@
                                         "lValueRequested": false,
                                         "memberName": "TransparentProxies",
                                         "nodeType": "MemberAccess",
-                                        "referencedDeclaration": 12914,
+                                        "referencedDeclaration": 12950,
                                         "src": "6165:26:42",
                                         "typeDescriptions": {
-                                          "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                          "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                           "typeString": "type(enum Library.TransparentProxies)"
                                         }
                                       },
@@ -25328,10 +25328,10 @@
                                       "lValueRequested": false,
                                       "memberName": "PriceConverter",
                                       "nodeType": "MemberAccess",
-                                      "referencedDeclaration": 12911,
+                                      "referencedDeclaration": 12947,
                                       "src": "6165:41:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                        "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                         "typeString": "enum Library.TransparentProxies"
                                       }
                                     }
@@ -25339,7 +25339,7 @@
                                   "expression": {
                                     "argumentTypes": [
                                       {
-                                        "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                        "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                         "typeString": "enum Library.TransparentProxies"
                                       }
                                     ],
@@ -25400,10 +25400,10 @@
                               "name": "IPriceConverter",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 11485,
+                              "referencedDeclaration": 11521,
                               "src": "6095:15:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11485_$",
+                                "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11521_$",
                                 "typeString": "type(contract IPriceConverter)"
                               }
                             },
@@ -25418,7 +25418,7 @@
                             "src": "6095:114:42",
                             "tryCall": false,
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_IPriceConverter_$11485",
+                              "typeIdentifier": "t_contract$_IPriceConverter_$11521",
                               "typeString": "contract IPriceConverter"
                             }
                           },
@@ -25429,7 +25429,7 @@
                           "lValueRequested": false,
                           "memberName": "fromUSDToETH",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 11479,
+                          "referencedDeclaration": 11515,
                           "src": "6095:127:42",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -25661,7 +25661,7 @@
                     "referencedDeclaration": 10317,
                     "src": "5963:5:42",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     }
                   }
@@ -25704,7 +25704,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_Prices_$12905",
+                    "typeIdentifier": "t_enum$_Prices_$12941",
                     "typeString": "enum Library.Prices"
                   },
                   "typeName": {
@@ -25714,13 +25714,13 @@
                       "id": 10315,
                       "name": "Library.Prices",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 12905,
+                      "referencedDeclaration": 12941,
                       "src": "5896:14:42"
                     },
-                    "referencedDeclaration": 12905,
+                    "referencedDeclaration": 12941,
                     "src": "5896:14:42",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     }
                   },
@@ -26736,7 +26736,7 @@
           },
           {
             "baseFunctions": [
-              11671
+              11707
             ],
             "body": {
               "id": 10488,
@@ -26814,7 +26814,7 @@
                                   "referencedDeclaration": 4619,
                                   "src": "7304:16:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IManager_$11282",
+                                    "typeIdentifier": "t_contract$_IManager_$11318",
                                     "typeString": "contract IManager"
                                   }
                                 },
@@ -26825,7 +26825,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveTransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 11253,
+                                "referencedDeclaration": 11289,
                                 "src": "7304:43:42",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -26857,10 +26857,10 @@
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 13101,
+                                      "referencedDeclaration": 13137,
                                       "src": "7358:7:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
@@ -26871,10 +26871,10 @@
                                     "lValueRequested": false,
                                     "memberName": "TransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12914,
+                                    "referencedDeclaration": 12950,
                                     "src": "7358:26:42",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                       "typeString": "type(enum Library.TransparentProxies)"
                                     }
                                   },
@@ -26885,10 +26885,10 @@
                                   "lValueRequested": false,
                                   "memberName": "PriceConverter",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 12911,
+                                  "referencedDeclaration": 12947,
                                   "src": "7358:41:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 }
@@ -26896,7 +26896,7 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 ],
@@ -26957,10 +26957,10 @@
                           "name": "IPriceConverter",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 11485,
+                          "referencedDeclaration": 11521,
                           "src": "7288:15:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11485_$",
+                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11521_$",
                             "typeString": "type(contract IPriceConverter)"
                           }
                         },
@@ -26975,7 +26975,7 @@
                         "src": "7288:114:42",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IPriceConverter_$11485",
+                          "typeIdentifier": "t_contract$_IPriceConverter_$11521",
                           "typeString": "contract IPriceConverter"
                         }
                       },
@@ -26986,7 +26986,7 @@
                       "lValueRequested": false,
                       "memberName": "fromUSDToETH",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11479,
+                      "referencedDeclaration": 11515,
                       "src": "7288:127:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -27315,7 +27315,7 @@
           },
           {
             "baseFunctions": [
-              11676
+              11712
             ],
             "body": {
               "id": 10499,
@@ -27439,7 +27439,7 @@
           },
           {
             "baseFunctions": [
-              11679
+              11715
             ],
             "body": {
               "id": 10515,
@@ -29093,7 +29093,7 @@
           },
           {
             "baseFunctions": [
-              11686
+              11722
             ],
             "body": {
               "id": 10637,
@@ -29236,7 +29236,7 @@
           },
           {
             "baseFunctions": [
-              11693
+              11729
             ],
             "body": {
               "id": 10650,
@@ -29390,7 +29390,7 @@
           },
           {
             "baseFunctions": [
-              11706
+              11742
             ],
             "body": {
               "id": 10672,
@@ -29651,7 +29651,7 @@
           },
           {
             "baseFunctions": [
-              11711
+              11747
             ],
             "body": {
               "id": 10681,
@@ -30789,10 +30789,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "10110:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -30803,7 +30803,7 @@
                       "lValueRequested": false,
                       "memberName": "ProductOfFactors",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13462,
+                      "referencedDeclaration": 13498,
                       "src": "10110:28:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_array$_t_uint256_$dyn_memory_ptr_$returns$_t_uint256_$",
@@ -33249,10 +33249,10 @@
                                   "name": "UintLibrary",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 13514,
+                                  "referencedDeclaration": 13550,
                                   "src": "11678:11:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                                    "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                                     "typeString": "type(library UintLibrary)"
                                   }
                                 },
@@ -33263,7 +33263,7 @@
                                 "lValueRequested": false,
                                 "memberName": "FindUintPosition",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 13426,
+                                "referencedDeclaration": 13462,
                                 "src": "11678:28:42",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_delegatecall_pure$_t_uint256_$_t_array$_t_uint256_$dyn_memory_ptr_$returns$_t_uint256_$",
@@ -33354,10 +33354,10 @@
                               "name": "UintLibrary",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13514,
+                              "referencedDeclaration": 13550,
                               "src": "11644:11:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                                "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                                 "typeString": "type(library UintLibrary)"
                               }
                             },
@@ -33368,7 +33368,7 @@
                             "lValueRequested": false,
                             "memberName": "UintArrayRemoveResize",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 13487,
+                            "referencedDeclaration": 13523,
                             "src": "11644:33:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_array$_t_uint256_$dyn_storage_ptr_$returns$__$",
@@ -33522,7 +33522,7 @@
         2568
       ],
       "AddressLibrary": [
-        11847
+        11883
       ],
       "Context": [
         2589
@@ -33540,31 +33540,31 @@
         1179
       ],
       "IManager": [
-        11282
+        11318
       ],
       "IPriceConverter": [
-        11485
+        11521
       ],
       "IPropositionSettings": [
-        11498
+        11534
       ],
       "ISignatureBaseContract": [
-        11626
+        11662
       ],
       "IStdPropositionBaseContract": [
-        11642
+        11678
       ],
       "ITokenEventSubscriber": [
-        11655
+        11691
       ],
       "ITreasury": [
-        11712
+        11748
       ],
       "Initializable": [
         528
       ],
       "Library": [
-        13101
+        13137
       ],
       "ManagedBaseContract": [
         4661
@@ -33579,7 +33579,7 @@
         4838
       ],
       "SignatureLibrary": [
-        13384
+        13420
       ],
       "StdPropositionBaseContract": [
         5011
@@ -33597,7 +33597,7 @@
         10983
       ],
       "UintLibrary": [
-        13514
+        13550
       ],
       "UpgradeableBeacon": [
         1972
@@ -33624,7 +33624,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 11713,
+        "sourceUnit": 11749,
         "src": "714:37:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -33636,7 +33636,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 11486,
+        "sourceUnit": 11522,
         "src": "753:43:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -33648,7 +33648,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 13515,
+        "sourceUnit": 13551,
         "src": "798:38:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -33660,7 +33660,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 10984,
-        "sourceUnit": 13102,
+        "sourceUnit": 13138,
         "src": "838:34:42",
         "symbolAliases": [],
         "unitAlias": ""
@@ -33697,7 +33697,7 @@
               "id": 9908,
               "name": "ITreasury",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 11712,
+              "referencedDeclaration": 11748,
               "src": "1030:9:42"
             },
             "id": 9909,
@@ -33728,10 +33728,10 @@
           4661,
           528,
           4838,
-          11626,
-          11655,
-          11642,
-          11712
+          11662,
+          11691,
+          11678,
+          11748
         ],
         "name": "Treasury",
         "nameLocation": "1018:8:42",
@@ -33743,7 +33743,7 @@
               "id": 9912,
               "name": "Library",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 13101,
+              "referencedDeclaration": 13137,
               "src": "1080:7:42"
             },
             "nodeType": "UsingForDirective",
@@ -33755,7 +33755,7 @@
               "id": 9914,
               "name": "UintLibrary",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 13514,
+              "referencedDeclaration": 13550,
               "src": "1106:11:42"
             },
             "nodeType": "UsingForDirective",
@@ -34773,7 +34773,7 @@
                 {
                   "condition": {
                     "commonType": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     },
                     "id": 10005,
@@ -34788,10 +34788,10 @@
                           "name": "Library",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 13101,
+                          "referencedDeclaration": 13137,
                           "src": "2420:7:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                            "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                             "typeString": "type(library Library)"
                           }
                         },
@@ -34802,10 +34802,10 @@
                         "lValueRequested": false,
                         "memberName": "Prices",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12905,
+                        "referencedDeclaration": 12941,
                         "src": "2420:14:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                          "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                           "typeString": "type(enum Library.Prices)"
                         }
                       },
@@ -34816,10 +34816,10 @@
                       "lValueRequested": false,
                       "memberName": "NewProvider",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 12901,
+                      "referencedDeclaration": 12937,
                       "src": "2420:26:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -34833,7 +34833,7 @@
                       "referencedDeclaration": 9991,
                       "src": "2450:5:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -34846,7 +34846,7 @@
                   "falseBody": {
                     "condition": {
                       "commonType": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       },
                       "id": 10014,
@@ -34861,10 +34861,10 @@
                             "name": "Library",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 13101,
+                            "referencedDeclaration": 13137,
                             "src": "2505:7:42",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                              "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                               "typeString": "type(library Library)"
                             }
                           },
@@ -34875,10 +34875,10 @@
                           "lValueRequested": false,
                           "memberName": "Prices",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 12905,
+                          "referencedDeclaration": 12941,
                           "src": "2505:14:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                            "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                             "typeString": "type(enum Library.Prices)"
                           }
                         },
@@ -34889,10 +34889,10 @@
                         "lValueRequested": false,
                         "memberName": "NewPool",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12902,
+                        "referencedDeclaration": 12938,
                         "src": "2505:22:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$12905",
+                          "typeIdentifier": "t_enum$_Prices_$12941",
                           "typeString": "enum Library.Prices"
                         }
                       },
@@ -34906,7 +34906,7 @@
                         "referencedDeclaration": 9991,
                         "src": "2531:5:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_enum$_Prices_$12905",
+                          "typeIdentifier": "t_enum$_Prices_$12941",
                           "typeString": "enum Library.Prices"
                         }
                       },
@@ -34919,7 +34919,7 @@
                     "falseBody": {
                       "condition": {
                         "commonType": {
-                          "typeIdentifier": "t_enum$_Prices_$12905",
+                          "typeIdentifier": "t_enum$_Prices_$12941",
                           "typeString": "enum Library.Prices"
                         },
                         "id": 10023,
@@ -34934,10 +34934,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13101,
+                              "referencedDeclaration": 13137,
                               "src": "2587:7:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -34948,10 +34948,10 @@
                             "lValueRequested": false,
                             "memberName": "Prices",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 12905,
+                            "referencedDeclaration": 12941,
                             "src": "2587:14:42",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                              "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                               "typeString": "type(enum Library.Prices)"
                             }
                           },
@@ -34962,10 +34962,10 @@
                           "lValueRequested": false,
                           "memberName": "NewCertificate",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 12903,
+                          "referencedDeclaration": 12939,
                           "src": "2587:29:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_enum$_Prices_$12905",
+                            "typeIdentifier": "t_enum$_Prices_$12941",
                             "typeString": "enum Library.Prices"
                           }
                         },
@@ -34979,7 +34979,7 @@
                           "referencedDeclaration": 9991,
                           "src": "2620:5:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_enum$_Prices_$12905",
+                            "typeIdentifier": "t_enum$_Prices_$12941",
                             "typeString": "enum Library.Prices"
                           }
                         },
@@ -35244,7 +35244,7 @@
                                   "referencedDeclaration": 4619,
                                   "src": "2759:16:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IManager_$11282",
+                                    "typeIdentifier": "t_contract$_IManager_$11318",
                                     "typeString": "contract IManager"
                                   }
                                 },
@@ -35255,7 +35255,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveTransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 11253,
+                                "referencedDeclaration": 11289,
                                 "src": "2759:43:42",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -35287,10 +35287,10 @@
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 13101,
+                                      "referencedDeclaration": 13137,
                                       "src": "2813:7:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
@@ -35301,10 +35301,10 @@
                                     "lValueRequested": false,
                                     "memberName": "TransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12914,
+                                    "referencedDeclaration": 12950,
                                     "src": "2813:26:42",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                       "typeString": "type(enum Library.TransparentProxies)"
                                     }
                                   },
@@ -35315,10 +35315,10 @@
                                   "lValueRequested": false,
                                   "memberName": "PriceConverter",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 12911,
+                                  "referencedDeclaration": 12947,
                                   "src": "2813:41:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 }
@@ -35326,7 +35326,7 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 ],
@@ -35387,10 +35387,10 @@
                           "name": "IPriceConverter",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 11485,
+                          "referencedDeclaration": 11521,
                           "src": "2743:15:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11485_$",
+                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11521_$",
                             "typeString": "type(contract IPriceConverter)"
                           }
                         },
@@ -35405,7 +35405,7 @@
                         "src": "2743:114:42",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IPriceConverter_$11485",
+                          "typeIdentifier": "t_contract$_IPriceConverter_$11521",
                           "typeString": "contract IPriceConverter"
                         }
                       },
@@ -35416,7 +35416,7 @@
                       "lValueRequested": false,
                       "memberName": "fromUSDToETH",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11479,
+                      "referencedDeclaration": 11515,
                       "src": "2743:127:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -35601,7 +35601,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_Prices_$12905",
+                    "typeIdentifier": "t_enum$_Prices_$12941",
                     "typeString": "enum Library.Prices"
                   },
                   "typeName": {
@@ -35611,13 +35611,13 @@
                       "id": 9989,
                       "name": "Library.Prices",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 12905,
+                      "referencedDeclaration": 12941,
                       "src": "2340:14:42"
                     },
-                    "referencedDeclaration": 12905,
+                    "referencedDeclaration": 12941,
                     "src": "2340:14:42",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     }
                   },
@@ -35889,7 +35889,7 @@
                               "referencedDeclaration": 4619,
                               "src": "3177:16:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IManager_$11282",
+                                "typeIdentifier": "t_contract$_IManager_$11318",
                                 "typeString": "contract IManager"
                               }
                             },
@@ -35900,7 +35900,7 @@
                             "lValueRequested": false,
                             "memberName": "retrieveTransparentProxies",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 11253,
+                            "referencedDeclaration": 11289,
                             "src": "3177:43:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -35932,10 +35932,10 @@
                                   "name": "Library",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 13101,
+                                  "referencedDeclaration": 13137,
                                   "src": "3231:7:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                    "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                     "typeString": "type(library Library)"
                                   }
                                 },
@@ -35946,10 +35946,10 @@
                                 "lValueRequested": false,
                                 "memberName": "TransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 12914,
+                                "referencedDeclaration": 12950,
                                 "src": "3231:26:42",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                  "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                   "typeString": "type(enum Library.TransparentProxies)"
                                 }
                               },
@@ -35960,10 +35960,10 @@
                               "lValueRequested": false,
                               "memberName": "PublicPool",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 12906,
+                              "referencedDeclaration": 12942,
                               "src": "3231:37:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                 "typeString": "enum Library.TransparentProxies"
                               }
                             }
@@ -35971,7 +35971,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                 "typeString": "enum Library.TransparentProxies"
                               }
                             ],
@@ -36037,10 +36037,10 @@
                         "name": "Library",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13101,
+                        "referencedDeclaration": 13137,
                         "src": "3151:7:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                          "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                           "typeString": "type(library Library)"
                         }
                       },
@@ -36051,7 +36051,7 @@
                       "lValueRequested": false,
                       "memberName": "ItIsSomeone",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 12968,
+                      "referencedDeclaration": 13004,
                       "src": "3151:19:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_address_$_t_address_$returns$__$",
@@ -37113,10 +37113,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13101,
+                              "referencedDeclaration": 13137,
                               "src": "4464:7:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -37127,7 +37127,7 @@
                             "lValueRequested": false,
                             "memberName": "BytestoBytes32",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 13087,
+                            "referencedDeclaration": 13123,
                             "src": "4464:22:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -37190,10 +37190,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4438:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -37204,7 +37204,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4438:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -37285,10 +37285,10 @@
                               "name": "Library",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13101,
+                              "referencedDeclaration": 13137,
                               "src": "4532:7:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                 "typeString": "type(library Library)"
                               }
                             },
@@ -37299,7 +37299,7 @@
                             "lValueRequested": false,
                             "memberName": "BytestoBytes32",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 13087,
+                            "referencedDeclaration": 13123,
                             "src": "4532:22:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_pure$_t_bytes_memory_ptr_$returns$_t_array$_t_bytes32_$dyn_memory_ptr_$",
@@ -37362,10 +37362,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4506:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -37376,7 +37376,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4506:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -37651,10 +37651,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4742:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -37665,7 +37665,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4742:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -37780,10 +37780,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4826:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -37794,7 +37794,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4826:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -37909,10 +37909,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4911:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -37923,7 +37923,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4911:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -38038,10 +38038,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "4999:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -38052,7 +38052,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "4999:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -38167,10 +38167,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "5085:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -38181,7 +38181,7 @@
                       "lValueRequested": false,
                       "memberName": "Bytes32ToUint",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13513,
+                      "referencedDeclaration": 13549,
                       "src": "5085:25:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_bytes32_$returns$_t_uint256_$",
@@ -38859,7 +38859,7 @@
           },
           {
             "baseFunctions": [
-              11664
+              11700
             ],
             "body": {
               "id": 10367,
@@ -38932,7 +38932,7 @@
                 {
                   "condition": {
                     "commonType": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     },
                     "id": 10335,
@@ -38948,7 +38948,7 @@
                       "referencedDeclaration": 10317,
                       "src": "6048:5:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -38961,10 +38961,10 @@
                           "name": "Library",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 13101,
+                          "referencedDeclaration": 13137,
                           "src": "6057:7:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                            "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                             "typeString": "type(library Library)"
                           }
                         },
@@ -38975,10 +38975,10 @@
                         "lValueRequested": false,
                         "memberName": "Prices",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 12905,
+                        "referencedDeclaration": 12941,
                         "src": "6057:14:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_enum$_Prices_$12905_$",
+                          "typeIdentifier": "t_type$_t_enum$_Prices_$12941_$",
                           "typeString": "type(enum Library.Prices)"
                         }
                       },
@@ -38989,10 +38989,10 @@
                       "lValueRequested": false,
                       "memberName": "NewProvider",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 12901,
+                      "referencedDeclaration": 12937,
                       "src": "6057:26:42",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_enum$_Prices_$12905",
+                        "typeIdentifier": "t_enum$_Prices_$12941",
                         "typeString": "enum Library.Prices"
                       }
                     },
@@ -39063,7 +39063,7 @@
                                       "referencedDeclaration": 4619,
                                       "src": "6111:16:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_contract$_IManager_$11282",
+                                        "typeIdentifier": "t_contract$_IManager_$11318",
                                         "typeString": "contract IManager"
                                       }
                                     },
@@ -39074,7 +39074,7 @@
                                     "lValueRequested": false,
                                     "memberName": "retrieveTransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 11253,
+                                    "referencedDeclaration": 11289,
                                     "src": "6111:43:42",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -39106,10 +39106,10 @@
                                           "name": "Library",
                                           "nodeType": "Identifier",
                                           "overloadedDeclarations": [],
-                                          "referencedDeclaration": 13101,
+                                          "referencedDeclaration": 13137,
                                           "src": "6165:7:42",
                                           "typeDescriptions": {
-                                            "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                            "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                             "typeString": "type(library Library)"
                                           }
                                         },
@@ -39120,10 +39120,10 @@
                                         "lValueRequested": false,
                                         "memberName": "TransparentProxies",
                                         "nodeType": "MemberAccess",
-                                        "referencedDeclaration": 12914,
+                                        "referencedDeclaration": 12950,
                                         "src": "6165:26:42",
                                         "typeDescriptions": {
-                                          "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                          "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                           "typeString": "type(enum Library.TransparentProxies)"
                                         }
                                       },
@@ -39134,10 +39134,10 @@
                                       "lValueRequested": false,
                                       "memberName": "PriceConverter",
                                       "nodeType": "MemberAccess",
-                                      "referencedDeclaration": 12911,
+                                      "referencedDeclaration": 12947,
                                       "src": "6165:41:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                        "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                         "typeString": "enum Library.TransparentProxies"
                                       }
                                     }
@@ -39145,7 +39145,7 @@
                                   "expression": {
                                     "argumentTypes": [
                                       {
-                                        "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                        "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                         "typeString": "enum Library.TransparentProxies"
                                       }
                                     ],
@@ -39206,10 +39206,10 @@
                               "name": "IPriceConverter",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 11485,
+                              "referencedDeclaration": 11521,
                               "src": "6095:15:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11485_$",
+                                "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11521_$",
                                 "typeString": "type(contract IPriceConverter)"
                               }
                             },
@@ -39224,7 +39224,7 @@
                             "src": "6095:114:42",
                             "tryCall": false,
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_IPriceConverter_$11485",
+                              "typeIdentifier": "t_contract$_IPriceConverter_$11521",
                               "typeString": "contract IPriceConverter"
                             }
                           },
@@ -39235,7 +39235,7 @@
                           "lValueRequested": false,
                           "memberName": "fromUSDToETH",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 11479,
+                          "referencedDeclaration": 11515,
                           "src": "6095:127:42",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -39467,7 +39467,7 @@
                     "referencedDeclaration": 10317,
                     "src": "5963:5:42",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     }
                   }
@@ -39510,7 +39510,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_enum$_Prices_$12905",
+                    "typeIdentifier": "t_enum$_Prices_$12941",
                     "typeString": "enum Library.Prices"
                   },
                   "typeName": {
@@ -39520,13 +39520,13 @@
                       "id": 10315,
                       "name": "Library.Prices",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 12905,
+                      "referencedDeclaration": 12941,
                       "src": "5896:14:42"
                     },
-                    "referencedDeclaration": 12905,
+                    "referencedDeclaration": 12941,
                     "src": "5896:14:42",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_enum$_Prices_$12905",
+                      "typeIdentifier": "t_enum$_Prices_$12941",
                       "typeString": "enum Library.Prices"
                     }
                   },
@@ -40542,7 +40542,7 @@
           },
           {
             "baseFunctions": [
-              11671
+              11707
             ],
             "body": {
               "id": 10488,
@@ -40620,7 +40620,7 @@
                                   "referencedDeclaration": 4619,
                                   "src": "7304:16:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_IManager_$11282",
+                                    "typeIdentifier": "t_contract$_IManager_$11318",
                                     "typeString": "contract IManager"
                                   }
                                 },
@@ -40631,7 +40631,7 @@
                                 "lValueRequested": false,
                                 "memberName": "retrieveTransparentProxies",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 11253,
+                                "referencedDeclaration": 11289,
                                 "src": "7304:43:42",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$__$returns$_t_array$_t_address_$dyn_memory_ptr_$",
@@ -40663,10 +40663,10 @@
                                       "name": "Library",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 13101,
+                                      "referencedDeclaration": 13137,
                                       "src": "7358:7:42",
                                       "typeDescriptions": {
-                                        "typeIdentifier": "t_type$_t_contract$_Library_$13101_$",
+                                        "typeIdentifier": "t_type$_t_contract$_Library_$13137_$",
                                         "typeString": "type(library Library)"
                                       }
                                     },
@@ -40677,10 +40677,10 @@
                                     "lValueRequested": false,
                                     "memberName": "TransparentProxies",
                                     "nodeType": "MemberAccess",
-                                    "referencedDeclaration": 12914,
+                                    "referencedDeclaration": 12950,
                                     "src": "7358:26:42",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12914_$",
+                                      "typeIdentifier": "t_type$_t_enum$_TransparentProxies_$12950_$",
                                       "typeString": "type(enum Library.TransparentProxies)"
                                     }
                                   },
@@ -40691,10 +40691,10 @@
                                   "lValueRequested": false,
                                   "memberName": "PriceConverter",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 12911,
+                                  "referencedDeclaration": 12947,
                                   "src": "7358:41:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 }
@@ -40702,7 +40702,7 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_enum$_TransparentProxies_$12914",
+                                    "typeIdentifier": "t_enum$_TransparentProxies_$12950",
                                     "typeString": "enum Library.TransparentProxies"
                                   }
                                 ],
@@ -40763,10 +40763,10 @@
                           "name": "IPriceConverter",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 11485,
+                          "referencedDeclaration": 11521,
                           "src": "7288:15:42",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11485_$",
+                            "typeIdentifier": "t_type$_t_contract$_IPriceConverter_$11521_$",
                             "typeString": "type(contract IPriceConverter)"
                           }
                         },
@@ -40781,7 +40781,7 @@
                         "src": "7288:114:42",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IPriceConverter_$11485",
+                          "typeIdentifier": "t_contract$_IPriceConverter_$11521",
                           "typeString": "contract IPriceConverter"
                         }
                       },
@@ -40792,7 +40792,7 @@
                       "lValueRequested": false,
                       "memberName": "fromUSDToETH",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 11479,
+                      "referencedDeclaration": 11515,
                       "src": "7288:127:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_uint256_$",
@@ -41121,7 +41121,7 @@
           },
           {
             "baseFunctions": [
-              11676
+              11712
             ],
             "body": {
               "id": 10499,
@@ -41245,7 +41245,7 @@
           },
           {
             "baseFunctions": [
-              11679
+              11715
             ],
             "body": {
               "id": 10515,
@@ -42899,7 +42899,7 @@
           },
           {
             "baseFunctions": [
-              11686
+              11722
             ],
             "body": {
               "id": 10637,
@@ -43042,7 +43042,7 @@
           },
           {
             "baseFunctions": [
-              11693
+              11729
             ],
             "body": {
               "id": 10650,
@@ -43196,7 +43196,7 @@
           },
           {
             "baseFunctions": [
-              11706
+              11742
             ],
             "body": {
               "id": 10672,
@@ -43457,7 +43457,7 @@
           },
           {
             "baseFunctions": [
-              11711
+              11747
             ],
             "body": {
               "id": 10681,
@@ -44595,10 +44595,10 @@
                         "name": "UintLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 13514,
+                        "referencedDeclaration": 13550,
                         "src": "10110:11:42",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                          "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                           "typeString": "type(library UintLibrary)"
                         }
                       },
@@ -44609,7 +44609,7 @@
                       "lValueRequested": false,
                       "memberName": "ProductOfFactors",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 13462,
+                      "referencedDeclaration": 13498,
                       "src": "10110:28:42",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_delegatecall_pure$_t_array$_t_uint256_$dyn_memory_ptr_$returns$_t_uint256_$",
@@ -47055,10 +47055,10 @@
                                   "name": "UintLibrary",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 13514,
+                                  "referencedDeclaration": 13550,
                                   "src": "11678:11:42",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                                    "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                                     "typeString": "type(library UintLibrary)"
                                   }
                                 },
@@ -47069,7 +47069,7 @@
                                 "lValueRequested": false,
                                 "memberName": "FindUintPosition",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 13426,
+                                "referencedDeclaration": 13462,
                                 "src": "11678:28:42",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_delegatecall_pure$_t_uint256_$_t_array$_t_uint256_$dyn_memory_ptr_$returns$_t_uint256_$",
@@ -47160,10 +47160,10 @@
                               "name": "UintLibrary",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 13514,
+                              "referencedDeclaration": 13550,
                               "src": "11644:11:42",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13514_$",
+                                "typeIdentifier": "t_type$_t_contract$_UintLibrary_$13550_$",
                                 "typeString": "type(library UintLibrary)"
                               }
                             },
@@ -47174,7 +47174,7 @@
                             "lValueRequested": false,
                             "memberName": "UintArrayRemoveResize",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 13487,
+                            "referencedDeclaration": 13523,
                             "src": "11644:33:42",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_delegatecall_nonpayable$_t_uint256_$_t_array$_t_uint256_$dyn_storage_ptr_$returns$__$",
@@ -47327,7 +47327,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-01-04T13:26:40.222Z",
+  "updatedAt": "2022-01-05T12:52:39.945Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

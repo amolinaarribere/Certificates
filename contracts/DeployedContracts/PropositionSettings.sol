@@ -37,7 +37,7 @@ contract PropositionSettings is IPropositionSettings, StdPropositionBaseContract
     }
 
     // GOVERNANCE /////////////////////////////////////////
-    function checkProposition(bytes[] memory NewValues) internal override 
+    function checkProposition(bytes[] memory NewValues) internal override view 
     {
         areSettingsOKFunc(UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[1])[0]), UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[2])[0]));
     }
