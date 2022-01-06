@@ -21,8 +21,6 @@ contract MockENSRegistry is IENSRegistry{
     mapping (bytes32 => Record) records;
     mapping (address => mapping(address => bool)) operators;
 
-    bool init;
-
     // Permits modifications only by the owner of the specified node.
     modifier authorised(bytes32 node) {
         address owner = records[node].owner;
@@ -35,16 +33,6 @@ contract MockENSRegistry is IENSRegistry{
      */
     constructor() {
         records[0x0].owner = msg.sender;
-    }
-
-    function initialize(bytes32[] memory initNodes, address resolver, address owner) external {
-        require(false == init, "Registry already initialized");
-        init = true;
-        for(uint i = 0; i < initNodes.length; i++){
-            records[initNodes[i]].ttl = 0;
-            records[initNodes[i]].resolver = resolver;
-            records[initNodes[i]].owner = owner;
-        }
     }
 
     /**

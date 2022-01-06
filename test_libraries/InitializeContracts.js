@@ -33,6 +33,10 @@ const OwnerRefundPriceUSD = constants.OwnerRefundPriceUSD;
 const rate = constants.rate;
 const decimals = constants.decimals;
 const initNodes = constants.initNodes;
+const reverseHashName = constants.reverseHashName;
+const ethHashName = constants.ethHashName;
+const aljomoarEthHashName = constants.aljomoarEthHashName;
+const blockcertsAljomoarEthHashName = constants.blockcertsAljomoarEthHashName;
 var ENSRegistryAddress;
 var ENSReverseRegistryAddress;
 var ENSResolverAddress;
@@ -368,11 +372,8 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
 
   let proxies = await retrieveProxies(certPoolManagerProxy, user_1);
 
-  let mockENSRegistryContract = new web3.eth.Contract(MockENSRegistryAbi, ENSRegistryAddress);
-  await mockENSRegistryContract.methods.initialize(initNodes, ENSResolverAddress, proxies[7]).send({from: user_1, gas: Gas});
-  await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('reverse'), user_1).send({from: user_1, gas: Gas});
-  await mockENSRegistryContract.methods.setSubnodeOwner("0xa097f6721ce401e757d1223a763fef49b8b5f90bb18567ddb86fd205dff71d34", web3.utils.sha3('addr'), ENSReverseRegistryAddress).send({from: user_1, gas: Gas});
-
+  await initializeENS(user_1, proxies[7]);
+  
   return [certPoolManagerProxy, proxies, implementations, admin.address, certPoolManager.address];
 }
 
@@ -443,6 +444,22 @@ function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPers
   let ENSProxyData = getProxyData(ENSProxyInitializerMethod, [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, certPoolManager, chairPerson, ENSContractName, ENSContractVersion]);
 
   return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData, PriceConverterProxyData, PropositionSettingsProxyData, ENSProxyData];
+}
+
+async function initializeENS(user_1, ENSContractAddress){
+  let mockENSRegistryContract = new web3.eth.Contract(MockENSRegistryAbi, ENSRegistryAddress);
+
+  // Reverse Registry Ownership Assignment
+  await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('reverse'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner(reverseHashName, web3.utils.sha3('addr'), ENSReverseRegistryAddress).send({from: user_1, gas: Gas});
+
+  // Provider and PrivatePool Ownership Assignment
+  await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('eth'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner(ethHashName, web3.utils.sha3('aljomoar'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner(aljomoarEthHashName, web3.utils.sha3('blockcerts'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeRecord(blockcertsAljomoarEthHashName, web3.utils.sha3('provider'), ENSContractAddress, ENSResolverAddress, 0).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeRecord(blockcertsAljomoarEthHashName, web3.utils.sha3('privatepool'), ENSContractAddress, ENSResolverAddress, 0).send({from: user_1, gas: Gas});
+
 }
 
 exports.InitializeContracts = InitializeContracts;

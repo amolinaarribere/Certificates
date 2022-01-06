@@ -7,6 +7,10 @@ const OwnerRefundPriceUSD = 200;
 const rate = 1000000000000;
 const decimals = 0;
 const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"]
+const reverseHashName = "0xa097f6721ce401e757d1223a763fef49b8b5f90bb18567ddb86fd205dff71d34"
+const ethHashName = "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae"
+const aljomoarEthHashName = "0xb1fe26b45b845782dfed1cc603f1684b2fbd9d9cdc7e9f309f9260a624ea79ce"
+const blockcertsAljomoarEthHashName = "0xe30ca74a70585a5ccb0c21f7acb47c69a54d3cdcb4176662aa7c12a9441ac2a5"
 // Mock ------------------
 const TotalTokenSupply = 1000;
 const PropositionLifeTime = 604800;
@@ -39,6 +43,10 @@ exports.OwnerRefundPriceUSD = OwnerRefundPriceUSD;
 exports.rate = rate;
 exports.decimals = decimals;
 exports.initNodes = initNodes;
+exports.reverseHashName = reverseHashName;
+exports.ethHashName = ethHashName;
+exports.aljomoarEthHashName = aljomoarEthHashName;
+exports.blockcertsAljomoarEthHashName = blockcertsAljomoarEthHashName;
 // Mock ------------------
 exports.TotalTokenSupply = TotalTokenSupply;
 exports.PropositionLifeTime = PropositionLifeTime;

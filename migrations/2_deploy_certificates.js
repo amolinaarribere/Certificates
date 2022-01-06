@@ -47,6 +47,11 @@ const OwnerRefundFeeUSD = 30;
 const rate = new BigNumber("10000");
 const MockDecimals = 0;
 const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"]
+// Mock
+const reverseHashName = "0xa097f6721ce401e757d1223a763fef49b8b5f90bb18567ddb86fd205dff71d34"
+const ethHashName = "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae"
+const aljomoarEthHashName = "0xb1fe26b45b845782dfed1cc603f1684b2fbd9d9cdc7e9f309f9260a624ea79ce"
+const blockcertsAljomoarEthHashName = "0xe30ca74a70585a5ccb0c21f7acb47c69a54d3cdcb4176662aa7c12a9441ac2a5"
 // privatepool.blockcerts.aljomoar.eth, provider.blockcerts.aljomoar.eth
 const PublicMinOwners = 1;
 const PublicPoolContractName = "Public Certificate Pool";
@@ -72,7 +77,8 @@ module.exports = async function(deployer, network, accounts){
 
   let ENSresult = await ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockENSReverseRegistry, initNodes, web3, accounts[0]);
   let ENSRegistryAddress = ENSresult[0];
-  let ENSReverseRegistryAddress = ENSresult[1];
+  let ENSResolverAddress = ENSresult[1];
+  let ENSReverseRegistryAddress = ENSresult[2];
 
   const PublicOwners = [accounts[0]];
 
@@ -611,7 +617,7 @@ module.exports = async function(deployer, network, accounts){
   var ProviderFactoryProxyInitializerParameters = [ManagerAddress];
   var ProviderFactoryProxyData = web3.eth.abi.encodeFunctionCall(ProviderFactoryProxyInitializerMethod, ProviderFactoryProxyInitializerParameters);
 
- // Initialize Contract Manager
+// Initialize Contract Manager
  var CertificatesPoolManagerProxyInstance = new web3.eth.Contract(CertificatesPoolManagerAbi, ManagerAddress);
   
  await CertificatesPoolManagerProxyInstance.methods.InitializeContracts(
@@ -646,7 +652,8 @@ module.exports = async function(deployer, network, accounts){
   let ManagerAdmin = await CertificatesPoolManagerProxyInstance.methods.retrieveManagerAdmin().call();
   let init = await CertificatesPoolManagerProxyInstance.methods.isInitialized().call();
 
-
+ // Initialize ENS Domains if required (mocking)
+ await ExternalRegistries.initializeENS(network, MockENSRegistry, ENSRegistryAddress, web3, accounts[0], TransparentProxies[7], ENSResolverAddress, ENSReverseRegistryAddress, reverseHashName, ethHashName, aljomoarEthHashName, blockcertsAljomoarEthHashName, Gas)
 
 
   console.log("Deployment Summary ----------------------------------------------- ");
