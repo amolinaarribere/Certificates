@@ -22,8 +22,12 @@ contract ProviderFactory is Factory{
     function create(address[] memory owners,  uint256 minOwners, string memory ElementName, string memory ENSName) external override payable
     {
         ITreasury(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.Treasury)]).pay{value:msg.value}(Library.Prices.NewProviderContract);
-        (,address ENSReverseAddress,,) = IENS(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ENS)]).retrieveSettings();
-        bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string,string,address)", owners, minOwners, ElementName, ENSName, ENSReverseAddress);
+        (,address ENSReverseAddress,,,,string memory ENSSuffix) = IENS(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ENS)]).retrieveSettings();
+
+        string memory ENSCompleteName = ENSName;
+        if(0 < bytes(ENSName).length) ENSCompleteName = string(abi.encodePacked(ENSName, ENSSuffix));
+
+        bytes memory data = abi.encodeWithSignature("Provider_init(address[],uint256,string,string,address)", owners, minOwners, ElementName, ENSCompleteName, ENSReverseAddress);
         internalCreate(_managerContract.retrieveBeacons()[uint256(Library.Beacons.Provider)], data, ElementName, ENSName);
     }
 

@@ -27,6 +27,7 @@ contract("Testing Admin",function(accounts){
     const address_1 = "0x0000000000000000000000000000000000000001";
     const address_2 = "0x0000000000000000000000000000000000000002";
     const emptyBytes = "0x";
+    var PropositionValues1 = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
 
     beforeEach(async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
@@ -38,26 +39,23 @@ contract("Testing Admin",function(accounts){
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
         // act
-        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
-        await proposition.Check_Proposition_Details(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+        await proposition.Check_Proposition_Details(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues1);
     });
 
     it("Vote/Propose/Cancel Admin Config WRONG",async function(){
-        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
-        await proposition.Config_Admin_Wrong(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
+        await proposition.Config_Admin_Wrong(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues1);
     });
 
     it("Vote/Propose/Cancel Admin Config CORRECT",async function(){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         var certContractAddress = contracts[4];
-
         var PropositionValues = [aux.AddressToBytes32(certContractAddress), emptyBytes, aux.AddressToBytes32(address_0)];
+
         await proposition.Config_Admin_Correct(admin, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
     });
 
     it("Votes Reassignment Admin",async function(){
-        var PropositionValues = [aux.AddressToBytes32(address_1), emptyBytes, aux.AddressToBytes32(address_2)];
-        await proposition.Check_Votes_Reassignment(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+        await proposition.Check_Votes_Reassignment(admin, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues1);
     });
 
     it("Reassigning Admin",async function(){

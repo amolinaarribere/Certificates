@@ -8,6 +8,12 @@ const constants = require("../test_libraries/constants.js");
 const ProviderFactory = artifacts.require("ProviderFactory");
 const ProviderFactoryAbi = ProviderFactory.abi;
 
+const MockENSResolver = artifacts.require("MockENSResolver");
+const MockENSResolverAbi = MockENSResolver.abi;
+
+const MockENSReverseRegistry = artifacts.require("MockENSReverseRegistry");
+const MockENSReverseRegistryAbi = MockENSReverseRegistry.abi;
+
 const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals - 2) / constants.rate;
 const ProviderPriceWei = constants.ProviderPriceUSD * FactorUSDtoETH;
 
@@ -29,6 +35,8 @@ contract("Testing Provider Factory",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         providerFactoryProxy = new web3.eth.Contract(ProviderFactoryAbi, contracts[1][4]);
+        ENSReverseRegistry = new web3.eth.Contract(MockENSReverseRegistryAbi, contracts[2][12]);
+        ENSResolver = new web3.eth.Contract(MockENSResolverAbi, contracts[2][13]);
     });
 
     // ****** Creating Provider ***************************************************************** //
@@ -38,7 +46,7 @@ contract("Testing Provider Factory",function(accounts){
     });
 
     it("Create Provider CORRECT",async function(){
-        await factory_common.createElementCorrect(providerFactoryProxy, ProviderOwners, minOwners, ["e1","e2","e3"], ProviderPriceWei, user_1, user_2, user_3);
+        await factory_common.createElementCorrect(providerFactoryProxy, ENSResolver, ENSReverseRegistry, ProviderOwners, minOwners, ["e1","e2","e3"], ProviderPriceWei, user_1, user_2, user_3, false);
     });
 
     // ****** Retrieve ***************************************************************** //

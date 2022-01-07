@@ -33,6 +33,7 @@ const OwnerRefundPriceUSD = constants.OwnerRefundPriceUSD;
 const rate = constants.rate;
 const decimals = constants.decimals;
 const initNodes = constants.initNodes;
+const initSuffixes = constants.initSuffixes;
 const reverseHashName = constants.reverseHashName;
 const ethHashName = constants.ethHashName;
 const aljomoarEthHashName = constants.aljomoarEthHashName;
@@ -102,6 +103,11 @@ const ENSProxyInitializerMethod = {
       "internalType": "bytes32[]",
       "name": "nodes",
       "type": "bytes32[]"
+    },
+    {
+      "internalType": "string[]",
+      "name": "suffixes",
+      "type": "string[]"
     },
     {
       "internalType": "address",
@@ -411,7 +417,7 @@ async function deployImplementations(user_1){
     ENSReverseRegistryAddress = mockENSReverseRegistry.address;
     // Mock ---------------
 
-    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address, ens.address, mockENSRegistry.address, mockENSReverseRegistry.address];
+    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address, ens.address, mockENSRegistry.address, mockENSReverseRegistry.address, mockENSResolver.address];
 }
 
 async function retrieveProxies(certPoolManager, user_1){
@@ -441,7 +447,7 @@ function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPers
   let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
   let PriceConverterProxyData = getProxyData(PriceConverterProxyInitializerMethod, [mockChainLinkFeedRegistry, certPoolManager, chairPerson, PriceConverterContractName, PriceConverterContractVersion]);
   let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [certPoolManager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion]);
-  let ENSProxyData = getProxyData(ENSProxyInitializerMethod, [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, certPoolManager, chairPerson, ENSContractName, ENSContractVersion]);
+  let ENSProxyData = getProxyData(ENSProxyInitializerMethod, [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, initSuffixes, certPoolManager, chairPerson, ENSContractName, ENSContractVersion]);
 
   return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData, PriceConverterProxyData, PropositionSettingsProxyData, ENSProxyData];
 }

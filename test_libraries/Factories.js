@@ -9,6 +9,10 @@ const NotEnoughFunds = new RegExp("EC2-");
 const NodeAlreadyExists = new RegExp("EC37-");
 const emptyLabel = "";
 const label = "TestLabel";
+const PrivatePoolSuffix = constants.initSuffixes[0];
+const ProviderSuffix = constants.initSuffixes[1];
+
+
 
 async function createElementWrong(FactoryProxy, Owners, minOwners, ElementName, Price, user_1){
 
@@ -72,7 +76,8 @@ async function createElementWrong(FactoryProxy, Owners, minOwners, ElementName, 
     }
 }
 
-async function createElementCorrect(FactoryProxy, Owners, minOwners, ElementName, Price, user_1, user_2, user_3){
+async function createElementCorrect(FactoryProxy, ENSResolver, ENSReverseRegistry, Owners, minOwners, ElementName, Price, user_1, user_2, user_3, privateOrProvider){
+    // Factory creation
     var total = await FactoryProxy.methods.retrieveTotal().call({from: user_1}, function(error, result){});
     expect(parseInt(total)).to.equal(0);
     await FactoryProxy.methods.create(Owners, minOwners, ElementName[0], emptyLabel).send({from: user_1, value: Price, gas: Gas}, function(error, result){});
@@ -89,6 +94,20 @@ async function createElementCorrect(FactoryProxy, Owners, minOwners, ElementName
     expect(ElementName_1).to.equal(ElementName[0]);
     expect(ElementName_2).to.equal(ElementName[1]);
     expect(ElementName_3).to.equal(ElementName[2]);
+
+    // ENS creation
+    let Domain = label + ProviderSuffix;
+    if(privateOrProvider) Domain = label + PrivatePoolSuffix;
+    
+    let Node = NameHash(Domain);
+    let ResolvedAddress_2 = await ENSResolver.methods.addr(Node).call({from: user_1});
+
+    expect(ResolvedAddress_2).to.equal(proxyaddress_2);
+
+    let proxyaddress_2_Node = await ENSReverseRegistry.methods.node(proxyaddress_2).call({from: user_1});
+    let ReversedResolvedName_2 = await ENSResolver.methods.name(proxyaddress_2_Node).call({from: user_1});
+
+    expect(ReversedResolvedName_2).to.equal(Domain);
 }
 
 async function retrieveWrong(FactoryProxy, user_1){
@@ -98,6 +117,20 @@ async function retrieveWrong(FactoryProxy, user_1){
     catch(error){
         expect(error.message).to.match(IDWrong);
     }
+}
+
+function NameHash(name){
+    let nameHash = 0;
+    let nameSplit = name.trim().split(".");
+
+    for(let i = 0; i < nameSplit.length; i++){
+        let index = nameSplit.length - 1 - i;
+        if(nameSplit[index].length > 0){
+            nameHash = web3.utils.soliditySha3(nameHash, web3.utils.sha3(nameSplit[index]));
+        }
+    }
+
+    return nameHash;
 }
 
 
