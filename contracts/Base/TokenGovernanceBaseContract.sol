@@ -179,6 +179,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
         PropositionInProgress(true)
         isAuthorizedToCancel(msg.sender)
     {
+        propositionCancelled();
         InternalCancelProposition();
         emit _CancelledProposition(_Proposition.PropID, _Proposition.Proposer);
     }
@@ -304,5 +305,7 @@ abstract contract TokenGovernanceBaseContract is ITokenEventSubscriber, Signatur
     function propositionRejected() internal virtual{}
 
     function propositionExpired() internal virtual{}
+
+    function propositionCancelled() internal virtual{}
 
 }
