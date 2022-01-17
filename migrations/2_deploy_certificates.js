@@ -33,8 +33,8 @@ let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominatio
 
 const Gas = 6721975;
 const PropositionLifeTime = 604800;
-const PropositionThresholdPercentage = 50;
-const minWeightToProposePercentage = 5;
+const PropositionThreshold = 50000000;
+const minToPropose = 5000000;
 const TokenName = "CertisToken";
 const TokenSymbol = "CERT";
 const TokenSupply = 100000000;
@@ -47,7 +47,13 @@ const OwnerRefundFeeUSD = 30;
 const rate = new BigNumber("10000");
 const MockDecimals = 0;
 const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f3636b9d4", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20a10799"]
-// privatepool.blockcerts.aljomoar.eth, provider.blockcerts.aljomoar.eth
+const initSuffixes = [".privatepool.blockcerts.aljomoar.eth", ".provider.blockcerts.aljomoar.eth"]
+// Mock
+const reverseHashName = "0xa097f6721ce401e757d1223a763fef49b8b5f90bb18567ddb86fd205dff71d34"
+const ethHashName = "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae"
+const aljomoarEthHashName = "0xb1fe26b45b845782dfed1cc603f1684b2fbd9d9cdc7e9f309f9260a624ea79ce"
+const blockcertsAljomoarEthHashName = "0xe30ca74a70585a5ccb0c21f7acb47c69a54d3cdcb4176662aa7c12a9441ac2a5"
+// Mock
 const PublicMinOwners = 1;
 const PublicPoolContractName = "Public Certificate Pool";
 const PublicPoolContractVersion = "1.0";
@@ -70,9 +76,10 @@ const AdminContractVersion = "1.0";
 module.exports = async function(deployer, network, accounts){
   let ChainLinkRegistryAddress = await ExternalRegistries.GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry, rate, MockDecimals);
 
-  let ENSresult = await ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockENSReverseRegistry, initNodes);
+  let ENSresult = await ExternalRegistries.GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockENSReverseRegistry, initNodes, web3, accounts[0]);
   let ENSRegistryAddress = ENSresult[0];
-  let ENSReverseRegistryAddress = ENSresult[1];
+  let ENSResolverAddress = ENSresult[1];
+  let ENSReverseRegistryAddress = ENSresult[2];
 
   const PublicOwners = [accounts[0]];
 
@@ -209,6 +216,11 @@ module.exports = async function(deployer, network, accounts){
         "type": "bytes32[]"
       },
       {
+        "internalType": "string[]",
+        "name": "suffixes",
+        "type": "string[]"
+      },
+      {
         "internalType": "address",
         "name": "managerContractAddress",
         "type": "address"
@@ -235,7 +247,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var ENSProxyInitializerParameters = [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, ManagerAddress, accounts[0], ENSContractName, ENSContractVersion];
+  var ENSProxyInitializerParameters = [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, initSuffixes, ManagerAddress, accounts[0], ENSContractName, ENSContractVersion];
   var ENSProxyData = web3.eth.abi.encodeFunctionCall(ENSProxyInitializerMethod, ENSProxyInitializerParameters);
 
   
@@ -271,14 +283,14 @@ module.exports = async function(deployer, network, accounts){
         "type": "uint256"
       },
       {
-        "internalType": "uint8",
-        "name": "PropositionThresholdPercentage",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "PropositionThreshold",
+        "type": "uint256"
       },
       {
-        "internalType": "uint8",
-        "name": "minWeightToProposePercentage",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "minToPropose",
+        "type": "uint256"
       },
       {
         "internalType": "string",
@@ -297,7 +309,7 @@ module.exports = async function(deployer, network, accounts){
     "type": "function"
   };
 
-  var PropositionSettingsProxyInitializerParameters = [ManagerAddress, accounts[0], PropositionLifeTime, PropositionThresholdPercentage, minWeightToProposePercentage, PropositionSettingsContractName, PropositionSettingsContractVersion];
+  var PropositionSettingsProxyInitializerParameters = [ManagerAddress, accounts[0], PropositionLifeTime, PropositionThreshold, minToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion];
   var PropositionSettingsProxyData = web3.eth.abi.encodeFunctionCall(PropositionSettingsProxyInitializerMethod, PropositionSettingsProxyInitializerParameters);
 
   // Price Converter -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -611,7 +623,7 @@ module.exports = async function(deployer, network, accounts){
   var ProviderFactoryProxyInitializerParameters = [ManagerAddress];
   var ProviderFactoryProxyData = web3.eth.abi.encodeFunctionCall(ProviderFactoryProxyInitializerMethod, ProviderFactoryProxyInitializerParameters);
 
- // Initialize Contract Manager
+// Initialize Contract Manager
  var CertificatesPoolManagerProxyInstance = new web3.eth.Contract(CertificatesPoolManagerAbi, ManagerAddress);
   
  await CertificatesPoolManagerProxyInstance.methods.InitializeContracts(
@@ -646,7 +658,8 @@ module.exports = async function(deployer, network, accounts){
   let ManagerAdmin = await CertificatesPoolManagerProxyInstance.methods.retrieveManagerAdmin().call();
   let init = await CertificatesPoolManagerProxyInstance.methods.isInitialized().call();
 
-
+ // Initialize ENS Domains if required (mocking)
+ await ExternalRegistries.initializeENS(network, MockENSRegistry, ENSRegistryAddress, web3, accounts[0], TransparentProxies[7], ENSResolverAddress, ENSReverseRegistryAddress, reverseHashName, ethHashName, aljomoarEthHashName, blockcertsAljomoarEthHashName, Gas)
 
 
   console.log("Deployment Summary ----------------------------------------------- ");

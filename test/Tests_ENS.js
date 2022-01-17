@@ -24,11 +24,17 @@ contract("Testing ENS",function(accounts){
     const minOwners = 2;
     const user_1 = accounts[4];
     const tokenOwner = [accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
+    const address_0 = "0x0000000000000000000000000000000000000000";
+    const emptyBytes = "0x";
     const address_1 = "0x0000000000000000000000000000000000000001";
     const address_2 = "0x0000000000000000000000000000000000000002";
     const initNodes = ["0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f36000000", "0xfb2b320dd4db2d98782dcf0e70619f558862e1d313050e2408ea439c20000000"];
+    const initSuffixes = [".privatepool.something.eth", ".provider.something.eth"];
     const label = "0xf48fea3be10b651407ef19aa331df17a59251f41cbd949d07560de8f36000000";
-    var PropositionValues = [aux.AddressToBytes32(address_1), aux.AddressToBytes32(address_2), initNodes[0], initNodes[1]];
+    var PropositionValues1 = [aux.AddressToBytes32(address_1), aux.AddressToBytes32(address_2), initNodes[0], initNodes[1], aux.StringToBytes(initSuffixes[0]), aux.StringToBytes(initSuffixes[1])];
+    var PropositionValues2 = [aux.AddressToBytes32(address_0), aux.AddressToBytes32(address_0), emptyBytes, emptyBytes, aux.StringToBytes(""), aux.StringToBytes(initSuffixes[1])];
+    var PropositionValues3 = [aux.AddressToBytes32(address_1), aux.AddressToBytes32(address_2), initNodes[0], initNodes[1], aux.StringToBytes(initSuffixes[0]), emptyBytes];
+    var PropositionValues = [PropositionValues1, PropositionValues2, PropositionValues3];
 
     const Unauthorized = new RegExp("EC8-");
 
@@ -55,11 +61,11 @@ contract("Testing ENS",function(accounts){
     // ****** Testing Settings Configuration ***************************************************************** //
     it("Retrieve Proposals Details",async function(){
         // act
-        await proposition.Check_Proposition_Details(ensProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+        await proposition.Check_Proposition_Details(ensProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues1);
     });
 
     it("Vote/Propose/Cancel ENS Config WRONG",async function(){
-        await proposition.Config_ENS_Wrong(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues);
+        await proposition.Config_ENS_Wrong(ensProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, PropositionValues1);
     });
 
     it("Vote/Propose/Cancel ENS Config CORRECT",async function(){
@@ -67,7 +73,7 @@ contract("Testing ENS",function(accounts){
     });
 
     it("Votes Reassignment ENS",async function(){
-        await proposition.Check_Votes_Reassignment(ensProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
+        await proposition.Check_Votes_Reassignment(ensProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues1);
     });
 
 });

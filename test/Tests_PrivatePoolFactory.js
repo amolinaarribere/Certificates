@@ -8,6 +8,12 @@ const constants = require("../test_libraries/constants.js");
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const PrivatePoolFactoryAbi = PrivatePoolFactory.abi;
 
+const MockENSResolver = artifacts.require("MockENSResolver");
+const MockENSResolverAbi = MockENSResolver.abi;
+
+const MockENSReverseRegistry = artifacts.require("MockENSReverseRegistry");
+const MockENSReverseRegistryAbi = MockENSReverseRegistry.abi;
+
 const FactorUSDtoETH = Math.pow(10, 18 + constants.decimals - 2) / constants.rate;
 const PrivatePriceWei = constants.PrivatePriceUSD * FactorUSDtoETH;
 
@@ -16,6 +22,9 @@ const PrivatePriceWei = constants.PrivatePriceUSD * FactorUSDtoETH;
 
 contract("Testing Private Pool Factory",function(accounts){
     var certPoolManager;
+    var privatePoolFactoryProxy;
+    var ENSResolver;
+    var ENSReverseRegistry;
     // used addresses
     const chairPerson = accounts[0];
     const PublicOwners = [accounts[1], accounts[2], accounts[3]];
@@ -29,6 +38,8 @@ contract("Testing Private Pool Factory",function(accounts){
         let contracts = await init.InitializeContracts(chairPerson, PublicOwners, minOwners, user_1);
         certPoolManager = contracts[0];
         privatePoolFactoryProxy = new web3.eth.Contract(PrivatePoolFactoryAbi, contracts[1][3]);
+        ENSReverseRegistry = new web3.eth.Contract(MockENSReverseRegistryAbi, contracts[2][12]);
+        ENSResolver = new web3.eth.Contract(MockENSResolverAbi, contracts[2][13]);
     });
 
     // ****** Creating Private Pools ***************************************************************** //
@@ -38,7 +49,7 @@ contract("Testing Private Pool Factory",function(accounts){
     });
 
     it("Create Private Pool CORRECT",async function(){
-        await factory_common.createElementCorrect(privatePoolFactoryProxy, PrivateOwners, minOwners, ["e1","e2","e3"], PrivatePriceWei, user_1, user_2, user_3);
+        await factory_common.createElementCorrect(privatePoolFactoryProxy, ENSResolver, ENSReverseRegistry, PrivateOwners, minOwners, ["e1","e2","e3"], PrivatePriceWei, user_1, user_2, user_3, true);
     });
 
     // ****** Retrieve ***************************************************************** //

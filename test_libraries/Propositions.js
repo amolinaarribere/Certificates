@@ -97,10 +97,25 @@ async function checkPropositionSettings(contractAddress, propBytes, user_1){
 
 async function checkENS(contractAddress, ENSBytes, user_1){
     let _ENS =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    expect(aux.Bytes32ToAddress(ENSBytes[0])).to.equal(_ENS[0]);
-    expect(aux.Bytes32ToAddress(ENSBytes[1])).to.equal(_ENS[1]);
-    expect(ENSBytes[2]).to.equal(_ENS[2]);
-    expect(ENSBytes[3]).to.equal(_ENS[3]);
+
+    if(address_0 != aux.Bytes32ToAddress(ENSBytes[0])) expect(aux.Bytes32ToAddress(ENSBytes[0])).to.equal(_ENS[0]);
+    else expect(aux.Bytes32ToAddress(ENSBytes[0])).to.not.equal(_ENS[0]);
+
+    if(address_0 != aux.Bytes32ToAddress(ENSBytes[1])) expect(aux.Bytes32ToAddress(ENSBytes[1])).to.equal(_ENS[1]);
+    else expect(aux.Bytes32ToAddress(ENSBytes[1])).to.not.equal(_ENS[1]);
+
+    if(emptyBytes != ENSBytes[2]) expect(ENSBytes[2]).to.equal(_ENS[2]);
+    else expect(ENSBytes[2]).to.not.equal(_ENS[2]);
+
+    if(emptyBytes != ENSBytes[3]) expect(ENSBytes[3]).to.equal(_ENS[3]);
+    else expect(ENSBytes[3]).to.not.equal(_ENS[3]);
+
+    if(emptyBytes != ENSBytes[4]) expect(aux.BytesToString(ENSBytes[4])).to.equal(_ENS[4]);
+    else expect(aux.BytesToString(ENSBytes[4])).to.not.equal(_ENS[4]);
+
+    if(emptyBytes != ENSBytes[5]) expect(aux.BytesToString(ENSBytes[5])).to.equal(_ENS[5]);
+    else expect(aux.BytesToString(ENSBytes[5])).to.not.equal(_ENS[5]);
+
 }
 
 async function checkPrice(contractAddress, PricesBytes, user_1){
@@ -138,9 +153,10 @@ async function checkAdmin(contractAddress, addressBytes, user_1){
 
 async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
+    let tooMuch = TotalTokenSupply + 1;
     // act
     try{
-        await contractAddress.methods.sendProposition([NewValues[0], aux.IntToBytes32(101), NewValues[2]]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([NewValues[0], aux.IntToBytes32(tooMuch), NewValues[2]]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -149,7 +165,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
     }
     // act
     try{
-        await contractAddress.methods.sendProposition([NewValues[0], NewValues[1], aux.IntToBytes32(101)]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([NewValues[0], NewValues[1], aux.IntToBytes32(tooMuch)]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -162,7 +178,7 @@ async function Config_Proposition_Wrong(contractAddress, certisTokenProxy, token
 async function Config_Proposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _propositionSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     let InitValue = [aux.IntToBytes32(_propositionSettings[0]), aux.IntToBytes32(_propositionSettings[1]), aux.IntToBytes32(_propositionSettings[2])];
-    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPropositionSettings);
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPropositionSettings, true);
    
 };
 
@@ -182,14 +198,14 @@ async function Config_PriceConverter_Wrong(contractAddress, certisTokenProxy, to
 async function Config_PriceConverter_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _registryAddress =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     let InitValue = [aux.AddressToBytes32(_registryAddress)];
-    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPriceConverter);
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPriceConverter, true);
 };
 
 async function Config_ENS_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     await Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
     // act
     try{
-        await contractAddress.methods.sendProposition([aux.AddressToBytes32(address_0), aux.AddressToBytes32(address_0), emptyBytes, emptyBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await contractAddress.methods.sendProposition([aux.AddressToBytes32(address_0), aux.AddressToBytes32(address_0), emptyBytes, emptyBytes, emptyBytes, emptyBytes]).send({from: chairPerson, gas: Gas}, function(error, result){});
         expect.fail();
     }
     // assert
@@ -200,8 +216,10 @@ async function Config_ENS_Wrong(contractAddress, certisTokenProxy, tokenOwner, u
 
 async function Config_ENS_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _ENSSettings =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
-    let InitValue = [aux.AddressToBytes32(_ENSSettings[0]), aux.AddressToBytes32(_ENSSettings[1]), _ENSSettings[2], _ENSSettings[3]];
-    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkENS);
+    let InitValue = [aux.AddressToBytes32(_ENSSettings[0]), aux.AddressToBytes32(_ENSSettings[1]), _ENSSettings[2], _ENSSettings[3], aux.StringToBytes(_ENSSettings[4]),  aux.StringToBytes(_ENSSettings[5])];
+    for(let i=0; i < NewValues.length; i++){
+        await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues[i], InitValue, checkENS, ((0==i)?true:false));
+    }
 };
 
 async function Config_Treasury_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
@@ -221,7 +239,7 @@ async function Config_Treasury_Wrong(contractAddress, certisTokenProxy, tokenOwn
 async function Config_Treasury_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues ){
     let _price =  await contractAddress.methods.retrieveSettings().call({from: user_1}, function(error, result){});
     let InitValue = [aux.IntToBytes32(_price[0]), aux.IntToBytes32(_price[1]), aux.IntToBytes32(_price[2]), aux.IntToBytes32(_price[3]), aux.IntToBytes32(_price[4])];
-    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPrice);
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkPrice, true);
    
 };
 
@@ -254,7 +272,7 @@ async function Config_ContractsManager_Correct(contractAddress, certisTokenProxy
         aux.StringToBytes(result[20]),
         aux.StringToBytes(result[21]),
     ];
-    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts);
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkContracts, true);
    
 };
 
@@ -274,10 +292,18 @@ async function Config_Admin_Wrong(contractAddress, certisTokenProxy, tokenOwner,
 async function Config_Admin_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     let _managerAddress =  await contractAddress.methods.retrieveManager().call({from: user_1}, function(error, result){});
     let InitValue = [aux.AddressToBytes32(_managerAddress), emptyBytes, contractAddress._address];
-    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkAdmin);
+    await Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkAdmin, true);
 };
 
 /////////////////////
+
+function EmptyPropositions(Array){
+    var EmptyProposition = []
+    for(let i=0; i < Array.length; i++){
+        EmptyProposition.push(emptyBytes);
+    }
+    return EmptyProposition;
+}
 
 async function Config_CommonProposition_Wrong(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues){
     // act
@@ -360,30 +386,36 @@ async function Config_CommonProposition_Wrong(contractAddress, certisTokenProxy,
     
 };
 
-async function Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFunction){
-    // act
-    await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
- 
-    // Rejected 
-    await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
-    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
-    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
-    await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
- 
-    // Cancelled
-    await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
-    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
-    await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
-    await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
-    await checkFunction(contractAddress, InitValue, user_1);
- 
+async function Config_CommonProposition_Correct(contractAddress, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues, InitValue, checkFunction, fullTest){
+    var EmptyProposition = EmptyPropositions(NewValues);
+
+    if(fullTest){
+        // act
+        await SplitTokenSupply(certisTokenProxy, tokenOwner, chairPerson);
+    
+        // Rejected 
+        await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await contractAddress.methods.voteProposition(false).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await checkProposition(contractAddress, EmptyProposition, user_1);
+    
+        // Cancelled
+        await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await contractAddress.methods.voteProposition(true).send({from: tokenOwner[0], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await contractAddress.methods.voteProposition(true).send({from: tokenOwner[1], gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await contractAddress.methods.cancelProposition().send({from: chairPerson, gas: Gas}, function(error, result){});
+        await checkFunction(contractAddress, InitValue, user_1);
+        await checkProposition(contractAddress, EmptyProposition, user_1);
+    }
+    
     // Validated
     await contractAddress.methods.sendProposition(NewValues).send({from: chairPerson, gas: Gas}, function(error, result){});
     await checkFunction(contractAddress, InitValue, user_1);
@@ -393,6 +425,7 @@ async function Config_CommonProposition_Correct(contractAddress, certisTokenProx
     await checkFunction(contractAddress, InitValue, user_1);
     await contractAddress.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
     await checkFunction(contractAddress, NewValues, user_1);
+    await checkProposition(contractAddress, EmptyProposition, user_1);
 
     // Validated again
     await contractAddress.methods.sendProposition(InitValue).send({from: chairPerson, gas: Gas}, function(error, result){});
@@ -407,6 +440,7 @@ async function Config_CommonProposition_Correct(contractAddress, certisTokenProx
     await checkFunction(contractAddress, NewValues, user_1);
     await contractAddress.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
     await checkFunction(contractAddress, InitValue, user_1);
+    await checkProposition(contractAddress, EmptyProposition, user_1);
   
  };
 

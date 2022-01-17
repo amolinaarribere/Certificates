@@ -47,6 +47,12 @@ abstract contract StdPropositionBaseContract is IStdPropositionBaseContract, Tok
         removeProposition();
     }
 
+    function propositionCancelled() internal override
+    {
+        removeProposition();
+    }
+
+
     function removeProposition() internal
     {
         delete(_ProposedNewValues);

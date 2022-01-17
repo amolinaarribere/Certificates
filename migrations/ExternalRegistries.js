@@ -25,8 +25,9 @@ async function GetChainLinkAddress(network, deployer, MockChainLinkFeedRegistry,
   
 }
 
-async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry, initNodes){
+async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolver, MockReverseRegistry){
     var ENSRegistryAddress = MainENSRegistryAddress;
+    var ENSResolverAddress = "";
     var ENSReverseRegistryAddress = MainENSReverseRegistryAddress;
 
     if("mainnet" != network &&
@@ -34,25 +35,51 @@ async function GetENSAddresses(network, deployer, MockENSRegistry, MockENSResolv
        "rinkeby" != network &&
        "goerli" != network)
     {
-        await deployer.deploy(MockENSResolver);
-        let MockENSResolverInstance = await MockENSResolver.deployed();
-        console.log("MockENSResolverInstance deployed : " + MockENSResolverInstance.address);
-
-        await deployer.deploy(MockENSRegistry, initNodes, MockENSResolverInstance.address);
+        await deployer.deploy(MockENSRegistry);
         let MockENSRegistryInstance = await MockENSRegistry.deployed();
         console.log("MockENSRegistryInstance deployed : " + MockENSRegistryInstance.address);
 
-        await deployer.deploy(MockReverseRegistry);
+        await deployer.deploy(MockENSResolver, MockENSRegistryInstance.address);
+        let MockENSResolverInstance = await MockENSResolver.deployed();
+        console.log("MockENSResolverInstance deployed : " + MockENSResolverInstance.address);
+
+        await deployer.deploy(MockReverseRegistry, MockENSRegistryInstance.address, MockENSResolverInstance.address);
         let MockReverseRegistryInstance = await MockReverseRegistry.deployed();
         console.log("MockReverseRegistryInstance deployed : " + MockReverseRegistryInstance.address);
 
+        ENSRegistryAddress = MockENSRegistryInstance.address;
+        ENSResolverAddress = MockENSResolverInstance.address;
+        ENSReverseRegistryAddress = MockReverseRegistryInstance.address;
 
-        ENSRegistryAddress = MockENSRegistryInstance.address
-        ENSReverseRegistryAddress = MockReverseRegistryInstance.address
     }
 
-    return [ENSRegistryAddress, ENSReverseRegistryAddress];
+    return [ENSRegistryAddress, ENSResolverAddress, ENSReverseRegistryAddress];
 }
+
+async function initializeENS(network, MockENSRegistry, ENSRegistryAddress, web3, account, ENSContractAddress, ENSResolverAddress, ENSReverseRegistryAddress, reverseHashName, ethHashName, aljomoarEthHashName, blockcertsAljomoarEthHashName, Gas){
+    if("mainnet" != network &&
+       "ropsten" != network &&
+       "rinkeby" != network &&
+       "goerli" != network)
+    {
+        const MockENSRegistryAbi = MockENSRegistry.abi;
+        let mockENSRegistryContract = new web3.eth.Contract(MockENSRegistryAbi, ENSRegistryAddress);
+
+        // Reverse Registry Ownership Assignment
+        await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('reverse'), account).send({from: account, gas: Gas});
+        await mockENSRegistryContract.methods.setSubnodeOwner(reverseHashName, web3.utils.sha3('addr'), ENSReverseRegistryAddress).send({from: account, gas: Gas});
+    
+        // Provider and PrivatePool Ownership Assignment
+        await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('eth'), account).send({from: account, gas: Gas});
+        await mockENSRegistryContract.methods.setSubnodeOwner(ethHashName, web3.utils.sha3('aljomoar'), account).send({from: account, gas: Gas});
+        await mockENSRegistryContract.methods.setSubnodeOwner(aljomoarEthHashName, web3.utils.sha3('blockcerts'), account).send({from: account, gas: Gas});
+        await mockENSRegistryContract.methods.setSubnodeRecord(blockcertsAljomoarEthHashName, web3.utils.sha3('provider'), ENSContractAddress, ENSResolverAddress, 0).send({from: account, gas: Gas});
+        await mockENSRegistryContract.methods.setSubnodeRecord(blockcertsAljomoarEthHashName, web3.utils.sha3('privatepool'), ENSContractAddress, ENSResolverAddress, 0).send({from: account, gas: Gas});
+        
+        console.log("ENS Domains initialized");
+    }
+  }
 
 exports.GetChainLinkAddress = GetChainLinkAddress;
 exports.GetENSAddresses = GetENSAddresses;
+exports.initializeENS = initializeENS;

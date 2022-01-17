@@ -13,11 +13,12 @@ const ProviderFactory = artifacts.require("ProviderFactory");
 
 const CertificatesPoolManagerAbi = CertificatesPoolManager.abi;
 
-
 const MockChainLinkFeedRegistry = artifacts.require("MockChainLinkFeedRegistry"); // Mock
 const MockENSRegistry = artifacts.require("MockENSRegistry"); // Mock
 const MockENSResolver = artifacts.require("MockENSResolver"); // Mock
 const MockENSReverseRegistry = artifacts.require("MockENSReverseRegistry"); // Mock
+
+const MockENSRegistryAbi = MockENSRegistry.abi;
 
 
 const constants = require("../test_libraries/constants.js");
@@ -28,14 +29,22 @@ const PrivatePriceUSD = constants.PrivatePriceUSD;
 const ProviderPriceUSD = constants.ProviderPriceUSD;
 const CertificatePriceUSD = constants.CertificatePriceUSD;
 const OwnerRefundPriceUSD = constants.OwnerRefundPriceUSD;
-const rate = constants.rate; // mock
-const decimals = constants.decimals; // mock
-const initNodes = constants.initNodes; // mock
-var ENSRegistryAddress; // mock
-var ENSReverseRegistryAddress; // mock
+// Mock -----------
+const rate = constants.rate;
+const decimals = constants.decimals;
+const initNodes = constants.initNodes;
+const initSuffixes = constants.initSuffixes;
+const reverseHashName = constants.reverseHashName;
+const ethHashName = constants.ethHashName;
+const aljomoarEthHashName = constants.aljomoarEthHashName;
+const blockcertsAljomoarEthHashName = constants.blockcertsAljomoarEthHashName;
+var ENSRegistryAddress;
+var ENSReverseRegistryAddress;
+var ENSResolverAddress;
+// Mock -----------
 const PropositionLifeTime = constants.PropositionLifeTime;
-const PropositionThresholdPercentage = constants.PropositionThresholdPercentage;
-const minPercentageToPropose = constants.minPercentageToPropose;
+const PropositionThreshold = constants.PropositionThreshold;
+const minToPropose = constants.minToPropose;
 const TotalTokenSupply = constants.TotalTokenSupply;
 const Gas = constants.Gas;
 const PublicPoolContractName = constants.PublicPoolContractName;
@@ -96,6 +105,11 @@ const ENSProxyInitializerMethod = {
       "type": "bytes32[]"
     },
     {
+      "internalType": "string[]",
+      "name": "suffixes",
+      "type": "string[]"
+    },
+    {
       "internalType": "address",
       "name": "managerContractAddress",
       "type": "address"
@@ -139,14 +153,14 @@ const PropositionSettingsProxyInitializerMethod = {
       "type": "uint256"
     },
     {
-      "internalType": "uint8",
-      "name": "PropositionThresholdPercentage",
-      "type": "uint8"
+      "internalType": "uint256",
+      "name": "PropositionThreshold",
+      "type": "uint256"
     },
     {
-      "internalType": "uint8",
-      "name": "minWeightToProposePercentage",
-      "type": "uint8"
+      "internalType": "uint256",
+      "name": "minToPropose",
+      "type": "uint256"
     },
     {
       "internalType": "string",
@@ -364,6 +378,8 @@ async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1)
 
   let proxies = await retrieveProxies(certPoolManagerProxy, user_1);
 
+  await initializeENS(user_1, proxies[7]);
+  
   return [certPoolManagerProxy, proxies, implementations, admin.address, certPoolManager.address];
 }
 
@@ -391,14 +407,17 @@ async function deployImplementations(user_1){
     let propositionSettings = await PropositionSettings.new({from: user_1});
     let ens = await ENS.new({from: user_1});
 
-    let mockChainLinkFeedRegistry = await MockChainLinkFeedRegistry.new(rate, decimals, {from: user_1}); // Mock
-    let mockENSResolver = await MockENSResolver.new({from: user_1}); // Mock
-    let mockENSRegistry = await MockENSRegistry.new(initNodes, mockENSResolver.address, {from: user_1}); // Mock
+    // Mock ---------------
+    let mockChainLinkFeedRegistry = await MockChainLinkFeedRegistry.new(rate, decimals, {from: user_1});
+    let mockENSRegistry = await MockENSRegistry.new({from: user_1});
     ENSRegistryAddress = mockENSRegistry.address;
-    let mockENSReverseRegistry = await MockENSReverseRegistry.new({from: user_1}); // Mock
+    let mockENSResolver = await MockENSResolver.new(ENSRegistryAddress, {from: user_1});
+    ENSResolverAddress = mockENSResolver.address;
+    let mockENSReverseRegistry = await MockENSReverseRegistry.new(ENSRegistryAddress, mockENSResolver.address, {from: user_1});
     ENSReverseRegistryAddress = mockENSReverseRegistry.address;
+    // Mock ---------------
 
-    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address, ens.address, mockENSRegistry.address, mockENSReverseRegistry.address];
+    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address, ens.address, mockENSRegistry.address, mockENSReverseRegistry.address, mockENSResolver.address];
 }
 
 async function retrieveProxies(certPoolManager, user_1){
@@ -427,10 +446,26 @@ function returnProxyInitData(PublicOwners, minOwners, certPoolManager, chairPers
   let PrivatePoolFactoryProxyData = getProxyData(PrivatePoolFactoryProxyInitializerMethod, [certPoolManager]);
   let ProviderFactoryProxyData = getProxyData(ProviderFactoryProxyInitializerMethod, [certPoolManager]);
   let PriceConverterProxyData = getProxyData(PriceConverterProxyInitializerMethod, [mockChainLinkFeedRegistry, certPoolManager, chairPerson, PriceConverterContractName, PriceConverterContractVersion]);
-  let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [certPoolManager, chairPerson, PropositionLifeTime, PropositionThresholdPercentage, minPercentageToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion]);
-  let ENSProxyData = getProxyData(ENSProxyInitializerMethod, [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, certPoolManager, chairPerson, ENSContractName, ENSContractVersion]);
+  let PropositionSettingsProxyData = getProxyData(PropositionSettingsProxyInitializerMethod, [certPoolManager, chairPerson, PropositionLifeTime, PropositionThreshold, minToPropose, PropositionSettingsContractName, PropositionSettingsContractVersion]);
+  let ENSProxyData = getProxyData(ENSProxyInitializerMethod, [ENSRegistryAddress, ENSReverseRegistryAddress, initNodes, initSuffixes, certPoolManager, chairPerson, ENSContractName, ENSContractVersion]);
 
   return [PublicCertificatesPoolProxyData, TreasuryProxyData, CertisProxyData, PrivatePoolFactoryProxyData, ProviderFactoryProxyData, PriceConverterProxyData, PropositionSettingsProxyData, ENSProxyData];
+}
+
+async function initializeENS(user_1, ENSContractAddress){
+  let mockENSRegistryContract = new web3.eth.Contract(MockENSRegistryAbi, ENSRegistryAddress);
+
+  // Reverse Registry Ownership Assignment
+  await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('reverse'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner(reverseHashName, web3.utils.sha3('addr'), ENSReverseRegistryAddress).send({from: user_1, gas: Gas});
+
+  // Provider and PrivatePool Ownership Assignment
+  await mockENSRegistryContract.methods.setSubnodeOwner("0x0000000000000000000000000000000000000000", web3.utils.sha3('eth'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner(ethHashName, web3.utils.sha3('aljomoar'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeOwner(aljomoarEthHashName, web3.utils.sha3('blockcerts'), user_1).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeRecord(blockcertsAljomoarEthHashName, web3.utils.sha3('provider'), ENSContractAddress, ENSResolverAddress, 0).send({from: user_1, gas: Gas});
+  await mockENSRegistryContract.methods.setSubnodeRecord(blockcertsAljomoarEthHashName, web3.utils.sha3('privatepool'), ENSContractAddress, ENSResolverAddress, 0).send({from: user_1, gas: Gas});
+
 }
 
 exports.InitializeContracts = InitializeContracts;
