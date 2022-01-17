@@ -7,14 +7,15 @@ pragma solidity 0.8.7;
  * @dev Store & retrieve value in a variable
 
 Transparent Proxies:
-    - 0 : Public Pool
-    - 1 : Treasury
-    - 2 : Certis Token
-    - 3 : Private Pool Factory
-    - 4 : Provider Factory
-    - 5 : Price Converter
-    - 6 : Proposition Settings
-    - 7 : ENS
+    - 0 : Itself (Certificate Pool Manager)
+    - 1 : Public Pool
+    - 2 : Treasury
+    - 3 : Certis Token
+    - 4 : Private Pool Factory
+    - 5 : Provider Factory
+    - 6 : Price Converter
+    - 7 : Proposition Settings
+    - 8 : ENS
 
 Beacons:
     - 0 : Private Pool
