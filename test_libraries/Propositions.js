@@ -418,7 +418,7 @@ async function Config_CommonProposition_Correct(contractAddress, certisTokenProx
     await checkFunction(contractAddress, InitValue, user_1);
     await contractAddress.methods.voteProposition(true).send({from: tokenOwner[2], gas: Gas}, function(error, result){});
     await checkFunction(contractAddress, NewValues, user_1);
-    /*await checkProposition(contractAddress, EmptyProposition, user_1);
+    await checkProposition(contractAddress, EmptyProposition, user_1);
 
     // Validated again
     await contractAddress.methods.sendProposition(InitValue).send({from: chairPerson, gas: Gas}, function(error, result){});
@@ -433,7 +433,7 @@ async function Config_CommonProposition_Correct(contractAddress, certisTokenProx
     await checkFunction(contractAddress, NewValues, user_1);
     await contractAddress.methods.voteProposition(true).send({from: tokenOwner[4], gas: Gas}, function(error, result){});
     await checkFunction(contractAddress, InitValue, user_1);
-    await checkProposition(contractAddress, EmptyProposition, user_1);*/
+    await checkProposition(contractAddress, EmptyProposition, user_1);
   
  };
 
