@@ -66,9 +66,6 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     event _ContractUpgrade(address NewContractAddress, uint ProxyId, string ProxyType);
 
     // DATA /////////////////////////////////////////
-    // Admin Smart Contract
-    address private _AdminManager;
-
     // Admin Proxy to manage all the TransparentUpgradeableProxies
     ProxyAdmin private _Admin;
 
@@ -92,46 +89,36 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         _;
     }
 
-    modifier isFromManagerAdmin(address addr){
-        Library.ItIsSomeone(addr, _AdminManager);
-        _;
-    }
-
     // INITIALIZATION /////////////////////////////////////////
     function CertificatesPoolManager_init(address chairPerson, string memory contractName, string memory contractVersion) public initializer
     {
         super.StdPropositionBaseContract_init(chairPerson, address(this), contractName, contractVersion);
         _Admin = new ProxyAdmin();
-        _AdminManager = msg.sender;
     }
 
-    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) 
+    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts, TransparentUpgradeableProxy ManagerProxyAddress) 
         isFromChairPerson(msg.sender)
         isNotInitialized()
     external override
     {
-        initProxies(initialContracts);
+        initProxies(initialContracts, ManagerProxyAddress);
         _init = true;
     }
 
     // FUNCTIONALITY /////////////////////////////////////////
     // governance : contracts assignment and management
-    function changeManagerAdmin(address newManagerAdmin) external override
-        isFromManagerAdmin(msg.sender)
+    function initProxies(Library.ProposedContractsStruct calldata initialContracts, TransparentUpgradeableProxy ManagerProxyAddress) private
     {
-        _AdminManager = newManagerAdmin;
-    }
+        _TransparentProxies.push(TransparentUpgradeableProxy(ManagerProxyAddress));
 
-    function initProxies(Library.ProposedContractsStruct calldata initialContracts) private
-    {
         for(uint i=0; i < initialContracts.TransparentAddresses.length; i++){
-            addTransaprentProxy(initialContracts.TransparentAddresses[i], initialContracts.TransparentData[i]);
+            addTransparentProxy(initialContracts.TransparentAddresses[i], initialContracts.TransparentData[i]);
         }
         for(uint i=0; i < initialContracts.BeaconAddresses.length; i++){
             addBeacon(initialContracts.BeaconAddresses[i]);
         }
-        IFactory(address(_TransparentProxies[3])).updateContractName(initialContracts.PrivatePoolContractName);
-        IFactory(address(_TransparentProxies[3])).updateContractVersion(initialContracts.PrivatePoolContractVersion);
+        IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractName(initialContracts.PrivatePoolContractName);
+        IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractVersion(initialContracts.PrivatePoolContractVersion);
     }
 
     function UpdateAll() internal override
@@ -142,8 +129,8 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         uint256 NewBeaconProxies = UintLibrary.Bytes32ToUint(Library.BytestoBytes32(_ProposedNewValues[1])[0]); // q
         uint256 TransaprentProxyDataSkip = _TransparentProxies.length + NewTransparentProxies + _Beacons.length + NewBeaconProxies;
 
-        // Transaprent Proxies
-        for(uint i=0; i < _TransparentProxies.length; i++){
+        // Transaprent Proxies : We start at 1 so that if we update the code of this SC it will be done at the end
+        for(uint i=1; i < _TransparentProxies.length; i++){
             upgradeTransparentProxy(_TransparentProxies[i], 
                 i, 
                 _ProposedNewValues[pointer + i], 
@@ -154,7 +141,7 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
 
         if(NewTransparentProxies > 0){
             for(uint i=0; i < NewTransparentProxies; i++){
-                addTransaprentProxy(
+                addTransparentProxy(
                 AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(_ProposedNewValues[pointer + i])[0]), 
                 _ProposedNewValues[pointer + TransaprentProxyDataSkip + i]);
             }
@@ -188,9 +175,15 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         if(0 < _ProposedNewValues[pointer + 1].length)
             IFactory(address(_TransparentProxies[3])).updateContractVersion(string(_ProposedNewValues[pointer + 1]));
 
+        // We finally upgrade this contract if required
+        upgradeTransparentProxy(_TransparentProxies[0], 
+                0, 
+                _ProposedNewValues[_NewPropositionsRedimesionFields], 
+                _ProposedNewValues[_NewPropositionsRedimesionFields + TransaprentProxyDataSkip]);
+
     }
 
-    function addTransaprentProxy(address implAddress, bytes memory data) private
+    function addTransparentProxy(address implAddress, bytes memory data) private
     {
         if(address(0) != implAddress){
             _TransparentProxies.push(new TransparentUpgradeableProxy(implAddress, address(_Admin), data));
@@ -246,6 +239,10 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
     }
 
     // configuration implementations
+    function retrieveProxyAdmin() external override view returns (address){
+        return address(_Admin);
+    }
+
     function retrieveTransparentProxiesImpl() external override view returns (address[] memory) 
     {
         address[] memory implementations = new address[](_TransparentProxies.length);
@@ -262,11 +259,6 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
             implementations[i] = internalRetrieveBeaconImpl(_Beacons[i]);
         }
         return implementations;
-    }
-
-    function retrieveManagerAdmin() external override view returns (address)
-    {
-        return _AdminManager;
     }
 
     function isInitialized() external override view returns(bool){
