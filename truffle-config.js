@@ -63,9 +63,9 @@ module.exports = {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*"
-     }
+     },
     // ETHEREUM /////////////////////////////////////////////////////////////////////////////////////
-   /* kovan: {
+    kovan: {
       provider: () => new HDWalletProvider(mnemonic, `https://kovan.infura.io/v3/${projectId}`),
       network_id: 42,       // Ropsten's id
       gas: 6721975,        // Ropsten has a lower block limit than mainnet
@@ -98,7 +98,7 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true
-    }*/
+    }
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     // ropsten: {
