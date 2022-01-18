@@ -170,14 +170,14 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         
 
         if(0 < _ProposedNewValues[pointer].length)
-            IFactory(address(_TransparentProxies[3])).updateContractName(string(_ProposedNewValues[pointer]));
+            IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractName(string(_ProposedNewValues[pointer]));
 
         if(0 < _ProposedNewValues[pointer + 1].length)
-            IFactory(address(_TransparentProxies[3])).updateContractVersion(string(_ProposedNewValues[pointer + 1]));
+            IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractVersion(string(_ProposedNewValues[pointer + 1]));
 
         // We finally upgrade this contract if required
-        upgradeTransparentProxy(_TransparentProxies[0], 
-                0, 
+        upgradeTransparentProxy(_TransparentProxies[uint256(Library.TransparentProxies.CertificatePoolManager)], 
+                uint256(Library.TransparentProxies.CertificatePoolManager), 
                 _ProposedNewValues[_NewPropositionsRedimesionFields], 
                 _ProposedNewValues[_NewPropositionsRedimesionFields + TransaprentProxyDataSkip]);
 

@@ -163,7 +163,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
     }
 
     // ****** TESTING Retrieves ***************************************************************** //
-/*
+
     it("Retrieve Configuration",async function(){
         // assert
         await checkProxyAddresses(certContractProxy._address, publicPoolProxy._address, treasuryProxy._address, certisTokenProxy._address, privatePoolFactoryProxy._address, providerFactoryProxy._address, priceConverterProxy._address, propositionSettingsProxy._address, ensProxy._address);
@@ -185,7 +185,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
         await proposition.Config_ContractsManager_Wrong(certContractProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
     });
-*/
+
     it("Vote/Propose/Cancel Contracts Config CORRECT",async function(){
         let contracts = await init.deployImplementations(chairPerson);
         let i = 0;
@@ -226,7 +226,7 @@ contract("Testing Certificate Pool Manager",function(accounts){
         
         await proposition.Config_ContractsManager_Correct(certContractProxy, certisTokenProxy, tokenOwner, user_1, chairPerson, NewValues);
     });
-/*
+
     it("Vote/Propose/Cancel Contracts Configuration CORRECT Empty",async function(){
         // act
         var address0 = aux.AddressToBytes32(address_0);
@@ -254,5 +254,5 @@ contract("Testing Certificate Pool Manager",function(accounts){
 
         await proposition.Check_Votes_Reassignment(certContractProxy, certisTokenProxy, chairPerson, tokenOwner, user_1, PropositionValues);
     });
-*/
+
 });
