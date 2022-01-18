@@ -44,10 +44,10 @@ import "../Base/ManagedBaseContract.sol";
         if(_managerContract.isInitialized()){
             address[] memory Proxies = _managerContract.retrieveTransparentProxies();
             
-            ITokenEventSubscriber(Proxies[1]).onTokenBalanceChanged(from, to, amount); // Treasury
-            ITokenEventSubscriber(Proxies[5]).onTokenBalanceChanged(from, to, amount); // Price Converter
-            ITokenEventSubscriber(Proxies[6]).onTokenBalanceChanged(from, to, amount); // Proposition Settings
-            ITokenEventSubscriber(Proxies[7]).onTokenBalanceChanged(from, to, amount); // ENS
+            ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.Treasury)]).onTokenBalanceChanged(from, to, amount); // Treasury
+            ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.PriceConverter)]).onTokenBalanceChanged(from, to, amount); // Price Converter
+            ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.PropSettings)]).onTokenBalanceChanged(from, to, amount); // Proposition Settings
+            ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.ENS)]).onTokenBalanceChanged(from, to, amount); // ENS
             ITokenEventSubscriber(address(_managerContract)).onTokenBalanceChanged(from, to, amount); // Certificate Pool Manager
             ITokenEventSubscriber(_managerContract.retrieveManagerAdmin()).onTokenBalanceChanged(from, to, amount); // Admin
         }

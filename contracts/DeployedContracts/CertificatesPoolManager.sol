@@ -129,8 +129,8 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         for(uint i=0; i < initialContracts.BeaconAddresses.length; i++){
             addBeacon(initialContracts.BeaconAddresses[i]);
         }
-        IFactory(address(_TransparentProxies[3])).updateContractName(initialContracts.PrivatePoolContractName);
-        IFactory(address(_TransparentProxies[3])).updateContractVersion(initialContracts.PrivatePoolContractVersion);
+        IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractName(initialContracts.PrivatePoolContractName);
+        IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractVersion(initialContracts.PrivatePoolContractVersion);
     }
 
     function UpdateAll() internal override
@@ -182,10 +182,10 @@ contract CertificatesPoolManager is IManager, StdPropositionBaseContract{
         
 
         if(0 < _ProposedNewValues[pointer].length)
-            IFactory(address(_TransparentProxies[3])).updateContractName(string(_ProposedNewValues[pointer]));
+            IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractName(string(_ProposedNewValues[pointer]));
 
         if(0 < _ProposedNewValues[pointer + 1].length)
-            IFactory(address(_TransparentProxies[3])).updateContractVersion(string(_ProposedNewValues[pointer + 1]));
+            IFactory(address(_TransparentProxies[uint256(Library.TransparentProxies.PrivatePoolFactory)])).updateContractVersion(string(_ProposedNewValues[pointer + 1]));
 
     }
 
