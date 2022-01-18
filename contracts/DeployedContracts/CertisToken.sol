@@ -49,7 +49,6 @@ import "../Base/ManagedBaseContract.sol";
             ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.PropSettings)]).onTokenBalanceChanged(from, to, amount); // Proposition Settings
             ITokenEventSubscriber(Proxies[uint256(Library.TransparentProxies.ENS)]).onTokenBalanceChanged(from, to, amount); // ENS
             ITokenEventSubscriber(address(_managerContract)).onTokenBalanceChanged(from, to, amount); // Certificate Pool Manager
-            ITokenEventSubscriber(_managerContract.retrieveManagerAdmin()).onTokenBalanceChanged(from, to, amount); // Admin
         }
     }
 
