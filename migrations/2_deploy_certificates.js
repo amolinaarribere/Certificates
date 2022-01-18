@@ -644,7 +644,6 @@ module.exports = async function(deployer, network, accounts){
 
   console.log("CertificatesPoolManager initialized");
 
-  let CertManagerAddress = CertificatesPoolManagerInstance.address;
   let TransparentProxies = await CertificatesPoolManagerProxyInstance.methods.retrieveTransparentProxies().call();
   let TransparentImpl = await CertificatesPoolManagerProxyInstance.methods.retrieveTransparentProxiesImpl().call();
   let Beacons = await CertificatesPoolManagerProxyInstance.methods.retrieveBeacons().call();
@@ -668,40 +667,42 @@ module.exports = async function(deployer, network, accounts){
 
   console.log("Contracts ******* ");
 
-  console.log("Proxy Admin Address : " + ProxyAdmin._address);
+  console.log("Proxy Admin Address : " + ProxyAdmin);
 
-  console.log("Manager Proxy Address : " + CertificatesPoolManagerProxyInstance._address);
-  console.log("Manager Address : " + CertManagerAddress + " is iniitalized : " + init);
+  let i=0;
+  console.log("Manager Proxy Address : " + TransparentProxies[i]);
+  console.log("Manager Address : " + TransparentImpl[i++] + " is iniitalized : " + init);
 
-  console.log("Public Pool Proxy Address : " + TransparentProxies[0]);
-  console.log("Public Pool Address : " + TransparentImpl[0]);
+  console.log("Public Pool Proxy Address : " + TransparentProxies[i]);
+  console.log("Public Pool Address : " + TransparentImpl[i++]);
 
-  console.log("Treasury Proxy Address : " + TransparentProxies[1]);
-  console.log("Treasury Address : " + TransparentImpl[1]);
+  console.log("Treasury Proxy Address : " + TransparentProxies[i]);
+  console.log("Treasury Address : " + TransparentImpl[i++]);
 
-  console.log("Certis Proxy Address : " + TransparentProxies[2]);
-  console.log("Certis Address : " + TransparentImpl[2]);
+  console.log("Certis Proxy Address : " + TransparentProxies[i]);
+  console.log("Certis Address : " + TransparentImpl[i++]);
 
-  console.log("Private Pool Factory Proxy Address : " + TransparentProxies[3]);
-  console.log("Private Pool Factory Address : " + TransparentImpl[3]);
+  console.log("Private Pool Factory Proxy Address : " + TransparentProxies[i]);
+  console.log("Private Pool Factory Address : " + TransparentImpl[i++]);
 
-  console.log("Provider Factory Proxy Address : " + TransparentProxies[4]);
-  console.log("Provider Factory Address : " + TransparentImpl[4]);
+  console.log("Provider Factory Proxy Address : " + TransparentProxies[i]);
+  console.log("Provider Factory Address : " + TransparentImpl[i++]);
 
-  console.log("Price Converter Proxy Address : " + TransparentProxies[5]);
-  console.log("Price Converter Address : " + TransparentImpl[5]);
+  console.log("Price Converter Proxy Address : " + TransparentProxies[i]);
+  console.log("Price Converter Address : " + TransparentImpl[i++]);
 
-  console.log("Proposition Settings Proxy Address : " + TransparentProxies[6]);
-  console.log("Proposition Settings Address : " + TransparentImpl[6]);
+  console.log("Proposition Settings Proxy Address : " + TransparentProxies[i]);
+  console.log("Proposition Settings Address : " + TransparentImpl[i++]);
 
-  console.log("ENS Proxy Address : " + TransparentProxies[7]);
-  console.log("ENS Address : " + TransparentImpl[7]);
+  console.log("ENS Proxy Address : " + TransparentProxies[i]);
+  console.log("ENS Address : " + TransparentImpl[i++]);
 
-  console.log("Private Pool Beacon Address : " + Beacons[0]);
-  console.log("Private Pool Implementation Address : " + BeaconsImpl[0]);
+  let j=0;
+  console.log("Private Pool Beacon Address : " + Beacons[j]);
+  console.log("Private Pool Implementation Address : " + BeaconsImpl[j++]);
 
-  console.log("Provider Beacon Address : " + Beacons[1]);
-  console.log("Provider Implementation Address : " + BeaconsImpl[1]);
+  console.log("Provider Beacon Address : " + Beacons[j]);
+  console.log("Provider Implementation Address : " + BeaconsImpl[j++]);
 
 
 }
