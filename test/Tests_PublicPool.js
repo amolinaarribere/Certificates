@@ -132,7 +132,7 @@ contract("Testing Public Pool",function(accounts){
     // ****** TESTING Transfering Certificate ***************************************************************** //
 
     it("Transfering Certificate WRONG",async function(){
-        await pool_common.TransferCertificateWrong(publicCertPool, holder_1, user_1);   
+        await pool_common.TransferCertificateWrong(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1, false);   
     });
 
     it("Transfering Certificate CORRECT",async function(){

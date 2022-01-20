@@ -63,6 +63,11 @@ abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, Mult
         require(address(0) != _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider, "EC16-");
         _;
     }
+
+    modifier AddressIsNot(address originalAddress, address newAddress){
+        require(originalAddress != newAddress, "EC17-");
+        _;
+    }
     
     // CONSTRUCTOR /////////////////////////////////////////
     function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners, string memory contractName, string memory contractVersion) public initializer 
@@ -160,6 +165,7 @@ abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, Mult
 
     function transferCertificate(bytes32 CertificateHash, address newHolder) external override
         CertificateExist(msg.sender, CertificateHash)
+        AddressIsNot(msg.sender, newHolder)
     {
         if(address(0) == _CertificatesPerHolder[newHolder]._CertificateFromProvider[CertificateHash]._provider) {
             addingCertificate(_CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]._provider, CertificateHash, newHolder);

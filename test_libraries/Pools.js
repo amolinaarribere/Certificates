@@ -36,6 +36,7 @@ const MinNumberRequired = new RegExp("EC19-");
 const NotAProvider = new RegExp("EC12-");
 const CertificateAlreadyExists = new RegExp("EC15-");
 const CertificateDoesNotExists = new RegExp("EC16-");
+const NotToYourself = new RegExp("EC17-");
 const NotAllowedToRemoveCertificate = new RegExp("EC14-");
 const WrongSender = new RegExp("EC8-");
 const NotSentYet = new RegExp("EC28-");
@@ -756,7 +757,7 @@ async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provi
     //await CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
 }
 
-async function TransferCertificateWrong(CertPool, holder_1, user_1){
+async function TransferCertificateWrong(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
     try{
         await CertPool.methods.transferCertificate(hash_1, holder_1).send({from: user_1, gas: Gas}, function(error, result){});
         expect.fail();
@@ -764,6 +765,16 @@ async function TransferCertificateWrong(CertPool, holder_1, user_1){
     // assert
     catch(error){
         expect(error.message).to.match(CertificateDoesNotExists);
+    }
+    try{
+        await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate);
+        await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate);
+        await CertPool.methods.transferCertificate(hash_1, holder_1).send({from: holder_1, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(NotToYourself);
     }
 }
 
