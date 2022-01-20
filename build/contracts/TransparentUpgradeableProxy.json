@@ -20,8 +20,7 @@
         }
       ],
       "stateMutability": "payable",
-      "type": "constructor",
-      "payable": true
+      "type": "constructor"
     },
     {
       "anonymous": false,
@@ -70,13 +69,11 @@
     },
     {
       "stateMutability": "payable",
-      "type": "fallback",
-      "payable": true
+      "type": "fallback"
     },
     {
       "stateMutability": "payable",
-      "type": "receive",
-      "payable": true
+      "type": "receive"
     },
     {
       "inputs": [],
@@ -146,8 +143,7 @@
       "name": "upgradeToAndCall",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function",
-      "payable": true
+      "type": "function"
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_logic\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"admin_\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"}],\"stateMutability\":\"payable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"previousAdmin\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newAdmin\",\"type\":\"address\"}],\"name\":\"AdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"beacon\",\"type\":\"address\"}],\"name\":\"BeaconUpgraded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"admin_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newAdmin\",\"type\":\"address\"}],\"name\":\"changeAdmin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"implementation_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"}],\"name\":\"upgradeTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"upgradeToAndCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"details\":\"This contract implements a proxy that is upgradeable by an admin. To avoid https://medium.com/nomic-labs-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357[proxy selector clashing], which can potentially be used in an attack, this contract uses the https://blog.openzeppelin.com/the-transparent-proxy-pattern/[transparent proxy pattern]. This pattern implies two things that go hand in hand: 1. If any account other than the admin calls the proxy, the call will be forwarded to the implementation, even if that call matches one of the admin functions exposed by the proxy itself. 2. If the admin calls the proxy, it can access the admin functions, but its calls will never be forwarded to the implementation. If the admin tries to call a function on the implementation it will fail with an error that says \\\"admin cannot fallback to proxy target\\\". These properties mean that the admin account can only be used for admin actions like upgrading the proxy or changing the admin, so it's best if it's a dedicated account that is not used for anything else. This will avoid headaches due to sudden errors when trying to call a function from the proxy implementation. Our recommendation is for the dedicated account to be an instance of the {ProxyAdmin} contract. If set up this way, you should think of the `ProxyAdmin` instance as the real administrative interface of your proxy.\",\"kind\":\"dev\",\"methods\":{\"admin()\":{\"details\":\"Returns the current admin. NOTE: Only the admin can call this function. See {ProxyAdmin-getProxyAdmin}. TIP: To get this value clients can read directly from the storage slot shown below (specified by EIP1967) using the https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`] RPC call. `0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103`\"},\"changeAdmin(address)\":{\"details\":\"Changes the admin of the proxy. Emits an {AdminChanged} event. NOTE: Only the admin can call this function. See {ProxyAdmin-changeProxyAdmin}.\"},\"constructor\":{\"details\":\"Initializes an upgradeable proxy managed by `_admin`, backed by the implementation at `_logic`, and optionally initialized with `_data` as explained in {ERC1967Proxy-constructor}.\"},\"implementation()\":{\"details\":\"Returns the current implementation. NOTE: Only the admin can call this function. See {ProxyAdmin-getProxyImplementation}. TIP: To get this value clients can read directly from the storage slot shown below (specified by EIP1967) using the https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`] RPC call. `0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`\"},\"upgradeTo(address)\":{\"details\":\"Upgrade the implementation of the proxy. NOTE: Only the admin can call this function. See {ProxyAdmin-upgrade}.\"},\"upgradeToAndCall(address,bytes)\":{\"details\":\"Upgrade the implementation of the proxy, and then call a function from the new implementation as specified by `data`, which should be an encoded function call. This is useful to initialize new storage variables in the proxied contract. NOTE: Only the admin can call this function. See {ProxyAdmin-upgradeAndCall}.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol\":\"TransparentUpgradeableProxy\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol\":{\"keccak256\":\"0xd935bb93dcd2deefc3d2dbe1c363098c1ae192832cf598bcb97f104c1121106e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5f85867554474aa4bda2f2615ca8df91ae3e4abe9bc2102fc2117c961dc37e2c\",\"dweb:/ipfs/QmRGUYhf7QRH1FgSqbuTJghubuTQSjsmPoGNk6o3Rzfbzh\"]},\"@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol\":{\"keccak256\":\"0xe002cfae5c997ad96a1b435be136d2a31a4bd6310f0be84e4d1a7e0c4dc93a5d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f1fee8a32d72129ec1d23b60d7fddec3b6ef81f3dd8e225c0f732b482fb67125\",\"dweb:/ipfs/QmRAhXZZH95JpUmMeBGBDb4rhV8pEnDZLaTYazRC2dVaZp\"]},\"@openzeppelin/contracts/proxy/Proxy.sol\":{\"keccak256\":\"0x97d5615ed968b9457ec0ca61fe32465381f7b7d4b65df4ee689f7dbe1a2a7a25\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://54acff584108517978409e881c0713250196b39054aa47e2cee5b6b9d41a2759\",\"dweb:/ipfs/QmQbZ9rJ3ThNEkrceNemTKjaN5Z9v6mVZuk5CdHZbvoFWb\"]},\"@openzeppelin/contracts/proxy/beacon/IBeacon.sol\":{\"keccak256\":\"0x1787aee0279f26d98400e030f9780d4fba6dc9aec7388fa31deca8959f47adb3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d5ad655bbccda034dfa9dcce58be2f14105c3db41909dd8983febb03020c0954\",\"dweb:/ipfs/QmemV5KpajYrN78JMYgYctESkgfJvzRmMCqz88eiFyER9u\"]},\"@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol\":{\"keccak256\":\"0xb615de73606f7753d653fc55239359698d2a0bce3c2fad7181b54115e528a508\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://58928d21a66c23952a6160749929cbb79ab8abc4698ed6511b82a9c9e45c93e8\",\"dweb:/ipfs/Qmcoh4JepFSw8AtzKNLoLoNKMuTVBnnAsu6j41qPp7SJZu\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0x2c035598c90ecd26c00f2b73207b4b4d52e3c46484f6e1380e4f9bb4a43cabc7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b04637146b14ae894c047c0dbd933c3ebf76898cd895aa881f5ea4d5db337da2\",\"dweb:/ipfs/QmZE73N5EvuAch1CX88DePfCgmwjLvKSaFEunjy5UoAuU9\"]},\"@openzeppelin/contracts/utils/StorageSlot.sol\":{\"keccak256\":\"0xff211e55ae47cb2f597e0b1046132bc7f034b9d6a1d57c490ed83f17977a87f7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://355d2525ec0dd2d47a586f63938c0c3c528324465a41ddef3e471302c13a4f9e\",\"dweb:/ipfs/QmQyCmpV2zvw4mkWTMaAkVxUb9LvHMigi15aRzCXNkzeyz\"]}},\"version\":1}",
@@ -10246,87 +10242,9 @@
     "name": "solc",
     "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
   },
-  "networks": {
-    "3": {
-      "events": {},
-      "links": {},
-      "address": "0x7E3a007bB12B74D221f830DECA040c96ee55a3f7",
-      "transactionHash": "0x80335b799319b437f30baf468c5f8fd36a7afcc0dc56d1890cc9c4ced8284526"
-    },
-    "4": {
-      "events": {},
-      "links": {},
-      "address": "0x73cE5E1Cfac797C81988175e6F668Fa2E09E487c",
-      "transactionHash": "0x76523e7c50b8682690a91e300275c7576b2dd964431f083a46124c973d80fa40"
-    },
-    "42": {
-      "events": {},
-      "links": {},
-      "address": "0x72b7b7D7d7629fBE41CE1aC2a45919C30265cbDe",
-      "transactionHash": "0x012cf56beec8d9fea87b09edb7b336be31bcd8aa02f44cf189f4bd7d252437b8"
-    },
-    "5777": {
-      "events": {
-        "0x7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "previousAdmin",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "newAdmin",
-              "type": "address"
-            }
-          ],
-          "name": "AdminChanged",
-          "type": "event"
-        },
-        "0x1cf3b03a6cf19fa2baba4df148e9dcabedea7f8a5c07840e207e5c089be95d3e": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "beacon",
-              "type": "address"
-            }
-          ],
-          "name": "BeaconUpgraded",
-          "type": "event"
-        },
-        "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "implementation",
-              "type": "address"
-            }
-          ],
-          "name": "Upgraded",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0x85A7e144E79e476957b975246865f150f7a62889",
-      "transactionHash": "0x892d32e6cd02b0e1d2a440e0384434198f4e285cc09abbd70e40db8b338da6e5"
-    },
-    "80001": {
-      "events": {},
-      "links": {},
-      "address": "0xadA387D5a04982323de1C2957E2DCD08FE52b4E0",
-      "transactionHash": "0x413eb452ad0b576e093bd2f73f2919f7075725b1504e2a12e9ec8900f1464113"
-    }
-  },
+  "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-01-19T11:36:09.112Z",
-  "networkType": "ethereum",
+  "updatedAt": "2022-01-20T13:14:26.159Z",
   "devdoc": {
     "details": "This contract implements a proxy that is upgradeable by an admin. To avoid https://medium.com/nomic-labs-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357[proxy selector clashing], which can potentially be used in an attack, this contract uses the https://blog.openzeppelin.com/the-transparent-proxy-pattern/[transparent proxy pattern]. This pattern implies two things that go hand in hand: 1. If any account other than the admin calls the proxy, the call will be forwarded to the implementation, even if that call matches one of the admin functions exposed by the proxy itself. 2. If the admin calls the proxy, it can access the admin functions, but its calls will never be forwarded to the implementation. If the admin tries to call a function on the implementation it will fail with an error that says \"admin cannot fallback to proxy target\". These properties mean that the admin account can only be used for admin actions like upgrading the proxy or changing the admin, so it's best if it's a dedicated account that is not used for anything else. This will avoid headaches due to sudden errors when trying to call a function from the proxy implementation. Our recommendation is for the dedicated account to be an instance of the {ProxyAdmin} contract. If set up this way, you should think of the `ProxyAdmin` instance as the real administrative interface of your proxy.",
     "kind": "dev",

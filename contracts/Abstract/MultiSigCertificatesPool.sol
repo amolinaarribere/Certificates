@@ -13,12 +13,13 @@ import "../Interfaces/IPool.sol";
 import "../Base/SignatureBaseContract.sol";
 import "../Libraries/SignatureLibrary.sol";
 
-
 abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, MultiSigContract { 
     using SignatureLibrary for *;
 
     // EVENTS /////////////////////////////////////////
     event _AddCertificate(address indexed Provider, address indexed Holder, bytes32 Certificate);
+    event _TransferCertificate(address indexed oldHolder, address indexed newHolder, bytes32 Certificate);
+
 
     // DATA /////////////////////////////////////////
     // Contract configuration
@@ -33,9 +34,15 @@ abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, Mult
     string constant _providerLabel = "Provider";
 
     string[] internal _Label;
+
     // Holders
+    struct _CertificateInfo{
+        address _provider;
+        uint _pos;
+    }
+
     struct _CertificatePerHolder{
-        mapping(bytes32 => address) _CertificateFromProvider;
+        mapping(bytes32 => _CertificateInfo) _CertificateFromProvider;
         bytes32[] _ListOfCertificates;
     }
     
@@ -48,7 +55,12 @@ abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, Mult
     }
     
     modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){
-        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash], "EC15-");
+        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider, "EC15-");
+        _;
+    }
+
+    modifier CertificateExist(address holder, bytes32 CertificateHash){
+        require(address(0) != _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider, "EC16-");
         _;
     }
     
@@ -133,16 +145,42 @@ abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, Mult
         NotEmpty(CertificateHash)
         CertificateDoesNotExist(holder, CertificateHash)
     {
-        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash] = provider;
-        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
+        addingCertificate(provider, CertificateHash, holder);
 
         emit _AddCertificate(provider, holder, CertificateHash);
+    }
+
+    function addingCertificate(address provider, bytes32 CertificateHash, address holder) private
+    {
+        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider = provider;
+        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash);
+        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._pos = _CertificatesPerHolder[holder]._ListOfCertificates.length - 1;
+    }
+
+
+    function transferCertificate(bytes32 CertificateHash, address newHolder) external override
+        CertificateExist(msg.sender, CertificateHash)
+    {
+        if(address(0) == _CertificatesPerHolder[newHolder]._CertificateFromProvider[CertificateHash]._provider) {
+            addingCertificate(_CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]._provider, CertificateHash, newHolder);
+        }
+        if(_CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]._provider == _CertificatesPerHolder[newHolder]._CertificateFromProvider[CertificateHash]._provider){
+             uint pos = _CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]._pos;
+
+            delete(_CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]);
+            Library.ArrayRemoveResize(pos, _CertificatesPerHolder[msg.sender]._ListOfCertificates);
+
+            if(_CertificatesPerHolder[msg.sender]._ListOfCertificates.length > pos)_CertificatesPerHolder[msg.sender]._CertificateFromProvider[_CertificatesPerHolder[msg.sender]._ListOfCertificates[pos]]._pos = pos;
+
+            emit _TransferCertificate(msg.sender, newHolder, CertificateHash);
+        }
+        
     }
 
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override
     view returns (address)
     {
-        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]);
+        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider);
     }
 
     function retrieveTotalCertificatesByHolder(address holder) public override 

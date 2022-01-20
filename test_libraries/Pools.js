@@ -35,6 +35,7 @@ const MustBeActivated = new RegExp("EC7-");
 const MinNumberRequired = new RegExp("EC19-");
 const NotAProvider = new RegExp("EC12-");
 const CertificateAlreadyExists = new RegExp("EC15-");
+const CertificateDoesNotExists = new RegExp("EC16-");
 const NotAllowedToRemoveCertificate = new RegExp("EC14-");
 const WrongSender = new RegExp("EC8-");
 const NotSentYet = new RegExp("EC28-");
@@ -49,6 +50,8 @@ const WrongSignature = new RegExp("EC32-");
 
 const Domain = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)";
 const DomainHeader = web3.utils.soliditySha3({type: "string", value: Domain});
+
+const address_0 = "0x0000000000000000000000000000000000000000";
 
 function AddressToBytes32(address){
     return ("0x000000000000000000000000" + address.substring(2, address.length)).toLowerCase();
@@ -621,6 +624,15 @@ async function AddCertificateWrong(CertPool, Owners, provider_1, provider_2, hol
     catch(error){
         expect(error.message).to.match(CertificateAlreadyExists);
     }
+    // act
+    try{
+        await CertPool.methods.addCertificate(hash_1, holder_1).send({from: provider_2, gas: Gas, value:value_To_Pay}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(CertificateAlreadyExists);
+    }
     if(!isPrivate){
         // act
         try{
@@ -744,6 +756,26 @@ async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provi
     //await CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
 }
 
+async function TransferCertificateWrong(CertPool, holder_1, user_1){
+    try{
+        await CertPool.methods.transferCertificate(hash_1, holder_1).send({from: user_1, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(CertificateDoesNotExists);
+    }
+}
+
+async function TransferCertificateCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
+    // act
+    await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate);
+    await AddANDTransferCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate);
+    await AddANDTransferCertificate(CertPool, provider_2, provider_1, holder_1, holder_2, user_1, isPrivate);
+    // assert
+    await CheckCertificatesTransfered(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
+}
+
 async function CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1){
     // assert
     let Provider_1 = await CertPool.methods.retrieveCertificateProvider(hash_1, holder_1).call({from: user_1}, function(error, result){});
@@ -769,6 +801,43 @@ async function CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1
     expect(CertificatesHolder2[1]).to.equal(hash_2);
     expect(CertificatesHolder1b[0]).to.equal(hash_2);
     expect(CertificatesHolder2b[0]).to.equal(hash_1);
+}
+
+async function AddANDTransferCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
+    await AddingCertificate(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate);
+    await CertPool.methods.transferCertificate(hash_1, user_1).send({from: holder_1, gas: Gas}, function(error, result){});
+    await CertPool.methods.transferCertificate(hash_2, user_1).send({from: holder_2, gas: Gas}, function(error, result){});
+    await CertPool.methods.transferCertificate(hash_2, user_1).send({from: holder_1, gas: Gas}, function(error, result){});
+    await CertPool.methods.transferCertificate(hash_1, user_1).send({from: holder_2, gas: Gas}, function(error, result){});
+}
+
+async function CheckCertificatesTransfered(CertPool, provider_1, provider_2, holder_1, holder_2, user_1){
+    // assert
+    let Provider_1 = await CertPool.methods.retrieveCertificateProvider(hash_1, holder_1).call({from: user_1}, function(error, result){});
+    let Provider_1b = await CertPool.methods.retrieveCertificateProvider(hash_1, holder_2).call({from: user_1}, function(error, result){});
+    let Provider_1c = await CertPool.methods.retrieveCertificateProvider(hash_1, user_1).call({from: user_1}, function(error, result){});
+
+    let Provider_2 = await CertPool.methods.retrieveCertificateProvider(hash_2, holder_1).call({from: user_1}, function(error, result){});
+    let Provider_2b = await CertPool.methods.retrieveCertificateProvider(hash_2, holder_2).call({from: user_1}, function(error, result){});
+    let Provider_2c = await CertPool.methods.retrieveCertificateProvider(hash_2, user_1).call({from: user_1}, function(error, result){});
+
+    let TotalHolder_1 = await CertPool.methods.retrieveTotalCertificatesByHolder(holder_1).call({from: user_1}, function(error, result){});
+    let TotalHolder_2 = await CertPool.methods.retrieveTotalCertificatesByHolder(holder_2).call({from: user_1}, function(error, result){});
+    let TotalHolder_3 = await CertPool.methods.retrieveTotalCertificatesByHolder(user_1).call({from: user_1}, function(error, result){});
+
+    
+    expect(Provider_1).to.equal(provider_2);
+    expect(Provider_1b).to.equal(provider_2);
+    expect(Provider_1c).to.equal(provider_1);
+
+    expect(Provider_2).to.equal(provider_1);
+    expect(Provider_2b).to.equal(provider_1);
+    expect(Provider_2c).to.equal(provider_2);
+
+    expect(TotalHolder_1).to.equal("2");
+    expect(TotalHolder_2).to.equal("2");
+    expect(TotalHolder_3).to.equal("2");
+
 }
 
 async function RemoveCertificateWrong(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
@@ -989,6 +1058,8 @@ exports.AddCertificateWrong = AddCertificateWrong;
 exports.AddCertificateCorrect = AddCertificateCorrect;
 exports.AddCertificateOnBehalfWrong = AddCertificateOnBehalfWrong;
 exports.AddCertificateOnBehalfCorrect = AddCertificateOnBehalfCorrect;
+exports.TransferCertificateWrong = TransferCertificateWrong;
+exports.TransferCertificateCorrect = TransferCertificateCorrect;
 exports.RemoveCertificateWrong = RemoveCertificateWrong;
 exports.RemoveCertificateCorrect = RemoveCertificateCorrect;
 exports.ValidatingProviders = ValidatingProviders;
