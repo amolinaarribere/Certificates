@@ -12,7 +12,7 @@ let Denominations = artifacts.require("@chainlink/contracts/src/v0.8/Denominatio
 
 module.exports = async function(deployer, network, accounts){
   // Libraries -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  var deployedLibraries = require('./Deployed_Libraries_Addresses.json');
+  /*var deployedLibraries = require('./Deployed_Libraries_Addresses.json');
 
   await Library.at(deployedLibraries[network]["LibraryAddress"]);
 
@@ -24,7 +24,7 @@ module.exports = async function(deployer, network, accounts){
 
   await SignatureLibrary.at(deployedLibraries[network]["SignatureLibraryAddress"]);
 
-  await Denominations.at(deployedLibraries[network]["DenominationsAddress"]);
+  await Denominations.at(deployedLibraries[network]["DenominationsAddress"]);*/
 
   // Public Pool -----------------------------------------------------------------------------------------------------------------------------------------------------------------
   await deployer.link(Library, PublicCertificatesPool);

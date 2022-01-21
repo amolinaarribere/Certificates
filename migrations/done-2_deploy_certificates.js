@@ -650,10 +650,6 @@ module.exports = async function(deployer, network, accounts){
   let BeaconsImpl = await CertificatesPoolManagerProxyInstance.methods.retrieveBeaconsImpl().call();
   let init = await CertificatesPoolManagerProxyInstance.methods.isInitialized().call();
 
- // Initialize ENS Domains if required (mocking)
- await ExternalRegistries.initializeENS(network, MockENSRegistry, ENSRegistryAddress, web3, accounts[0], TransparentProxies[7], ENSResolverAddress, ENSReverseRegistryAddress, reverseHashName, ethHashName, aljomoarEthHashName, blockcertsAljomoarEthHashName, Gas)
-
-
   console.log("Deployment Summary ----------------------------------------------- ");
 
   console.log("Libraries ******* ");
@@ -695,7 +691,10 @@ module.exports = async function(deployer, network, accounts){
   console.log("Proposition Settings Address : " + TransparentImpl[i++]);
 
   console.log("ENS Proxy Address : " + TransparentProxies[i]);
+  // Initialize ENS Domains if required (mocking)
+  await ExternalRegistries.initializeENS(network, MockENSRegistry, ENSRegistryAddress, web3, accounts[0], TransparentProxies[i], ENSResolverAddress, ENSReverseRegistryAddress, reverseHashName, ethHashName, aljomoarEthHashName, blockcertsAljomoarEthHashName, Gas)
   console.log("ENS Address : " + TransparentImpl[i++]);
+
 
   let j=0;
   console.log("Private Pool Beacon Address : " + Beacons[j]);
