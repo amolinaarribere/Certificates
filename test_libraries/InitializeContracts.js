@@ -1,4 +1,3 @@
-const Admin = artifacts.require("Admin");
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const Treasury = artifacts.require("Treasury");
 const PublicCertificatesPool = artifacts.require("PublicCertificatesPool");
@@ -10,8 +9,10 @@ const ENS = artifacts.require("ENS");
 const PropositionSettings = artifacts.require("PropositionSettings");
 const PrivatePoolFactory = artifacts.require("PrivatePoolFactory");
 const ProviderFactory = artifacts.require("ProviderFactory");
+const TransparentUpgradeableProxy = artifacts.require("@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol");
 
 const CertificatesPoolManagerAbi = CertificatesPoolManager.abi;
+const TransparentUpgradeableProxyAbi = TransparentUpgradeableProxy.abi;
 
 const MockChainLinkFeedRegistry = artifacts.require("MockChainLinkFeedRegistry"); // Mock
 const MockENSRegistry = artifacts.require("MockENSRegistry"); // Mock
@@ -61,8 +62,6 @@ const PropositionSettingsContractName = constants.PropositionSettingsContractNam
 const PropositionSettingsContractVersion = constants.PropositionSettingsContractVersion;
 const ENSContractName = constants.ENSContractName;
 const ENSContractVersion = constants.ENSContractVersion;
-const AdminContractName = constants.AdminContractName;
-const AdminContractVersion = constants.AdminContractVersion;
 
 var CertificatesPoolManagerProxyInitializerMethod = {
   "inputs": [
@@ -365,37 +364,34 @@ const PublicCertificatesPoolProxyInitializerMethod = {
 async function InitializeContracts(chairPerson, PublicOwners, minOwners, user_1){
   let certPoolManager = await CertificatesPoolManager.new({from: chairPerson, gas: Gas});
   let CertPoolManagerProxyData = getProxyData(CertificatesPoolManagerProxyInitializerMethod, [chairPerson, CertificateManagerContractName, CertificateManagerContractVersion]);
-  let admin = await deployAndInitNewAdmin(AdminContractName, AdminContractVersion, certPoolManager.address, CertPoolManagerProxyData, chairPerson);
-  let certPoolManagerProxyAddress = await admin.retrieveManagerProxy();
+
+  // New
+  let TransparentUpgradeableProxyIns = await TransparentUpgradeableProxy.new(certPoolManager.address, chairPerson, CertPoolManagerProxyData, {from: chairPerson, gas: Gas});
+  let certPoolManagerProxyAddress = TransparentUpgradeableProxyIns.address;
 
   var certPoolManagerProxy = new web3.eth.Contract(CertificatesPoolManagerAbi, certPoolManagerProxyAddress);
+  var TransparentUpgradeableProxyInstance = new web3.eth.Contract(TransparentUpgradeableProxyAbi, certPoolManagerProxyAddress);
+
+
+  let ProxyAdmin = await certPoolManagerProxy.methods.retrieveProxyAdmin().call({from: user_1});
+  await TransparentUpgradeableProxyInstance.methods.changeAdmin(ProxyAdmin).send({from: chairPerson, gas: Gas});;
 
   let implementations = await deployImplementations(user_1);
   let ProxyData = returnProxyInitData(PublicOwners, minOwners, certPoolManagerProxyAddress, chairPerson, implementations[8]);
 
   await certPoolManagerProxy.methods.InitializeContracts(obj.returnUpgradeObject(implementations[0], implementations[1], implementations[2], implementations[3], implementations[4], implementations[5], implementations[6], implementations[7], implementations[9], implementations[10],
-    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5], ProxyData[6], ProxyData[7], PrivatePoolContractName, PrivatePoolContractVersion)).send({from: chairPerson, gas: Gas});
+    ProxyData[0], ProxyData[1], ProxyData[2], ProxyData[3], ProxyData[4], ProxyData[5], ProxyData[6], ProxyData[7], PrivatePoolContractName, PrivatePoolContractVersion),
+    certPoolManagerProxy._address).send({from: chairPerson, gas: Gas});
 
   let proxies = await retrieveProxies(certPoolManagerProxy, user_1);
 
   await initializeENS(user_1, proxies[7]);
   
-  return [certPoolManagerProxy, proxies, implementations, admin.address, certPoolManager.address];
-}
-
-async function deployAndInitNewAdmin(ContractName, ContractVersion, certPoolManagerAddress, CertPoolManagerProxyData, chairPerson){
-  let admin = await Admin.new();
-  await admin.Admin_init(ContractName, ContractVersion, certPoolManagerAddress, CertPoolManagerProxyData, {from: chairPerson, gas: Gas});
-  return admin;
-}
-
-async function redeployAndInitAdmin(ContractName, ContractVersion, certPoolManagerProxyAddress, adminProxyAddress, chairPerson){
-  let admin = await Admin.new();
-  await admin.Admin_init_redeploy(ContractName, ContractVersion, certPoolManagerProxyAddress, adminProxyAddress, {from: chairPerson, gas: Gas});
-  return admin;
+  return [certPoolManagerProxy._address, proxies, implementations, ProxyAdmin, certPoolManager.address];
 }
 
 async function deployImplementations(user_1){
+    let certManager = await CertificatesPoolManager.new({from: user_1});
     let publicPool = await PublicCertificatesPool.new({from: user_1});
     let treasury = await Treasury.new({from: user_1});
     let certisToken = await CertisToken.new({from: user_1});
@@ -417,20 +413,28 @@ async function deployImplementations(user_1){
     ENSReverseRegistryAddress = mockENSReverseRegistry.address;
     // Mock ---------------
 
-    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address, ens.address, mockENSRegistry.address, mockENSReverseRegistry.address, mockENSResolver.address];
+    return [publicPool.address, treasury.address, certisToken.address, privatePoolFactory.address, privatePool.address, providerFactory.address, provider.address, priceConverter.address, mockChainLinkFeedRegistry.address, propositionSettings.address, ens.address, mockENSRegistry.address, mockENSReverseRegistry.address, mockENSResolver.address, certManager.address];
 }
 
 async function retrieveProxies(certPoolManager, user_1){
   let TransparentProxies = await certPoolManager.methods.retrieveTransparentProxies().call({from: user_1});
 
-  let publicPoolProxy = TransparentProxies[0];
-  let treasuryProxy = TransparentProxies[1];
-  let certisTokenProxy = TransparentProxies[2];
-  let privatePoolFactoryProxy = TransparentProxies[3];
-  let providerFactoryProxy = TransparentProxies[4];
-  let priceConverterProxy = TransparentProxies[5];
-  let propositionSettingsProxy = TransparentProxies[6];
-  let ensProxy = TransparentProxies[7];
+  let i = 1;
+  let publicPoolProxy = TransparentProxies[i];
+  i++;
+  let treasuryProxy = TransparentProxies[i];
+  i++;
+  let certisTokenProxy = TransparentProxies[i];
+  i++;
+  let privatePoolFactoryProxy = TransparentProxies[i];
+  i++;
+  let providerFactoryProxy = TransparentProxies[i];
+  i++;
+  let priceConverterProxy = TransparentProxies[i];
+  i++;
+  let propositionSettingsProxy = TransparentProxies[i];
+  i++;
+  let ensProxy = TransparentProxies[i];
 
   return [publicPoolProxy, treasuryProxy, certisTokenProxy, privatePoolFactoryProxy, providerFactoryProxy, priceConverterProxy, propositionSettingsProxy, ensProxy];
 }
@@ -471,4 +475,3 @@ async function initializeENS(user_1, ENSContractAddress){
 exports.InitializeContracts = InitializeContracts;
 exports.deployImplementations = deployImplementations;
 exports.returnProxyInitData = returnProxyInitData;
-exports.redeployAndInitAdmin = redeployAndInitAdmin;

@@ -11,6 +11,7 @@ pragma solidity 0.8.7;
  interface IPool  {
     function addCertificate(bytes32 CertificateHash, address holder) external payable;
     function addCertificateOnBehalfOf(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) external payable;
+    function transferCertificate(bytes32 CertificateHash, address newHolder) external;
     function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external view returns (address);
     function retrieveTotalCertificatesByHolder(address holder) external view returns (uint256);
     function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external view returns (bytes32[] memory);

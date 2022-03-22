@@ -71,6 +71,7 @@ abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, I
         _minOwners = minOwners;
         for (uint i=0; i < owners.length; i++) {
             bytes32 ownerInBytes = AddressLibrary.AddressToBytes32(owners[i]);
+            require(false == _Entities[_ownerId]._items[ownerInBytes]._activated, "EC29-");
             _Entities[_ownerId]._items[ownerInBytes]._activated = true;
             _Entities[_ownerId]._activatedItems.push(ownerInBytes); 
         } 

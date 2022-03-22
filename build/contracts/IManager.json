@@ -34,22 +34,14 @@
           "internalType": "struct Library.ProposedContractsStruct",
           "name": "initialContracts",
           "type": "tuple"
-        }
-      ],
-      "name": "InitializeContracts",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
+        },
         {
-          "internalType": "address",
-          "name": "newManagerAdmin",
+          "internalType": "contract TransparentUpgradeableProxy",
+          "name": "ManagerProxy",
           "type": "address"
         }
       ],
-      "name": "changeManagerAdmin",
+      "name": "InitializeContracts",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -108,7 +100,7 @@
     },
     {
       "inputs": [],
-      "name": "retrieveManagerAdmin",
+      "name": "retrieveProxyAdmin",
       "outputs": [
         {
           "internalType": "address",
@@ -133,7 +125,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"components\":[{\"internalType\":\"address[]\",\"name\":\"TransparentAddresses\",\"type\":\"address[]\"},{\"internalType\":\"address[]\",\"name\":\"BeaconAddresses\",\"type\":\"address[]\"},{\"internalType\":\"bytes[]\",\"name\":\"TransparentData\",\"type\":\"bytes[]\"},{\"internalType\":\"string\",\"name\":\"PrivatePoolContractName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"PrivatePoolContractVersion\",\"type\":\"string\"}],\"internalType\":\"struct Library.ProposedContractsStruct\",\"name\":\"initialContracts\",\"type\":\"tuple\"}],\"name\":\"InitializeContracts\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newManagerAdmin\",\"type\":\"address\"}],\"name\":\"changeManagerAdmin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isInitialized\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveBeacons\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveBeaconsImpl\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveManagerAdmin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTransparentProxies\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTransparentProxiesImpl\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IManager.sol\":\"IManager\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0xa6f2be28404e8f1c7490b55ca772b22e2b4ba82beb2148d8bdf24785e02485cf\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://50e704dbe12ffe90b0a5ebbaa58c844bc491bb9bafc24d2168e0cb38fb775175\",\"dweb:/ipfs/QmVcc8xvfRnqNbnZB8iHZgnBiqo6mkAD8F8iGYPLWiTqGr\"]},\"@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol\":{\"keccak256\":\"0xd935bb93dcd2deefc3d2dbe1c363098c1ae192832cf598bcb97f104c1121106e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5f85867554474aa4bda2f2615ca8df91ae3e4abe9bc2102fc2117c961dc37e2c\",\"dweb:/ipfs/QmRGUYhf7QRH1FgSqbuTJghubuTQSjsmPoGNk6o3Rzfbzh\"]},\"@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol\":{\"keccak256\":\"0xe002cfae5c997ad96a1b435be136d2a31a4bd6310f0be84e4d1a7e0c4dc93a5d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f1fee8a32d72129ec1d23b60d7fddec3b6ef81f3dd8e225c0f732b482fb67125\",\"dweb:/ipfs/QmRAhXZZH95JpUmMeBGBDb4rhV8pEnDZLaTYazRC2dVaZp\"]},\"@openzeppelin/contracts/proxy/Proxy.sol\":{\"keccak256\":\"0x97d5615ed968b9457ec0ca61fe32465381f7b7d4b65df4ee689f7dbe1a2a7a25\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://54acff584108517978409e881c0713250196b39054aa47e2cee5b6b9d41a2759\",\"dweb:/ipfs/QmQbZ9rJ3ThNEkrceNemTKjaN5Z9v6mVZuk5CdHZbvoFWb\"]},\"@openzeppelin/contracts/proxy/beacon/IBeacon.sol\":{\"keccak256\":\"0x1787aee0279f26d98400e030f9780d4fba6dc9aec7388fa31deca8959f47adb3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d5ad655bbccda034dfa9dcce58be2f14105c3db41909dd8983febb03020c0954\",\"dweb:/ipfs/QmemV5KpajYrN78JMYgYctESkgfJvzRmMCqz88eiFyER9u\"]},\"@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol\":{\"keccak256\":\"0xcec5dbc3f24533dc705ca56c80eec0d9916dccbfab23815cada9546707ac31ec\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7a891005191dae166b82a89a97bf60ec2501d211f432a72e8954b522f24e639f\",\"dweb:/ipfs/QmdhER1wmtkEPEBMWGuQNeHvC7sSbP5DJ4mybzeSukyjgH\"]},\"@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol\":{\"keccak256\":\"0xb615de73606f7753d653fc55239359698d2a0bce3c2fad7181b54115e528a508\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://58928d21a66c23952a6160749929cbb79ab8abc4698ed6511b82a9c9e45c93e8\",\"dweb:/ipfs/Qmcoh4JepFSw8AtzKNLoLoNKMuTVBnnAsu6j41qPp7SJZu\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0x2c035598c90ecd26c00f2b73207b4b4d52e3c46484f6e1380e4f9bb4a43cabc7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b04637146b14ae894c047c0dbd933c3ebf76898cd895aa881f5ea4d5db337da2\",\"dweb:/ipfs/QmZE73N5EvuAch1CX88DePfCgmwjLvKSaFEunjy5UoAuU9\"]},\"@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0x681ab5b6cd77464aec17a8fefa55d054f2cfd9a1f5b5de5be1f13a9cdf83bd28\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0040db56603a9105a1b5571f3ef8cc700068930125675065816dc83bfdc459fb\",\"dweb:/ipfs/QmaCJWcBpSwqhYHzCzE2Hg1zjQkaBp8S1git5shZaGJTe7\"]},\"@openzeppelin/contracts/utils/StorageSlot.sol\":{\"keccak256\":\"0xff211e55ae47cb2f597e0b1046132bc7f034b9d6a1d57c490ed83f17977a87f7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://355d2525ec0dd2d47a586f63938c0c3c528324465a41ddef3e471302c13a4f9e\",\"dweb:/ipfs/QmQyCmpV2zvw4mkWTMaAkVxUb9LvHMigi15aRzCXNkzeyz\"]},\"project:/contracts/Interfaces/IManager.sol\":{\"keccak256\":\"0xb4647063f6e7ef243faa6aacf47930af49c663090c596a020b8e34230510ccd8\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://d6170c4b35d3b3f24dd122c011f3a259d1a85d8e914ea4d487bd4c43392595aa\",\"dweb:/ipfs/QmQcdDACSDpmN1oC3uU42E6eNzcWibNhqLe31pswLwjUYM\"]},\"project:/contracts/Libraries/Library.sol\":{\"keccak256\":\"0xd22f5b4a8b10fb295e7cf2230b3ceabce4350544b84b2b4844494eef99050a71\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://c4bd07717413a3b4fda00f98a6da095fdcbb8c3968a3e60e577e08f278d58d09\",\"dweb:/ipfs/QmZwBr2rGx5L49rVGJiE3zscxrX24AS12vcNHpovj4KsHb\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"components\":[{\"internalType\":\"address[]\",\"name\":\"TransparentAddresses\",\"type\":\"address[]\"},{\"internalType\":\"address[]\",\"name\":\"BeaconAddresses\",\"type\":\"address[]\"},{\"internalType\":\"bytes[]\",\"name\":\"TransparentData\",\"type\":\"bytes[]\"},{\"internalType\":\"string\",\"name\":\"PrivatePoolContractName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"PrivatePoolContractVersion\",\"type\":\"string\"}],\"internalType\":\"struct Library.ProposedContractsStruct\",\"name\":\"initialContracts\",\"type\":\"tuple\"},{\"internalType\":\"contract TransparentUpgradeableProxy\",\"name\":\"ManagerProxy\",\"type\":\"address\"}],\"name\":\"InitializeContracts\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isInitialized\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveBeacons\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveBeaconsImpl\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveProxyAdmin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTransparentProxies\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"retrieveTransparentProxiesImpl\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Interfaces/IManager.sol\":\"IManager\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0xa6f2be28404e8f1c7490b55ca772b22e2b4ba82beb2148d8bdf24785e02485cf\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://50e704dbe12ffe90b0a5ebbaa58c844bc491bb9bafc24d2168e0cb38fb775175\",\"dweb:/ipfs/QmVcc8xvfRnqNbnZB8iHZgnBiqo6mkAD8F8iGYPLWiTqGr\"]},\"@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol\":{\"keccak256\":\"0xd935bb93dcd2deefc3d2dbe1c363098c1ae192832cf598bcb97f104c1121106e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5f85867554474aa4bda2f2615ca8df91ae3e4abe9bc2102fc2117c961dc37e2c\",\"dweb:/ipfs/QmRGUYhf7QRH1FgSqbuTJghubuTQSjsmPoGNk6o3Rzfbzh\"]},\"@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol\":{\"keccak256\":\"0xe002cfae5c997ad96a1b435be136d2a31a4bd6310f0be84e4d1a7e0c4dc93a5d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f1fee8a32d72129ec1d23b60d7fddec3b6ef81f3dd8e225c0f732b482fb67125\",\"dweb:/ipfs/QmRAhXZZH95JpUmMeBGBDb4rhV8pEnDZLaTYazRC2dVaZp\"]},\"@openzeppelin/contracts/proxy/Proxy.sol\":{\"keccak256\":\"0x97d5615ed968b9457ec0ca61fe32465381f7b7d4b65df4ee689f7dbe1a2a7a25\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://54acff584108517978409e881c0713250196b39054aa47e2cee5b6b9d41a2759\",\"dweb:/ipfs/QmQbZ9rJ3ThNEkrceNemTKjaN5Z9v6mVZuk5CdHZbvoFWb\"]},\"@openzeppelin/contracts/proxy/beacon/IBeacon.sol\":{\"keccak256\":\"0x1787aee0279f26d98400e030f9780d4fba6dc9aec7388fa31deca8959f47adb3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d5ad655bbccda034dfa9dcce58be2f14105c3db41909dd8983febb03020c0954\",\"dweb:/ipfs/QmemV5KpajYrN78JMYgYctESkgfJvzRmMCqz88eiFyER9u\"]},\"@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol\":{\"keccak256\":\"0xcec5dbc3f24533dc705ca56c80eec0d9916dccbfab23815cada9546707ac31ec\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7a891005191dae166b82a89a97bf60ec2501d211f432a72e8954b522f24e639f\",\"dweb:/ipfs/QmdhER1wmtkEPEBMWGuQNeHvC7sSbP5DJ4mybzeSukyjgH\"]},\"@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol\":{\"keccak256\":\"0xb615de73606f7753d653fc55239359698d2a0bce3c2fad7181b54115e528a508\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://58928d21a66c23952a6160749929cbb79ab8abc4698ed6511b82a9c9e45c93e8\",\"dweb:/ipfs/Qmcoh4JepFSw8AtzKNLoLoNKMuTVBnnAsu6j41qPp7SJZu\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0x2c035598c90ecd26c00f2b73207b4b4d52e3c46484f6e1380e4f9bb4a43cabc7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b04637146b14ae894c047c0dbd933c3ebf76898cd895aa881f5ea4d5db337da2\",\"dweb:/ipfs/QmZE73N5EvuAch1CX88DePfCgmwjLvKSaFEunjy5UoAuU9\"]},\"@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0x681ab5b6cd77464aec17a8fefa55d054f2cfd9a1f5b5de5be1f13a9cdf83bd28\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0040db56603a9105a1b5571f3ef8cc700068930125675065816dc83bfdc459fb\",\"dweb:/ipfs/QmaCJWcBpSwqhYHzCzE2Hg1zjQkaBp8S1git5shZaGJTe7\"]},\"@openzeppelin/contracts/utils/StorageSlot.sol\":{\"keccak256\":\"0xff211e55ae47cb2f597e0b1046132bc7f034b9d6a1d57c490ed83f17977a87f7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://355d2525ec0dd2d47a586f63938c0c3c528324465a41ddef3e471302c13a4f9e\",\"dweb:/ipfs/QmQyCmpV2zvw4mkWTMaAkVxUb9LvHMigi15aRzCXNkzeyz\"]},\"project:/contracts/Interfaces/IManager.sol\":{\"keccak256\":\"0xc50254707f626a2d1ebcfe037d62663dee750be2aad41c55558f2bea2ce8d1ed\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://fc04eda713576969f423a3c2d3a25afcdce6be7b462239f189964f36c4de025c\",\"dweb:/ipfs/Qmd38vfoDGPwq5NASyzAp5npwSQnhZSwhN9U3p2CR6E4WU\"]},\"project:/contracts/Libraries/Library.sol\":{\"keccak256\":\"0xc3c68a40dc4672a3cb45fb6dd0c4306df3c1292954ddf6a172f376f81d72a968\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://b61a25430feda941fca74a222eb5df4c3138e74caaf6b99b814f51a4b27e233d\",\"dweb:/ipfs/QmSAMiAiA3C1kL8WGoV5iDuMBbk8ECn6hvtdbuqF8KrC4N\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -141,7 +133,7 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n import \"../Libraries/Library.sol\";\r\n import \"@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol\";\r\nimport \"@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol\";\r\n\r\n interface IManager  {\r\n    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts) external;\r\n    function changeManagerAdmin(address newManagerAdmin) external;\r\n\r\n    function retrieveTransparentProxies() external view returns (address[] memory) ;\r\n    function retrieveBeacons() external view returns (address[] memory);\r\n    function retrieveTransparentProxiesImpl() external view returns (address[] memory);\r\n    function retrieveBeaconsImpl() external view returns (address[] memory);\r\n    function retrieveManagerAdmin() external view returns (address);\r\n    \r\n    function isInitialized() external view returns(bool);\r\n}",
+  "source": "// SPDX-License-Identifier: GPL-3.0\r\n\r\npragma solidity 0.8.7;\r\n\r\n/**\r\n * @title Storage\r\n * @dev Store & retrieve value in a variable\r\n */\r\n import \"../Libraries/Library.sol\";\r\n import \"@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol\";\r\nimport \"@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol\";\r\n\r\n interface IManager  {\r\n    function InitializeContracts(Library.ProposedContractsStruct calldata initialContracts, TransparentUpgradeableProxy ManagerProxy) external;\r\n\r\n    function retrieveTransparentProxies() external view returns (address[] memory) ;\r\n    function retrieveBeacons() external view returns (address[] memory);\r\n    function retrieveTransparentProxiesImpl() external view returns (address[] memory);\r\n    function retrieveBeaconsImpl() external view returns (address[] memory);\r\n    function retrieveProxyAdmin() external view returns (address);\r\n    \r\n    function isInitialized() external view returns(bool);\r\n}",
   "sourcePath": "C:\\Users\\d-aam\\GitHub\\Certificates\\contracts\\Interfaces\\IManager.sol",
   "ast": {
     "absolutePath": "project:/contracts/Interfaces/IManager.sol",
@@ -162,10 +154,10 @@
         1897
       ],
       "IManager": [
-        11512
+        11433
       ],
       "Library": [
-        13331
+        13260
       ],
       "Ownable": [
         1351
@@ -183,53 +175,53 @@
         1972
       ]
     },
-    "id": 11513,
+    "id": 11434,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 11463,
+        "id": 11386,
         "literals": [
           "solidity",
           "0.8",
           ".7"
         ],
         "nodeType": "PragmaDirective",
-        "src": "39:22:49"
+        "src": "39:22:47"
       },
       {
         "absolutePath": "project:/contracts/Libraries/Library.sol",
         "file": "../Libraries/Library.sol",
-        "id": 11464,
+        "id": 11387,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 11513,
-        "sourceUnit": 13332,
-        "src": "141:34:49",
+        "scope": 11434,
+        "sourceUnit": 13261,
+        "src": "141:34:47",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
         "file": "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
-        "id": 11465,
+        "id": 11388,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 11513,
+        "scope": 11434,
         "sourceUnit": 1973,
-        "src": "178:68:49",
+        "src": "178:68:47",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
         "file": "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
-        "id": 11466,
+        "id": 11389,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 11513,
+        "scope": 11434,
         "sourceUnit": 2273,
-        "src": "248:83:49",
+        "src": "248:83:47",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -239,160 +231,138 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 11512,
+        "id": 11433,
         "linearizedBaseContracts": [
-          11512
+          11433
         ],
         "name": "IManager",
-        "nameLocation": "346:8:49",
+        "nameLocation": "346:8:47",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "functionSelector": "deb46666",
-            "id": 11472,
+            "functionSelector": "5a85cfda",
+            "id": 11398,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "InitializeContracts",
-            "nameLocation": "372:19:49",
+            "nameLocation": "372:19:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11470,
+              "id": 11396,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11469,
+                  "id": 11392,
                   "mutability": "mutable",
                   "name": "initialContracts",
-                  "nameLocation": "433:16:49",
+                  "nameLocation": "433:16:47",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11472,
-                  "src": "392:57:49",
+                  "scope": 11398,
+                  "src": "392:57:47",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$_ProposedContractsStruct_$13161_calldata_ptr",
+                    "typeIdentifier": "t_struct$_ProposedContractsStruct_$13090_calldata_ptr",
                     "typeString": "struct Library.ProposedContractsStruct"
                   },
                   "typeName": {
-                    "id": 11468,
+                    "id": 11391,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 11467,
+                      "id": 11390,
                       "name": "Library.ProposedContractsStruct",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 13161,
-                      "src": "392:31:49"
+                      "referencedDeclaration": 13090,
+                      "src": "392:31:47"
                     },
-                    "referencedDeclaration": 13161,
-                    "src": "392:31:49",
+                    "referencedDeclaration": 13090,
+                    "src": "392:31:47",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_ProposedContractsStruct_$13161_storage_ptr",
+                      "typeIdentifier": "t_struct$_ProposedContractsStruct_$13090_storage_ptr",
                       "typeString": "struct Library.ProposedContractsStruct"
                     }
                   },
                   "visibility": "internal"
-                }
-              ],
-              "src": "391:59:49"
-            },
-            "returnParameters": {
-              "id": 11471,
-              "nodeType": "ParameterList",
-              "parameters": [],
-              "src": "459:0:49"
-            },
-            "scope": 11512,
-            "src": "363:97:49",
-            "stateMutability": "nonpayable",
-            "virtual": false,
-            "visibility": "external"
-          },
-          {
-            "functionSelector": "06fde4ff",
-            "id": 11477,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "changeManagerAdmin",
-            "nameLocation": "475:18:49",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 11475,
-              "nodeType": "ParameterList",
-              "parameters": [
+                },
                 {
                   "constant": false,
-                  "id": 11474,
+                  "id": 11395,
                   "mutability": "mutable",
-                  "name": "newManagerAdmin",
-                  "nameLocation": "502:15:49",
+                  "name": "ManagerProxy",
+                  "nameLocation": "479:12:47",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11477,
-                  "src": "494:23:49",
+                  "scope": 11398,
+                  "src": "451:40:47",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
+                    "typeIdentifier": "t_contract$_TransparentUpgradeableProxy_$2272",
+                    "typeString": "contract TransparentUpgradeableProxy"
                   },
                   "typeName": {
-                    "id": 11473,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "494:7:49",
-                    "stateMutability": "nonpayable",
+                    "id": 11394,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 11393,
+                      "name": "TransparentUpgradeableProxy",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 2272,
+                      "src": "451:27:47"
+                    },
+                    "referencedDeclaration": 2272,
+                    "src": "451:27:47",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
+                      "typeIdentifier": "t_contract$_TransparentUpgradeableProxy_$2272",
+                      "typeString": "contract TransparentUpgradeableProxy"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "493:25:49"
+              "src": "391:101:47"
             },
             "returnParameters": {
-              "id": 11476,
+              "id": 11397,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "527:0:49"
+              "src": "501:0:47"
             },
-            "scope": 11512,
-            "src": "466:62:49",
+            "scope": 11433,
+            "src": "363:139:47",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "e220ad95",
-            "id": 11483,
+            "id": 11404,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveTransparentProxies",
-            "nameLocation": "545:26:49",
+            "nameLocation": "519:26:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11478,
+              "id": 11399,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "571:2:49"
+              "src": "545:2:47"
             },
             "returnParameters": {
-              "id": 11482,
+              "id": 11403,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11481,
+                  "id": 11402,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11483,
-                  "src": "597:16:49",
+                  "scope": 11404,
+                  "src": "571:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -401,19 +371,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11479,
+                      "id": 11400,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "597:7:49",
+                      "src": "571:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11480,
+                    "id": 11401,
                     "nodeType": "ArrayTypeName",
-                    "src": "597:9:49",
+                    "src": "571:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -422,42 +392,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "596:18:49"
+              "src": "570:18:47"
             },
-            "scope": 11512,
-            "src": "536:80:49",
+            "scope": 11433,
+            "src": "510:80:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "efd621de",
-            "id": 11489,
+            "id": 11410,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveBeacons",
-            "nameLocation": "631:15:49",
+            "nameLocation": "605:15:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11484,
+              "id": 11405,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "646:2:49"
+              "src": "620:2:47"
             },
             "returnParameters": {
-              "id": 11488,
+              "id": 11409,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11487,
+                  "id": 11408,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11489,
-                  "src": "672:16:49",
+                  "scope": 11410,
+                  "src": "646:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -466,19 +436,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11485,
+                      "id": 11406,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "672:7:49",
+                      "src": "646:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11486,
+                    "id": 11407,
                     "nodeType": "ArrayTypeName",
-                    "src": "672:9:49",
+                    "src": "646:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -487,42 +457,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "671:18:49"
+              "src": "645:18:47"
             },
-            "scope": 11512,
-            "src": "622:68:49",
+            "scope": 11433,
+            "src": "596:68:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "fe9dc8dc",
-            "id": 11495,
+            "id": 11416,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveTransparentProxiesImpl",
-            "nameLocation": "705:30:49",
+            "nameLocation": "679:30:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11490,
+              "id": 11411,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "735:2:49"
+              "src": "709:2:47"
             },
             "returnParameters": {
-              "id": 11494,
+              "id": 11415,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11493,
+                  "id": 11414,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11495,
-                  "src": "761:16:49",
+                  "scope": 11416,
+                  "src": "735:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -531,19 +501,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11491,
+                      "id": 11412,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "761:7:49",
+                      "src": "735:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11492,
+                    "id": 11413,
                     "nodeType": "ArrayTypeName",
-                    "src": "761:9:49",
+                    "src": "735:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -552,42 +522,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "760:18:49"
+              "src": "734:18:47"
             },
-            "scope": 11512,
-            "src": "696:83:49",
+            "scope": 11433,
+            "src": "670:83:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "9f777104",
-            "id": 11501,
+            "id": 11422,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveBeaconsImpl",
-            "nameLocation": "794:19:49",
+            "nameLocation": "768:19:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11496,
+              "id": 11417,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "813:2:49"
+              "src": "787:2:47"
             },
             "returnParameters": {
-              "id": 11500,
+              "id": 11421,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11499,
+                  "id": 11420,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11501,
-                  "src": "839:16:49",
+                  "scope": 11422,
+                  "src": "813:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -596,19 +566,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11497,
+                      "id": 11418,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "839:7:49",
+                      "src": "813:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11498,
+                    "id": 11419,
                     "nodeType": "ArrayTypeName",
-                    "src": "839:9:49",
+                    "src": "813:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -617,42 +587,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "838:18:49"
+              "src": "812:18:47"
             },
-            "scope": 11512,
-            "src": "785:72:49",
+            "scope": 11433,
+            "src": "759:72:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "functionSelector": "06489577",
-            "id": 11506,
+            "functionSelector": "8c324a43",
+            "id": 11427,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "retrieveManagerAdmin",
-            "nameLocation": "872:20:49",
+            "name": "retrieveProxyAdmin",
+            "nameLocation": "846:18:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11502,
+              "id": 11423,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "892:2:49"
+              "src": "864:2:47"
             },
             "returnParameters": {
-              "id": 11505,
+              "id": 11426,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11504,
+                  "id": 11425,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11506,
-                  "src": "918:7:49",
+                  "scope": 11427,
+                  "src": "890:7:47",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -660,10 +630,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 11503,
+                    "id": 11424,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "918:7:49",
+                    "src": "890:7:47",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -673,42 +643,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "917:9:49"
+              "src": "889:9:47"
             },
-            "scope": 11512,
-            "src": "863:64:49",
+            "scope": 11433,
+            "src": "837:62:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "392e53cd",
-            "id": 11511,
+            "id": 11432,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "isInitialized",
-            "nameLocation": "948:13:49",
+            "nameLocation": "920:13:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11507,
+              "id": 11428,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "961:2:49"
+              "src": "933:2:47"
             },
             "returnParameters": {
-              "id": 11510,
+              "id": 11431,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11509,
+                  "id": 11430,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11511,
-                  "src": "986:4:49",
+                  "scope": 11432,
+                  "src": "958:4:47",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -716,10 +686,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 11508,
+                    "id": 11429,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "986:4:49",
+                    "src": "958:4:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -728,21 +698,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "985:6:49"
+              "src": "957:6:47"
             },
-            "scope": 11512,
-            "src": "939:53:49",
+            "scope": 11433,
+            "src": "911:53:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 11513,
-        "src": "336:659:49",
+        "scope": 11434,
+        "src": "336:631:47",
         "usedErrors": []
       }
     ],
-    "src": "39:956:49"
+    "src": "39:928:47"
   },
   "legacyAST": {
     "absolutePath": "project:/contracts/Interfaces/IManager.sol",
@@ -763,10 +733,10 @@
         1897
       ],
       "IManager": [
-        11512
+        11433
       ],
       "Library": [
-        13331
+        13260
       ],
       "Ownable": [
         1351
@@ -784,53 +754,53 @@
         1972
       ]
     },
-    "id": 11513,
+    "id": 11434,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 11463,
+        "id": 11386,
         "literals": [
           "solidity",
           "0.8",
           ".7"
         ],
         "nodeType": "PragmaDirective",
-        "src": "39:22:49"
+        "src": "39:22:47"
       },
       {
         "absolutePath": "project:/contracts/Libraries/Library.sol",
         "file": "../Libraries/Library.sol",
-        "id": 11464,
+        "id": 11387,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 11513,
-        "sourceUnit": 13332,
-        "src": "141:34:49",
+        "scope": 11434,
+        "sourceUnit": 13261,
+        "src": "141:34:47",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
         "file": "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
-        "id": 11465,
+        "id": 11388,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 11513,
+        "scope": 11434,
         "sourceUnit": 1973,
-        "src": "178:68:49",
+        "src": "178:68:47",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
         "file": "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
-        "id": 11466,
+        "id": 11389,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 11513,
+        "scope": 11434,
         "sourceUnit": 2273,
-        "src": "248:83:49",
+        "src": "248:83:47",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -840,160 +810,138 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 11512,
+        "id": 11433,
         "linearizedBaseContracts": [
-          11512
+          11433
         ],
         "name": "IManager",
-        "nameLocation": "346:8:49",
+        "nameLocation": "346:8:47",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "functionSelector": "deb46666",
-            "id": 11472,
+            "functionSelector": "5a85cfda",
+            "id": 11398,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "InitializeContracts",
-            "nameLocation": "372:19:49",
+            "nameLocation": "372:19:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11470,
+              "id": 11396,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11469,
+                  "id": 11392,
                   "mutability": "mutable",
                   "name": "initialContracts",
-                  "nameLocation": "433:16:49",
+                  "nameLocation": "433:16:47",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11472,
-                  "src": "392:57:49",
+                  "scope": 11398,
+                  "src": "392:57:47",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$_ProposedContractsStruct_$13161_calldata_ptr",
+                    "typeIdentifier": "t_struct$_ProposedContractsStruct_$13090_calldata_ptr",
                     "typeString": "struct Library.ProposedContractsStruct"
                   },
                   "typeName": {
-                    "id": 11468,
+                    "id": 11391,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 11467,
+                      "id": 11390,
                       "name": "Library.ProposedContractsStruct",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 13161,
-                      "src": "392:31:49"
+                      "referencedDeclaration": 13090,
+                      "src": "392:31:47"
                     },
-                    "referencedDeclaration": 13161,
-                    "src": "392:31:49",
+                    "referencedDeclaration": 13090,
+                    "src": "392:31:47",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_ProposedContractsStruct_$13161_storage_ptr",
+                      "typeIdentifier": "t_struct$_ProposedContractsStruct_$13090_storage_ptr",
                       "typeString": "struct Library.ProposedContractsStruct"
                     }
                   },
                   "visibility": "internal"
-                }
-              ],
-              "src": "391:59:49"
-            },
-            "returnParameters": {
-              "id": 11471,
-              "nodeType": "ParameterList",
-              "parameters": [],
-              "src": "459:0:49"
-            },
-            "scope": 11512,
-            "src": "363:97:49",
-            "stateMutability": "nonpayable",
-            "virtual": false,
-            "visibility": "external"
-          },
-          {
-            "functionSelector": "06fde4ff",
-            "id": 11477,
-            "implemented": false,
-            "kind": "function",
-            "modifiers": [],
-            "name": "changeManagerAdmin",
-            "nameLocation": "475:18:49",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 11475,
-              "nodeType": "ParameterList",
-              "parameters": [
+                },
                 {
                   "constant": false,
-                  "id": 11474,
+                  "id": 11395,
                   "mutability": "mutable",
-                  "name": "newManagerAdmin",
-                  "nameLocation": "502:15:49",
+                  "name": "ManagerProxy",
+                  "nameLocation": "479:12:47",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11477,
-                  "src": "494:23:49",
+                  "scope": 11398,
+                  "src": "451:40:47",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
+                    "typeIdentifier": "t_contract$_TransparentUpgradeableProxy_$2272",
+                    "typeString": "contract TransparentUpgradeableProxy"
                   },
                   "typeName": {
-                    "id": 11473,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "494:7:49",
-                    "stateMutability": "nonpayable",
+                    "id": 11394,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 11393,
+                      "name": "TransparentUpgradeableProxy",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 2272,
+                      "src": "451:27:47"
+                    },
+                    "referencedDeclaration": 2272,
+                    "src": "451:27:47",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
+                      "typeIdentifier": "t_contract$_TransparentUpgradeableProxy_$2272",
+                      "typeString": "contract TransparentUpgradeableProxy"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "493:25:49"
+              "src": "391:101:47"
             },
             "returnParameters": {
-              "id": 11476,
+              "id": 11397,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "527:0:49"
+              "src": "501:0:47"
             },
-            "scope": 11512,
-            "src": "466:62:49",
+            "scope": 11433,
+            "src": "363:139:47",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "e220ad95",
-            "id": 11483,
+            "id": 11404,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveTransparentProxies",
-            "nameLocation": "545:26:49",
+            "nameLocation": "519:26:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11478,
+              "id": 11399,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "571:2:49"
+              "src": "545:2:47"
             },
             "returnParameters": {
-              "id": 11482,
+              "id": 11403,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11481,
+                  "id": 11402,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11483,
-                  "src": "597:16:49",
+                  "scope": 11404,
+                  "src": "571:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1002,19 +950,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11479,
+                      "id": 11400,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "597:7:49",
+                      "src": "571:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11480,
+                    "id": 11401,
                     "nodeType": "ArrayTypeName",
-                    "src": "597:9:49",
+                    "src": "571:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -1023,42 +971,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "596:18:49"
+              "src": "570:18:47"
             },
-            "scope": 11512,
-            "src": "536:80:49",
+            "scope": 11433,
+            "src": "510:80:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "efd621de",
-            "id": 11489,
+            "id": 11410,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveBeacons",
-            "nameLocation": "631:15:49",
+            "nameLocation": "605:15:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11484,
+              "id": 11405,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "646:2:49"
+              "src": "620:2:47"
             },
             "returnParameters": {
-              "id": 11488,
+              "id": 11409,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11487,
+                  "id": 11408,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11489,
-                  "src": "672:16:49",
+                  "scope": 11410,
+                  "src": "646:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1067,19 +1015,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11485,
+                      "id": 11406,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "672:7:49",
+                      "src": "646:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11486,
+                    "id": 11407,
                     "nodeType": "ArrayTypeName",
-                    "src": "672:9:49",
+                    "src": "646:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -1088,42 +1036,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "671:18:49"
+              "src": "645:18:47"
             },
-            "scope": 11512,
-            "src": "622:68:49",
+            "scope": 11433,
+            "src": "596:68:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "fe9dc8dc",
-            "id": 11495,
+            "id": 11416,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveTransparentProxiesImpl",
-            "nameLocation": "705:30:49",
+            "nameLocation": "679:30:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11490,
+              "id": 11411,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "735:2:49"
+              "src": "709:2:47"
             },
             "returnParameters": {
-              "id": 11494,
+              "id": 11415,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11493,
+                  "id": 11414,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11495,
-                  "src": "761:16:49",
+                  "scope": 11416,
+                  "src": "735:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1132,19 +1080,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11491,
+                      "id": 11412,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "761:7:49",
+                      "src": "735:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11492,
+                    "id": 11413,
                     "nodeType": "ArrayTypeName",
-                    "src": "761:9:49",
+                    "src": "735:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -1153,42 +1101,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "760:18:49"
+              "src": "734:18:47"
             },
-            "scope": 11512,
-            "src": "696:83:49",
+            "scope": 11433,
+            "src": "670:83:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "9f777104",
-            "id": 11501,
+            "id": 11422,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "retrieveBeaconsImpl",
-            "nameLocation": "794:19:49",
+            "nameLocation": "768:19:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11496,
+              "id": 11417,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "813:2:49"
+              "src": "787:2:47"
             },
             "returnParameters": {
-              "id": 11500,
+              "id": 11421,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11499,
+                  "id": 11420,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11501,
-                  "src": "839:16:49",
+                  "scope": 11422,
+                  "src": "813:16:47",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1197,19 +1145,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 11497,
+                      "id": 11418,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "839:7:49",
+                      "src": "813:7:47",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 11498,
+                    "id": 11419,
                     "nodeType": "ArrayTypeName",
-                    "src": "839:9:49",
+                    "src": "813:9:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -1218,42 +1166,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "838:18:49"
+              "src": "812:18:47"
             },
-            "scope": 11512,
-            "src": "785:72:49",
+            "scope": 11433,
+            "src": "759:72:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "functionSelector": "06489577",
-            "id": 11506,
+            "functionSelector": "8c324a43",
+            "id": 11427,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "retrieveManagerAdmin",
-            "nameLocation": "872:20:49",
+            "name": "retrieveProxyAdmin",
+            "nameLocation": "846:18:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11502,
+              "id": 11423,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "892:2:49"
+              "src": "864:2:47"
             },
             "returnParameters": {
-              "id": 11505,
+              "id": 11426,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11504,
+                  "id": 11425,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11506,
-                  "src": "918:7:49",
+                  "scope": 11427,
+                  "src": "890:7:47",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1261,10 +1209,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 11503,
+                    "id": 11424,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "918:7:49",
+                    "src": "890:7:47",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1274,42 +1222,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "917:9:49"
+              "src": "889:9:47"
             },
-            "scope": 11512,
-            "src": "863:64:49",
+            "scope": 11433,
+            "src": "837:62:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "392e53cd",
-            "id": 11511,
+            "id": 11432,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "isInitialized",
-            "nameLocation": "948:13:49",
+            "nameLocation": "920:13:47",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 11507,
+              "id": 11428,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "961:2:49"
+              "src": "933:2:47"
             },
             "returnParameters": {
-              "id": 11510,
+              "id": 11431,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 11509,
+                  "id": 11430,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 11511,
-                  "src": "986:4:49",
+                  "scope": 11432,
+                  "src": "958:4:47",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1317,10 +1265,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 11508,
+                    "id": 11429,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "986:4:49",
+                    "src": "958:4:47",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -1329,21 +1277,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "985:6:49"
+              "src": "957:6:47"
             },
-            "scope": 11512,
-            "src": "939:53:49",
+            "scope": 11433,
+            "src": "911:53:47",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 11513,
-        "src": "336:659:49",
+        "scope": 11434,
+        "src": "336:631:47",
         "usedErrors": []
       }
     ],
-    "src": "39:956:49"
+    "src": "39:928:47"
   },
   "compiler": {
     "name": "solc",
@@ -1351,7 +1299,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-01-14T12:35:13.510Z",
+  "updatedAt": "2022-03-22T11:39:59.294Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
