@@ -7,6 +7,7 @@ const AtLeastOne = new RegExp("EC19-");
 const MinNumberRequired = new RegExp("EC19-");
 const NotEnoughFunds = new RegExp("EC2-");
 const NodeAlreadyExists = new RegExp("EC37-");
+const DuplicatedOwner = new RegExp("EC29-");
 const emptyLabel = "";
 const label = "TestLabel";
 const PrivatePoolSuffix = constants.initSuffixes[0];
@@ -59,6 +60,16 @@ async function createElementWrong(FactoryProxy, Owners, minOwners, ElementName, 
     // assert
     catch(error){
         expect(error.message).to.match(AtLeastOne);
+        var total = await FactoryProxy.methods.retrieveTotal().call({from: user_1}, function(error, result){});
+        expect(parseInt(total)).to.equal(0);
+    }
+    try{
+        await FactoryProxy.methods.create([user_1, user_1], 1, ElementName, emptyLabel).send({from: user_1, value: Price, gas: Gas}, function(error, result){});
+        expect.fail();
+    }
+    // assert
+    catch(error){
+        expect(error.message).to.match(DuplicatedOwner);
         var total = await FactoryProxy.methods.retrieveTotal().call({from: user_1}, function(error, result){});
         expect(parseInt(total)).to.equal(0);
     }
