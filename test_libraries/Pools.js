@@ -52,6 +52,9 @@ const WrongSignature = new RegExp("EC32-");
 const Domain = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)";
 const DomainHeader = web3.utils.soliditySha3({type: "string", value: Domain});
 
+const Salt = '\x19\x01';
+
+
 const address_0 = "0x0000000000000000000000000000000000000000";
 
 function AddressToBytes32(address){
@@ -102,24 +105,29 @@ async function AddingCertificate(CertPool, provider_1, provider_2, holder_1, hol
 }
 
 function GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress){
-    return web3.utils.soliditySha3({type: "bytes32", value: DomainHeader},
+    let PadedContractAddress = "0x000000000000000000000000" + ContractAddress.substring(2, 42);
+    return web3.utils.soliditySha3(
+        {type: "bytes32", value: DomainHeader},
         {type: "bytes32", value: ContractName},
         {type: "bytes32", value: ContractVersion},
         {type: "uint256", value: chainId},
-        {type: "address", value: ContractAddress});
+        {type: "bytes32", value: PadedContractAddress});
 }
 
 function GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline){
-    return  web3.utils.soliditySha3({type: "bytes32", value: addCertificateOnBehalfOfHeader},
-    {type: "address", value: provider},
-    {type: "bytes32", value: hash},
-    {type: "address", value: holder},
-    {type: "uint256", value: nonce},
-    {type: "uint256", value: deadline});
+    let PadedProvider = "0x000000000000000000000000" + provider.substring(2, 42);
+    let PadedHolder = "0x000000000000000000000000" + holder.substring(2, 42);
+    return  web3.utils.soliditySha3(
+        {type: "bytes32", value: addCertificateOnBehalfOfHeader},
+        {type: "bytes32", value: PadedProvider},
+        {type: "bytes32", value: hash},
+        {type: "bytes32", value: PadedHolder},
+        {type: "uint256", value: nonce},
+        {type: "uint256", value: deadline});
 }
 
 async function GetSignature(dataToSign, from){
-    let signature = await web3.eth.sign(dataToSign, signer);
+    let signature = await web3.eth.sign(dataToSign, from);
     /*let params = [from, dataToSign];
     let method = "eth_signTypedData_v3"
 
@@ -128,9 +136,11 @@ async function GetSignature(dataToSign, from){
           if (err) console.log("error " + err)
           else if (result.error) console.log("result error " + JSON.stringify(result.error))
           else return result.result
-        });
-    console.log(signature)*/
-    //signature = signature.substr(0, 130) + (signature.substr(130) == "00" ? "1b" : "1c");
+        });*/
+    signature = signature.substr(0, 130) + (signature.substr(130) == "00" ? "1b" : "1c");
+    console.log("data : " + dataToSign)
+    console.log("signature : " + signature)
+
     return signature
 }
 
@@ -139,32 +149,26 @@ async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName
     const chainId = await web3.eth.getChainId();
     let ContractAddress = CertPool._address;
     // domain hash
-    //const addCertificateOnBehalfOfType = "addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)"
-    //let addCertificateOnBehalfOfHeader = web3.utils.soliditySha3({type: "string", value: addCertificateOnBehalfOfType});
+    const addCertificateOnBehalfOfType = "addCertificateOnBehalfOf(address provider,bytes32 certificateHash,address holder,uint256 nonce,uint256 deadline)"
+    let addCertificateOnBehalfOfHeader = web3.utils.soliditySha3({type: "string", value: addCertificateOnBehalfOfType});
     let domainHash = GetDomainHash(DomainHeader, ContractName, ContractVersion, chainId, ContractAddress);
     // function hash
     let functionHash = GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder, nonce, deadline);
-    //let dataToSign = web3.utils.soliditySha3({type: "bytes32", value: domainHash}, {type: "bytes32", value: functionHash});
 
-    /*let dataToSign = '{"domain":{"name":"'
-    + ContractName
-    +'","version":"'
-    + ContractVersion
-    +'","chainId":'
-    + chainId 
-    + ',"verifyingContract":"'
-    + ContractAddress
-    + '"},"message":{"provider":"'
-    + provider
-    +'","certificateHash":"'
-    + hash
-    +'","holder":"'
-    + holder
-    +'","nonce":'
-    + nonce
-    +',"deadline":'
-    + deadline
-    +'},"primaryType":"addCertificateOnBehalfOf","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"addCertificateOnBehalfOf":[{"name":"provider","type":"address"},{"name":"certificateHash","type":"bytes32"},{"name":"holder","type":"address"},{"name":"nonce","type":"uint256"},{"name":"deadline","type":"uint256"}]}}'*/
+    let dataToSign = web3.utils.soliditySha3(
+        web3.utils.encodePacked(
+            {type: "string", value: Salt}, 
+            {type: "bytes32", value: domainHash}, 
+            {type: "bytes32", value: functionHash}));
+
+    console.log("contract : " + ContractAddress)
+    console.log("provider : " + provider)
+    console.log("hash : " + hash)
+    console.log("holder : " + holder)
+    console.log("nonce : " + nonce)
+    console.log("deadline : " + deadline)
+
+
 
     return await GetSignature(dataToSign, provider);
 }
@@ -174,17 +178,19 @@ async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, hol
     let deadline = Math.ceil(Date.now() / 1000) + 120;
     let nonce = 0;
 
-    //let ContractName =  web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractName));
-    //let ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PrivatePoolContractVersion));
-    let ContractName =  PrivatePoolContractName;
-    let ContractVersion = PrivatePoolContractVersion;
+    let ContractName = web3.utils.soliditySha3({type: "string", value: PrivatePoolContractName});
+    let ContractVersion = web3.utils.soliditySha3({type: "string", value: PrivatePoolContractVersion});
+    //let ContractName =  PrivatePoolContractName;
+    //let ContractVersion = PrivatePoolContractVersion;
 
     if(!isPrivate) {
         value_To_Pay = CertificatePriceWei;
         //ContractName = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractName));
         //ContractVersion = web3.utils.keccak256(web3.utils.stringToHex(PublicPoolContractVersion));
-        ContractName =  PublicPoolContractName;
-        ContractVersion = PublicPoolContractVersion;
+        ContractName = web3.utils.soliditySha3({type: "string", value: PublicPoolContractName});
+        ContractVersion = web3.utils.soliditySha3({type: "string", value: PublicPoolContractVersion});
+        //ContractName =  PublicPoolContractName;
+        //ContractVersion = PublicPoolContractVersion;
     }
 
     // signature
