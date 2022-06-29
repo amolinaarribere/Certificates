@@ -2,6 +2,10 @@
 // ERROR tests = First we test the error message then we test the action was not carried out
 
 const BigNumber = require('bignumber.js');
+const { ethers } = require("ethers");
+const { sigUtils } = require("eth-sig-util");
+const aux = require("./auxiliaries.js");
+
 
 const CertificatesPoolManager = artifacts.require("CertificatesPoolManager");
 const PrivateCertificates = artifacts.require("PrivateCertificatesPool");
@@ -126,7 +130,7 @@ function GetFunctionHash(addCertificateOnBehalfOfHeader, provider, hash, holder,
         {type: "uint256", value: deadline});
 }
 
-async function GetSignature(dataToSign, from){
+/*async function GetSignature(dataToSign, from){
     let signature = await web3.eth.sign(dataToSign, from);
     /*let params = [from, dataToSign];
     let method = "eth_signTypedData_v3"
@@ -136,15 +140,116 @@ async function GetSignature(dataToSign, from){
           if (err) console.log("error " + err)
           else if (result.error) console.log("result error " + JSON.stringify(result.error))
           else return result.result
-        });*/
+        });
     signature = signature.substr(0, 130) + (signature.substr(130) == "00" ? "1b" : "1c");
+    let signer2 = web3.eth.accounts.recover(dataToSign, signature);
+
     console.log("data : " + dataToSign)
     console.log("signature : " + signature)
+    console.log("signer2 : " + signer2)
+    console.log("from : " + from)
+
 
     return signature
+}*/
+
+async function GetSignature(ContractName, ContractVersion, chainId, ContractAddress, Provider, Hash, Holder, Nonce, Deadline, accounts){
+    //let provider = new ethers.providers.Web3Provider(web3.eth.currentProvider);
+    let accountId = aux.GetAccountId(accounts, Provider);
+    let path = "m/44'/60'/0'/0/0";
+    if(accountId != -1) path = "m/44'/60'/0'/0/" + accountId.toString();
+    let wallet = new ethers.Wallet.fromMnemonic("mimic clump vessel spirit drum airport trash ribbon mind ability sister rice", path);
+    //wallet.connect(provider);
+    //let wallet = new ethers.Wallet("15bd012f872673795372abb1d6ff8d7340d56a4b35c906b11a13627b442aad58", provider);
+    console.log("address : " + wallet.address);
+    console.log("provider : " + wallet.provider );
+    console.log("publicKey  : " + wallet.publicKey);
+
+    const domain = {
+        name: ContractName,
+        version: ContractVersion,
+        chainId: chainId,
+        verifyingContract: ContractAddress,
+    };
+    
+    // The named list of all type definitions
+    const types = {
+        addCertificateOnBehalfOf: [
+            { name: 'provider', type: 'address' },
+            { name: 'certificateHash', type: 'bytes32' },
+            { name: 'holder', type: 'address' },
+            { name: 'nonce', type: 'uint256' },
+            { name: 'deadline', type: 'uint256' }
+        ]
+    };
+    
+    // The data to sign
+    const value = {
+        provider: Provider,
+        certificateHash: Hash,
+        holder: Holder,
+        nonce: Nonce,
+        deadline: Deadline
+    };
+
+    let signature = await wallet._signTypedData(domain, types, value);
+    console.log("signature : " + signature)
+
+    return signature;
 }
 
-async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName, ContractVersion, deadline){
+async function GetSignature2(ContractName, ContractVersion, chainId, ContractAddress, Provider, Hash, Holder, Nonce, Deadline, accounts){
+
+    let Domain = {
+        name: ContractName,
+        version: ContractVersion,
+        chainId: chainId,
+        verifyingContract: ContractAddress,
+    };
+
+    let Message = {
+        provider: Provider,
+        certificateHash: Hash,
+        holder: Holder,
+        nonce: Nonce,
+        deadline: Deadline
+    };
+
+    let CertificateParams = JSON.stringify({
+        domain: Domain,
+        message: Message,
+        primaryType: 'addCertificateOnBehalfOf',
+        types: {
+          EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' },
+          ],
+          addCertificateOnBehalfOf: [
+            { name: 'provider', type: 'address' },
+            { name: 'certificateHash', type: 'bytes32' },
+            { name: 'holder', type: 'address' },
+            { name: 'nonce', type: 'uint256' },
+            { name: 'deadline', type: 'uint256' }
+          ]
+        }
+      });
+  
+    let params = [Provider, CertificateParams];
+    let method = 'eth_signTypedData_v4';
+    /*let signature = await web3.currentProvider.send({method,params,Provider}, 
+        (err, result) => {
+          if (err) console.log("error " + JSON.stringify(err))
+          else if (result.error)  console.log("result error " + JSON.stringify(result.error))
+          else return result.result
+        });*/
+    let signature = sigUtils.eth_signTypedData_v4();
+
+    return signature;
+}
+
+async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName, ContractVersion, deadline, accounts){
     // general
     const chainId = await web3.eth.getChainId();
     let ContractAddress = CertPool._address;
@@ -157,9 +262,13 @@ async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName
 
     let dataToSign = web3.utils.soliditySha3(
         web3.utils.encodePacked(
-            {type: "string", value: Salt}, 
+            {type: "string", value: Salt},
             {type: "bytes32", value: domainHash}, 
             {type: "bytes32", value: functionHash}));
+
+    console.log("domainHash : " + domainHash)
+    console.log("functionHash : " + functionHash)
+    console.log("dataToSign : " + dataToSign)
 
     console.log("contract : " + ContractAddress)
     console.log("provider : " + provider)
@@ -170,10 +279,11 @@ async function SignMessage(CertPool, provider, hash, holder, nonce, ContractName
 
 
 
-    return await GetSignature(dataToSign, provider);
+    //return await GetSignature(dataToSign, provider);
+    return await GetSignature(ContractName, ContractVersion, chainId, ContractAddress, provider, hash, holder, nonce, deadline, accounts);
 }
 
-async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1){
+async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1, accounts){
     let value_To_Pay = 0;
     let deadline = Math.ceil(Date.now() / 1000) + 120;
     let nonce = 0;
@@ -194,7 +304,7 @@ async function AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, hol
     }
 
     // signature
-    let signature_1 = await SignMessage(CertPool, provider_1, hash_1, holder_1, nonce, ContractName, ContractVersion, deadline);
+    let signature_1 = await SignMessage(CertPool, provider_1, hash_1, holder_1, nonce, ContractName, ContractVersion, deadline, accounts);
     //let signature_2 = await SignMessage(CertPool, provider_1, hash_1, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
     //let signature_3 = await SignMessage(CertPool, provider_2, hash_2, holder_1, nonce, ContractName, ContractVersion, deadline);
     //let signature_4 = await SignMessage(CertPool, provider_2, hash_2, holder_2, nonce + 1, ContractName, ContractVersion, deadline);
@@ -755,10 +865,10 @@ async function AddCertificateOnBehalfWrong(CertPool, Owners, provider_1, provide
     }
 }
 
-async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate){
+async function AddCertificateOnBehalfCorrect(CertPool, Owners, provider_1, provider_2, holder_1, holder_2, user_1, isPrivate, accounts){
     // act
     await AddingOrValidatingProviders(CertPool, Owners, provider_1, provider_2, isPrivate)
-    await AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1);
+    await AddingCertificateOnBehalfOf(CertPool, provider_1, provider_2, holder_1, holder_2, isPrivate, user_1, accounts);
     // assert
     //await CheckCertificatesAdded(CertPool, provider_1, provider_2, holder_1, holder_2, user_1);
 }

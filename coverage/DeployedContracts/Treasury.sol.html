@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for DeployedContracts\Treasury.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">DeployedContracts/</a> Treasury.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/91</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/32</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/28</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/86</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: GPL-3.0
+&nbsp;
+pragma solidity 0.8.7;
+&nbsp;
+/**
+ Treasury receives all the payments and assigns dividends to token holders.
+ Public Certificate Pool contract can ask for its owners to eb refunded even if they do not own tokens.
+&nbsp;
+ First dividends must be assigned to an account and then the account owner can withdraw the funds.
+ Both actions must be triggered by the account owner.
+&nbsp;
+  Events : 
+    - New Prices Added : list of prices
+    - Payment recieved : payer, amount, new total aggregated contract amount
+    - Refund : who, amount, among how many
+    - Assign Dividends : who, amount (number of tokens), among how many (total supply)
+    - Withdraw : who, how much
+ */
+&nbsp;
+import "../Interfaces/ITreasury.sol";
+import "../Interfaces/IPriceConverter.sol";
+import "../Libraries/UintLibrary.sol";
+import "../Libraries/Library.sol";
+import "../Base/StdPropositionBaseContract.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+&nbsp;
+&nbsp;
+contract Treasury is ITreasury, StdPropositionBaseContract{
+    using Library for *;
+    using UintLibrary for *;
+&nbsp;
+    // EVENTS /////////////////////////////////////////
+    event _NewPrices(uint Public, uint Private, uint Provider, uint Certificate, uint OwnerRefund);
+    event _Pay(address indexed Payer, uint Amount, uint AggregatedAmount);
+    event _Refund(address indexed Owner, uint Amount, uint TotalOwners);
+    event _AssignDividend(address indexed Recipient, uint Amount, uint TotalSupply);
+    event _Withdraw(address indexed Recipient, uint Amount);
+&nbsp;
+    // DATA /////////////////////////////////////////
+    // prices parameters usd
+    uint private _PublicPriceUSD;
+    uint private _CertificatePriceUSD;
+    uint private _PrivatePriceUSD;
+    uint private _ProviderPriceUSD;
+    uint private _OwnerRefundFeeUSD;
+&nbsp;
+    // last amount at which dividends where assigned for each token owner
+    uint private _AggregatedDividendAmount;
+    mapping(address =&gt; uint) private _lastAssigned;
+&nbsp;
+    // dividends per token owner
+    struct _BalanceStruct{
+        mapping(uint =&gt; uint) _balance;
+        uint[] _factors;
+    }
+    
+    mapping(address =&gt; _BalanceStruct) private _balances;
+&nbsp;
+    // MODIFIERS /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    modifier areFundsEnough(uint256 value, Library.Prices price){</span>
+<span class="cstat-no" title="statement not covered" >        uint256 minPriceUSD = 2**256 - 1;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(Library.Prices.NewProvider == price) <span class="cstat-no" title="statement not covered" >minPriceUSD = _PublicPriceUSD</span>;</span>
+        else <span class="cstat-no" title="statement not covered" >if(Library.Prices.NewPool == price) <span class="cstat-no" title="statement not covered" >minPriceUSD = _PrivatePriceUSD</span>;</span>
+        else <span class="cstat-no" title="statement not covered" >if(Library.Prices.NewCertificate == price) <span class="cstat-no" title="statement not covered" >minPriceUSD = _CertificatePriceUSD</span>;</span>
+        else <span class="cstat-no" title="statement not covered" >minPriceUSD = _ProviderPriceUSD</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        uint256 minPriceETH = IPriceConverter(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PriceConverter)]).fromUSDToETH(minPriceUSD);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        require(value &gt;= minPriceETH, "EC2-")</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier isBalanceEnough(uint amount, address addr){</span>
+<span class="cstat-no" title="statement not covered" >        require(checkFullBalance(addr) &gt;= amount, "EC20-")</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier isFromPublicPool(address addr){</span>
+<span class="cstat-no" title="statement not covered" >        Library.ItIsSomeone(addr, _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PublicPool)])</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier isPriceOK(uint256 PublicPriceUSD, uint256 OwnerRefundFeeUSD){</span>
+<span class="cstat-no" title="statement not covered" >        isPriceOKFunc(PublicPriceUSD, OwnerRefundFeeUSD)</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isPriceOKFunc(uint256 PublicPriceUSD, uint256 OwnerRefundFeeUSD) internal pure{</span>
+<span class="cstat-no" title="statement not covered" >        require(PublicPriceUSD &gt;= OwnerRefundFeeUSD, "EC21-")</span>;
+    }
+    
+    // CONSTRUCTOR /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function Treasury_init(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer </span>
+        isPriceOK(PublicPriceUSD, OwnerRefundFeeUSD)
+    {
+<span class="cstat-no" title="statement not covered" >        super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion)</span>;
+<span class="cstat-no" title="statement not covered" >        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD)</span>;
+    }
+&nbsp;
+    // GOVERNANCE /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function checkProposition(bytes[] memory NewValues) internal override </span>
+        isPriceOK(UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[0])[0]), UintLibrary.Bytes32ToUint(Library.BytestoBytes32(NewValues[4])[0]))
+    {}
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function UpdateAll() internal override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        bytes32[] memory ProposedNewValues = PropositionsToBytes32();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        uint256 PublicPriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[0]);</span>
+<span class="cstat-no" title="statement not covered" >        uint256 PrivatePriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[1]);</span>
+<span class="cstat-no" title="statement not covered" >        uint256 ProviderPriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[2]);</span>
+<span class="cstat-no" title="statement not covered" >        uint256 CertificatePriceUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[3]);</span>
+<span class="cstat-no" title="statement not covered" >        uint256 OwnerRefundFeeUSD = UintLibrary.Bytes32ToUint(ProposedNewValues[4]);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        InternalupdatePrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit _NewPrices(PublicPriceUSD, PrivatePriceUSD, ProviderPriceUSD, CertificatePriceUSD, OwnerRefundFeeUSD);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function InternalupdatePrices(uint256 PublicPriceUSD, uint256 PrivatePriceUSD, uint256 ProviderPriceUSD, uint256 CertificatePriceUSD, uint256 OwnerRefundFeeUSD) internal</span>
+    {
+<span class="cstat-no" title="statement not covered" >        _PublicPriceUSD = PublicPriceUSD</span>;
+<span class="cstat-no" title="statement not covered" >        _PrivatePriceUSD = PrivatePriceUSD</span>;
+<span class="cstat-no" title="statement not covered" >        _ProviderPriceUSD = ProviderPriceUSD</span>;
+<span class="cstat-no" title="statement not covered" >        _CertificatePriceUSD = CertificatePriceUSD</span>;
+<span class="cstat-no" title="statement not covered" >        _OwnerRefundFeeUSD = OwnerRefundFeeUSD</span>;
+    }
+&nbsp;
+    // FUNCTIONALITY /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function pay(Library.Prices price) external </span>
+        areFundsEnough(msg.value, price)
+    override payable
+    {
+<span class="cstat-no" title="statement not covered" >        uint256 amount = msg.value;</span>
+<span class="cstat-no" title="statement not covered" >        if(price == Library.Prices.NewProvider) <span class="cstat-no" title="statement not covered" >amount -= IPriceConverter(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PriceConverter)]).fromUSDToETH(_OwnerRefundFeeUSD)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        _AggregatedDividendAmount += amount</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit _Pay(msg.sender, msg.value, _AggregatedDividendAmount);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function InternalonTokenBalanceChanged(address from, address to, uint256 amount) internal override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        super.InternalonTokenBalanceChanged(from, to, amount)</span>;
+<span class="cstat-no" title="statement not covered" >        if(address(0) != from) <span class="cstat-no" title="statement not covered" >InternalAssignDividends(from)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        if(address(0) != to) <span class="cstat-no" title="statement not covered" >InternalAssignDividends(to)</span>;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function InternalAssignDividends(address recipient) internal</span>
+    {
+<span class="cstat-no" title="statement not covered" >        (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(recipient);</span>
+<span class="cstat-no" title="statement not covered" >        _lastAssigned[recipient] = _AggregatedDividendAmount</span>;
+        
+<span class="cstat-no" title="statement not covered" >        if(totalOffBalance &gt; 0){   </span>
+<span class="cstat-no" title="statement not covered" >           addBalance(recipient, totalOffBalance, DividendOffBalance)</span>;
+<span class="cstat-no" title="statement not covered" >           emit _AssignDividend(recipient, totalOffBalance, DividendOffBalance);</span>
+        }
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function getRefund(address addr, uint numberOfOwners) external </span>
+        isFromPublicPool(msg.sender)
+    override
+    {
+<span class="cstat-no" title="statement not covered" >        uint OwnerRefundFeeWei = IPriceConverter(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PriceConverter)]).fromUSDToETH(_OwnerRefundFeeUSD);</span>
+<span class="cstat-no" title="statement not covered" >        addBalance(addr, OwnerRefundFeeWei, numberOfOwners)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit _Refund(addr, OwnerRefundFeeWei, numberOfOwners);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function withdraw(uint amount) external </span>
+    override
+    {
+<span class="cstat-no" title="statement not covered" >        InternalWithdraw(amount)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function withdrawAll() external override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        uint All = checkFullBalance(msg.sender);</span>
+<span class="cstat-no" title="statement not covered" >        InternalWithdraw(All)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function InternalWithdraw(uint amount) internal </span>
+        isBalanceEnough(amount, msg.sender)
+    {
+<span class="cstat-no" title="statement not covered" >        InternalAssignDividends(msg.sender)</span>;
+<span class="cstat-no" title="statement not covered" >        uint[] memory f = returnFactors(msg.sender);</span>
+<span class="cstat-no" title="statement not covered" >        (uint total, uint commonDividend) = sumUpTotalOnBalance(msg.sender);</span>
+<span class="cstat-no" title="statement not covered" >        uint remainder =  total - (amount * commonDividend);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        for(uint i=0; i &lt; f.length; i++){</span>
+<span class="cstat-no" title="statement not covered" >            substractBalance(msg.sender, returnBalanceForFactor(msg.sender, f[i]), f[i])</span>;
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        addBalance(msg.sender, remainder, commonDividend)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        (bool success, bytes memory data) = msg.sender.call{value: amount}("");</span>
+<span class="cstat-no" title="statement not covered" >        require(success, string(abi.encodePacked("Error transfering funds to address : ", data)))</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit _Withdraw(msg.sender, amount);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveLastAssigned(address addr) external override view returns(uint)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return _lastAssigned[addr];</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveFullBalance(address addr) external override view returns(uint)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return checkFullBalance(addr);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveSettings() external override view returns(uint, uint, uint, uint, uint)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return(_PublicPriceUSD, _PrivatePriceUSD, _ProviderPriceUSD, _CertificatePriceUSD, _OwnerRefundFeeUSD);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveAggregatedAmount() external override view returns(uint){</span>
+<span class="cstat-no" title="statement not covered" >        return _AggregatedDividendAmount;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function checkFullBalance(address addr) internal view returns(uint){</span>
+<span class="cstat-no" title="statement not covered" >        (uint total, uint commonDividend) = sumUpTotal(addr);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return total / commonDividend;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function sumUpTotal(address addr) internal view returns (uint, uint)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        (uint totalOnBalance, uint commonDividendOnBalance) = sumUpTotalOnBalance(addr);</span>
+<span class="cstat-no" title="statement not covered" >        (uint totalOffBalance, uint DividendOffBalance) = sumUpTotalOffBalance(addr);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        uint total = (totalOnBalance * DividendOffBalance) + (totalOffBalance * commonDividendOnBalance);</span>
+<span class="cstat-no" title="statement not covered" >        uint CommonDividend = commonDividendOnBalance * DividendOffBalance;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return (total, CommonDividend);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function sumUpTotalOnBalance(address addr) internal view returns (uint, uint)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        uint[] memory f = returnFactors(addr);</span>
+<span class="cstat-no" title="statement not covered" >        uint CommonDividend = UintLibrary.ProductOfFactors(f);</span>
+<span class="cstat-no" title="statement not covered" >        uint total = 0;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        for(uint i=0; i &lt; f.length; i++){</span>
+<span class="cstat-no" title="statement not covered" >            total += returnBalanceForFactor(addr, f[i]) * CommonDividend / f[i]</span>;
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return (total, CommonDividend);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function sumUpTotalOffBalance(address addr) internal view returns (uint, uint)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        uint total = 0;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(_lastAssigned[addr] &lt; _AggregatedDividendAmount)</span>
+        {
+<span class="cstat-no" title="statement not covered" >            total = (_AggregatedDividendAmount - _lastAssigned[addr]) * GetTokensBalance(addr)</span>;           
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return (total, totalSupply());</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function returnFactors(address addr) internal view returns(uint[] memory){</span>
+<span class="cstat-no" title="statement not covered" >        return _balances[addr]._factors;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function returnBalanceForFactor(address addr, uint factor) internal view returns(uint){</span>
+<span class="cstat-no" title="statement not covered" >        return _balances[addr]._balance[factor];</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function addBalance(address addr, uint amount, uint factor) internal</span>
+    {
+<span class="cstat-no" title="statement not covered" >        if(amount &gt; 0){</span>
+<span class="cstat-no" title="statement not covered" >            if(0 == _balances[addr]._balance[factor])</span>
+            {
+<span class="cstat-no" title="statement not covered" >                _balances[addr]._factors.push(factor)</span>;
+            }
+<span class="cstat-no" title="statement not covered" >            _balances[addr]._balance[factor] += amount</span>;
+        }
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function substractBalance(address addr, uint amount, uint factor) internal</span>
+    {
+<span class="cstat-no" title="statement not covered" >        require(_balances[addr]._balance[factor] &gt;= amount, "Not enough balance for this factor")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        _balances[addr]._balance[factor] -= amount</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(0 == _balances[addr]._balance[factor])</span>
+        {
+<span class="cstat-no" title="statement not covered" >            UintLibrary.UintArrayRemoveResize(UintLibrary.FindUintPosition(factor, _balances[addr]._factors), _balances[addr]._factors)</span>;
+        }
+        
+    }
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 05 2022 13:13:49 GMT+0200 (heure d’été d’Europe centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

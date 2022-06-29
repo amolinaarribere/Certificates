@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for Abstract\MultiSigContract.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">Abstract/</a> MultiSigContract.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/50</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/25</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/50</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: GPL-3.0
+&nbsp;
+pragma solidity 0.8.7;
+&nbsp;
+/*
+  MultiSig Contract.
+    Inherits from EntitesBaseCOntract and simply defines CRUD operations for Owners with spepcific security checks
+ */
+&nbsp;
+ import "../Interfaces/IMultiSigContract.sol";
+ import "../Base/EntitiesBaseContract.sol";
+ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+&nbsp;
+abstract contract MultiSigContract is IMultiSigContract, EntitiesBaseContract, Initializable{
+&nbsp;
+    // DATA /////////////////////////////////////////
+    // proposal for new min owners
+    uint256 internal _newMinOwners;
+    uint256 internal _newMinOwnersVotesFor;
+    uint256 internal _newMinOwnersVotesAgainst;
+    address[] internal _newMinOwnersVoters;
+&nbsp;
+    // MODIFIERS /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    modifier NotEmpty(bytes32 document){</span>
+<span class="cstat-no" title="statement not covered" >        require(0 &lt; document.length, "EC11-")</span>;
+        _;
+    }
+    
+<span class="fstat-no" title="function not covered" >    modifier minRequired(uint min, uint number){</span>
+<span class="cstat-no" title="statement not covered" >         minRequiredFunc(min, number)</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function minRequiredFunc(uint min, uint number) internal pure{</span>
+<span class="cstat-no" title="statement not covered" >        require(min &lt;= number, "EC19-")</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier HasNotAlreadyVotedMinOwner(address voter){</span>
+<span class="cstat-no" title="statement not covered" >        HasNotAlreadyVotedMinOwnerFunc(voter)</span>;
+       _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function HasNotAlreadyVotedMinOwnerFunc(address voter) internal view {</span>
+<span class="cstat-no" title="statement not covered" >        require(false == AddressLibrary.FindAddress(voter, _newMinOwnersVoters), "EC5-")</span>;
+    }
+    
+<span class="fstat-no" title="function not covered" >    modifier NewMinOwnerInProgress(bool YesOrNo){</span>
+<span class="cstat-no" title="statement not covered" >        NewMinOwnerInProgressFunc(YesOrNo)</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function NewMinOwnerInProgressFunc(bool YesOrNo) internal view{</span>
+<span class="cstat-no" title="statement not covered" >        if(YesOrNo) <span class="cstat-no" title="statement not covered" >require(0 != _newMinOwners, "EC31-")</span>;</span>
+        else <span class="cstat-no" title="statement not covered" >require(0 == _newMinOwners, "EC30-")</span>;
+    }
+&nbsp;
+    // CONSTRUCTOR /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function MultiSigContract_init(address[] memory owners,  uint256 minOwners, uint256 TotalEntities, string[] memory labels, uint256 ownerId) public initializer </span>
+        minRequired(minOwners, owners.length)
+        minRequired(1, minOwners)
+    {
+<span class="cstat-no" title="statement not covered" >        require(TotalEntities == labels.length, "EC18-")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        _ownerId = ownerId</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        for(uint j=0; j &lt; TotalEntities; j++){</span>
+<span class="cstat-no" title="statement not covered" >            _Entities.push()</span>;
+<span class="cstat-no" title="statement not covered" >            _entitiesLabel.push(labels[j])</span>;
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        _minOwners = minOwners</span>;
+<span class="cstat-no" title="statement not covered" >        for (uint i=0; i &lt; owners.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >            bytes32 ownerInBytes = AddressLibrary.AddressToBytes32(owners[i]);</span>
+<span class="cstat-no" title="statement not covered" >            require(false == _Entities[_ownerId]._items[ownerInBytes]._activated, "EC29-")</span>;
+<span class="cstat-no" title="statement not covered" >            _Entities[_ownerId]._items[ownerInBytes]._activated = true</span>;
+<span class="cstat-no" title="statement not covered" >            _Entities[_ownerId]._activatedItems.push(ownerInBytes)</span>; 
+        } 
+    }
+&nbsp;
+    // FUNCTIONALITY /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function addOwner(address owner, string calldata ownerInfo) external override </span>
+    {
+<span class="cstat-no" title="statement not covered" >        addEntity(owner, ownerInfo, _ownerId)</span>;
+    }
+    
+<span class="fstat-no" title="function not covered" >    function removeOwner(address owner) external override</span>
+        minRequired(_minOwners, retrieveAllEntities(_ownerId).length - 1)
+    {
+<span class="cstat-no" title="statement not covered" >        removeEntity(owner, _ownerId)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function validateOwner(address owner) external override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        if(true == isEntityPendingToRemoved(owner, _ownerId)){</span>
+<span class="cstat-no" title="statement not covered" >            require(_minOwners &lt;= retrieveAllEntities(_ownerId).length - 1, "EC19-")</span>;
+        }
+<span class="cstat-no" title="statement not covered" >        validateEntity(owner, _ownerId)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function rejectOwner(address owner) external override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        rejectEntity(owner, _ownerId)</span>;
+    }
+    
+<span class="fstat-no" title="function not covered" >    function retrieveOwner(address owner) external override view returns (ItemsLibrary._itemIdentity memory){</span>
+<span class="cstat-no" title="statement not covered" >        return (retrieveEntity(owner, _ownerId));</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveAllOwners() external override view returns (bytes32[] memory){</span>
+<span class="cstat-no" title="statement not covered" >        return(retrieveAllEntities(_ownerId));</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveMinOwners() external override view returns (uint){</span>
+<span class="cstat-no" title="statement not covered" >        return (_minOwners);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isOwner(address owner) internal view returns (bool){</span>
+<span class="cstat-no" title="statement not covered" >        return(isEntity(owner, _ownerId));</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrievePendingOwners(bool addedORremove) external override view returns (bytes32[] memory){</span>
+<span class="cstat-no" title="statement not covered" >        return(retrievePendingEntities(addedORremove, _ownerId));</span>
+    }
+&nbsp;
+    // New min Owners proposal
+<span class="fstat-no" title="function not covered" >    function changeMinOwners(uint newMinOwners) external override</span>
+        isAnOwner(msg.sender)
+        NewMinOwnerInProgress(false)
+        minRequired(newMinOwners, _Entities[_ownerId]._activatedItems.length)
+        minRequired(1, newMinOwners)
+    {
+<span class="cstat-no" title="statement not covered" >        _newMinOwners = newMinOwners</span>;
+<span class="cstat-no" title="statement not covered" >        voteNewMinOwners(true)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function validateMinOwners() external override</span>
+        isAnOwner(msg.sender)
+        NewMinOwnerInProgress(true)
+        HasNotAlreadyVotedMinOwner(msg.sender)
+    {
+<span class="cstat-no" title="statement not covered" >        voteNewMinOwners(true)</span>;
+    }
+    
+<span class="fstat-no" title="function not covered" >    function rejectMinOwners() external override</span>
+        isAnOwner(msg.sender)
+        NewMinOwnerInProgress(true)
+        HasNotAlreadyVotedMinOwner(msg.sender)
+    {
+<span class="cstat-no" title="statement not covered" >        voteNewMinOwners(false)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function deleteNewMinOwners() internal </span>
+    {
+<span class="cstat-no" title="statement not covered" >        _newMinOwners = 0</span>;
+<span class="cstat-no" title="statement not covered" >        _newMinOwnersVotesFor = 0</span>;
+<span class="cstat-no" title="statement not covered" >        _newMinOwnersVotesAgainst = 0</span>;
+        delete(_newMinOwnersVoters);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function voteNewMinOwners(bool vote) internal </span>
+    {
+<span class="cstat-no" title="statement not covered" >        if(vote) <span class="cstat-no" title="statement not covered" >_newMinOwnersVotesFor += 1</span>;</span>
+        else <span class="cstat-no" title="statement not covered" >_newMinOwnersVotesAgainst += 1</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        _newMinOwnersVoters.push(msg.sender)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        checkNewMinOwners()</span>;        
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function checkNewMinOwners() internal</span>
+    {
+<span class="cstat-no" title="statement not covered" >        if(ItemsLibrary.CheckValidations(_newMinOwnersVotesFor, _minOwners))</span>
+        {
+<span class="cstat-no" title="statement not covered" >            _minOwners = _newMinOwners</span>;
+<span class="cstat-no" title="statement not covered" >            deleteNewMinOwners()</span>;
+        }
+        else <span class="cstat-no" title="statement not covered" >if(ItemsLibrary.CheckValidations(_newMinOwnersVotesAgainst, _minOwners))</span>
+        {
+<span class="cstat-no" title="statement not covered" >            deleteNewMinOwners()</span>;
+        }
+&nbsp;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrievePendingMinOwners() external override view returns (uint)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return _newMinOwners;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrievePendingMinOwnersStatus() external override view returns (uint, uint, address[] memory)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return (_newMinOwnersVotesFor, _newMinOwnersVotesAgainst, _newMinOwnersVoters);</span>
+    }
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 05 2022 13:13:49 GMT+0200 (heure d’été d’Europe centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

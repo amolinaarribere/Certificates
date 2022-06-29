@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for DeployedContracts\ENS.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">DeployedContracts/</a> ENS.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/46</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/20</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/47</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: GPL-3.0
+&nbsp;
+pragma solidity 0.8.7;
+&nbsp;
+/**
+ Price Converter is an interface to the Chain Link Price Registry for USD to ETH exchange
+ */
+&nbsp;
+import "../Interfaces/IENS.sol";
+import "../Base/StdPropositionBaseContract.sol";
+import "../Interfaces/IENSRegistry.sol";
+import "../Interfaces/IENSResolver.sol";
+&nbsp;
+contract ENS is IENS, StdPropositionBaseContract {
+&nbsp;
+    // EVENTS /////////////////////////////////////////
+    event _NewRegistry(address Registry);
+    event _NewReverseRegistry(address ReverseRegistry);
+    event _NewPrivatePoolNode(bytes32 PrivatePoolNode);
+    event _NewProviderNode(bytes32 ProviderNode);
+    event _NewPrivatePoolSuffix(string PrivatePoolSuffix);
+    event _NewProviderSuffix(string ProviderSuffix);
+    event _NewSubdomainCreated(bytes32 node, bytes32 label, address addr);
+&nbsp;
+    // DATA /////////////////////////////////////////
+    IENSRegistry internal _ENS;
+    address internal _ENSReverseRegistry;
+    bytes32 internal _PrivatePoolNode; 
+    bytes32 internal _ProviderNode; 
+    string internal _PrivatePoolENSSuffix; 
+    string internal _ProviderENSSuffix; 
+&nbsp;
+&nbsp;
+    // MODIFIERS /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    modifier isFromAuthorizedContract(address addr){</span>
+<span class="cstat-no" title="statement not covered" >        require(_managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PrivatePoolFactory)] == addr ||</span>
+                _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.ProviderFactory)] == addr, "EC8-");
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier arePropositionsOK(address addr1, address addr2, bytes32 privatenode, bytes32 providernode, bytes memory privatesuffix, bytes memory providersuffix){</span>
+<span class="cstat-no" title="statement not covered" >        require(address(0) != addr1 || address(0) != addr2 || privatenode &gt; 0 || providernode &gt; 0 || privatesuffix.length &gt; 0 || providersuffix.length &gt; 0, "EC21-")</span>;
+        _;
+    }
+&nbsp;
+    // CONSTRUCTOR /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function ENS_init(address ENSRegistry, address ENSReverseRegistry, bytes32[] memory nodes, string[] memory suffixes, address managerContractAddress, address chairPerson, string memory contractName, string memory contractVersion) public initializer </span>
+    {
+<span class="cstat-no" title="statement not covered" >        super.StdPropositionBaseContract_init(chairPerson, managerContractAddress, contractName, contractVersion)</span>;
+<span class="cstat-no" title="statement not covered" >        _ENS = IENSRegistry(ENSRegistry)</span>;
+<span class="cstat-no" title="statement not covered" >        _ENSReverseRegistry = ENSReverseRegistry</span>;
+<span class="cstat-no" title="statement not covered" >        _PrivatePoolNode = nodes[0]</span>;
+<span class="cstat-no" title="statement not covered" >        _ProviderNode = nodes[1]</span>;
+<span class="cstat-no" title="statement not covered" >        _PrivatePoolENSSuffix = suffixes[0]</span>;
+<span class="cstat-no" title="statement not covered" >        _ProviderENSSuffix = suffixes[1]</span>;
+    }
+&nbsp;
+    // GOVERNANCE /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function checkProposition(bytes[] memory NewValues) internal override </span>
+        arePropositionsOK(AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[0])[0]),
+                            AddressLibrary.Bytes32ToAddress(Library.BytestoBytes32(NewValues[1])[0]),
+                            Library.BytestoBytes32(NewValues[2])[0],
+                            Library.BytestoBytes32(NewValues[3])[0],
+                            NewValues[4],
+                            NewValues[5])
+    {}
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function UpdateAll() internal override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        bytes32 NewRegistryAddressValue = Library.BytestoBytes32(_ProposedNewValues[0])[0];</span>
+<span class="cstat-no" title="statement not covered" >        bytes32 NewReverseRegistryAddressValue = Library.BytestoBytes32(_ProposedNewValues[1])[0];</span>
+<span class="cstat-no" title="statement not covered" >        bytes32 NewPrivatePoolNodeValue = Library.BytestoBytes32(_ProposedNewValues[2])[0];</span>
+<span class="cstat-no" title="statement not covered" >        bytes32 NewProviderNodeValue = Library.BytestoBytes32(_ProposedNewValues[3])[0];</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        address NewRegistryAddress = AddressLibrary.Bytes32ToAddress(NewRegistryAddressValue);</span>
+<span class="cstat-no" title="statement not covered" >        address NewReverseRegistryAddress = AddressLibrary.Bytes32ToAddress(NewReverseRegistryAddressValue);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(address(0) != NewRegistryAddress){</span>
+<span class="cstat-no" title="statement not covered" >            _ENS = IENSRegistry(NewRegistryAddress)</span>;
+<span class="cstat-no" title="statement not covered" >            emit _NewRegistry(NewRegistryAddress);</span>
+        } 
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(address(0) != NewReverseRegistryAddress){</span>
+<span class="cstat-no" title="statement not covered" >            _ENSReverseRegistry = NewReverseRegistryAddress</span>;
+<span class="cstat-no" title="statement not covered" >            emit _NewReverseRegistry(NewReverseRegistryAddress);</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(NewPrivatePoolNodeValue &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >            _PrivatePoolNode = NewPrivatePoolNodeValue</span>;
+<span class="cstat-no" title="statement not covered" >            emit _NewPrivatePoolNode(NewPrivatePoolNodeValue);</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(NewProviderNodeValue &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >            _ProviderNode = NewProviderNodeValue</span>;
+<span class="cstat-no" title="statement not covered" >            emit _NewProviderNode(NewProviderNodeValue);</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(_ProposedNewValues[4].length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >            _PrivatePoolENSSuffix = string(_ProposedNewValues[4])</span>;
+<span class="cstat-no" title="statement not covered" >            emit _NewPrivatePoolSuffix(string(_ProposedNewValues[4]));</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(_ProposedNewValues[5].length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >            _ProviderENSSuffix = string(_ProposedNewValues[5])</span>;
+<span class="cstat-no" title="statement not covered" >            emit _NewProviderSuffix(string(_ProposedNewValues[5]));</span>
+        }
+&nbsp;
+    }
+&nbsp;
+    // FUNCTIONALITY /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function check(bytes32 node) internal view returns(bool) {</span>
+<span class="cstat-no" title="statement not covered" >        return _ENS.recordExists(node);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function createSubdomain(bytes32 label, address addr) external override</span>
+        isFromAuthorizedContract(msg.sender)
+    {
+<span class="cstat-no" title="statement not covered" >        bytes32 node = _ProviderNode;</span>
+<span class="cstat-no" title="statement not covered" >        if(msg.sender == _managerContract.retrieveTransparentProxies()[uint256(Library.TransparentProxies.PrivatePoolFactory)]) <span class="cstat-no" title="statement not covered" >node = _PrivatePoolNode</span>;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        bytes32 FullNode = keccak256(abi.encodePacked(node, label));</span>
+<span class="cstat-no" title="statement not covered" >        require(false == check(FullNode), "EC37-")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        address resolverAddress = _ENS.resolver(node);</span>
+<span class="cstat-no" title="statement not covered" >        uint64 ttl = _ENS.ttl(node);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        _ENS.setSubnodeRecord(node, label, address(this), resolverAddress, ttl)</span>;
+<span class="cstat-no" title="statement not covered" >        IENSResolver resolver = IENSResolver(resolverAddress);</span>
+<span class="cstat-no" title="statement not covered" >        resolver.setAddr(FullNode, addr)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit _NewSubdomainCreated(node, label, addr);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveSettings() external override view returns(address, address, bytes32, bytes32, string memory, string memory)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return (address(_ENS), _ENSReverseRegistry, _PrivatePoolNode, _ProviderNode, _PrivatePoolENSSuffix, _ProviderENSSuffix);</span>
+    }
+    
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 05 2022 13:13:49 GMT+0200 (heure d’été d’Europe centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

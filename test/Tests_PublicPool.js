@@ -126,7 +126,7 @@ contract("Testing Public Pool",function(accounts){
     });
 */
     it("Adding Certificate On Behalf Of CORRECT",async function(){
-        await pool_common.AddCertificateOnBehalfCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1);
+        await pool_common.AddCertificateOnBehalfCorrect(publicCertPool, PublicOwners, provider_1, provider_2, holder_1, holder_2, user_1, false, accounts);
     });
 /*
     // ****** TESTING Transfering Certificate ***************************************************************** //

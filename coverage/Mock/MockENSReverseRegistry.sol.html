@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for Mock\MockENSReverseRegistry.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">Mock/</a> MockENSReverseRegistry.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/23</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/26</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: GPL-3.0
+&nbsp;
+pragma solidity 0.8.7;
+&nbsp;
+/**
+ Mock Contract simulating the ChainLink Feed Registry ETH &lt;-&gt; USD for the tests chains that do not include it
+ */
+&nbsp;
+  // copied from ENS domain GutHub repository: https://github.com/ensdomains/ens/blob/master/contracts/ReverseRegistrar.sol
+&nbsp;
+&nbsp;
+ import "../Interfaces/IENSReverseRegistry.sol";
+ import "../Interfaces/IENSRegistry.sol";
+ import "./MockENSResolver.sol";
+&nbsp;
+&nbsp;
+contract MockENSReverseRegistry is IENSReverseRegistry{
+&nbsp;
+    // namehash('addr.reverse')
+    bytes32 public constant ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
+&nbsp;
+    IENSRegistry public ens;
+    NameResolver public defaultResolver;
+&nbsp;
+    /**
+     * @dev Constructor
+     * @param ensAddr The address of the ENS registry.
+     * @param resolverAddr The address of the default reverse resolver.
+     */
+<span class="fstat-no" title="function not covered" >    constructor(IENSRegistry ensAddr, NameResolver resolverAddr) {</span>
+<span class="cstat-no" title="statement not covered" >        ens = ensAddr</span>;
+<span class="cstat-no" title="statement not covered" >        defaultResolver = resolverAddr</span>;
+&nbsp;
+        // Assign ownership of the reverse record to our deployer
+<span class="cstat-no" title="statement not covered" >        MockENSReverseRegistry oldRegistrar = MockENSReverseRegistry(ens.owner(ADDR_REVERSE_NODE));</span>
+<span class="cstat-no" title="statement not covered" >        if (address(oldRegistrar) != address(0x0)) {</span>
+<span class="cstat-no" title="statement not covered" >            oldRegistrar.claim(msg.sender)</span>;
+        }
+    }
+&nbsp;
+    /**
+     * @dev Transfers ownership of the reverse ENS record associated with the
+     *      calling account.
+     * @param owner The address to set as the owner of the reverse record in ENS.
+     * @return The ENS node hash of the reverse record.
+     */
+<span class="fstat-no" title="function not covered" >    function claim(address owner) external override returns (bytes32) {</span>
+<span class="cstat-no" title="statement not covered" >        return claimWithResolver_int(owner, address(0x0));</span>
+    }
+&nbsp;
+    /**
+     * @dev Transfers ownership of the reverse ENS record associated with the
+     *      calling account.
+     * @param owner The address to set as the owner of the reverse record in ENS.
+     * @param resolver The address of the resolver to set; 0 to leave unchanged.
+     * @return The ENS node hash of the reverse record.
+     */
+<span class="fstat-no" title="function not covered" >    function claimWithResolver(address owner, address resolver) external override returns (bytes32) {</span>
+<span class="cstat-no" title="statement not covered" >        return claimWithResolver_int(owner, resolver);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function claimWithResolver_int(address owner, address resolver) internal returns (bytes32) {</span>
+<span class="cstat-no" title="statement not covered" >        bytes32 label = sha3HexAddress(msg.sender);</span>
+<span class="cstat-no" title="statement not covered" >        bytes32 node = keccak256(abi.encodePacked(ADDR_REVERSE_NODE, label));</span>
+<span class="cstat-no" title="statement not covered" >        address currentOwner = ens.owner(node);</span>
+&nbsp;
+        // Update the resolver if required
+<span class="cstat-no" title="statement not covered" >        if (resolver != address(0x0) &amp;&amp; resolver != ens.resolver(node)) {</span>
+            // Transfer the name to us first if it's not already
+<span class="cstat-no" title="statement not covered" >            if (currentOwner != address(this)) {</span>
+<span class="cstat-no" title="statement not covered" >                ens.setSubnodeOwner(ADDR_REVERSE_NODE, label, address(this))</span>;
+<span class="cstat-no" title="statement not covered" >                currentOwner = address(this)</span>;
+            }
+<span class="cstat-no" title="statement not covered" >            ens.setResolver(node, resolver)</span>;
+        }
+&nbsp;
+        // Update the owner if required
+<span class="cstat-no" title="statement not covered" >        if (currentOwner != owner) {</span>
+<span class="cstat-no" title="statement not covered" >            ens.setSubnodeOwner(ADDR_REVERSE_NODE, label, owner)</span>;
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return node;</span>
+    }
+&nbsp;
+    /**
+     * @dev Sets the `name()` record for the reverse ENS record associated with
+     * the calling account. First updates the resolver to the default reverse
+     * resolver if necessary.
+     * @param name The name to set for this address.
+     * @return The ENS node hash of the reverse record.
+     */
+<span class="fstat-no" title="function not covered" >    function setName(string memory name) external override returns (bytes32) {</span>
+<span class="cstat-no" title="statement not covered" >        bytes32 node = claimWithResolver_int(address(this), address(defaultResolver));</span>
+<span class="cstat-no" title="statement not covered" >        defaultResolver.setName(node, name)</span>;
+<span class="cstat-no" title="statement not covered" >        return node;</span>
+    }
+&nbsp;
+    /**
+     * @dev Returns the node hash for a given account's reverse records.
+     * @param addr The address to hash
+     * @return The ENS node hash.
+     */
+<span class="fstat-no" title="function not covered" >    function node(address addr) external override pure returns (bytes32) {</span>
+<span class="cstat-no" title="statement not covered" >        return keccak256(abi.encodePacked(ADDR_REVERSE_NODE, sha3HexAddress(addr)));</span>
+    }
+&nbsp;
+    /**
+     * @dev An optimised function to compute the sha3 of the lower-case
+     *      hexadecimal representation of an Ethereum address.
+     * @param addr The address to hash
+     * @return ret The SHA3 hash of the lower-case hexadecimal encoding of the
+     *         input address.
+     */
+<span class="fstat-no" title="function not covered" >    function sha3HexAddress(address addr) private pure returns (bytes32 ret) {</span>
+        addr;
+        ret; // Stop warning us about unused variables
+        assembly {
+            let lookup := 0x3031323334353637383961626364656600000000000000000000000000000000
+&nbsp;
+            for { let i := 40 } gt(i, 0) { } {
+                i := sub(i, 1)
+                mstore8(i, byte(and(addr, 0xf), lookup))
+                addr := div(addr, 0x10)
+                i := sub(i, 1)
+                mstore8(i, byte(and(addr, 0xf), lookup))
+                addr := div(addr, 0x10)
+            }
+&nbsp;
+            ret := keccak256(0, 40)
+        }
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function getDefaultResolver() external view override returns (address){</span>
+<span class="cstat-no" title="statement not covered" >        return address(defaultResolver);</span>
+    }
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 05 2022 13:13:49 GMT+0200 (heure d’été d’Europe centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

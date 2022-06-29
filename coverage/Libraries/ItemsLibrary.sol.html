@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for Libraries\ItemsLibrary.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">Libraries/</a> ItemsLibrary.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/87</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/42</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/21</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/86</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: GPL-3.0
+&nbsp;
+pragma solidity 0.8.7;
+&nbsp;
+/*
+Common functionality for all Items
+  Items -&gt; Certificate &amp; Entities(Owners &amp; Providers &amp; Pools)
+    Item Identity : 
+       - activated : Item is activated (true/false)
+       - info : Item info
+       - id : Item id (only is item is activated)
+       - pendingId : Item id in activation/deletion pending list (only if item is been added or removed)
+       - validations[] : List of address that validated the item (accepted its activation or deletion)
+       - rejections[] : List of address that rejected the item (rejected its activation or deletion)
+    Items structure:
+        - mapping bytes32 to Item identity
+        - List of currently activated items (id -&gt; to reference from item identity)
+        - List of currently pending Items to be activated (pendingId -&gt; to reference from item identity)
+        - List of currently pending Items to be deleted (pendingId -&gt; to reference from item identity)
+&nbsp;
+Functionality (with basic security check)
+    - Add Item
+    - Remove Item
+    - Validate Item creation/removal
+    - Reject Item creation/removal
+  
+  Events : 
+  Item Type(string) - Item(bytes32) - Item info(string)
+    - Item activation validated
+    - Item activation rejected
+    - Item deletion validated
+    - Item deletion rejected
+  
+ */
+&nbsp;
+import "./Library.sol";
+import "../Libraries/AddressLibrary.sol";
+&nbsp;
+library ItemsLibrary{
+    using AddressLibrary for *;
+    using Library for *;
+&nbsp;
+    // EVENTS /////////////////////////////////////////
+    event _AddItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
+    event _RemoveItemValidation(string ItemType,  bytes32 indexed Item,  string Info);
+    event _AddItemRejection(string ItemType,  bytes32 indexed Item,  string Info);
+    event _RemoveItemRejection( string ItemType,  bytes32 indexed Item,  string Info);
+&nbsp;
+    // FUNCTIONS for MODIFIERS /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function ItemNotActivated(bytes32 item, _ItemsStruct storage itemStruct) public view {</span>
+<span class="cstat-no" title="statement not covered" >        require(false == isItem(item, itemStruct), "EC6-")</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function ItemActivated(bytes32 item, _ItemsStruct storage itemStruct) public view {</span>
+<span class="cstat-no" title="statement not covered" >        require(true == isItem(item, itemStruct), "EC7-")</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function ItemNotPending(bytes32 item, _ItemsStruct storage itemStruct) public view{</span>
+<span class="cstat-no" title="statement not covered" >        require(false == isItemPendingToAdded(item, itemStruct) &amp;&amp; </span>
+                false == isItemPendingToRemoved(item, itemStruct), "EC27-");
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function ItemPending(bytes32 item, _ItemsStruct storage itemStruct) public view{</span>
+<span class="cstat-no" title="statement not covered" >        require(true == isItemPendingToAdded(item, itemStruct) ||</span>
+                true == isItemPendingToRemoved(item, itemStruct), "EC28-");
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function HasNotAlreadyVoted(address addr, bytes32 item, _ItemsStruct storage itemStruct) public view{</span>
+<span class="cstat-no" title="statement not covered" >        require(false == hasVoted(addr, item, itemStruct), "EC5-")</span>;
+    }
+    
+    // DATA /////////////////////////////////////////
+    struct _itemIdentity{
+        string _Info;
+        bool _activated;
+        uint _id;
+        uint _pendingId;
+        address[] _Validations;
+        address[] _Rejections;
+    }
+&nbsp;
+    struct _ItemsStruct{
+        mapping(bytes32 =&gt; _itemIdentity) _items;
+        bytes32[] _activatedItems;
+        bytes32[] _pendingItemsAdd;
+        bytes32[] _pendingItemsRemove;
+    }
+&nbsp;
+    // structured used as input parameter for CRUD functions
+    struct _manipulateItemStruct{
+        bytes32 item;
+        string info;
+        uint256 _minSignatures;
+        string ItemTypeLabel; // Certificate, owner, provider, pool
+        uint[] ids; // Ids that will be returned to callback when item activation/deletion has been validated/rejected 
+    }
+&nbsp;
+    
+    // AUX FUNCTIONALITY /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function CheckValidations(uint256 signatures, uint256 minSignatures) public pure returns(bool){</span>
+<span class="cstat-no" title="statement not covered" >        if(signatures &lt; minSignatures) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function ReturnManipulateStructContent(_manipulateItemStruct memory manipulateItemstruct) public pure returns(bytes32, uint, string memory, uint[] memory)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return(manipulateItemstruct.item,</span>
+         manipulateItemstruct._minSignatures,
+         manipulateItemstruct.ItemTypeLabel,
+         manipulateItemstruct.ids);
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function deleteVoters(bytes32 item, _ItemsStruct storage itemStruct) public{</span>
+        delete(itemStruct._items[item]._Rejections);
+        delete(itemStruct._items[item]._Validations);
+<span class="cstat-no" title="statement not covered" >        itemStruct._items[item]._pendingId = 0</span>;
+    }
+&nbsp;
+    // Remove Item from array and resize (not keeping order) it reindexing the item that was moved
+<span class="fstat-no" title="function not covered" >    function RemoveResizePending(bool addOrRemove, bytes32 item, _ItemsStruct storage itemStruct) public</span>
+    {
+<span class="cstat-no" title="statement not covered" >        bytes32[] storage arrayToRemoveResize = (addOrRemove)? itemStruct._pendingItemsAdd : itemStruct._pendingItemsRemove;</span>
+<span class="cstat-no" title="statement not covered" >        uint position = itemStruct._items[item]._pendingId;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        Library.ArrayRemoveResize(position, arrayToRemoveResize)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(position &lt; arrayToRemoveResize.length){</span>
+<span class="cstat-no" title="statement not covered" >            bytes32 ItemMoved = arrayToRemoveResize[position];</span>
+<span class="cstat-no" title="statement not covered" >            itemStruct._items[ItemMoved]._pendingId = position</span>;
+        }
+&nbsp;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function RemoveResizeActivated(bytes32 item, _ItemsStruct storage itemStruct) public</span>
+    {
+<span class="cstat-no" title="statement not covered" >        bytes32[] storage arrayToRemoveResize = itemStruct._activatedItems;</span>
+<span class="cstat-no" title="statement not covered" >        uint position = itemStruct._items[item]._id;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        Library.ArrayRemoveResize(position, arrayToRemoveResize)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(position &lt; arrayToRemoveResize.length){</span>
+<span class="cstat-no" title="statement not covered" >            bytes32 ItemMoved = arrayToRemoveResize[position];</span>
+<span class="cstat-no" title="statement not covered" >            itemStruct._items[ItemMoved]._id = position</span>;
+        }
+&nbsp;
+    }
+&nbsp;
+    // MAIN FUNCTIONALITY /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function addItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public</span>
+    {
+<span class="cstat-no" title="statement not covered" >        ItemNotActivated(manipulateItemstruct.item, itemStruct)</span>;
+<span class="cstat-no" title="statement not covered" >        ItemNotPending(manipulateItemstruct.item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        bytes32 item = manipulateItemstruct.item;</span>
+<span class="cstat-no" title="statement not covered" >        string memory info = manipulateItemstruct.info;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        itemStruct._items[item]._Info = info</span>;
+<span class="cstat-no" title="statement not covered" >        itemStruct._pendingItemsAdd.push(item)</span>;
+<span class="cstat-no" title="statement not covered" >        itemStruct._items[item]._pendingId = itemStruct._pendingItemsAdd.length - 1</span>;
+        
+<span class="cstat-no" title="statement not covered" >        validateItem(manipulateItemstruct, itemStruct, callerContract)</span>;
+    }
+     
+<span class="fstat-no" title="function not covered" >    function removeItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public</span>
+    {
+<span class="cstat-no" title="statement not covered" >        ItemActivated(manipulateItemstruct.item, itemStruct)</span>;
+<span class="cstat-no" title="statement not covered" >        ItemNotPending(manipulateItemstruct.item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        bytes32 item = manipulateItemstruct.item;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        itemStruct._pendingItemsRemove.push(item)</span>;
+<span class="cstat-no" title="statement not covered" >        itemStruct._items[item]._pendingId = itemStruct._pendingItemsRemove.length - 1</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        validateItem(manipulateItemstruct, itemStruct, callerContract)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function validateItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public</span>
+    {
+<span class="cstat-no" title="statement not covered" >        ItemPending(manipulateItemstruct.item, itemStruct)</span>;
+<span class="cstat-no" title="statement not covered" >        HasNotAlreadyVoted(msg.sender, manipulateItemstruct.item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        (bytes32 item, uint _minSignatures, string memory ItemTypeLabel, uint[] memory ids) = ReturnManipulateStructContent(manipulateItemstruct);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        itemStruct._items[item]._Validations.push(msg.sender)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(CheckValidations(itemStruct._items[item]._Validations.length, _minSignatures))</span>
+        {
+<span class="cstat-no" title="statement not covered" >            if(isItemPendingToAdded(item, itemStruct))</span>
+            {
+<span class="cstat-no" title="statement not covered" >                itemStruct._items[item]._activated = true</span>; 
+<span class="cstat-no" title="statement not covered" >                itemStruct._activatedItems.push(item)</span>;
+<span class="cstat-no" title="statement not covered" >                itemStruct._items[item]._id = itemStruct._activatedItems.length - 1</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                RemoveResizePending(true, item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, true));</span>
+<span class="cstat-no" title="statement not covered" >                require(success, string(data))</span>;
+                
+<span class="cstat-no" title="statement not covered" >                deleteVoters(item, itemStruct)</span>;
+<span class="cstat-no" title="statement not covered" >                emit _AddItemValidation(ItemTypeLabel, item, itemStruct._items[item]._Info);</span>
+            }
+            else{
+<span class="cstat-no" title="statement not covered" >                RemoveResizeActivated(item, itemStruct)</span>;
+<span class="cstat-no" title="statement not covered" >                RemoveResizePending(false, item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemValidated(bytes32,uint256[],bool)", item, ids, false));</span>
+<span class="cstat-no" title="statement not covered" >                require(success, string(data))</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                emit _RemoveItemValidation(ItemTypeLabel, item, itemStruct._items[item]._Info);</span>
+                delete(itemStruct._items[item]);
+            }   
+        }
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function rejectItem(_manipulateItemStruct memory manipulateItemstruct, _ItemsStruct storage itemStruct, address callerContract) public</span>
+    {
+<span class="cstat-no" title="statement not covered" >        ItemPending(manipulateItemstruct.item, itemStruct)</span>;
+<span class="cstat-no" title="statement not covered" >        HasNotAlreadyVoted(msg.sender, manipulateItemstruct.item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        (bytes32 item, uint _minSignatures, string memory ItemTypeLabel, uint[] memory ids) = ReturnManipulateStructContent(manipulateItemstruct);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        itemStruct._items[item]._Rejections.push(msg.sender)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(CheckValidations(itemStruct._items[item]._Rejections.length, _minSignatures))</span>
+        {
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            if(isItemPendingToAdded(item, itemStruct))</span>
+            {
+<span class="cstat-no" title="statement not covered" >                RemoveResizePending(true, item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, true)); </span>
+<span class="cstat-no" title="statement not covered" >                require(success, string(data))</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                emit _AddItemRejection(ItemTypeLabel, item, itemStruct._items[item]._Info);</span>
+                delete(itemStruct._items[item]);
+            }
+            else
+            {
+<span class="cstat-no" title="statement not covered" >                RemoveResizePending(false, item, itemStruct)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                (bool success, bytes memory data) = callerContract.call(abi.encodeWithSignature("onItemRejected(bytes32,uint256[],bool)", item, ids, false));</span>
+<span class="cstat-no" title="statement not covered" >                require(success, string(data))</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                deleteVoters(item, itemStruct)</span>;
+<span class="cstat-no" title="statement not covered" >                emit _RemoveItemRejection(ItemTypeLabel, item, itemStruct._items[item]._Info);</span>
+            }
+                
+        }
+    }
+&nbsp;
+&nbsp;
+    // READ Data
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns(bool){</span>
+<span class="cstat-no" title="statement not covered" >        return itemStruct._items[item]._activated;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isItemPendingToAdded(bytes32 item, _ItemsStruct storage itemStruct) public view returns(bool)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        if(itemStruct._pendingItemsAdd.length &gt; itemStruct._items[item]._pendingId){</span>
+<span class="cstat-no" title="statement not covered" >            if(item == itemStruct._pendingItemsAdd[itemStruct._items[item]._pendingId]) <span class="cstat-no" title="statement not covered" >return true;</span></span>
+        }
+<span class="cstat-no" title="statement not covered" >        return false;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isItemPendingToRemoved(bytes32 item, _ItemsStruct storage itemStruct) public view returns(bool)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        if(itemStruct._pendingItemsRemove.length &gt; itemStruct._items[item]._pendingId){</span>
+<span class="cstat-no" title="statement not covered" >            if(item == itemStruct._pendingItemsRemove[itemStruct._items[item]._pendingId]) <span class="cstat-no" title="statement not covered" >return true;</span></span>
+        }
+<span class="cstat-no" title="statement not covered" >        return false;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrievePendingItems(bool addORemove, _ItemsStruct storage itemStruct) public view returns (bytes32[] memory)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        bytes32[] memory Items;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if(addORemove) <span class="cstat-no" title="statement not covered" >Items = itemStruct._pendingItemsAdd</span>;</span>
+        else <span class="cstat-no" title="statement not covered" >Items = itemStruct._pendingItemsRemove</span>;
+        
+<span class="cstat-no" title="statement not covered" >        return Items;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveItem(bytes32 item, _ItemsStruct storage itemStruct) public view returns (_itemIdentity memory) </span>
+    {
+<span class="cstat-no" title="statement not covered" >        return (itemStruct._items[item]);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveAllItems(_ItemsStruct storage itemStruct) public view returns (bytes32[] memory) </span>
+    {
+<span class="cstat-no" title="statement not covered" >        return itemStruct._activatedItems;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function hasVoted(address add, bytes32 item, _ItemsStruct storage itemStruct) public view returns (bool) </span>
+    {
+<span class="cstat-no" title="statement not covered" >        return (AddressLibrary.FindAddress(add, itemStruct._items[item]._Validations) ||</span>
+                AddressLibrary.FindAddress(add, itemStruct._items[item]._Rejections));
+    }
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 05 2022 13:13:49 GMT+0200 (heure d’été d’Europe centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

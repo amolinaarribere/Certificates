@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for Mock\MockENSResolver.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">Mock/</a> MockENSResolver.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/27</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/30</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: GPL-3.0
+&nbsp;
+pragma solidity 0.8.7;
+&nbsp;
+/**
+ Mock Contract simulating the ChainLink Feed Registry ETH &lt;-&gt; USD for the tests chains that do not include it
+ */
+&nbsp;
+ // copied from ENS domain GutHub repository: https://github.com/ensdomains/resolvers/blob/master/contracts/PublicResolver.sol
+&nbsp;
+&nbsp;
+ import "../Interfaces/IENSResolver.sol";
+ import "../Interfaces/IENSRegistry.sol";
+&nbsp;
+abstract contract ResolverBase {
+    bytes4 private constant INTERFACE_META_ID = 0x01ffc9a7;
+&nbsp;
+    function isAuthorised(bytes32 node) internal virtual view returns(bool);
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier authorised(bytes32 node) {</span>
+<span class="cstat-no" title="statement not covered" >        require(isAuthorised(node))</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function bytesToAddress(bytes memory b) internal pure returns(address payable a) {</span>
+<span class="cstat-no" title="statement not covered" >        require(b.length == 20)</span>;
+        assembly {
+            a := div(mload(add(b, 32)), exp(256, 12))
+        }
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function addressToBytes(address a) internal pure returns(bytes memory b) {</span>
+<span class="cstat-no" title="statement not covered" >        b = new bytes(20)</span>;
+        assembly {
+            mstore(add(b, 32), mul(a, exp(256, 12)))
+        }
+    }
+}
+&nbsp;
+abstract contract AddrResolver is IENSResolver, ResolverBase {
+    bytes4 constant private ADDR_INTERFACE_ID = 0x3b3b57de;
+    bytes4 constant private ADDRESS_INTERFACE_ID = 0xf1cb7e06;
+    uint constant private COIN_TYPE_ETH = 60;
+&nbsp;
+    event AddrChanged(bytes32 indexed node, address a);
+    event AddressChanged(bytes32 indexed node, uint coinType, bytes newAddress);
+&nbsp;
+    mapping(bytes32=&gt;mapping(uint=&gt;bytes)) _addresses;
+&nbsp;
+    /**
+     * Sets the address associated with an ENS node.
+     * May only be called by the owner of that node in the ENS registry.
+     * @param node The node to update.
+     * @param a The address to set.
+     */
+<span class="fstat-no" title="function not covered" >    function setAddr(bytes32 node, address a) external override authorised(node) {</span>
+<span class="cstat-no" title="statement not covered" >        setAddr(node, COIN_TYPE_ETH, addressToBytes(a))</span>;
+    }
+&nbsp;
+    /**
+     * Returns the address associated with an ENS node.
+     * @param node The ENS node to query.
+     * @return The associated address.
+     */
+<span class="fstat-no" title="function not covered" >    function addr(bytes32 node) external override view returns (address) {</span>
+<span class="cstat-no" title="statement not covered" >        bytes memory a = addr(node, COIN_TYPE_ETH);</span>
+<span class="cstat-no" title="statement not covered" >        if(a.length == 0) {</span>
+<span class="cstat-no" title="statement not covered" >            return address(0);</span>
+        }
+<span class="cstat-no" title="statement not covered" >        return bytesToAddress(a);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function setAddr(bytes32 node, uint coinType, bytes memory a) internal authorised(node) {</span>
+<span class="cstat-no" title="statement not covered" >        emit AddressChanged(node, coinType, a);</span>
+<span class="cstat-no" title="statement not covered" >        if(coinType == COIN_TYPE_ETH) {</span>
+<span class="cstat-no" title="statement not covered" >            emit AddrChanged(node, bytesToAddress(a));</span>
+        }
+<span class="cstat-no" title="statement not covered" >        _addresses[node][coinType] = a</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function addr(bytes32 node, uint coinType) internal view returns(bytes memory) {</span>
+<span class="cstat-no" title="statement not covered" >        return _addresses[node][coinType];</span>
+    }
+}
+&nbsp;
+abstract contract NameResolver is ResolverBase {
+    bytes4 constant private NAME_INTERFACE_ID = 0x691f3431;
+&nbsp;
+    event NameChanged(bytes32 indexed node, string name);
+&nbsp;
+    mapping(bytes32=&gt;string) names;
+&nbsp;
+    /**
+     * Sets the name associated with an ENS node, for reverse records.
+     * May only be called by the owner of that node in the ENS registry.
+     * @param node The node to update.
+     * @param name The name to set.
+     */
+<span class="fstat-no" title="function not covered" >    function setName(bytes32 node, string calldata name) external authorised(node) {</span>
+<span class="cstat-no" title="statement not covered" >        names[node] = name</span>;
+<span class="cstat-no" title="statement not covered" >        emit NameChanged(node, name);</span>
+    }
+&nbsp;
+    /**
+     * Returns the name associated with an ENS node, for reverse records.
+     * Defined in EIP181.
+     * @param node The ENS node to query.
+     * @return The associated name.
+     */
+<span class="fstat-no" title="function not covered" >    function name(bytes32 node) external view returns (string memory) {</span>
+<span class="cstat-no" title="statement not covered" >        return names[node];</span>
+    }
+&nbsp;
+}
+&nbsp;
+contract MockENSResolver is AddrResolver, NameResolver{
+&nbsp;
+    IENSRegistry ens;
+&nbsp;
+    /**
+     * A mapping of authorisations. An address that is authorised for a name
+     * may make any changes to the name that the owner could, but may not update
+     * the set of authorisations.
+     * (node, owner, caller) =&gt; isAuthorised
+     */
+    mapping(bytes32=&gt;mapping(address=&gt;mapping(address=&gt;bool))) public authorisations;
+&nbsp;
+    event AuthorisationChanged(bytes32 indexed node, address indexed owner, address indexed target, bool isAuthorised);
+&nbsp;
+<span class="fstat-no" title="function not covered" >    constructor(IENSRegistry _ens) {</span>
+<span class="cstat-no" title="statement not covered" >        ens = _ens</span>;
+    }
+&nbsp;
+    /**
+     * @dev Sets or clears an authorisation.
+     * Authorisations are specific to the caller. Any account can set an authorisation
+     * for any name, but the authorisation that is checked will be that of the
+     * current owner of a name. Thus, transferring a name effectively clears any
+     * existing authorisations, and new authorisations can be set in advance of
+     * an ownership transfer if desired.
+     *
+     * @param node The name to change the authorisation on.
+     * @param target The address that is to be authorised or deauthorised.
+     * @param isAuthorised True if the address should be authorised, or false if it should be deauthorised.
+     */
+<span class="fstat-no" title="function not covered" >    function setAuthorisation(bytes32 node, address target, bool isAuthorised) external {</span>
+<span class="cstat-no" title="statement not covered" >        authorisations[node][msg.sender][target] = isAuthorised</span>;
+<span class="cstat-no" title="statement not covered" >        emit AuthorisationChanged(node, msg.sender, target, isAuthorised);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isAuthorised(bytes32 node) internal override view returns(bool) {</span>
+<span class="cstat-no" title="statement not covered" >        address owner = ens.owner(node);</span>
+<span class="cstat-no" title="statement not covered" >        return owner == msg.sender || authorisations[node][owner][msg.sender];</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function multicall(bytes[] calldata data) external returns(bytes[] memory results) {</span>
+<span class="cstat-no" title="statement not covered" >        results = new bytes[](data.length)</span>;
+<span class="cstat-no" title="statement not covered" >        for(uint i = 0; i &lt; data.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >            (bool success, bytes memory result) = address(this).delegatecall(data[i]);</span>
+<span class="cstat-no" title="statement not covered" >            require(success)</span>;
+<span class="cstat-no" title="statement not covered" >            results[i] = result</span>;
+        }
+<span class="cstat-no" title="statement not covered" >        return results;</span>
+    }
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 05 2022 13:13:49 GMT+0200 (heure d’été d’Europe centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

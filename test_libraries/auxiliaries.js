@@ -28,9 +28,20 @@ function BytesToString(bytes) {
     return web3.utils.hexToAscii(bytes);
 }
 
+function GetAccountId(accounts, account){
+    let id = 0;
+    while(accounts[id] != account && id < accounts.length){
+        id++;
+    }
+    if(id == accounts.length) return -1;
+    return id;
+}
+
 exports.AddressToBytes32 = AddressToBytes32;
 exports.Bytes32ToAddress = Bytes32ToAddress;
 exports.IntToBytes32 = IntToBytes32;
 exports.Bytes32ToInt = Bytes32ToInt;
 exports.StringToBytes = StringToBytes;
 exports.BytesToString = BytesToString;
+exports.GetAccountId = GetAccountId;
+

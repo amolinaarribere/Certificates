@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for Abstract\MultiSigCertificatesPool.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">Abstract/</a> MultiSigCertificatesPool.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/57</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/25</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/61</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: GPL-3.0
+&nbsp;
+pragma solidity 0.8.7;
+&nbsp;
+/*
+  MultiSig Certificate Pool Contract.
+    Inherits from MultiSig and simply defines CRUD operations for Providers as a second Entity next to Owners
+    Also allows for Certificates to be generated for specific holders
+ */
+&nbsp;
+import "./MultiSigContract.sol";
+import "../Interfaces/IPool.sol";
+import "../Base/SignatureBaseContract.sol";
+import "../Libraries/SignatureLibrary.sol";
+&nbsp;
+abstract contract MultiSigCertificatesPool is IPool, SignatureBaseContract, MultiSigContract { 
+    using SignatureLibrary for *;
+&nbsp;
+    // EVENTS /////////////////////////////////////////
+    event _AddCertificate(address indexed Provider, address indexed Holder, bytes32 Certificate);
+    event _TransferCertificate(address indexed oldHolder, address indexed newHolder, bytes32 Certificate);
+&nbsp;
+&nbsp;
+    // DATA /////////////////////////////////////////
+    // Contract configuration
+    uint256 constant _TotalEntities = 2;
+&nbsp;
+    // Owners
+    uint256 constant _ownerIdCertificates = 0;
+    string constant _ownerLabel = "Owner";
+&nbsp;
+    // Providers
+    uint256 constant _providerId = 1;
+    string constant _providerLabel = "Provider";
+&nbsp;
+    string[] internal _Label;
+&nbsp;
+    // Holders
+    struct _CertificateInfo{
+        address _provider;
+        uint _pos;
+    }
+&nbsp;
+    struct _CertificatePerHolder{
+        mapping(bytes32 =&gt; _CertificateInfo) _CertificateFromProvider;
+        bytes32[] _ListOfCertificates;
+    }
+    
+    mapping(address =&gt; _CertificatePerHolder) private _CertificatesPerHolder;
+&nbsp;
+    // MODIFIERS /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    modifier isAProvider(address provider){</span>
+<span class="cstat-no" title="statement not covered" >        require(true == isProvider(provider), "EC12-")</span>;
+        _;
+    }
+    
+<span class="fstat-no" title="function not covered" >    modifier CertificateDoesNotExist(address holder, bytes32 CertificateHash){</span>
+<span class="cstat-no" title="statement not covered" >        require(address(0) == _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider, "EC15-")</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier CertificateExist(address holder, bytes32 CertificateHash){</span>
+<span class="cstat-no" title="statement not covered" >        require(address(0) != _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider, "EC16-")</span>;
+        _;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    modifier AddressIsNot(address originalAddress, address newAddress){</span>
+<span class="cstat-no" title="statement not covered" >        require(originalAddress != newAddress, "EC17-")</span>;
+        _;
+    }
+    
+    // CONSTRUCTOR /////////////////////////////////////////
+<span class="fstat-no" title="function not covered" >    function MultiSigCertPool_init(address[] memory owners,  uint256 minOwners, string memory contractName, string memory contractVersion) public initializer </span>
+    {
+<span class="cstat-no" title="statement not covered" >        _Label = new string[](2)</span>;
+<span class="cstat-no" title="statement not covered" >        _Label[0] = _ownerLabel</span>;
+<span class="cstat-no" title="statement not covered" >        _Label[1] = _providerLabel</span>;
+<span class="cstat-no" title="statement not covered" >        setContractConfig(contractName, contractVersion)</span>;
+<span class="cstat-no" title="statement not covered" >        super.MultiSigContract_init(owners, minOwners, _TotalEntities, _Label, _ownerIdCertificates)</span>; 
+    }
+&nbsp;
+    // FUNCTIONALITY /////////////////////////////////////////
+    // Providers CRUD Operations
+<span class="fstat-no" title="function not covered" >    function addProvider(address provider, string calldata providerInfo) external override payable virtual</span>
+    {
+<span class="cstat-no" title="statement not covered" >        addEntity(provider, providerInfo, _providerId)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function removeProvider(address provider) external override</span>
+    {
+<span class="cstat-no" title="statement not covered" >       removeEntity(provider, _providerId)</span>; 
+    }   
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function validateProvider(address provider) external override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        validateEntity(provider, _providerId)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function rejectProvider(address provider) external override</span>
+    {
+<span class="cstat-no" title="statement not covered" >        rejectEntity(provider, _providerId)</span>;
+    }
+    
+<span class="fstat-no" title="function not covered" >    function retrieveProvider(address provider) external override view returns (ItemsLibrary._itemIdentity memory)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return (retrieveEntity(provider, _providerId));</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveAllProviders() external override view returns (bytes32[] memory)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return(retrieveAllEntities(_providerId));</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function isProvider(address provider) internal view returns (bool)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return(isEntity(provider, _providerId));</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrievePendingProviders(bool addedORremove) external override view returns (bytes32[] memory)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return(retrievePendingEntities(addedORremove, _providerId));</span>
+    }
+    
+    // Certificates CRUD Operations
+<span class="fstat-no" title="function not covered" >    function addCertificate(bytes32 CertificateHash, address holder) external override payable virtual</span>
+    {
+<span class="cstat-no" title="statement not covered" >        onBeforeAddCertificate()</span>;
+<span class="cstat-no" title="statement not covered" >        addCertificateInternal(msg.sender, CertificateHash, holder)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function addCertificateOnBehalfOf(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) external override payable virtual</span>
+    {
+<span class="cstat-no" title="statement not covered" >        onBeforeAddCertificate()</span>;
+<span class="cstat-no" title="statement not covered" >        checkSignature(provider, CertificateHash, holder, nonce, deadline, signature)</span>;
+<span class="cstat-no" title="statement not covered" >        addCertificateInternal(provider, CertificateHash, holder)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function onBeforeAddCertificate() internal virtual {}</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function checkSignature(address provider, bytes32 CertificateHash, address holder, uint256 nonce, uint256 deadline, bytes memory signature) internal</span>
+        isDeadlineOK(deadline)
+        isNonceOK(provider, nonce)
+    {
+<span class="cstat-no" title="statement not covered" >        require(true == SignatureLibrary.verifyAddCertificate(provider, CertificateHash, holder, nonce, deadline, signature, _ContractName, _ContractVersion), "EC32-")</span>;
+<span class="cstat-no" title="statement not covered" >        validateNonce(provider, nonce)</span>;
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function addCertificateInternal(address provider, bytes32 CertificateHash, address holder) internal</span>
+        isAProvider(provider) 
+        NotEmpty(CertificateHash)
+        CertificateDoesNotExist(holder, CertificateHash)
+    {
+<span class="cstat-no" title="statement not covered" >        addingCertificate(provider, CertificateHash, holder)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit _AddCertificate(provider, holder, CertificateHash);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function addingCertificate(address provider, bytes32 CertificateHash, address holder) private</span>
+    {
+<span class="cstat-no" title="statement not covered" >        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider = provider</span>;
+<span class="cstat-no" title="statement not covered" >        _CertificatesPerHolder[holder]._ListOfCertificates.push(CertificateHash)</span>;
+<span class="cstat-no" title="statement not covered" >        _CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._pos = _CertificatesPerHolder[holder]._ListOfCertificates.length - 1</span>;
+    }
+&nbsp;
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function transferCertificate(bytes32 CertificateHash, address newHolder) external override</span>
+        CertificateExist(msg.sender, CertificateHash)
+        AddressIsNot(msg.sender, newHolder)
+    {
+<span class="cstat-no" title="statement not covered" >        if(address(0) == _CertificatesPerHolder[newHolder]._CertificateFromProvider[CertificateHash]._provider) {</span>
+<span class="cstat-no" title="statement not covered" >            addingCertificate(_CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]._provider, CertificateHash, newHolder)</span>;
+        }
+<span class="cstat-no" title="statement not covered" >        if(_CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]._provider == _CertificatesPerHolder[newHolder]._CertificateFromProvider[CertificateHash]._provider){</span>
+<span class="cstat-no" title="statement not covered" >             uint pos = _CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]._pos;</span>
+&nbsp;
+            delete(_CertificatesPerHolder[msg.sender]._CertificateFromProvider[CertificateHash]);
+<span class="cstat-no" title="statement not covered" >            Library.ArrayRemoveResize(pos, _CertificatesPerHolder[msg.sender]._ListOfCertificates)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            if(_CertificatesPerHolder[msg.sender]._ListOfCertificates.length &gt; pos)<span class="cstat-no" title="statement not covered" >_CertificatesPerHolder[msg.sender]._CertificateFromProvider[_CertificatesPerHolder[msg.sender]._ListOfCertificates[pos]]._pos = pos</span>;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            emit _TransferCertificate(msg.sender, newHolder, CertificateHash);</span>
+        }
+        
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveCertificateProvider(bytes32 CertificateHash, address holder) external override</span>
+    view returns (address)
+    {
+<span class="cstat-no" title="statement not covered" >        return (_CertificatesPerHolder[holder]._CertificateFromProvider[CertificateHash]._provider);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveTotalCertificatesByHolder(address holder) public override </span>
+    view returns (uint256)
+    {
+<span class="cstat-no" title="statement not covered" >        return (_CertificatesPerHolder[holder]._ListOfCertificates.length);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveCertificatesByHolder(address holder, uint skipFirst, uint max) external override</span>
+    view returns (bytes32[] memory)
+    {
+<span class="cstat-no" title="statement not covered" >        if(retrieveTotalCertificatesByHolder(holder) &lt;= skipFirst){</span>
+<span class="cstat-no" title="statement not covered" >            return (new bytes32[](0));</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        uint maxSize = max;</span>
+<span class="cstat-no" title="statement not covered" >        if(retrieveTotalCertificatesByHolder(holder) - skipFirst &lt; max){</span>
+<span class="cstat-no" title="statement not covered" >            maxSize = retrieveTotalCertificatesByHolder(holder) - skipFirst</span>;
+        }
+<span class="cstat-no" title="statement not covered" >        bytes32[] memory ListOfCertificatesByHolder = new bytes32[](maxSize);</span>
+<span class="cstat-no" title="statement not covered" >        bytes32[] memory listOfCert = _CertificatesPerHolder[holder]._ListOfCertificates;</span>
+<span class="cstat-no" title="statement not covered" >        uint count = 0;</span>
+<span class="cstat-no" title="statement not covered" >        uint skipped = 0;</span>
+        
+<span class="cstat-no" title="statement not covered" >        for(uint i=0; i &lt; listOfCert.length; i++){</span>
+<span class="cstat-no" title="statement not covered" >            if(count &gt;= max) break;</span>
+<span class="cstat-no" title="statement not covered" >            if(skipFirst &gt; skipped){</span>
+<span class="cstat-no" title="statement not covered" >                    skipped += 1</span>;
+            }
+            else{
+<span class="cstat-no" title="statement not covered" >                ListOfCertificatesByHolder[count] = listOfCert[i]</span>;
+<span class="cstat-no" title="statement not covered" >                count += 1</span>;
+            }             
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return (ListOfCertificatesByHolder);</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveAddCertificatePriceWei() external override virtual view returns(uint256)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return 0;</span>
+    }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    function retrieveSubscriptionPriceWei() external override virtual view returns(uint256)</span>
+    {
+<span class="cstat-no" title="statement not covered" >        return 0;</span>
+    }
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 05 2022 13:13:49 GMT+0200 (heure d’été d’Europe centrale)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
